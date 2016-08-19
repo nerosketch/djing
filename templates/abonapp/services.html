@@ -1,0 +1,63 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% block content %}
+
+<legend>Купленные абонентом услуги (назначенные тарифные планы)</legend>
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th width="50">Приоритет</th>
+        <th>Тариф</th>
+        <th>Стоимость</th>
+        <th>Входящая скорость</th>
+        <th>Исходящая скорость</th>
+        <th>Время действия</th>
+        <th colspan="2">Ред.</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for trf in abon_tarifs %}
+    <tr{% if trf.id == active_abontariff_id %} class="active"{% endif %}>
+        <td>{{ trf.tariff_priority }}</td>
+        <td><a href="{% url 'tarifs_edit_link' trf.tariff.id %}" title="{{ trf.time_start|default:'' }}">{{ trf.tariff.title }}</a></td>
+        <td>{{ trf.tariff.amount }}</td>
+        <td>{{ trf.tariff.speedIn }}</td>
+        <td>{{ trf.tariff.speedOut }}</td>
+        <td>{{ trf.tariff.time_of_action }}</td>
+        {% if trf.id != active_abontariff_id %}
+            <td colspan="2" class="btn-group">
+                <a href="{% url 'abonapp_chpriority_tariff' gid abon_id %}?t={{ trf.id }}&a=up" class="btn btn-blue">
+                    <i class="icon-fing_up"></i>
+                </a>
+                <a href="{% url 'abonapp_chpriority_tariff' gid abon_id %}?t={{ trf.id }}&a=down" class="btn btn-blue">
+                    <i class="icon-fing_down"></i>
+                </a>
+                <a href="#" class="btn btn-blue" title="Отменить услугу">
+                    <i class="icon-trash"></i>
+                </a>
+            </td>
+        {% else %}
+            <td colspan="2">
+                <a href="{% url 'abonapp_compl_srv' gid abon_id trf.id %}" title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
+                    <i class="glyphicon glyphicon-remove"></i> Завершить
+                </a>
+            </td>
+        {% endif %}
+    </tr>
+    {% empty %}
+    <tr><td colspan="8">Нет подключённых абоненту услуг, <a href="{% url 'abonapp_buy_tariff' gid abon_id %}" class="lgtbx">купить</a></td></tr>
+    {% endfor %}
+    </tbody>
+
+    <tfoot>
+    <tr><th colspan="8">
+        <a href="{% url 'abonapp_buy_tariff' gid abon_id %}" class="btn btn-sm btn-success">
+            <span class="glyphicon glyphicon-plus"></span> Купить услугу
+        </a>
+    </th></tr>
+    </tfoot>
+
+</table>
+
+
+{% endblock %}

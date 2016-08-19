@@ -1,0 +1,23 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+
+{% block main %}
+
+    <div class="page-header">
+        <h2>Имя абонента <small>Балланс <b>&#8399;{{ ballance }}</b> руб</small></h2>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'abonhome_link' gid abon_id %}" role="tab" data-toggle="tab">Информация абонента</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_services_link' gid abon_id %}" role="tab" data-toggle="tab">Услуги</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_amount_link' gid abon_id %}" role="tab" data-toggle="tab">Пополнить счёт</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_debts_link' gid abon_id %}" role="tab" data-toggle="tab">Долги</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_phistory_link' gid abon_id %}" role="tab" data-toggle="tab">История платежей</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="livetab_content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}

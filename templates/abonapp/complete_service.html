@@ -1,0 +1,54 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% block main %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Завершить услугу</h3>
+    </div>
+    <div class="panel-body">
+        {% if warntext %}
+            <div class="alert-danger">{{ warntext }}</div>
+        {% endif %}
+        <form role="form" action="{% url 'abonapp_compl_srv' gid uid abtar.id %}" method="post">{% csrf_token %}
+            <input name="finish_confirm" value="yes" type="hidden">
+
+            <p>Досрочное завершение текущей услуги приведёт к тому что на счёт вернуться деньги за неиспользованные
+                ресурсы согласно тарифного плана, и подключится следующий по списку заказанный тарифный план, если он есть. Если больше услуг нет то доступ
+                в сеть будет закрыт.<br/>
+                Это значит, что если тариф стоит 300 и модуль расчёта по тарифу сказал что использовано ресурсов было на 200, то на счёт вернётся 100.
+                Или если модуль вернёт 300 то на счёт ничего не вернётся. <b>Вы так же можете создавать свою логику расчёта по тарифу</b>, читайте документацию</p>
+
+            <p>Подробнее:<br/>
+                Вы завершаете тариф <a href="{% url 'tarifs_edit_link' abtar.tariff.id %}" target="_blank">{{ abtar.tariff.title }}</a>.<br/>
+
+                {% if next_tariff %}
+                Следующим будет подключен
+                <a href="{% url 'tarifs_edit_link' next_tariff.tariff.id %}" target="_blank">{{ next_tariff.tariff.title }}</a>.<br/>
+                {% else %}
+                Больше заказанных тарифов нет, а значит доступ в интернет для абонента будет закрыт.
+                {% endif %}<br/>
+
+                Время начала: {{ abtar.time_start|date:'d F Y, H:i:s' }}<br/>
+                Сегодня: {% now "d F Y, H:i:s" %}<br/>
+                Время использования: {% if time_use.days %}{{ time_use.days }} дней.{% endif %}
+                    {{ time_use.hours }} часов и {{ time_use.minutes }} минут.<br/>
+                Полная стоимость услуги: {{ abtar.tariff.amount }}<br/>
+                Итоговая стоимость: {{ abtar.calc_amount_service }}
+            </p>
+
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                </button>
+                <button type="reset" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

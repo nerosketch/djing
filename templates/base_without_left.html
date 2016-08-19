@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>djing</title>
+        <meta charset="UTF-8">
+        <!--[if lt IE 9]><meta http-equiv="refresh" content="0;URL=/static/bad_ie.html" /><![endif]-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/static/js/jquery.js" type="text/javascript"></script>
+        <script src="/static/js/jquery.colorbox.js" type="text/javascript"></script>
+        <script src="/static/js/my.js" type="text/javascript"></script>
+        <link href="/static/css/colorbox.css" rel="stylesheet" type="text/css"/>
+        <link href="/static/css/style.css" rel="stylesheet" type="text/css"/>
+        <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+    </head>
+    <body>
+        <header>
+            <div id="brand"></div>
+            <div id="hinfo">
+                <section>
+                    <div><i class="black icon-user"></i> абонентов online <b>137/200</b></div>
+                    <div><i class="black icon-dev"></i> свободно места на HDD <b>12 %</b></div>
+                </section>
+                <section>
+                    <div><i class="black icon-cross"></i> ваш ip <b>{{ client_ipaddress }}</b></div>
+                    <div><i class="black icon-trash"></i> траффик за сегодня <b>45 Tb</b></div>
+                </section>
+                <form action="{% url 'search_home_link' %}" method="get" id="searchform">
+                    <input type="text" name="s" placeholder="Введите текст сюда">
+                    <input type="submit" class="btn btn-blue" value="Найти">
+                </form>
+            </div>
+        </header>
+        <nav id="topnav">
+            <ul><li>
+                <a href="dfdfsdf">управление</a>
+            </li>
+            <li>
+                <a href="dfdfsdf">Движение средств</a>
+            </li>
+            <li>
+                <a href="{% url 'stat_home' %}">График траффика</a>
+            </li>
+            <li>
+                <a target="_blank" href="{% url 'maps_home_link' %}">Карта</a>
+            </li>
+            <li>
+                <a href="{% url 'settings_chinfo_link' %}">Настройки</a>
+            </li>
+            <li>
+                <a href="{% url 'logout_link' %}">Выйти</a>
+            </li></ul>
+        </nav>
+
+        <div id="fullpage">
+            <main role="main" id="maincontent">
+                <!--<div class="linkmap">
+                    <a href="#Dad">лог событий</a>&#9658;<a href="#wegweg878432">выбранное событие</a>&#9658;оповестить
+                </div>-->
+
+                {% block main %}{% endblock %}
+
+            </main>
+
+            <aside></aside><!-- боковая панель -->
+
+        </div>
+        <footer>
+            &copy; <a href="https://vk.com/nerosketch" target="_blank" title="on vk.com">Dmitry Novikov</a> 2016
+        </footer>
+        <div id="errbox"></div>
+        <div id="preloader"></div>
+    </body>
+</html>

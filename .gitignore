@@ -1,0 +1,6 @@
+*.pyc
+*.db
+media/*
+media/min/*
+~*/migrations/000*.py
+.idea/

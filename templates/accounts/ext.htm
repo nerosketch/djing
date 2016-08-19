@@ -1,0 +1,42 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="thumbnail">
+                {% if user.avatar %}
+                    <img alt="ava" src="{{ user.avatar.min }}"/>
+                {% else %}
+                    <img alt="ava" src="/static/img/user_ava.gif"/>
+                {% endif %}
+                <div class="caption">
+                  <a href="{% url 'settings_chinfo_link' %}" class="btn btn-primary" role="button">Редактировать</a>
+                  <a href="#" class="btn btn-default" role="button" data-toggle="modal" data-target="#modFrm">###</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-9">
+            <h3>{{ user.username|default:"&lt;Нет ника&gt;" }}</h3>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#livetab_content" data-tab-remote="{% url 'other_profile' uid %}" role="tab" data-toggle="tab">
+                        Администратор
+                    </a>
+                </li>
+                <li>
+                    <a href="#livetab_content" data-tab-remote="{% url 'profile_chgroup_link' uid %}" role="tab" data-toggle="tab">
+                        Группы
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="livetab_content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

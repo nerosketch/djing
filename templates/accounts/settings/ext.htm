@@ -1,0 +1,43 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+
+{% block main %}
+
+<div class="row">
+    <div class="col-sm-3">
+        <form action="{% url 'settings_chava_link' %}" method="post" class="thumbnail" enctype="multipart/form-data">{% csrf_token %}
+
+            {% if user.avatar %}<img alt="ava" src="{{ user.avatar.min }}"/>
+            {% else %}<img alt="ava" src="/static/img/user_ava.gif"/>
+            {% endif %}
+
+            <div class="caption">
+              <button type="submit" class="btn btn-primary">Сохранить</button>
+              <input type="file" name="avatar" class="live_review" accept="image/png, image/jpeg, image/gif">
+            </div>
+        </form>
+    </div>
+
+    <div class="col-sm-9">
+        <h3>{{ user.username|default:"&lt;Нет ника&gt;" }}</h3>
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#livetab_content" data-tab-remote="{% url 'settings_chinfo_link' %}" role="tab" data-toggle="tab">
+                    Изменить инфу о себе
+                </a>
+            </li>
+            <li>
+                <a href="#livetab_content" data-tab-remote="">
+                    &lt;Другое&gt;
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="livetab_content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

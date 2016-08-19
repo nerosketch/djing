@@ -1,0 +1,7 @@
+<tr{% if not msg.is_viewed %} class="green"{% endif %}>
+    <td><input type="checkbox" id="c{{ msg.id }}"><label for="c{{ msg.id }}" class="checkbox"></label></td>
+    <td>{{ msg.text }}</td>
+    <td><a href="{% url 'other_profile' msg.sender.id %}">{{ msg.sender.get_full_name }}</a></td>
+    <td>{{ msg.date_send }}</td>
+    <td><a href="{% url 'privmsg_delitem' msg.id %}" class="btn btn-blue jsdel"><i class="icon-trash"></i></a></td>
+</tr>

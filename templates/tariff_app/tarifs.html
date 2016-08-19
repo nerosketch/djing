@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block main %}
+
+    <h3>История абонента</h3>
+    <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Тариф</th>
+                <th>Входящая скорость</th>
+                <th>Исходящая скорость</th>
+                <th>Стоимость</th>
+                <th>Время действия</th>
+                <th width="250">Название скрипта</th>
+                <th width="50">Do</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tar in tariflist %}
+            <tr>
+                <td><a href="{% url 'tarifs_edit_link' tar.id %}"><b>{{ tar.title }}</b></a></td>
+                <td>{{ tar.speedIn }}</td>
+                <td>{{ tar.speedOut }}</td>
+                <td>{{ tar.amount }} руб</td>
+                <td>{{ tar.time_of_action }} дней</td>
+                <td>{{ tar.calc_type }}</td>
+                <td><a href="{% url 'tarifs_del_link' tar.id %}" class="btn btn-sm btn-danger">
+                    <span class="glyphicon glyphicon-remove-circle"></span>
+                </a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">Ещё нет созданных тарифов, <a href="{% url 'tarifs_add_link' %}" class="lgtbx">создать</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+        <tfoot>
+        <tr>
+            <td colspan="7">
+                <a href="{% url 'tarifs_add_link' %}" class="btn btn-sm btn-success">
+                    <span class="glyphicon glyphicon-plus"></span> Добавить
+                </a>
+            </td>
+        </tr>
+        </tfoot>
+
+    </table>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=tariflist %}
+
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Аутентификация</title>
+    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+    <style>
+h3,h4,label{
+    color: #383838;
+}
+body{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+}
+form{
+    background-color: #ECECEC;
+    padding: 30px 71px;
+    border-radius: 4px;
+    position: fixed;
+    left: 50%;
+    width: 322px;
+    margin-top: 100px;
+    margin-left: -275px;
+    box-shadow: 4px 4px 8px #484848;
+    border-top: 1px solid #FFF;
+    border-left: 1px solid #FFF;
+}
+form * {
+    display: block;
+}
+form input{
+    width: 100%;
+    border-radius: 5px;
+    padding: 4px 8px;
+}
+.err{
+    background-color: #FFBDBD;
+    padding: 1px 25px;
+    color: #520000;
+    border-radius: 3px;
+}
+    </style>
+</head>
+<body>
+    <form id="frm" action="{% url 'login_link' %}?next={{ next }}" method="POST" accept-charset="utf-8">{% csrf_token %}
+        {% if errmsg %}<div class="err">
+            <h4>{{ errmsg }}</h4>
+        </div>{% endif %}
+        <h3>Аутентификация</h3>
+        <label for="inp_uname">Имя пользователя</label>
+        <input type="text" id="inp_uname" placeholder="username" name="login" autofocus>
+        <br>
+        <label for="inp_pass">Пароль</label>
+        <input type="password" id="inp_pass" name="password">
+        <br>
+        <input type="submit" value="Войти">
+    </form>
+<script>
+function resz(){
+    var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+    document.body.style.height = y-16+'px';
+}
+window.onload = resz;
+document.body.onresize = resz;
+</script>
+</body>
+</html>

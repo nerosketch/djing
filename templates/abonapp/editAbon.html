@@ -1,0 +1,88 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% block content %}
+
+
+    {% if warntext %}
+    <div class="alert alert-warning alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{ warntext }}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-sm-4">
+            <form role="form" action="{% url 'abonhome_link' gid abon_id %}" method="post"> {% csrf_token %}
+
+                <div class="form-group-sm">
+                    <label for="grp">Группа</label>
+                    {{ form.group }}{{ form.group.errors }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="isactive">Активен</label>
+                    {{ form.is_active }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="login">Логин абонента</label>
+                    {{ form.username }}{{ form.username.errors }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="fio">ФИО</label>
+                    {{ form.fio }}{{ form.fio.errors }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="ip">IP Адрес</label>
+                    {{ form.ip_address }}{{ form.ip_address.errors }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="contract">Договор</label>
+                    <input type="text" class="form-control" id="contract" placeholder="Contract"/>
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="telephone">Телефон</label>
+                    {{ form.telephone }}{{ form.telephone.errors }}
+                </div>
+
+                <div class="form-group-sm">
+                    <label for="address">Адрес проживания</label>
+                    {{ form.address }}{{ form.address.errors }}
+                </div>
+
+                <br>
+                <button type="submit" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-save"></span> Сохранить</button>
+            </form>
+
+        </div>
+        <div class="col-sm-4">
+            <form role="form" action="" method="get">
+
+                <div class="form-group-sm">
+                    <label for="pasp_num">Серия паспорта</label>
+                    <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
+                </div>
+                <div class="form-group-sm">
+                    <label for="pasp_sr">Номер паспорта</label>
+                    <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
+                </div>
+                <div class="form-group-sm">
+                    <label for="wr">Кем выдан</label>
+                    <input type="text" name="wr" class="form-control" id="wr"/>
+                </div>
+
+                <br>
+                <button type="submit" class="btn btn-default btn-sm">
+                    <span class="glyphicon glyphicon-save"></span> Сохранить</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+
+        </div>
+    </div>
+
+{% endblock %}

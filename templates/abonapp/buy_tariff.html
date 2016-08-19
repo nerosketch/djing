@@ -1,0 +1,31 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+
+{% block main %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Купить новую услугу (заказать тариф) для <a href="{% url 'abonhome_link' gid uid %}" title="На страницу абонента">абонента</a></h3>
+    </div>
+    <div class="panel-body">
+        {% if warntext %}
+            <div class="alert-danger">{{ warntext }}</div>
+        {% endif %}
+        <form role="form" action="{% url 'abonapp_buy_tariff' gid uid %}" method="post">{% csrf_token %}
+            <div class="form-group">
+                <label for="tariff">Выбирите тарифф</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
+                    {{ form.tariff }}{{ form.tariff.errors }}
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                </button>
+                <button type="reset" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

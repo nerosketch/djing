@@ -1,0 +1,20 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+
+{% block main %}
+
+    <div class="page-header">
+        <h2>{{ dev.comment|default:'Без названия' }}</h2>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'devs_view_link' dev.id %}" role="tab" data-toggle="tab">Порты {{ dev.ip_address }}</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'devs_edit_link' dev.id %}" role="tab" data-toggle="tab">Редактировать</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="livetab_content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
