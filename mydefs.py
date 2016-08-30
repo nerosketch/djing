@@ -109,3 +109,22 @@ class MyChoicesAdapter(Iterator):
             res = e[ci][0], e[ci][1].description()
             self.current_index += 1
             return res
+
+
+# Для сортировки таблиц
+# через get должно быть передано order_by=<поле в бд> а в dir=<up|down> направление сортировки
+# возвращает новое направление сортировки и поле для сортировки с направлением
+def order_helper(request):
+    dir = request.GET.get('dir')
+    dfx = ''
+    if dir == 'down':
+        dir = 'up'
+        dfx = '-'
+    else:
+        dir = 'down'
+
+    orby = request.GET.get('order_by')
+    if orby:
+        return dir, dfx + orby
+    else:
+        return dir, orby
