@@ -9,10 +9,10 @@ from django.core.urlresolvers import reverse_lazy
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$xvppe_5&iu4fgnj2h@eie6+w*n&m=60e7k_6ha5r4rgnfndz1'
+SECRET_KEY = '$xvppe_5&iu4fgnt2h@eie6+w*n&m=60e7k_6hb5r4rgnfndz1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -79,7 +79,7 @@ DATABASES = {
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jungagent',
+        'NAME': 'djingdb',
         'USER': 'root',
         'PASSWORD': 'ps',
         'HOST': 'localhost'

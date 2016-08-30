@@ -21,7 +21,9 @@ body {
  * Navbar
  */
 .navbar-inverse {
-    background-image: none;
+    background-image: url(/static/img/bcgr.png);
+    background-repeat: no-repeat;
+    background-position-x: 16px;
 }
 
 
