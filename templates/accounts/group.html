@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block main %}
 
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+  <li><a href="{% url 'profile_groups_list' %}">Группы</a></li>
+  <li class="active">{{ group.name }}</li>
+</ol>
+
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Действующее распределение прав для группы <b>{{ group.name }}</b></h3>

@@ -1,6 +1,11 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+  <li class="active">Добавить</li>
+</ol>
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -47,7 +52,7 @@
                         <label for="tel">Телефон</label>
                         <div class="input-group">
                             <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
-                            <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone" placeholder="+[7,8,9,3] и 10,11 цифр" value="{{ newuser.telephone }}" class="form-control">
+                            <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone" placeholder="+[7,8,9,3] и 10,11 цифр" value="{{ newuser.telephone }}" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-group">

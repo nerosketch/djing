@@ -1,6 +1,12 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-
 {% block main %}
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+  <li><a href="{% url 'profile'  %}">{{ user.username }}</a></li>
+  <li class="active">Настройки</li>
+</ol>
 
 <div class="row">
     <div class="col-sm-3">

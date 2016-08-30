@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block main %}
 
+
+    <ol class="breadcrumb">
+      <li><span class="glyphicon glyphicon-home"></span></li>
+      <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+      <li class="active">Группы</li>
+    </ol>
+
+
+
     <h3>Список групп администраторов</h3>
 
 

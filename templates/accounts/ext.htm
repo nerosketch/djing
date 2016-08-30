@@ -1,12 +1,18 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-
 {% block main %}
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+  <li class="active">{{ userprofile.username }}</li>
+</ol>
+
 
     <div class="row">
         <div class="col-sm-3">
             <div class="thumbnail">
-                {% if user.avatar %}
-                    <img alt="ava" src="{{ user.avatar.min }}"/>
+                {% if userprofile.avatar %}
+                    <img alt="ava" src="{{ userprofile.avatar.min }}"/>
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
@@ -18,7 +24,7 @@
         </div>
 
         <div class="col-sm-9">
-            <h3>{{ user.username|default:"&lt;Нет ника&gt;" }}</h3>
+            <h3>{{ userprofile.username|default:"&lt;Нет ника&gt;" }}</h3>
             <ul class="nav nav-tabs">
                 <li class="active">
                     <a href="#livetab_content" data-tab-remote="{% url 'other_profile' uid %}" role="tab" data-toggle="tab">
