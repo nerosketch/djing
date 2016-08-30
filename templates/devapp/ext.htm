@@ -1,6 +1,12 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-
 {% block main %}
+
+    <ol class="breadcrumb">
+      <li><span class="glyphicon glyphicon-home"></span></li>
+      <li><a href="{% url 'devs_link' %}">Устройства</a></li>
+      <li class="active">{{ dev.ip_address }}</li>
+    </ol>
+
 
     <div class="page-header">
         <h2>{{ dev.comment|default:'Без названия' }}</h2>
