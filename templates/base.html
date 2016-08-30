@@ -89,8 +89,9 @@
 
                         </div>
                         <div class="col-sm-7">
+                            <b>{{ user.username }}</b><br>
                             <span>{{ user.fio }}</span>
-                            <a href="tel:{{ user.username }}">{{ user.username }}</a>
+                            <a href="tel:{{ user.telephone }}">{{ user.telephone }}</a>
                         </div>
                     </div>
 
@@ -115,18 +116,7 @@
                        <li>
                     {% endif %}
                           <a href="{{ abongroup_list_link }}">
-                          <span class="glyphicon glyphicon-user"></span> группы абонентов
-                      </a></li>
-
-
-                    {% url 'abonapp_log_link' as abonapp_log_link %}
-                    {% if abonapp_log_link in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ abonapp_log_link }}">
-                          <span class="glyphicon glyphicon-record"></span> действия абонентов
+                          <span class="glyphicon glyphicon-user"></span> абоненты
                       </a></li>
 
 
@@ -176,12 +166,6 @@
 
                 <!-- Main content -->
                 <div class="col-sm-10 col-sm-offset-2 main">
-                    <ol class="breadcrumb">
-                      <li><span class="glyphicon glyphicon-home"></span></li>
-                      <li><a href="#">Пользователи</a></li>
-                      <li><a href="#">Подгуппа</a></li>
-                      <li class="active">Имя человаека</li>
-                    </ol>
 
                     {% block main %}{% endblock %}
 
