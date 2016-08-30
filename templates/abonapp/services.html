@@ -26,10 +26,10 @@
         <td>{{ trf.tariff.time_of_action }}</td>
         {% if trf.id != active_abontariff_id %}
             <td colspan="2" class="btn-group">
-                <a href="{% url 'abonapp_chpriority_tariff' gid abon_id %}?t={{ trf.id }}&a=up" class="btn btn-blue">
+                <a href="{% url 'abonapp_chpriority_tariff' abon_group.id abon.id %}?t={{ trf.id }}&a=up" class="btn btn-blue">
                     <i class="icon-fing_up"></i>
                 </a>
-                <a href="{% url 'abonapp_chpriority_tariff' gid abon_id %}?t={{ trf.id }}&a=down" class="btn btn-blue">
+                <a href="{% url 'abonapp_chpriority_tariff' abon_group.id abon.id %}?t={{ trf.id }}&a=down" class="btn btn-blue">
                     <i class="icon-fing_down"></i>
                 </a>
                 <a href="#" class="btn btn-blue" title="Отменить услугу">
@@ -38,20 +38,20 @@
             </td>
         {% else %}
             <td colspan="2">
-                <a href="{% url 'abonapp_compl_srv' gid abon_id trf.id %}" title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
+                <a href="{% url 'abonapp_compl_srv' abon_group.id abon.id trf.id %}" title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
                     <i class="glyphicon glyphicon-remove"></i> Завершить
                 </a>
             </td>
         {% endif %}
     </tr>
     {% empty %}
-    <tr><td colspan="8">Нет подключённых абоненту услуг, <a href="{% url 'abonapp_buy_tariff' gid abon_id %}" class="lgtbx">купить</a></td></tr>
+    <tr><td colspan="8">Нет подключённых абоненту услуг, <a href="{% url 'abonapp_buy_tariff' abon_group.id abon.id %}" class="lgtbx">купить</a></td></tr>
     {% endfor %}
     </tbody>
 
     <tfoot>
     <tr><th colspan="8">
-        <a href="{% url 'abonapp_buy_tariff' gid abon_id %}" class="btn btn-sm btn-success">
+        <a href="{% url 'abonapp_buy_tariff' abon_group.id abon.id %}" class="btn btn-sm btn-success">
             <span class="glyphicon glyphicon-plus"></span> Купить услугу
         </a>
     </th></tr>

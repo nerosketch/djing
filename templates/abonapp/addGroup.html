@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% block main %}
 
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+  <li class="active">Добавить группу</li>
+</ol>
+
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Добавьте группу абонентов</h3>

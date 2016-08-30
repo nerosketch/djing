@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block main %}
 
+    <ol class="breadcrumb">
+      <li><span class="glyphicon glyphicon-home"></span></li>
+      <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+      <li class="active">История действий абонентов</li>
+    </ol>
+
 
     <h3>История абонента</h3>
     <div class="table-responsive">

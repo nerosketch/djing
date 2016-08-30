@@ -1,6 +1,17 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+  <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+  <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+  <li class="active">Завершить услугу</li>
+</ol>
+
+
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Завершить услугу</h3>
@@ -9,7 +20,7 @@
         {% if warntext %}
             <div class="alert-danger">{{ warntext }}</div>
         {% endif %}
-        <form role="form" action="{% url 'abonapp_compl_srv' gid uid abtar.id %}" method="post">{% csrf_token %}
+        <form role="form" action="{% url 'abonapp_compl_srv' abon_group.id abon.id abtar.id %}" method="post">{% csrf_token %}
             <input name="finish_confirm" value="yes" type="hidden">
 
             <p>Досрочное завершение текущей услуги приведёт к тому что на счёт вернуться деньги за неиспользованные

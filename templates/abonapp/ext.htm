@@ -1,17 +1,24 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-
 {% block main %}
 
+    <ol class="breadcrumb">
+      <li><span class="glyphicon glyphicon-home"></span></li>
+      <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+      <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+      <li class="active">{{ abon.fio }}</li>
+    </ol>
+
+
     <div class="page-header">
-        <h2>Имя абонента <small>Балланс <b>&#8399;{{ ballance }}</b> руб</small></h2>
+        <h2>{{ abon.fio|default:"Имя абонента" }} <small>Балланс <b>&#8399;{{ ballance }}</b> руб</small></h2>
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'abonhome_link' gid abon_id %}" role="tab" data-toggle="tab">Информация абонента</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_services_link' gid abon_id %}" role="tab" data-toggle="tab">Услуги</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_amount_link' gid abon_id %}" role="tab" data-toggle="tab">Пополнить счёт</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_debts_link' gid abon_id %}" role="tab" data-toggle="tab">Долги</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_phistory_link' gid abon_id %}" role="tab" data-toggle="tab">История платежей</a></li>
+        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'abonhome_link' abon_group.id abon.id %}" role="tab" data-toggle="tab">Информация абонента</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_services_link' abon_group.id abon.id %}" role="tab" data-toggle="tab">Услуги</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_amount_link' abon_group.id abon.id %}" role="tab" data-toggle="tab">Пополнить счёт</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_debts_link' abon_group.id abon.id %}" role="tab" data-toggle="tab">Долги</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'abon_phistory_link' abon_group.id abon.id %}" role="tab" data-toggle="tab">История платежей</a></li>
     </ul>
 
     <div class="tab-content">

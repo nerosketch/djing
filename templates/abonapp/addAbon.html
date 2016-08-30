@@ -1,6 +1,14 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+  <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+  <li class="active">Добавить абонента</li>
+</ol>
+
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Добавьте аккаунт абонента</h3>
@@ -9,7 +17,7 @@
         {% if warntext %}
             <div class="alert-danger">{{ warntext }}</div>
         {% endif %}
-        <form role="form" action="{% url 'addabon_link' gid %}" method="post">{% csrf_token %}
+        <form role="form" action="{% url 'addabon_link' abon_group.id %}" method="post">{% csrf_token %}
             <div class="form-group">
                 <label for="login">Логин абонента</label>
                 <div class="input-group">

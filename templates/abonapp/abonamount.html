@@ -13,7 +13,7 @@
 
     <div class="row">
         <div class="col-sm-4">
-            <form role="form" action="{% url 'abon_amount_link' gid abon_id %}" method="post"> {% csrf_token %}
+            <form role="form" action="{% url 'abon_amount_link' abon_group.id abon.id %}" method="post"> {% csrf_token %}
 
                 <div class="form-group-sm">
                     <label for="amount">Количество денег</label>
@@ -22,7 +22,7 @@
                         <input id="amount" type="text" name="amount" placeholder="0.0" class="form-control" required pattern="\d+">
                     </div>
                 </div>
-                <input type="hidden" name="abonid" value="{{ abon_id }}"><br>
+                <input type="hidden" name="abonid" value="{{ abon.id }}"><br>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> Пополнить

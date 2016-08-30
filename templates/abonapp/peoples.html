@@ -1,16 +1,44 @@
 {% extends 'base.html' %}
 {% block main %}
 
+
+    <ol class="breadcrumb">
+      <li><span class="glyphicon glyphicon-home"></span></li>
+      <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+      <li class="active">{{ abon_group.title }}</li>
+    </ol>
+
+
     <h3>Народ в выбранной группе</h3>
     <div class="table-responsive">
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
             <th width="15">#</th>
-            <th>Абонент</th>
-            <th>IP Адрес</th>
-            <th>ФИО</th>
-            <th width="50">Балланс</th>
+            <th>
+                <a href="{% url 'people_list_link' abon_group.id %}?order_by=username&dir={{ dir|default:"down" }}">
+                    Абонент
+                </a>
+                {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+            </th>
+            <th>
+                <a href="{% url 'people_list_link' abon_group.id %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                    IP Адрес
+                </a>
+                {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+            </th>
+            <th>
+                <a href="{% url 'people_list_link' abon_group.id %}?order_by=fio&dir={{ dir|default:"down" }}">
+                    ФИО
+                </a>
+                {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+            </th>
+            <th width="50">
+                <a href="{% url 'people_list_link' abon_group.id %}?order_by=ballance&dir={{ dir|default:"down" }}">
+                    Балланс
+                </a>
+                {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+            </th>
             <th width="150">Телефон</th>
             <th width="150">Тариф</th>
             <th width="100">Do</th>
@@ -38,7 +66,7 @@
         {% empty %}
             <tr>
                 <td colspan="8">
-                    Ещё нет абонентов, <a href="{% url 'addabon_link' gid %}">добавить</a>
+                    Ещё нет абонентов, <a href="{% url 'addabon_link' abon_group.id %}">добавить</a>
                 </td>
             </tr>
         {% endfor %}
@@ -46,7 +74,7 @@
         <tfoot>
         <tr>
             <td colspan="8">
-                <a href="{% url 'addabon_link' gid %}" class="btn btn-sm btn-default" title="Добавить">
+                <a href="{% url 'addabon_link' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
                     <span class="glyphicon glyphicon-plus"></span> Добавить абонента
                 </a>
             </td>
