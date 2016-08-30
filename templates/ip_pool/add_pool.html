@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block main %}
 
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'pool_home_link' %}">IP Пул</a></li>
+  <li class="active">Добавить</li>
+</ol>
+
+
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Добавить IP пул</h3>
