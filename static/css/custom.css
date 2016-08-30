@@ -143,3 +143,12 @@ td.btn-group{
     background-color: #FBEB79;
 }
 /*-------END-Switch--------*/
+
+
+/* Table filter */
+.table th>a {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+/* end */

@@ -52,7 +52,6 @@ $(document).ready(function(){
   // Validate inputs of form
   $('input.form-control[pattern]').keyup(function(){
       var pr = $(this).closest('.form-group-sm,.form-group');
-      console.debug(pr);
       pr.removeClass('has-success');
       pr.removeClass('has-error');
       pr.find('.form-control-feedback').remove();
