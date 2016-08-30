@@ -2,6 +2,19 @@
 {% block main %}
 
 
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'tarifs_link' %}">Тарифы</a></li>
+  <li class="active">
+      {% if tarif_id == 0 %}
+          Добавить
+      {% else %}
+          Редактировать
+      {% endif %}
+  </li>
+</ol>
+
+
     <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">{% if tarif_id == 0 %}Создать{% else %}Редактировать{% endif %} тариф</h3>
