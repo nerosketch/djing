@@ -2,7 +2,7 @@
 from json import dumps
 from django.db import IntegrityError
 from django.db.models import Count
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from accounts_app.models import UserProfile
@@ -18,13 +18,22 @@ import mydefs
 
 @login_required
 def peoples(request, gid):
+
     peopleslist = models.Abon.objects.filter(group=gid)
+
+    # фильтр
+    dir, field = mydefs.order_helper(request)
+    if field:
+        peopleslist = peopleslist.order_by(field)
+
 
     peopleslist = mydefs.pag_mn(request, peopleslist)
 
     return render(request, 'abonapp/peoples.html', {
         'peoples': peopleslist,
-        'gid': gid
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'dir': dir,
+        'order_by': request.GET.get('order_by')
     })
 
 
@@ -51,10 +60,17 @@ def addgroup(request):
 def grouplist(request):
     groups = models.AbonGroup.objects.annotate(usercount=Count('abon'))
 
+    # фильтр
+    dir, field = mydefs.order_helper(request)
+    if field:
+        groups = groups.order_by(field)
+
     groups = mydefs.pag_mn(request, groups)
 
     return render(request, 'abonapp/group_list.html', {
-        'groups': groups
+        'groups': groups,
+        'dir': dir,
+        'order_by': request.GET.get('order_by')
     })
 
 
@@ -80,7 +96,7 @@ def addabon(request, gid):
                 prf.group = grp
                 prf.save_form(frm)
                 prf.save()
-                return redirect('pays_people_list_link', gid)
+                return redirect('people_list_link', grp.id)
             else:
                 warntext = u'Некоторые поля заполнены не правильно, проверте ещё раз'
 
@@ -100,7 +116,7 @@ def addabon(request, gid):
         'warntext': warntext,
         'csrf_token': csrf(request)['csrf_token'],
         'form': frm,
-        'gid': gid
+        'abon_group': grp
     })
 
 
@@ -113,74 +129,75 @@ def delentity(request):
 
     if typ == 'a':
         abon = get_object_or_404(models.Abon, id=uid)
+        gid = abon.group.id
         abon.delete()
-        return mydefs.res_success(request, 'pays_people_list_link')
+        return mydefs.res_success(request, resolve_url('people_list_link', gid))
     elif typ == 'g':
         get_object_or_404(models.AbonGroup, id=uid).delete()
-    return mydefs.res_success(request, 'pays_people_list_link')
+    return mydefs.res_success(request, 'abongroup_list_link')
 
 
 @login_required
 def abonamount(request, gid, uid):
     warntext=''
+    abon = get_object_or_404(models.Abon, id=uid)
     if request.method == 'POST':
         abonid = mydefs.safe_int(request.POST.get('abonid'))
         if abonid == int(uid):
             amnt = mydefs.safe_float(request.POST.get('amount'))
-            abon = get_object_or_404(models.Abon, id=abonid)
             abon.add_ballance(request.user, amnt)
             abon.save()
             return redirect('abonhome_link', gid=gid, uid=uid)
         else:
             warntext = u'Не правильно выбран абонент как цель для пополнения'
     return render(request, 'abonapp/abonamount.html', {
-        'abon_id': int(uid),
-        'gid': gid,
+        'abon': abon,
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
         'warntext': warntext
     })
 
 
 @login_required
 def invoice_for_payment(request, gid, uid):
-    #abon = get_object_or_404(models.Abon, id=uid)
-    invoices = models.InvoiceForPayment.objects.filter(abon_id=uid)
+    abon = get_object_or_404(models.Abon, id=uid)
+    invoices = models.InvoiceForPayment.objects.filter(abon=abon)
     invoices = mydefs.pag_mn(request, invoices)
     return render(request, 'abonapp/invoiceForPayment.html', {
         'invoices': invoices,
-        'gid': gid,
-        'abon_id': uid
+        'abon_group': abon.group,
+        'abon': abon
     })
 
 
 @login_required
 def pay_history(request, gid, uid):
-    #abon = get_object_or_404(models.Abon, id=uid)
-    pay_history = models.AbonLog.objects.filter(abon_id=uid).order_by('-id')
+    abon = get_object_or_404(models.Abon, id=uid)
+    pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
     pay_history = mydefs.pag_mn(request, pay_history)
-
     return render(request, 'abonapp/payHistory.html', {
         'pay_history': pay_history,
-        'gid': gid,
-        'abon_id': uid
+        'abon_group': abon.group,
+        'abon': abon
     })
 
 
 @login_required
 def abon_services(request, gid, uid):
-    #abon = get_object_or_404(models.Abon, id=uid)
-    abon_tarifs = models.AbonTariff.objects.filter(abon_id=uid).order_by('tariff_priority')
+    abon = get_object_or_404(models.Abon, id=uid)
+    abon_tarifs = models.AbonTariff.objects.filter(abon=abon).order_by('tariff_priority')
 
     return render(request, 'abonapp/services.html', {
-        'abon_id': uid,
+        'abon': abon,
         'abon_tarifs': abon_tarifs,
         'active_abontariff_id': abon_tarifs[0].id if abon_tarifs.count() > 0 else None,
-        'gid': gid
+        'abon_group': abon.group
     })
 
 
 @login_required
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
+    abon_group = get_object_or_404(models.AbonGroup, id=gid)
     warntext = ''
     ballance = abon.ballance
     frm = None
@@ -246,9 +263,9 @@ def abonhome(request, gid, uid):
     return render(request, 'abonapp/editAbon.html', {
         'warntext': warntext,
         'form': frm or forms.AbonForm(initial=init_frm_dat),
-        'abon_id': uid,
+        'abon': abon,
         'ballance': ballance,
-        'gid': gid
+        'abon_group': abon_group
     })
 
 
@@ -270,6 +287,7 @@ def terminal_pay(request):
 def add_invoice(request, gid, uid):
     uid = mydefs.safe_int(uid)
     abon = get_object_or_404(models.Abon, id=uid)
+    grp = get_object_or_404(models.AbonGroup, id=gid)
 
     if request.method == 'POST':
         curr_amount = mydefs.safe_int(request.POST.get('curr_amount'))
@@ -291,7 +309,7 @@ def add_invoice(request, gid, uid):
             'csrf_token': csrf(request)['csrf_token'],
             'abon': abon,
             'invcount': models.InvoiceForPayment.objects.filter(abon=abon).count(),
-            'gid': gid
+            'abon_group': grp
         })
 
 
@@ -299,15 +317,16 @@ def add_invoice(request, gid, uid):
 def buy_tariff(request, gid, uid):
     warntext = ''
     frm = None
+    grp = get_object_or_404(models.AbonGroup, id=gid)
+    abon = get_object_or_404(models.Abon, id=uid)
     try:
         if request.method == 'POST':
             frm = forms.BuyTariff(request.POST)
             if frm.is_valid():
                 cd = frm.cleaned_data
-                abon = get_object_or_404(models.Abon, id=uid)
                 abon.buy_tariff(cd['tariff'], request.user)
                 abon.save()
-                return redirect('abonhome_link', uid=uid)
+                return redirect('abonhome_link', uid=abon.id)
             else:
                 warntext = u'Что-то не так при покупке услуги, проверьте и попробуйте ещё'
         else:
@@ -321,8 +340,8 @@ def buy_tariff(request, gid, uid):
     return render(request, 'abonapp/buy_tariff.html', {
         'warntext': warntext,
         'form': frm or forms.BuyTariff(),
-        'uid': uid,
-        'gid': gid
+        'abon': abon,
+        'abon_group': grp
     })
 
 
@@ -384,10 +403,10 @@ def complete_service(request, gid, uid, srvid):
         return render(request, 'abonapp/complete_service.html', {
             'csrf_token': csrf(request)['csrf_token'],
             'abtar': abtar,
-            'uid': uid,
+            'abon': get_object_or_404(models.Abon, id=uid),
             'next_tariff': next_tariff[0] if next_tariff.count() > 0 else None,
             'time_use': time_use,
-            'gid': gid
+            'abon_group': get_object_or_404(models.AbonGroup, id=gid)
         })
 
     except models.LogicError as e:

@@ -2,7 +2,7 @@ from django.conf.urls import url
 import views
 
 urlpatterns = [
-    url(r'^$', views.peoples, name='pays_people_list_link'),
+    url(r'^$', views.peoples, name='people_list_link'),
     url(r'^addabon$', views.addabon, name='addabon_link'),
     url(r'^(?P<uid>\d+)$', views.abonhome, name='abonhome_link'),
 
