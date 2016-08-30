@@ -10,10 +10,18 @@ import forms
 @login_required
 def tarifs(request):
     tars = Tariff.objects.all()
+
+    # фильтр
+    dir, field = mydefs.order_helper(request)
+    if field:
+        tars = tars.order_by(field)
+
     tars = mydefs.pag_mn(request, tars)
 
     return render(request, 'tariff_app/tarifs.html', {
-        'tariflist': tars
+        'tariflist': tars,
+        'dir': dir,
+        'order_by': request.GET.get('order_by')
     })
 
 
