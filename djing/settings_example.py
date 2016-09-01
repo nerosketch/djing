@@ -79,9 +79,9 @@ DATABASES = {
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jungagent',
-        'USER': 'root',
-        'PASSWORD': 'ps',
+        'NAME': 'djingdb',
+        'USER': 'USER',             # You can change the user name
+        'PASSWORD': 'PASSWORD',     # You can change the password
         'HOST': 'localhost'
     }
 }
