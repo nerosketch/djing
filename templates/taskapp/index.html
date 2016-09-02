@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block main %}
+
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li class="active">Задачи</li>
+</ol>
+
+
+    <h3>Задачи, которые необходимо выполнить</h3>
+    <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Пару слов..</th>
+                <th>Кому назначена</th>
+                <th>Кто назначил</th>
+                <th>Приоритет</th>
+                <th>Истечение срока</th>
+                <th>Дата создания</th>
+                <th width="50">Ред.</th>
+                <th width="50">Уд.</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for task in tasks %}
+
+        {% if task.priority == 'E' %}<tr class="danger">
+        {% elif task.priority == 'D' %}<tr class="warning">
+        {% elif task.priority == 'C' %}<tr class="info">
+        {% elif task.priority == 'B' %}<tr>
+        {% elif task.priority == 'A' %}<tr class="success">
+        {% else %}<tr>{% endif %}
+
+            <td>{{ task.descr }}</td>
+            <td><a href="{% url 'other_profile' task.recipient.id %}" title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
+            <td><a href="{% url 'other_profile' task.author.id %}" title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
+            <td>{{ task.get_priority_display }}</td>
+            <td>{{ task.out_date }}</td>
+            <td>{{ task.time_of_create }}</td>
+            <td colspan="2" class="btn-group">
+                <a href="{% url 'task_edit' task.id %}" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </a>
+                <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-danger">
+                    <span class="glyphicon glyphicon-remove-circle"></span>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">Нет ни одного задания на этот момент. <a href="{% url 'task_add' %}">Создать задачу</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="8">
+                <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a>
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=tasks %}
+
+{% endblock %}

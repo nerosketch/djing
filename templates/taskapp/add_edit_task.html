@@ -1,0 +1,74 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% block main %}
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li><a href="{% url 'task_home' %}">Задачи</a></li>
+  <li class="active">Создать</li>
+</ol>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Добавьте новую задачу</h3>
+    </div>
+    <div class="panel-body">
+        {% if warntext %}
+            <div class="alert-danger">{{ warntext }}</div>
+        {% endif %}
+
+        {% if task.id %}
+            <form role="form" action="{% url 'task_edit' task.id %}" method="post">
+        {% else %}
+            <form role="form" action="{% url 'task_add' %}" method="post">
+        {% endif %}
+        {% csrf_token %}
+
+            <div class="form-group">
+                <label for="descr">Пару слов...</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
+                    {{ form.descr }}{{ form.descr.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="recipient">Цель, на кого назначаем</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                    {{ form.recipient }}{{ form.recipient.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="device">С каким устройством связано</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
+                    {{ form.device }}{{ form.device.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="priority">Приоритет</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
+                    {{ form.priority }}{{ form.priority.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="out_date">Актуальность</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    {{ form.out_date }}{{ form.out_date.errors }}
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                </button>
+                <button type="reset" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
