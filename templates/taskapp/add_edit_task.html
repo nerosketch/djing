@@ -4,7 +4,7 @@
 <ol class="breadcrumb">
   <li><span class="glyphicon glyphicon-home"></span></li>
   <li><a href="{% url 'task_home' %}">Задачи</a></li>
-  <li class="active">Создать</li>
+  <li class="active">{% if task.id %}Редактировать{% else %}Создать{% endif %}</li>
 </ol>
 
 

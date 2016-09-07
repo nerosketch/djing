@@ -67,10 +67,12 @@ def agent_abon_typer(fn):
         if isinstance(abon, Abonent):
             fn(self, abon)
         else:
+            act_tar = abon.active_tariff()
+            agent_tariff = Tariff(act_tar.id, act_tar.speedIn, act_tar.speedOut) if act_tar else None
             abn = Abonent(
                 abon.id,
                 abon.ip_address.int_ip() if abon.ip_address else 0,
-                abon.active_tariff()
+                agent_tariff
             )
             fn(self, abn)
     return wrapped
@@ -108,7 +110,10 @@ class SSLTransmitterClient(object):
                 port or settings.SELF_PORT
             ))
         except socket.error:
-            raise NetExcept(u'Ошибка подключения к NAS агенту')
+            raise NetExcept('Ошибка подключения к NAS агенту %s:%d' % (
+                ip or settings.SELF_IP,
+                port or settings.SELF_PORT
+            ))
 
     def write(self, d):
         self.s.write(d)
@@ -162,7 +167,8 @@ class SSLTransmitterClient(object):
         )
 
     def __del__(self):
-        self.s.close()
+        if self.s:
+            self.s.close()
 
 
 class PlainTransmitterClient(SSLTransmitterClient):
@@ -176,12 +182,16 @@ class PlainTransmitterClient(SSLTransmitterClient):
             ))
             self.s = s
         except socket.error:
-            raise NetExcept(u'Ошибка подключения к NAS агенту')
+            raise NetExcept('Ошибка подключения к NAS агенту на %s:%d' % (
+                ip or settings.SELF_IP,
+                port or settings.SELF_PORT
+            ))
 
     def write(self, d):
         self.s.send(d)
 
 
+# общалка с NAS'ом
 def get_TransmitterClientKlass():
     if settings.IS_USE_SSL:
         return SSLTransmitterClient

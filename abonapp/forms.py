@@ -36,7 +36,7 @@ class AbonForm(forms.Form):
     )
     is_active = forms.BooleanField(
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control', 'id': 'isactive'})
+        widget=forms.NullBooleanSelect(attrs={'class': 'form-control', 'id': 'isactive'})
     )
 
     group = forms.ModelChoiceField(

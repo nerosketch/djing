@@ -21,10 +21,10 @@
 <div class="modal-header warning">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="modal-title" id="myModalLabel"><span class="glyphicon glyphicon-warning-sign"></span>
-        Ошибка</h4>
+        Надпись вверху</h4>
 </div>
 <div class="modal-body">
-    ...
+    тут содержимое блока
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -151,8 +151,20 @@
                           <a href="{{ pool_home_link }}">
                           <span class="glyphicon glyphicon-compressed"></span> ip пул
                       </a></li>
+
                       <li><a href="{% url 'devs_link' %}">
                           <span class="glyphicon glyphicon-hdd"></span> железки
+                      </a></li>
+
+
+                    {% url 'task_home' as task_home %}
+                    {% if task_home in request.path %}
+                      <li class="active">
+                    {% else %}
+                      <li>
+                    {% endif %}
+                          <a href="{{ task_home }}">
+                          <span class="glyphicon glyphicon-tasks"></span> Задачи
                       </a></li>
 
 

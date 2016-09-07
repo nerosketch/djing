@@ -5,3 +5,4 @@ media/min/*
 ~*/migrations/000*.py
 .idea/
 djing/settings.py
+*/migrations/000*.py

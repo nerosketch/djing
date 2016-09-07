@@ -2,12 +2,14 @@
 from django.utils import timezone
 from datetime import datetime, timedelta
 from base_intr import TariffBase
+#from abonapp import AbonTariff
 
 
 class TariffDefault(TariffBase):
 
     # Базовый функционал считает стоимость пропорционально использованному времени
     def calc_amount(self, abon_tariff):
+        #assert isinstance(abon_tariff, AbonTariff)
         # сейчас
         nw = datetime.now(tz=timezone.get_current_timezone())
 

@@ -46,7 +46,9 @@
         </thead>
         <tbody>
         {% for human in peoples %}
-            <tr>
+            {% if human.is_active %}<tr>
+            {% else %}<tr class="danger">
+            {% endif %}
                 <td>{{ human.id }}</td>
                 <td><a href="{% url 'abonhome_link' human.group.id human.id %}">{{ human.username }}</a></td>
                 <td>{{ human.ip_address|default:'Не назначен' }}</td>

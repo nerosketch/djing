@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class TicketsappConfig(AppConfig):
+class TaskappConfig(AppConfig):
     name = 'taskapp'

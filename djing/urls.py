@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^dev/', include('devapp.urls')),
     url(r'^map/', include('mapapp.urls')),
     url(r'^statistic/', include('statistics.urls')),
+    url(r'^tasks/', include('taskapp.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

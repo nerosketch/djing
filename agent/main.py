@@ -4,12 +4,14 @@ from db import load_from_db
 from firewall import FirewallManager
 from time import sleep
 from sslTransmitter import TransmitServer
+from agent.models import Abonent, Tariff
 
 
 def filter_user_by_id(users, uid):
-    usrs = filter(lambda usr: usr.uid == uid, users)
-    if len(usrs) > 0:
-        return usrs[0]
+    users = filter(lambda usr: isinstance(usr, Abonent), users)
+    users = filter(lambda usr: usr.uid == uid, users)
+    if len(users) > 0:
+        return users[0]
     else:
         return
 
@@ -21,7 +23,7 @@ def main(debug=False):
 
     # Инициализация абонентов
     if debug:
-        print u'Инициализация...'
+        print("Инициализация...")
     # Открываем доступ в инет тем кто активен и у кого подключён тариф
     for usr in filter(lambda usr: usr.is_active, users):
 
@@ -30,13 +32,14 @@ def main(debug=False):
         if usr.tariff:
             # Открываем доступ в инет
             frw.open_inet_door(usr)
+            if debug: print "Разрешён доступ в инет для:", usr.ip_str()
 
     # Слушем в отдельном процессе сеть на предмет событий
     ts = TransmitServer('127.0.0.1', 2134)
     ts.start()
 
     if debug:
-        print u"Загружено %d абонентов" % len(users)
+        print("Загружено %d абонентов" % len(users))
 
     while True:
 
@@ -44,9 +47,7 @@ def main(debug=False):
         events = ts.get_data()
         # Проходим по появившимся событиям
         for event in events:
-            #event.toa
-            #event.id
-            #event.dt
+            #event.toa, event.id, event.dt
 
             # Смотрим тип события
             toa = int(event.toa)
@@ -108,7 +109,7 @@ def main(debug=False):
                     frw.destroy_tariff(tariff)
                     frw.make_tariff(tariff)
                 else:
-                    print 'WARNING: не найден тариф для которого сигнал на изменение данных, пробуем перезагрузиться'
+                    print('WARNING: не найден тариф для которого возбуждён сигнал на изменение данных, пробуем перезагрузиться')
                     return
 
         # Очищаем очередь событий

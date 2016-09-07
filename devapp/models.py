@@ -18,6 +18,9 @@ class Device(models.Model):
     man_passw = models.CharField(max_length=16, null=True, blank=True)
     #map_dot = models.ForeignKey()
 
+    class Meta:
+        db_table = 'dev'
+
     def get_abons(self):
         pass
 
@@ -44,6 +47,7 @@ class Port(models.Model):
     speed = models.CharField(max_length=1, default=PORT_SPEEDS[0][0], choices=PORT_SPEEDS)
 
     class Meta:
+        db_table = 'dev_port'
         unique_together = (('device', 'num'))
 
 

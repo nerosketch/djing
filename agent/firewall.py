@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from agent.models import Abonent, Tariff
 
 
 class FirewallManager(object):
@@ -16,6 +17,7 @@ class FirewallManager(object):
 
     # Открывает доступ в интернет
     def open_inet_door(self, user):
+        assert isinstance(user, Abonent)
         if not user.tariff:
             print u'WARNING: User does not have a tariff'
             return
@@ -27,6 +29,7 @@ class FirewallManager(object):
 
     # Закрывает доступ в интернет
     def close_inet_door(self, user):
+        assert isinstance(user, Abonent)
         cmd = r"%s table 12 del %s/32 && %s table 13 del %s/32" % (
             self.f, user.ip_str(),
             self.f, user.ip_str()
@@ -35,11 +38,13 @@ class FirewallManager(object):
 
     # Создаёт тариф (пайпы, режущие скорость
     def make_tariff(self, tariff):
+        assert isinstance(tariff, Tariff)
         cmd = r"make ipfw tariff :)"
         self.exec_cmd(cmd)
 
     # Убирает тариф из фаервола
     def destroy_tariff(self, tariff):
+        assert isinstance(tariff, Tariff)
         cmd = r"destroy ipfw tariff :)"
         self.exec_cmd(cmd)
 

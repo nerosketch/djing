@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'searchapp',
     'devapp',
     'mapapp',
-    'statistics'
+    'statistics',
+    'taskapp'
 ]
 
 MIDDLEWARE_CLASSES = [

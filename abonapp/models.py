@@ -15,10 +15,15 @@ from accounts_app.models import UserProfile
 
 class LogicError(Exception):
 
-    def __init__(self, value):
-         self.value = value
+    def __init__(self, value, err_id=None):
+        self.value = value
+        if err_id:
+            self.err_id = err_id
 
     def __unicode__(self):
+        return repr(self.value)
+
+    def __str__(self):
         return repr(self.value)
 
 
@@ -49,7 +54,8 @@ class AbonLog(models.Model):
 
 class AbonTariffManager(models.Manager):
 
-    def update_priorities(self, abonent):
+    @staticmethod
+    def update_priorities(abonent):
         abon_tariff_list = AbonTariff.objects.filter(abon=abonent).order_by('tariff_priority')
 
         # Обновляем приоритеты, чтоб по порядку были
@@ -134,7 +140,7 @@ class AbonTariff(models.Model):
         next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)[:1]
 
         if next_tarifs.count() < 1:
-            raise LogicError(u'У абонента нет следующих назначенных услуг')
+            raise LogicError('У абонента нет следующих назначенных услуг')
 
         # 0й элемент это следующая подключаемая услуга
         next_tarifs[0].time_start = timezone.now()
@@ -177,6 +183,7 @@ class Abon(UserProfile):
 
     _act_tar_cache = None
 
+    # возвращает текущий тариф для абонента
     def active_tariff(self):
         if self._act_tar_cache:
             return self._act_tar_cache
@@ -316,6 +323,17 @@ class Abon(UserProfile):
                     author = author,
                     comment = u'Завершение услуги по истечению срока действия'
                 )
+
+    # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
+    def is_access(self):
+        trf = self.active_tariff()
+        if not trf: return False
+        ct = trf.get_calc_type()
+        if ct.manage_access(self):
+            return True
+        else:
+            return False
+
 
 
 class InvoiceForPayment(models.Model):

@@ -81,12 +81,14 @@ class Abonent(Serializer):
     is_active = True
 
     def __init__(self, uid=None, ip=None, tariff=None):
+        # none потому что может инициализироваться пустым, чтоб быть распакованным через deserialize()
+        if tariff:
+            assert isinstance(tariff, Tariff)
         self.ip = ip
         self.uid = uid
         self.tariff = tariff
 
     def ip_str(self):
-        # int2ip, Example out '127.0.0.1'
         return socket.inet_ntoa(struct.pack("!I", self.ip))
 
     def _serializable_obj(self):
@@ -98,6 +100,10 @@ class Abonent(Serializer):
         }
 
     def deserialize(self, dump, tariffs):
+        # фильтруем только элементы нужного типа
+        tariffs = filter(lambda trf: isinstance(trf, Tariff), tariffs)
+        assert len(tariffs) > 0
+
         inf = loads(dump) if type(dump) == str else dump
         self.uid = int(inf['id'])
         self.is_active = bool(inf['is_active'])

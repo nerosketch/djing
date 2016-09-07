@@ -213,6 +213,8 @@ def abonhome(request, gid, uid):
 
     try:
         if request.method == 'POST':
+            # подключение к NAS'у в начале для того чтоб если исключение то ничего не сохранялось и сразу показать ошибку
+            tc = get_TransmitterClientKlass()()
             frm = forms.AbonForm(request.POST)
             if frm.is_valid():
                 cd = frm.cleaned_data
@@ -229,19 +231,22 @@ def abonhome(request, gid, uid):
                 abon.is_active = 1 if cd['is_active'] else 0
                 abon.save()
 
-                # Если включили то шлём событие от этом
+                # Если включили абонента то шлём событие от этом
                 if cd['is_active'] and not abisactive:
-                    tc = get_TransmitterClientKlass()()
-                    tc.signal_abon_enable(abon)
+                    # смотрим есть-ли доступ у абонента к услуге
+                    is_acc = abon.is_access()
+                    if is_acc:
+                        tc.signal_abon_refresh_info(abon)
+                    else:
+                        tc.signal_abon_close_inet(abon)
 
-                # Если выключили
+
+                # Если выключили абонента
                 elif not cd['is_active'] and abisactive:
-                    tc = get_TransmitterClientKlass()()
                     tc.signal_abon_disable(abon)
 
                 # Если изменили инфу, важную для NAS то говорим NAS'у перечитать инфу об абоненте
                 if abon.ip_address != ip_address:
-                    tc = get_TransmitterClientKlass()()
                     tc.signal_abon_refresh_info(abon)
 
                 #return redirect('abonhome_link', gid, uid)
@@ -326,7 +331,7 @@ def buy_tariff(request, gid, uid):
                 cd = frm.cleaned_data
                 abon.buy_tariff(cd['tariff'], request.user)
                 abon.save()
-                return redirect('abonhome_link', uid=abon.id)
+                return redirect('abonhome_link', gid=gid, uid=abon.id)
             else:
                 warntext = u'Что-то не так при покупке услуги, проверьте и попробуйте ещё'
         else:
@@ -363,25 +368,37 @@ def chpriority(request, gid, uid):
 @login_required
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
+    abon_group = get_object_or_404(models.AbonGroup, id=gid)
 
     if abtar.abon.id != int(uid):
         return HttpResponse('<h1>uid not equal uid from service</h1>')
 
     try:
         if request.method == 'POST':
+            tc = get_TransmitterClientKlass()()
+            abon = abtar.abon
             # досрочно завершаем услугу
             try:
+                # пробуем активировать следующую услугу
                 abtar.finish_and_activate_next_tariff(request.user)
-                # завершаем текущую услугу.
-                abtar.delete()
 
             except models.LogicError:
-                # Значит у абонента нет следующих услуг. Сигналим о закрытии инета в NAS
-                tc = get_TransmitterClientKlass()()
-                tc.signal_abon_close_inet(abtar.abon)
+                # Значит у абонента нет следующих услуг. Игнорим, далее в tariff.manage_access() всё разрулится
+                pass
+
+            # завершаем текущую услугу.
+            abtar.delete()
 
             # Переупорядочиваем приоритеты
-            models.AbonTariff.objects.update_priorities(abtar.abon)
+            models.AbonTariff.objects.update_priorities(abon)
+
+            # проверяем, может-ли абонент пользоваться новым тарифным планом
+            if abon.is_access():
+                # обновляем инфу об абоненте, чтоб применился новый тариф
+                tc.signal_abon_refresh_info(abon)
+            else:
+                # если доступа нет - закрываем инет
+                tc.signal_abon_close_inet(abon)
 
             return redirect('abonhome_link', gid, uid)
 
@@ -401,12 +418,11 @@ def complete_service(request, gid, uid, srvid):
             'minutes': time_use.seconds / 60 % 60
         }
         return render(request, 'abonapp/complete_service.html', {
-            'csrf_token': csrf(request)['csrf_token'],
             'abtar': abtar,
-            'abon': get_object_or_404(models.Abon, id=uid),
+            'abon': abtar.abon,
             'next_tariff': next_tariff[0] if next_tariff.count() > 0 else None,
             'time_use': time_use,
-            'abon_group': get_object_or_404(models.AbonGroup, id=gid)
+            'abon_group': abon_group
         })
 
     except models.LogicError as e:
@@ -416,10 +432,10 @@ def complete_service(request, gid, uid, srvid):
         warntext = e.value
 
     return render(request, 'abonapp/complete_service.html', {
-        'csrf_token': csrf(request)['csrf_token'],
         'abtar': abtar,
-        'uid': uid,
-        'warntext': warntext
+        'abon': abtar.abon,
+        'warntext': warntext,
+        'abon_group': abon_group
     })
 
 
