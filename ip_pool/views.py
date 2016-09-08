@@ -6,6 +6,7 @@ import mydefs
 
 
 @login_required
+@mydefs.only_admins
 def home(request):
     pools = IpPoolItem.objects.get_pools()
     print pools
@@ -20,6 +21,7 @@ def home(request):
 
 
 @login_required
+@mydefs.only_admins
 def ips(request):
     ip_start = request.GET.get('ips')
     ip_end   = request.GET.get('ipe')
@@ -37,6 +39,7 @@ def ips(request):
 
 
 @login_required
+@mydefs.only_admins
 def del_pool(request):
     ip_start = request.GET.get('ips')
     ip_end   = request.GET.get('ipe')
@@ -51,6 +54,7 @@ def del_pool(request):
 
 
 @login_required
+@mydefs.only_admins
 def add_pool(request):
     if request.method == 'POST':
         frm = PoolForm(request.POST)
@@ -70,6 +74,7 @@ def add_pool(request):
 
 
 @login_required
+@mydefs.only_admins
 def delip(request):
     ipid = request.GET.get('id')
     get_object_or_404(IpPoolItem, id=ipid).delete()

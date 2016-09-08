@@ -8,6 +8,7 @@ import forms
 
 
 @login_required
+@mydefs.only_admins
 def tarifs(request):
     tars = Tariff.objects.all()
 
@@ -26,6 +27,7 @@ def tarifs(request):
 
 
 @login_required
+@mydefs.only_admins
 def edit_tarif(request, tarif_id=0):
     tarif_id = mydefs.safe_int(tarif_id)
 
@@ -53,6 +55,7 @@ def edit_tarif(request, tarif_id=0):
 
 
 @login_required
+@mydefs.only_admins
 def del_tarif(request, id):
     tar_id = mydefs.safe_int(id)
     get_object_or_404(Tariff, id=tar_id).delete()

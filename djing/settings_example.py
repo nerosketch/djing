@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'devapp',
     'mapapp',
     'statistics',
-    'taskapp'
+    'taskapp',
+    'clientsideapp'
 ]
 
 MIDDLEWARE_CLASSES = [

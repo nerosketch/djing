@@ -128,3 +128,13 @@ def order_helper(request):
         return dir, dfx + orby
     else:
         return dir, orby
+
+
+# Декоратор проверяет аккаунт, чтоб не пускать клиентов в страницы администрации
+def only_admins(fn):
+    def wrapped(request, *args, **kwargs):
+        if request.user.is_admin:
+            return fn(request, *args, **kwargs)
+        else:
+            return redirect('client_home')
+    return wrapped

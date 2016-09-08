@@ -2,11 +2,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from models import Task
-from mydefs import pag_mn#, order_helper
+from mydefs import pag_mn, only_admins#, order_helper
 from forms import TaskFrm
 
 
 @login_required
+@only_admins
 def home(request):
     tasks = Task.objects.all()
 
@@ -26,12 +27,14 @@ def home(request):
 
 
 @login_required
+@only_admins
 def task_delete(request, task_id):
     get_object_or_404(Task, id=task_id).delete()
     return redirect('task_home')
 
 
 @login_required
+@only_admins
 def task_add_edit(request, task_id=0):
     warntext = ''
     if request.method == 'POST':

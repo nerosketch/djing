@@ -11,6 +11,7 @@ from accounts_app.models import UserProfile
 
 
 @login_required
+@mydefs.only_admins
 def home(request):
     msgs = PrivateMessages.objects.all()
     return render(request, 'private_messages/index.html', {
@@ -19,6 +20,7 @@ def home(request):
 
 
 @login_required
+@mydefs.only_admins
 def delitem(request, id=0):
     r = {'errnum': 0,'errtext': u''}
     try:
@@ -32,6 +34,7 @@ def delitem(request, id=0):
 
 
 @login_required
+@mydefs.only_admins
 def send_message(request):
     if request.method == 'GET':
         return HttpResponse(render_to_string('private_messages/send_form.html',{

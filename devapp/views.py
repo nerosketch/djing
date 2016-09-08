@@ -2,11 +2,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from models import Device
-from mydefs import pag_mn, res_success, res_error
+from mydefs import pag_mn, res_success, res_error, only_admins
 from forms import DeviceForm
 
 
 @login_required
+@only_admins
 def devices(request):
     devs = Device.objects.all()
     devs = pag_mn(request, devs)
@@ -17,6 +18,7 @@ def devices(request):
 
 
 @login_required
+@only_admins
 def devdel(request, did):
     try:
         get_object_or_404(Device, id=did).delete()
@@ -26,6 +28,7 @@ def devdel(request, did):
 
 
 @login_required
+@only_admins
 def dev(request, devid=0):
     warntext = ''
     devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
@@ -48,6 +51,7 @@ def dev(request, devid=0):
 
 
 @login_required
+@only_admins
 def devview(request, did):
     warntext = ''
 

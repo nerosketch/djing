@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User side</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/static/clientside/custom.css" rel="stylesheet">
+    <script src="/static/js/jquery-2.2.4.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+</head>
+<body>
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <img src="/static/clientside/bc.png" class="navbar-brand">
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+
+            {% url 'client_home' as client_home %}
+            <li{% if client_home == request.path %} class="active"{% endif %}>
+                <a href="{{ client_home }}">Личный кабинет</a>
+            </li>
+
+            {% url 'client_pays' as client_pays %}
+            <li{% if client_pays == request.path %} class="active"{% endif %}>
+                <a href="{{ client_pays }}">Платежи</a>
+            </li>
+
+            {% url 'client_buy' as client_buy %}
+            <li{% if client_buy == request.path %} class="active"{% endif %}>
+                <a href="{{ client_buy }}">Подключить услугу</a>
+            </li>
+
+            <li>
+                <a href="#">
+                    Сообщения из администрации
+                    <span class="badge">14</span>
+                </a>
+            </li>
+
+            <li><a href="#contact">График трафика</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Подать заявку</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Сеансы подключений</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">Выйти</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+    <!-- Begin page content -->
+    <div class="container">
+        {% block client_main %}{% endblock %}
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </div>
+
+
+</body>
+</html>

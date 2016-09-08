@@ -17,6 +17,7 @@ import mydefs
 
 
 @login_required
+@mydefs.only_admins
 def peoples(request, gid):
 
     peopleslist = models.Abon.objects.filter(group=gid)
@@ -38,6 +39,7 @@ def peoples(request, gid):
 
 
 @login_required
+@mydefs.only_admins
 # @permission_required('abonapp.add_abongroup')
 def addgroup(request):
     warntext = ''
@@ -57,6 +59,7 @@ def addgroup(request):
 
 
 @login_required
+@mydefs.only_admins
 def grouplist(request):
     groups = models.AbonGroup.objects.annotate(usercount=Count('abon'))
 
@@ -75,6 +78,7 @@ def grouplist(request):
 
 
 @login_required
+@mydefs.only_admins
 def delgroup(request):
     agd = mydefs.safe_int(request.GET.get('id'))
     get_object_or_404(models.AbonGroup, id=agd).delete()
@@ -82,6 +86,7 @@ def delgroup(request):
 
 
 @login_required
+@mydefs.only_admins
 # @permission_required('abonapp.add_abon')
 # @permission_required('abonapp.change_abon')
 def addabon(request, gid):
@@ -121,6 +126,7 @@ def addabon(request, gid):
 
 
 @login_required
+@mydefs.only_admins
 # @permission_required('abonapp.delete_abon')
 # @permission_required('abonapp.delete_abongroup')
 def delentity(request):
@@ -138,6 +144,7 @@ def delentity(request):
 
 
 @login_required
+@mydefs.only_admins
 def abonamount(request, gid, uid):
     warntext=''
     abon = get_object_or_404(models.Abon, id=uid)
@@ -158,6 +165,7 @@ def abonamount(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def invoice_for_payment(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     invoices = models.InvoiceForPayment.objects.filter(abon=abon)
@@ -170,6 +178,7 @@ def invoice_for_payment(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def pay_history(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
@@ -182,6 +191,7 @@ def pay_history(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def abon_services(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_tarifs = models.AbonTariff.objects.filter(abon=abon).order_by('tariff_priority')
@@ -195,6 +205,7 @@ def abon_services(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
@@ -288,6 +299,7 @@ def terminal_pay(request):
 
 
 @login_required
+@mydefs.only_admins
 # @permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid, uid):
     uid = mydefs.safe_int(uid)
@@ -319,6 +331,7 @@ def add_invoice(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def buy_tariff(request, gid, uid):
     warntext = ''
     frm = None
@@ -351,6 +364,7 @@ def buy_tariff(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def chpriority(request, gid, uid):
     t = request.GET.get('t')
     act = request.GET.get('a')
@@ -366,6 +380,7 @@ def chpriority(request, gid, uid):
 
 
 @login_required
+@mydefs.only_admins
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
@@ -440,6 +455,7 @@ def complete_service(request, gid, uid, srvid):
 
 
 @login_required
+@mydefs.only_admins
 def log_page(request):
     logs = models.AbonLog.objects.all()
 

@@ -1,0 +1,12 @@
+img.navbar-brand {
+    width: 59px;
+    height: 50px;
+    padding: 0;
+    margin: 0 15px 0 0;
+}
+body > .container {
+  padding: 60px 15px 0;
+}
+.table thead {
+    background-color: #ddd;
+}

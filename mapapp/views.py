@@ -3,9 +3,11 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from models import Dot
 from json import dumps
+from mydefs import only_admins
 
 
 @login_required
+@only_admins
 def home(request):
     return render(request, 'maps/index.html')
 

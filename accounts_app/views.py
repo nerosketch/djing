@@ -12,6 +12,7 @@ import mydefs
 
 
 @login_required
+@mydefs.only_admins
 def home(request):
     return redirect('profile')
 
@@ -25,12 +26,14 @@ def to_signin(request):
             if auser:
                 login(request, auser)
                 if nextl == 'None' or nextl == None or nextl == '':
-                    return redirect('profile')
+                    if request.user.is_admin:
+                        return redirect('profile')
+                    else:
+                        return redirect('client_home')
                 else:
                     return redirect(nextl)
             else:
                 return render(request, 'accounts/login.html', {
-                    'csrf_token': csrf(request)['csrf_token'],
                     'next': nextl,
                     'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
                 })
@@ -48,6 +51,7 @@ def sign_out(request):
 
 
 @login_required
+@mydefs.only_admins
 def profile_show(request, id=0):
     id = mydefs.safe_int(id)
 
@@ -72,6 +76,7 @@ def profile_show(request, id=0):
 
 
 @login_required
+@mydefs.only_admins
 def chgroup(request, uid):
     usr = get_object_or_404(UserProfile, id=uid)
     usergroups = usr.groups.all()
@@ -87,6 +92,7 @@ def chgroup(request, uid):
 
 
 @login_required
+@mydefs.only_admins
 def ch_ava(request):
     if request.method == 'POST':
         user = request.user
@@ -105,6 +111,7 @@ def ch_ava(request):
 
 
 @login_required
+@mydefs.only_admins
 def ch_info(request):
     warntext=''
     if request.method == 'POST':
@@ -132,6 +139,7 @@ def ch_info(request):
 
 
 @login_required
+@mydefs.only_admins
 ##@permission_required('accounts_app.add_userprofile')
 def create_profile(request):
     if request.method == 'POST':
@@ -182,6 +190,7 @@ def create_profile(request):
 
 
 @login_required
+@mydefs.only_admins
 #@permission_required('accounts_app.del_userprofile')
 def delete_profile(request, uid):
     prf = get_object_or_404(UserProfile, id=uid)
@@ -190,6 +199,7 @@ def delete_profile(request, uid):
 
 
 @login_required
+@mydefs.only_admins
 def acc_list(request):
     users = UserProfile.objects.filter(is_admin=True)
 
@@ -201,6 +211,7 @@ def acc_list(request):
 
 
 @login_required
+@mydefs.only_admins
 #@permission_required('accounts_app.change_userprofile')
 def perms(request, id):
     ingroups = filter(lambda x: x[0] == 'ingroups', request.POST.lists())[0][1]
@@ -218,6 +229,7 @@ def perms(request, id):
 
 
 @login_required
+@mydefs.only_admins
 def groups(request):
     grps = Group.objects.all()
 
@@ -229,6 +241,7 @@ def groups(request):
 
 
 @login_required
+@mydefs.only_admins
 #@permission_required('auth.change_group')
 def group(request, id):
     id = mydefs.safe_int(id)
