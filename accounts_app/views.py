@@ -25,24 +25,23 @@ def to_signin(request):
             auser = authenticate(username=request.POST.get('login'), password=request.POST.get('password'))
             if auser:
                 login(request, auser)
-                if nextl == 'None' or nextl == None or nextl == '':
+                if nextl == 'None' or nextl is None or nextl == '':
                     if request.user.is_admin:
                         return redirect('profile')
-                    else:
-                        return redirect('client_home')
-                else:
-                    return redirect(nextl)
-            else:
-                return render(request, 'accounts/login.html', {
-                    'next': nextl,
-                    'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
-                })
+
+                    return redirect('client_home')
+
+                return redirect(nextl)
+
+            return render(request, 'accounts/login.html', {
+                'next': nextl,
+                'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
+            })
+        return render(request, 'accounts/login.html', {
+            'next': nextl
+        })
     except NoReverseMatch:
         raise Http404(u"Destination page does not exist")
-    return render(request, 'accounts/login.html', {
-        'csrf_token': csrf(request)['csrf_token'],
-        'next': nextl
-    })
 
 
 def sign_out(request):
