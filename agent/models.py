@@ -141,8 +141,10 @@ class EventNAS(Serializer):
             return {'toa': self.toa, 'id': self.id}
 
     def deserialize(self, dump):
-        print dump
-        inf = loads(dump) if type(dump) == str else dump
+        try:
+            inf = loads(dump) if type(dump) == str else dump
+        except ValueError:
+            return
         self.toa = int(inf['toa'])
         self.id = int(inf['id'])
         self.dt = inf.get('dt')

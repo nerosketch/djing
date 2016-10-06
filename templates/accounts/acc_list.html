@@ -17,7 +17,7 @@
             <th>ФИО (или ник если нет)</th>
             <th class="col-sm-2">Телефон</th>
             <th class="col-sm-2">Skype</th>
-            <th class="col-sm-1">&mdash;</th>
+            <th width="150">&mdash;</th>
         </tr>
         </thead>
         <tbody>
@@ -31,7 +31,10 @@
                 <td>{% if usr.telephone %}<a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>{% else %}Нету{% endif %}</td>
                 <td>{% if usr.skype %}<a href="skype:{{ usr.skype }}?call">{{ usr.skype }}{% else %}Нету{% endif %}</a></td>
                 <td class="btn-group">
-                    <a href="{% url 'privmsg_send_message' %}?a={{ usr.id }}" class="btn btn-sm btn-info">
+                    <a href="{% url 'profile_appoint_task' usr.id %}" class="btn btn-sm btn-default" title="Дать задание">
+                        <span class="glyphicon glyphicon-tasks"></span>
+                    </a>
+                    <a href="{% url 'privmsg_send_message' %}?a={{ usr.id }}" class="btn btn-sm btn-info" title="Отправить сообщение">
                         <span class="glyphicon glyphicon-envelope"></span>
                     </a>
                     <a href="#" class="btn btn-sm btn-danger">

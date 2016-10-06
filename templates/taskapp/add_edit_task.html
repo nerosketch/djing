@@ -25,39 +25,54 @@
         {% csrf_token %}
 
             <div class="form-group">
-                <label for="descr">Пару слов...</label>
+                <label for="id_descr">Пару слов...</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
                     {{ form.descr }}{{ form.descr.errors }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="recipient">Цель, на кого назначаем</label>
+                <label for="id_recipient">Цель, на кого назначаем</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                     {{ form.recipient }}{{ form.recipient.errors }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="device">С каким устройством связано</label>
+                <label for="id_device">С каким устройством связано</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
                     {{ form.device }}{{ form.device.errors }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="priority">Приоритет</label>
+                <label for="id_priority">Приоритет</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
                     {{ form.priority }}{{ form.priority.errors }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="out_date">Актуальность</label>
+                <label for="id_state">Состояние</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-retweet"></span></span>
+                    {{ form.state }}{{ form.state.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_out_date">Актуальность (дата, до которой нужно завершить задачу)</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     {{ form.out_date }}{{ form.out_date.errors }}
                 </div>
+                <script type="text/javascript">
+                    $(function(){
+                        $('#id_out_date').datetimepicker({
+                            format: 'YYYY-MM-DD',
+                            locale: 'ru'
+                        });
+                    });
+                </script>
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-sm btn-primary">

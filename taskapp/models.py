@@ -15,6 +15,12 @@ TASK_PRIORITIES = (
     (b'E', u'Низкий')
 )
 
+TASK_STATES = (
+    (b'S', u'Новая'),
+    (b'C', u'На выполнении'),
+    (b'F', u'Выполнена')
+)
+
 
 class Task(models.Model):
     descr = models.CharField(max_length=128)
@@ -24,12 +30,14 @@ class Task(models.Model):
     priority = models.CharField(max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
     out_date = models.DateField(null=True, blank=True, default=datetime.now()+timedelta(days=7))
     time_of_create = models.DateTimeField(auto_now_add=True)
+    state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
 
     def __unicode__(self):
         return self.descr
 
     class Meta:
         db_table = 'task'
+        ordering = ('-id',)
 
     def save_form(self, frm_instance, auth_user):
         cl = frm_instance.cleaned_data
@@ -39,3 +47,11 @@ class Task(models.Model):
         self.device = cl['device']
         self.priority = cl['priority']
         self.out_date = cl['out_date']
+        self.state = cl['state']
+
+    def finish(self, current_user):
+        self.state = 'F'  # Выполнена
+        self.out_date = datetime.now()  # Время завершения
+
+    def begin(self, current_user):
+        self.state = 'C'  # Начата

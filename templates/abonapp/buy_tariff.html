@@ -18,7 +18,10 @@
     </div>
     <div class="panel-body">
         {% if warntext %}
-            <div class="alert-danger">{{ warntext }}</div>
+            <div class="alert alert-danger alert-dismissable">
+                <button class="close" type="button" aria-hidden="true" data-dismiss="alert">&times;</button>
+                <strong>Внимание!</strong> {{ warntext }}
+            </div>
         {% endif %}
         <form role="form" action="{% url 'abonapp_buy_tariff' abon_group.id abon.id %}" method="post">{% csrf_token %}
             <div class="form-group">

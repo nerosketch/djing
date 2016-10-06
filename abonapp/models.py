@@ -240,6 +240,9 @@ class Abon(UserProfile):
             # денег достаточно, можно покупать
             self.ballance -= tariff.amount
 
+            # Пытаемся подключиться к NAS агенту
+            tc = get_TransmitterClientKlass()()
+
             # выбераем связь ТарифАбонент с самым низким приоритетом
             abtrf = AbonTariff.objects.filter(abon=self).order_by('-tariff_priority')[:1]
             abtrf = abtrf[0] if abtrf.count() > 0 else None
@@ -261,7 +264,6 @@ class Abon(UserProfile):
             # шлём сигнал о том что абонент купил первую услугу, а значит можно пользоваться инетом
             # сигнал можно слать только после того как будет сохранён новый объект AbonTariff
             if self.is_active and not abtrf:
-                tc = get_TransmitterClientKlass()()
                 act_tar = self.active_tariff()
                 agent_abon = Abonent(
                     self.id,
@@ -272,8 +274,7 @@ class Abon(UserProfile):
                         act_tar.speedOut if act_tar else 0.0
                     )
                 )
-                tc.signal_abon_refresh_info(agent_abon)
-                tc.signal_abon_open_inet(agent_abon)
+                tc.signal_abon_refresh(agent_abon)
 
             # Запись об этом в лог
             AbonLog.objects.create(
@@ -360,10 +361,41 @@ class InvoiceForPayment(models.Model):
         db_table = 'abonent_inv_pay'
 
 
-#def abon_save_signal(sender, instance, **kwargs):
-#    if not kwargs['created']:
-#        # if not create (change only)
-#        print "Kw1", instance.username, instance.is_active
+def abon_post_save(sender, instance, **kwargs):
+    if kwargs['created']:
+        print 'abon_pre_save CREATED'
+    else:
+        print 'abon_pre_save CHANGED'
+        # подключение к NAS'у в начале для того чтоб если исключение то ничего не сохранялось и сразу показать ошибку
+        tc = get_TransmitterClientKlass()()
+        # обновляем абонента на NAS
+        tc.signal_abon_refresh(instance)
 
 
-#models.signals.post_save.connect(abon_save_signal, sender=Abon)
+def abon_del_signal(sender, instance, **kwargs):
+    print 'abon_del_signal'
+    # подключаемся к NAS'у
+    tc = get_TransmitterClientKlass()()
+    # удаляем абонента на NAS
+    tc.signal_abon_remove(instance)
+
+
+'''def tarif_pre_save(sender, instance, **kwargs):
+    print 'tarif_pre_save'
+    abon = instance.abon
+    abon.save()
+    # подключаемся к NAS'у
+    #tc = get_TransmitterClientKlass()()'''
+
+
+def tarif_del_signal(sender, instance, **kwargs):
+    print 'tarif_del_signal'
+    abon = instance.abon
+    abon.save()
+
+
+models.signals.post_save.connect(abon_post_save, sender=Abon)
+models.signals.post_delete.connect(abon_del_signal, sender=Abon)
+
+#models.signals.pre_save.connect(tarif_pre_save, sender=AbonTariff)
+models.signals.post_delete.connect(tarif_del_signal, sender=AbonTariff)

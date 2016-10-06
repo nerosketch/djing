@@ -1,0 +1,51 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% block main %}
+
+<ol class="breadcrumb">
+  <li><span class="glyphicon glyphicon-home"></span></li>
+  <li class="active">Задачи</li>
+</ol>
+
+
+
+    {% if warntext %}
+    <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <strong>Предупреждение!</strong> {{ warntext }}
+    </div>
+    {% endif %}
+
+    <div class="page-header">
+        <h2>Задачи, которые необходимо выполнить</h2>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#livetab_content" data-tab-remote="{% url 'task_home' %}" role="tab" data-toggle="tab">
+                Новые задачи
+            </a>
+        </li>
+        <li>
+            <a href="#livetab_content" data-tab-remote="{% url 'active_tasks' %}" role="tab" data-toggle="tab">
+                Активные задачи
+            </a>
+        </li>
+        <li>
+            <a href="#livetab_content" data-tab-remote="{% url 'finished_tasks' %}" role="tab" data-toggle="tab">
+                Выполненные задачи
+            </a>
+        </li>
+        <li>
+            <a href="#livetab_content" data-tab-remote="{% url 'all_tasks' %}" role="tab" data-toggle="tab">
+                Все задачи
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="livetab_content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}

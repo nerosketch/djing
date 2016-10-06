@@ -8,6 +8,12 @@
       <li class="active">{{ abon.fio }}</li>
     </ol>
 
+    {% if warntext %}
+    <div class="alert alert-danger alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <strong>Предупреждение!</strong> {{ warntext }}
+    </div>
+    {% endif %}
 
     <div class="page-header">
         <h2>{{ abon.fio|default:"Имя абонента" }} <small>Балланс <b>&#8399;{{ ballance }}</b> руб</small></h2>

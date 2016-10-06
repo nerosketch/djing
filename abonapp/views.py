@@ -10,7 +10,7 @@ from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from django.template.context_processors import csrf
 from django.http import HttpResponse, Http404
-from agent import get_TransmitterClientKlass, NetExcept
+from agent import NetExcept
 import forms
 import models
 import mydefs
@@ -19,21 +19,19 @@ import mydefs
 @login_required
 @mydefs.only_admins
 def peoples(request, gid):
-
-    peopleslist = models.Abon.objects.filter(group=gid)
+    peoples_list = models.Abon.objects.filter(group=gid)
 
     # фильтр
-    dir, field = mydefs.order_helper(request)
+    dr, field = mydefs.order_helper(request)
     if field:
-        peopleslist = peopleslist.order_by(field)
+        peoples_list = peoples_list.order_by(field)
 
-
-    peopleslist = mydefs.pag_mn(request, peopleslist)
+    peoples_list = mydefs.pag_mn(request, peoples_list)
 
     return render(request, 'abonapp/peoples.html', {
-        'peoples': peopleslist,
+        'peoples': peoples_list,
         'abon_group': get_object_or_404(models.AbonGroup, id=gid),
-        'dir': dir,
+        'dir': dr,
         'order_by': request.GET.get('order_by')
     })
 
@@ -64,7 +62,7 @@ def grouplist(request):
     groups = models.AbonGroup.objects.annotate(usercount=Count('abon'))
 
     # фильтр
-    dir, field = mydefs.order_helper(request)
+    directory, field = mydefs.order_helper(request)
     if field:
         groups = groups.order_by(field)
 
@@ -72,7 +70,7 @@ def grouplist(request):
 
     return render(request, 'abonapp/group_list.html', {
         'groups': groups,
-        'dir': dir,
+        'dir': directory,
         'order_by': request.GET.get('order_by')
     })
 
@@ -90,38 +88,39 @@ def delgroup(request):
 # @permission_required('abonapp.add_abon')
 # @permission_required('abonapp.change_abon')
 def addabon(request, gid):
-    warntext = ''
+    warning_text = ''
     frm = None
+    group = None
     try:
-        grp = get_object_or_404(models.AbonGroup, id=gid)
+        group = get_object_or_404(models.AbonGroup, id=gid)
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST)
             if frm.is_valid():
                 prf = models.Abon()
-                prf.group = grp
+                prf.group = group
                 prf.save_form(frm)
                 prf.save()
-                return redirect('people_list_link', grp.id)
+                return redirect('people_list_link', group.id)
             else:
-                warntext = u'Некоторые поля заполнены не правильно, проверте ещё раз'
+                warning_text = u'Некоторые поля заполнены не правильно, проверте ещё раз'
 
     except IntegrityError, e:
-        warntext = "%s: %s" % (warntext, e)
+        warning_text = "%s: %s" % (warning_text, e)
 
     except models.LogicError as e:
-        warntext = e.value
+        warning_text = e.value
 
     if not frm:
         frm = forms.AbonForm(initial={
             'ip_address': IpPoolItem.objects.get_free_ip(),
-            'group': grp
+            'group': group
         })
 
     return render(request, 'abonapp/addAbon.html', {
-        'warntext': warntext,
+        'warntext': warning_text,
         'csrf_token': csrf(request)['csrf_token'],
         'form': frm,
-        'abon_group': grp
+        'abon_group': group
     })
 
 
@@ -146,7 +145,7 @@ def delentity(request):
 @login_required
 @mydefs.only_admins
 def abonamount(request, gid, uid):
-    warntext=''
+    warning_text = ''
     abon = get_object_or_404(models.Abon, id=uid)
     if request.method == 'POST':
         abonid = mydefs.safe_int(request.POST.get('abonid'))
@@ -156,11 +155,11 @@ def abonamount(request, gid, uid):
             abon.save()
             return redirect('abonhome_link', gid=gid, uid=uid)
         else:
-            warntext = u'Не правильно выбран абонент как цель для пополнения'
+            warning_text = u'Не правильно выбран абонент как цель для пополнения'
     return render(request, 'abonapp/abonamount.html', {
         'abon': abon,
         'abon_group': get_object_or_404(models.AbonGroup, id=gid),
-        'warntext': warntext
+        'warntext': warning_text
     })
 
 
@@ -196,7 +195,13 @@ def abon_services(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_tarifs = models.AbonTariff.objects.filter(abon=abon).order_by('tariff_priority')
 
+    warntext=''
+    if int(gid) != abon.group.id:
+        warntext = 'Группа абонента не совпадает с переданным номером группы'
+
+
     return render(request, 'abonapp/services.html', {
+        'warntext': warntext,
         'abon': abon,
         'abon_tarifs': abon_tarifs,
         'active_abontariff_id': abon_tarifs[0].id if abon_tarifs.count() > 0 else None,
@@ -224,41 +229,17 @@ def abonhome(request, gid, uid):
 
     try:
         if request.method == 'POST':
-            # подключение к NAS'у в начале для того чтоб если исключение то ничего не сохранялось и сразу показать ошибку
-            tc = get_TransmitterClientKlass()()
             frm = forms.AbonForm(request.POST)
             if frm.is_valid():
                 cd = frm.cleaned_data
                 abon.username = cd['username']
                 abon.fio = cd['fio']
-
-                ip_address = abon.ip_address
                 abon.ip_address = get_object_or_404(IpPoolItem, ip=cd['ip_address'])
-
                 abon.telephone = cd['telephone']
                 abon.group = cd['group']
                 abon.address = cd['address']
-                abisactive = abon.is_active
                 abon.is_active = 1 if cd['is_active'] else 0
                 abon.save()
-
-                # Если включили абонента то шлём событие от этом
-                if cd['is_active'] and not abisactive:
-                    # смотрим есть-ли доступ у абонента к услуге
-                    is_acc = abon.is_access()
-                    if is_acc:
-                        tc.signal_abon_refresh_info(abon)
-                    else:
-                        tc.signal_abon_close_inet(abon)
-
-
-                # Если выключили абонента
-                elif not cd['is_active'] and abisactive:
-                    tc.signal_abon_disable(abon)
-
-                # Если изменили инфу, важную для NAS то говорим NAS'у перечитать инфу об абоненте
-                if abon.ip_address != ip_address:
-                    tc.signal_abon_refresh_info(abon)
 
                 #return redirect('abonhome_link', gid, uid)
             else:
@@ -390,7 +371,6 @@ def complete_service(request, gid, uid, srvid):
 
     try:
         if request.method == 'POST':
-            tc = get_TransmitterClientKlass()()
             abon = abtar.abon
             # досрочно завершаем услугу
             try:
@@ -406,14 +386,6 @@ def complete_service(request, gid, uid, srvid):
 
             # Переупорядочиваем приоритеты
             models.AbonTariff.objects.update_priorities(abon)
-
-            # проверяем, может-ли абонент пользоваться новым тарифным планом
-            if abon.is_access():
-                # обновляем инфу об абоненте, чтоб применился новый тариф
-                tc.signal_abon_refresh_info(abon)
-            else:
-                # если доступа нет - закрываем инет
-                tc.signal_abon_close_inet(abon)
 
             return redirect('abonhome_link', gid, uid)
 

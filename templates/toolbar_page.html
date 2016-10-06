@@ -6,9 +6,9 @@
         {% if pag.has_previous %}
             <li><a href="?p={{ pag.previous_page_number }}">{{ pag.previous_page_number }}</a></li>
         {% endif %}
-        <li>{{ pag.number }}</li>
-        <li>/</li>
-        <li>{{ pag.paginator.num_pages }}</li>
+        <li class="disabled"><a href="#">{{ pag.number }}</a></li>
+        <li class="disabled"><a href="#">&frasl;</a></li>
+        <li class="disabled"><a href="#">{{ pag.paginator.num_pages }}</a></li>
         {% if pag.has_next %}
             <li><a href="?p={{ pag.next_page_number }}">{{ pag.next_page_number }}</a></li>
         {% endif %}

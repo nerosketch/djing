@@ -2,6 +2,7 @@
 from django.db import models
 from custom_tariffs import TariffBase, TARIFF_CHOICES
 from mydefs import MyChoicesAdapter
+from agent import get_TransmitterClientKlass
 
 
 # Класс похож на адаптер. Предназначен для Django CHOICES чтоб можно было передавать классывместо просто описания поля,
@@ -32,3 +33,21 @@ class Tariff(models.Model):
     def __unicode__(self):
         return u"%s (%f)" % (self.title, self.amount)
 
+
+def tariff_save_signal(sender, instance, **kwargs):
+    assert isinstance(instance, Tariff)
+    tc = get_TransmitterClientKlass()()
+    if kwargs['created']:
+        tc.signal_tariff_create(instance)
+    else:
+        tc.signal_tariff_refresh(instance)
+
+
+def tariff_remove_signal(sender, instance, **kwargs):
+    assert isinstance(instance, Tariff)
+    tc = get_TransmitterClientKlass()()
+    tc.signal_tariff_remove(instance)
+
+
+models.signals.pre_save.connect(tariff_save_signal, sender=Tariff)
+models.signals.post_delete.connect(tariff_remove_signal, sender=Tariff)

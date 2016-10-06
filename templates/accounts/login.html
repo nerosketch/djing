@@ -46,7 +46,7 @@ form input{
         {% if errmsg %}<div class="err">
             <h4>{{ errmsg }}</h4>
         </div>{% endif %}
-        <h3>Аутентификация</h3>
+        <h3>Аутентификация, ваш ip:{{ client_ipaddress }}</h3>
         <label for="inp_uname">Имя пользователя</label>
         <input type="text" id="inp_uname" placeholder="username" name="login" autofocus>
         <br>

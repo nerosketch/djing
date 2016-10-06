@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import ssl
 import socket
-from multiprocessing import Process, Manager#, Lock
+from multiprocessing import Process, Manager
 import settings
 from models import EventNAS, Abonent, Tariff
 
 
 class NetExcept(Exception):
     def __init__(self, value):
-         self.value = value
+        self.value = value
+
     def __str__(self):
         return repr(self.value)
 
@@ -17,15 +18,19 @@ class SSLTransmitterServer(object):
     bindsocket = None
 
     def connect(self, ip, port):
-        bindsocket = socket.socket()
-        bindsocket.bind((ip, port))
-        bindsocket.listen(5)
-        self.bindsocket = bindsocket
+        self.bindsocket = socket.socket()
+        self.bindsocket.bind((ip, port))
+        self.bindsocket.listen(5)
 
-    def _on_data_recive(self, v, data):
+    @staticmethod
+    def _on_data_recive(v, data):
         print "do_something:", data
         #with lock:
-        v.append(EventNAS().deserialize(data))
+        dat = EventNAS().deserialize(data)
+        if dat is not None:
+            v.append(dat)
+        else:
+            print 'ERROR: bad data:', data
         return False
 
     def _deal_with_client(self, connstream, v):
@@ -80,7 +85,7 @@ def agent_abon_typer(fn):
 
 # Декоратор переводит классы тарифа базы к объекту агента если надо.
 # tariff_app.models.Tariff -> agent.Tariff
-def agent_tarif_typer(fn):
+def agent_tariff_typer(fn):
     def wrapped(self, tariff):
         if isinstance(tariff, Tariff):
             fn(self, tariff)
@@ -118,52 +123,53 @@ class SSLTransmitterClient(object):
     def write(self, d):
         self.s.write(d)
 
+    # Создаём абонента
     @agent_abon_typer
-    def signal_abon_enable(self, abon):
+    def signal_abon_create(self, abon):
         self.write(
-            EventNAS(1, abon.uid).serialize()
+            EventNAS(1, abon.id, abon._serializable_obj()).serialize()
         )
 
+    # Обновляем абонента
     @agent_abon_typer
-    def signal_abon_disable(self, abon):
+    def signal_abon_refresh(self, abon):
         self.write(
-            EventNAS(2, abon.uid).serialize()
+            EventNAS(2, abon.uid, abon._serializable_obj()).serialize()
         )
 
+    # Удаляем абонента
     @agent_abon_typer
-    def signal_abon_set_cap(self, abon):
+    def signal_abon_remove(self, abon):
         self.write(
-            EventNAS(3, abon.uid).serialize()
+            EventNAS(3, abon.id).serialize()
         )
 
-    @agent_abon_typer
-    def signal_abon_open_inet(self, abon):
+    # Создаём тариф
+    @agent_tariff_typer
+    def signal_tariff_create(self, tariff):
         self.write(
-            EventNAS(4, abon.uid).serialize()
+            EventNAS(4, tariff.tid, tariff._serializable_obj()).serialize()
         )
 
-    @agent_abon_typer
-    def signal_abon_close_inet(self, abon):
+    # Обновляем тариф
+    @agent_tariff_typer
+    def signal_tariff_refresh(self, tariff):
         self.write(
-            EventNAS(5, abon.uid).serialize()
+            EventNAS(5, tariff.tid, tariff._serializable_obj()).serialize()
         )
 
-    @agent_abon_typer
-    def signal_agent_reboot(self, abon):
+    # Удаляем тариф
+    @agent_tariff_typer
+    def signal_tariff_remove(self, tariff):
         self.write(
-            EventNAS(6, abon.uid).serialize()
+            EventNAS(6, tariff.tid).serialize()
         )
 
+    # Перезагружаем всё
     @agent_abon_typer
-    def signal_abon_refresh_info(self, abon):
+    def signal_agent_reboot(self):
         self.write(
-            EventNAS(7, abon.uid, abon._serializable_obj()).serialize()
-        )
-
-    @agent_tarif_typer
-    def signal_tarif_refresh_info(self, tariff):
-        self.write(
-            EventNAS(8, tariff.tid, tariff._serializable_obj()).serialize()
+            EventNAS(7, 0).serialize()
         )
 
     def __del__(self):
@@ -175,12 +181,11 @@ class PlainTransmitterClient(SSLTransmitterClient):
 
     def __init__(self, ip=None, port=None):
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.connect((
                 ip or settings.SELF_IP,
                 port or settings.SELF_PORT
             ))
-            self.s = s
         except socket.error:
             raise NetExcept('Ошибка подключения к NAS агенту на %s:%d' % (
                 ip or settings.SELF_IP,

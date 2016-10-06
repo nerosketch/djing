@@ -21,6 +21,9 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_chgroup_link'),
     url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile_link'),
 
+    # назначить задание
+    url(r'^(?P<uid>\d+)/appoint_task$', views.appoint_task, name='profile_appoint_task'),
+
     url(r'^group/$', views.groups, name='profile_groups_list'),
     url(r'^group/(?P<id>\d+)$', views.group, name='profile_group_link')
 

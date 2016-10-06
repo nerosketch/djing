@@ -4,11 +4,12 @@ from django.contrib.auth import authenticate, login, logout
 from photo_app.models import Photo
 from django.core.urlresolvers import NoReverseMatch
 from models import UserProfile
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.template.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
 import mydefs
+from taskapp.models import Task
 
 
 @login_required
@@ -38,6 +39,7 @@ def to_signin(request):
                 'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
             })
         return render(request, 'accounts/login.html', {
+            'csrf_token': csrf(request)['csrf_token'],
             'next': nextl
         })
     except NoReverseMatch:
@@ -268,3 +270,11 @@ def group(request, id):
         'all_rights': all_rights,
         'grp_rights': grp_rights
     })
+
+
+@login_required
+@mydefs.only_admins
+def appoint_task(req, uid):
+    uid = mydefs.safe_int(uid)
+    url = resolve_url('task_add')
+    return redirect("%s?rp=%d" % (url, uid))

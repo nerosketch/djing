@@ -7,9 +7,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/static/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css">
         <link rel="stylesheet" href="/static/css/custom.css">
         <script src="/static/js/jquery-2.2.4.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/moment-with-locales.min.js"></script>
+        <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
         <script src="/static/js/my.js"></script>
         <link rel="shortcut icon" href="/static/img/favicon_m.ico">
     </head>
@@ -82,11 +85,13 @@
                     <div class="row profile_img">
                         <div class="col-sm-5">
 
+                        <a href="{% url 'profile' %}">
                             {% if user.avatar %}
                                 <img alt="{{ user.avatar.min }}" class="img-circle img-responsive" src="{{ user.avatar.min }}"/>
                             {% else %}
                                 <img src="/static/img/user_ava_min.gif" class="img-circle img-responsive" alt="user avatar"/>
                             {% endif %}
+                        </a>
 
                         </div>
                         <div class="col-sm-7">
@@ -99,74 +104,53 @@
                     <ul class="nav nav-sidebar">
 
                     {% url 'accounts_list' as accounts_list %}
-                    {% if accounts_list in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ accounts_list }}">
-                              <span class="glyphicon glyphicon-eye-open"></span> администраторы
-                          </a>
-                      </li>
+                    <li{% if accounts_list in request.path %} class="active"{% endif %}>
+                      <a href="{{ accounts_list }}">
+                          <span class="glyphicon glyphicon-eye-open"></span> администраторы
+                      </a>
+                    </li>
 
 
                     {% url 'abongroup_list_link' as abongroup_list_link %}
-                    {% if abongroup_list_link in request.path %}
-                      <li class="active">
-                    {% else %}
-                       <li>
-                    {% endif %}
-                          <a href="{{ abongroup_list_link }}">
-                          <span class="glyphicon glyphicon-user"></span> абоненты
-                      </a></li>
+                    <li{% if abongroup_list_link in request.path %} class="active"{% endif %}>
+                      <a href="{{ abongroup_list_link }}">
+                      <span class="glyphicon glyphicon-user"></span> абоненты
+                    </a></li>
 
 
                     {% url 'tarifs_link' as tarifs_link %}
-                    {% if tarifs_link in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ tarifs_link }}">
-                          <span class="glyphicon glyphicon-usd"></span> тарифы
-                      </a></li>
+                    <li{% if tarifs_link in request.path %} class="active"{% endif %}>
+                      <a href="{{ tarifs_link }}">
+                      <span class="glyphicon glyphicon-usd"></span> тарифы
+                    </a></li>
 
 
                     {% url 'privmsg_home' as privmsg_home %}
-                    {% if privmsg_home in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ privmsg_home }}">
-                          <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
-                      </a></li>
+                    <li{% if privmsg_home in request.path %} class="active"{% endif %}>
+                      <a href="{{ privmsg_home }}">
+                      <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
+                    </a></li>
 
 
                     {% url 'pool_home_link' as pool_home_link %}
-                    {% if pool_home_link in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ pool_home_link }}">
-                          <span class="glyphicon glyphicon-compressed"></span> ip пул
-                      </a></li>
+                    <li{% if pool_home_link in request.path %} class="active"{% endif %}>
+                      <a href="{{ pool_home_link }}">
+                      <span class="glyphicon glyphicon-compressed"></span> ip пул
+                    </a></li>
 
-                      <li><a href="{% url 'devs_link' %}">
-                          <span class="glyphicon glyphicon-hdd"></span> железки
-                      </a></li>
+                    {% url 'devs_link' as devs_link %}
+                    <li{% if devs_link in request.path %} class="active"{% endif %}>
+                      <a href="{{ devs_link }}">
+                      <span class="glyphicon glyphicon-hdd"></span> железки
+                    </a></li>
 
 
                     {% url 'task_home' as task_home %}
-                    {% if task_home in request.path %}
-                      <li class="active">
-                    {% else %}
-                      <li>
-                    {% endif %}
-                          <a href="{{ task_home }}">
-                          <span class="glyphicon glyphicon-tasks"></span> Задачи
-                      </a></li>
+                    <li{% if task_home in request.path %} class="active"{% endif %}>
+                      <a href="{{ task_home }}">
+                      <span class="glyphicon glyphicon-tasks"></span> Задачи
+                      {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
+                    </a></li>
 
 
                     </ul>
