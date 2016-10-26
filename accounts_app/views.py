@@ -20,6 +20,7 @@ def home(request):
 
 def to_signin(request):
     nextl = request.GET.get('next')
+    nextl = '' if nextl == 'None' or nextl is None or nextl.isspace() else nextl
 
     try:
         if request.POST:
@@ -27,7 +28,7 @@ def to_signin(request):
             if auser:
                 login(request, auser)
                 if nextl == 'None' or nextl is None or nextl == '':
-                    if request.user.is_admin:
+                    if request.user.is_staff:
                         return redirect('profile')
 
                     return redirect('client_home')
@@ -39,7 +40,6 @@ def to_signin(request):
                 'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
             })
         return render(request, 'accounts/login.html', {
-            'csrf_token': csrf(request)['csrf_token'],
             'next': nextl
         })
     except NoReverseMatch:

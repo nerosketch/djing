@@ -20,7 +20,7 @@
         {% if warntext %}
             <div class="alert alert-danger alert-dismissable">
                 <button class="close" type="button" aria-hidden="true" data-dismiss="alert">&times;</button>
-                <strong>Внимание!</strong> {{ warntext }}
+                <strong>Внимание!</strong> {{ warntext|safe }}
             </div>
         {% endif %}
         <form role="form" action="{% url 'abonapp_buy_tariff' abon_group.id abon.id %}" method="post">{% csrf_token %}

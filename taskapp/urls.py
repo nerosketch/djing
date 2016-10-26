@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^add$', views.task_add_edit, name='task_add'),
     url(r'^active$', views.active_tasks, name='active_tasks'),
     url(r'^finished$', views.finished_tasks, name='finished_tasks'),
+    url(r'^own$', views.own_tasks, name='own_tasks'),
     url(r'^all$', views.all_tasks, name='all_tasks')
 ]

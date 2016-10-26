@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse_lazy
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$xvppe_5&iu4fgnt2h@eie6+w*n&m=60e7k_6hb5r4rgnfndz1'
+SECRET_KEY = '!!!!!!!!!!!!!!!!!!!!!!!!YOUR SECRET KEY!!!!!!!!!!!!!!!!!!!!!!!!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -64,8 +64,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'mydefs.context_processor_client_ipaddress',
-                'taskapp.context_proc.get_active_tasks_count'
+                'global_context_processors.context_processor_client_ipaddress',
+                'taskapp.context_proc.get_active_tasks_count',
+                'global_context_processors.context_processor_additional_profile'
             ],
         },
     },
@@ -108,6 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+
+SESSION_COOKIE_HTTPONLY = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from djing import settings
+from django.conf import settings
 from devapp.models import Device
 from datetime import datetime, timedelta
 

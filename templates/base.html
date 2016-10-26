@@ -50,8 +50,8 @@
               <ul class="nav navbar-nav">
                 <li class="active"><a href="/">Главная</a></li>
                 <li><a href="{% url 'maps_home_link' %}" target="_blank">Карта</a></li>
-                <li><a href="{% url 'stat_home' %}">График траффика</a></li>
-                <li><a href="{% url 'client_home' %}">Кабинет клиента</a></li>
+                <li><a href="{% url 'stat_home' %}" target="_blank">График траффика</a></li>
+                <li><a href="{% url 'client_home' %}" target="_blank">Кабинет клиента</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
                   <ul class="dropdown-menu">
@@ -152,12 +152,8 @@
                       {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
                     </a></li>
 
-
                     </ul>
 
-                    <ul class="nav nav-sidebar">
-                      <li><a href="">Nav item</a></li>
-                    </ul>
                 </div>
                 <!-- END Left menu -->
 

@@ -55,14 +55,6 @@ def pag_mn(request, objs, count_per_page=10):
     return objs
 
 
-def context_processor_client_ipaddress(request):
-    ip = request.META.get('REMOTE_ADDR', '') or request.META.get('HTTP_X_FORWARDED_FOR', '')
-    return {
-        'client_ipaddress': ip
-    }
-    #logmodels.debug('%s %s %s'%(request.user, request.path, ip))
-
-
 class MyGenericIPAddressField(models.GenericIPAddressField):
 
     description = "Int32 notation ip address"

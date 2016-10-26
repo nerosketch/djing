@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template.context_processors import csrf
 from models import Tariff
 import mydefs
 import forms
@@ -48,7 +47,6 @@ def edit_tarif(request, tarif_id=0):
 
     return render(request, 'tariff_app/editTarif.html', {
         'warntext': warntext,
-        'csrf_token': csrf(request)['csrf_token'],
         'form': frm,
         'tarif_id': tarif_id
     })

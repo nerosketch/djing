@@ -152,7 +152,7 @@ def abonamount(request, gid, uid):
         if abonid == int(uid):
             amnt = mydefs.safe_float(request.POST.get('amount'))
             abon.add_ballance(request.user, amnt)
-            abon.save()
+            abon.save(update_fields=['ballance'])
             return redirect('abonhome_link', gid=gid, uid=uid)
         else:
             warning_text = u'Не правильно выбран абонент как цель для пополнения'
@@ -193,18 +193,14 @@ def pay_history(request, gid, uid):
 @mydefs.only_admins
 def abon_services(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
-    abon_tarifs = models.AbonTariff.objects.filter(abon=abon).order_by('tariff_priority')
+    abon_tarifs = models.AbonTariff.objects.filter(abon=uid)
 
-    warntext=''
-    if int(gid) != abon.group.id:
-        warntext = 'Группа абонента не совпадает с переданным номером группы'
-
+    active_abontariff = abon_tarifs.exclude(time_start=None)
 
     return render(request, 'abonapp/services.html', {
-        'warntext': warntext,
         'abon': abon,
         'abon_tarifs': abon_tarifs,
-        'active_abontariff_id': abon_tarifs[0].id if abon_tarifs.count() > 0 else None,
+        'active_abontariff_id': active_abontariff[0].id if active_abontariff.count() > 0 else None,
         'abon_group': abon.group
     })
 
@@ -275,7 +271,7 @@ def terminal_pay(request):
 
     abon.add_ballance(kernel_user, amount)
 
-    abon.save()
+    abon.save(update_fields=['ballance'])
     return HttpResponse('ok')
 
 
@@ -334,7 +330,8 @@ def buy_tariff(request, gid, uid):
         warntext = e.value
 
     except NetExcept as e:
-        warntext = e.value
+        warntext = e.value+u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.'\
+        u' <a href="%s">Вернуться</a>' % resolve_url('abonhome_link', gid=gid, uid=abon.id)
 
     return render(request, 'abonapp/buy_tariff.html', {
         'warntext': warntext,
@@ -364,39 +361,20 @@ def chpriority(request, gid, uid):
 @mydefs.only_admins
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
-    abon_group = get_object_or_404(models.AbonGroup, id=gid)
 
     if abtar.abon.id != int(uid):
         return HttpResponse('<h1>uid not equal uid from service</h1>')
 
     try:
         if request.method == 'POST':
-            abon = abtar.abon
             # досрочно завершаем услугу
-            try:
-                # пробуем активировать следующую услугу
-                abtar.finish_and_activate_next_tariff(request.user)
-
-            except models.LogicError:
-                # Значит у абонента нет следующих услуг. Игнорим, далее в tariff.manage_access() всё разрулится
-                pass
-
-            # завершаем текущую услугу.
-            abtar.delete()
-
-            # Переупорядочиваем приоритеты
-            models.AbonTariff.objects.update_priorities(abon)
-
-            return redirect('abonhome_link', gid, uid)
-
-        next_tariff = models.AbonTariff.objects.filter(
-            abon=abtar.abon,
-            tariff_priority__gt=abtar.tariff_priority
-        )[:1]
-
-        if not abtar.time_start:
-            abtar.time_start = timezone.now()
-            abtar.save()
+            finish_confirm = request.POST.get('finish_confirm')
+            if finish_confirm == 'yes':
+                # удаляем запись о текущей услуге.
+                abtar.delete()
+                return redirect('abonhome_link', gid, uid)
+            else:
+                raise models.LogicError('Действие не подтверждено')
 
         time_use = timezone.now() - abtar.time_start
         time_use = {
@@ -407,9 +385,8 @@ def complete_service(request, gid, uid, srvid):
         return render(request, 'abonapp/complete_service.html', {
             'abtar': abtar,
             'abon': abtar.abon,
-            'next_tariff': next_tariff[0] if next_tariff.count() > 0 else None,
             'time_use': time_use,
-            'abon_group': abon_group
+            'abon_group': get_object_or_404(models.AbonGroup, id=gid)
         })
 
     except models.LogicError as e:
@@ -422,8 +399,37 @@ def complete_service(request, gid, uid, srvid):
         'abtar': abtar,
         'abon': abtar.abon,
         'warntext': warntext,
-        'abon_group': abon_group
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid)
     })
+
+
+@login_required
+@mydefs.only_admins
+def activate_service(request, gid, uid, srvid):
+    abtar = get_object_or_404(models.AbonTariff, id=srvid)
+
+    if request.method == 'POST':
+        if request.POST.get('finish_confirm') != 'yes':
+            return HttpResponse('<h1>Request not confirmed</h1>')
+
+        abtar.activate(request.user)
+        return redirect('abonhome_link', gid, uid)
+
+    amount = abtar.calc_amount_service()
+    return render(request, 'abonapp/activate_service.html', {
+        'abon': abtar.abon,
+        'abon_group': abtar.abon.group,
+        'abtar': abtar,
+        'amount': amount,
+        'diff': abtar.abon.ballance - amount
+    })
+
+
+@login_required
+@mydefs.only_admins
+def unsubscribe_service(request, gid, uid, srvid):
+    get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
+    return redirect('abonhome_link', gid=gid, uid=uid)
 
 
 @login_required
@@ -435,6 +441,21 @@ def log_page(request):
 
     return render(request, 'abonapp/log.html', {
         'logs': logs
+    })
+
+
+@login_required
+@mydefs.only_admins
+def debtors(request):
+    #peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
+    #peoples_list = mydefs.pag_mn(request, peoples_list)
+
+    invs = models.InvoiceForPayment.objects.filter(status=True)
+    invs = mydefs.pag_mn(request, invs)
+
+    return render(request, 'abonapp/debtors.html', {
+        #'peoples': peoples_list
+        'invoices': invs
     })
 
 

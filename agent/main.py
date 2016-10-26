@@ -30,7 +30,8 @@ def create_abon(tariffs, users, event, frw):
         trf
     )
     users.append(abon)
-    frw.open_inet_door(abon)
+    if abon.is_access():
+        frw.open_inet_door(abon)
 
 
 def main(debug=False):
@@ -44,9 +45,8 @@ def main(debug=False):
     # Открываем доступ в инет тем кто активен и у кого подключён тариф
     for usr in filter(lambda usr: usr.is_active, users):
 
-        # Доступ в интернет происходит по наличию подключённого тарифа
-        # если тарифа нет, то и инета нет
-        if usr.tariff:
+        # даём услуги если можно
+        if usr.is_access():
             # Открываем доступ в инет
             frw.open_inet_door(usr)
             if debug: print "Разрешён доступ в инет для:", usr.ip_str()
@@ -55,8 +55,7 @@ def main(debug=False):
     ts = TransmitServer('127.0.0.1', 2134)
     ts.start()
 
-    if debug:
-        print("Загружено %d абонентов" % len(users))
+    if debug: print("Загружено %d абонентов" % len(users))
 
     while True:
         # Загружаем события для абонентов из сети (список объектов EventNAS из models)
@@ -77,20 +76,15 @@ def main(debug=False):
             elif toa == 2:
                 print('SIGNAL: Change abon')
                 usr = filter_user_by_id(users, event.id)
+                # если есть то меняем инфу о клиенте
                 if usr:
                     usr.deserialize(event.dt, tariffs)
-                    ##############################
-                    # НАДО УБЕДИТЬСЯ ЧТО ИЗМЕНЕНИЯ ЗАТРОНУТ ЭЛЕМЕНТ usr В ГЛОБАЛЬНОМ СПИСКЕ
-                    ##############################
-                    # если абонент активен, и куплен и активирован тариф то можно и в инет
-                    if usr.is_active and usr.tariff is not None:
-                        frw.close_inet_door(usr)
+                    # в любом случае сначала очистить всю инфу о клиенте из таблицы фаера
+                    frw.close_inet_door(usr)
+                    # если у абонента есть доступ то можно и в инет
+                    if usr.is_access():
                         frw.open_inet_door(usr)
-
-                    # DEBUG убеждаемся в изменениях
-                    usr_dbg = filter_user_by_id(users, event.id)
-                    assert usr.uid == usr_dbg.uid
-                    assert usr.ip == usr_dbg.ip
+                # Иначе создаём клиента
                 else:
                     create_abon(tariffs, users, event, frw)
 

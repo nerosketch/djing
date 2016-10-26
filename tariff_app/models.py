@@ -16,6 +16,7 @@ class _TariffChoicesAdapter(MyChoicesAdapter):
 
 class Tariff(models.Model):
     title = models.CharField(max_length=32)
+    descr = models.CharField(max_length=256)
     speedIn = models.FloatField(default=0.0)
     speedOut = models.FloatField(default=0.0)
     amount = models.FloatField(default=0.0)

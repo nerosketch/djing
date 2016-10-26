@@ -77,7 +77,8 @@ def agent_abon_typer(fn):
             abn = Abonent(
                 abon.id,
                 abon.ip_address.int_ip() if abon.ip_address else 0,
-                agent_tariff
+                agent_tariff,
+                abon.is_active
             )
             fn(self, abn)
     return wrapped
@@ -187,7 +188,7 @@ class PlainTransmitterClient(SSLTransmitterClient):
                 port or settings.SELF_PORT
             ))
         except socket.error:
-            raise NetExcept('Ошибка подключения к NAS агенту на %s:%d' % (
+            raise NetExcept(u'Ошибка подключения к NAS агенту на %s:%d' % (
                 ip or settings.SELF_IP,
                 port or settings.SELF_PORT
             ))

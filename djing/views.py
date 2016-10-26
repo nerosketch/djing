@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 
 @login_required
 def home(request):
-    if request.user.is_admin:
+    if request.user.is_staff:
         return redirect('profile')
     else:
         return redirect('client_home')

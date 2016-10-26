@@ -8,6 +8,7 @@ class TariffForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'descr': forms.TextInput(attrs={'class': 'form-control'}),
             'speedIn': forms.NumberInput(attrs={'class': 'form-control'}),
             'speedOut': forms.NumberInput(attrs={'class': 'form-control'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),

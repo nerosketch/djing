@@ -1,5 +1,5 @@
 from django.db import models
-from djing import settings
+from django.conf import settings
 
 
 class MessagesManager(models.Manager):

@@ -30,7 +30,7 @@
         {% if request.user.is_superuser %}
         <tr>
             <td>Административный доступ (все права)</td>
-            <td><input type="checkbox"{{ userprofile.is_admin|yesno:' checked,' }}></td>
+            <td><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
         </tr>
         {% endif %}
     </tbody>

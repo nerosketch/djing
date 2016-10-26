@@ -60,11 +60,11 @@
                 <li class="divider"></li>
                 <li class="dropdown-header">Nav header</li>
                 <li><a href="#">Separated link</a></li>
-                <li><a href="#">Выйти</a></li>
+                <li><a href="{% url 'logout_link' %}">Выйти</a></li>
               </ul>
             </li>
           </ul>
-          <span class="navbar-text">Ваш балланс <b>126</b> руб.</span>
+          <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance }}</b> руб.</span>
         </div><!--/.nav-collapse -->
       </div>
     </div>
@@ -72,12 +72,21 @@
 
     <!-- Begin page content -->
     <div class="container">
+
+        {% if request.user.is_staff %}
+            <div class="alert alert-info">
+                <strong>Кстати.</strong>
+                Вы администратор, и не должны производить действия из кабинета пользователя, производите их из админки.
+                Кабинет клиента для вас только для ознакомления.
+            </div>
+        {% endif %}
+
         {% block client_main %}{% endblock %}
     </div>
 
     <div id="footer">
       <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
+        <p class="text-muted">DN&copy;</p>
       </div>
     </div>
 

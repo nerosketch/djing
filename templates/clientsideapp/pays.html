@@ -9,17 +9,19 @@
       <tr>
           <th>Сумма транзакции (руб)</th>
           <th>Дата транзакции</th>
-          <th>Автор платежа</th>
           <th>Комментарий</th>
       </tr>
       </thead>
       <tbody>
+        {% for pay in pay_history %}
         <tr>
-          <td>100</td>
-          <td>08 Сентябрь 2016, 02:30:40</td>
-          <td><a target="_blank" href="/accounts/1">bashmak</a></td>
-          <td>Покупка тарифного плана через админку, тариф "New2"</td>
+          <td>{{ pay.amount }}</td>
+          <td>{{ pay.date|date:'d b H:i' }}</td>
+          <td>{{ pay.comment }}</td>
         </tr>
+        {% empty %}
+        <tr><td colspan="3">У вас нет проведённых платежей</td></tr>
+        {% endfor %}
       </tbody>
     </table>
 

@@ -46,6 +46,16 @@ def finished_tasks(request):
 
 @login_required
 @only_admins
+def own_tasks(request):
+    tasks = Task.objects.filter(author=request.user).exclude(state='F')  # Назначенные мной и не законченная
+    tasks = pag_mn(request, tasks)
+    return render(request, 'taskapp/tasklist_own.html', {
+        'tasks': tasks
+    })
+
+
+@login_required
+@only_admins
 def all_tasks(request):
     tasks = Task.objects.filter(recipient=request.user)  # Все задачи
     tasks = pag_mn(request, tasks)

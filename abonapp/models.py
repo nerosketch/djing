@@ -4,11 +4,11 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
-from agent import get_TransmitterClientKlass, Abonent, Tariff as AgentTariff
+from agent import get_TransmitterClientKlass
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from django.db import models
-from djing import settings
+from django.conf import settings
 from django.core.validators import DecimalValidator
 from accounts_app.models import UserProfile
 
@@ -63,7 +63,7 @@ class AbonTariffManager(models.Manager):
         for at in abon_tariff_list:
             at.tariff_priority = at_pr
             at_pr += 1
-            at.save()
+            at.save(update_fields=['tariff_priority'])
 
 
 class AbonTariff(models.Model):
@@ -103,9 +103,9 @@ class AbonTariff(models.Model):
         # Swap приоритетов у текущего и найденного с меньшим tariff_priority (большим приоритетом)
         tmp_prior = target_abtar.tariff_priority
         target_abtar.tariff_priority = self.tariff_priority
-        target_abtar.save()
+        target_abtar.save(update_fields=['tariff_priority'])
         self.tariff_priority = tmp_prior
-        self.save()
+        self.save(update_fields=['tariff_priority'])
 
     def priority_down(self):
         # ищем услугу с меньшим приоритетом
@@ -123,8 +123,8 @@ class AbonTariff(models.Model):
         tmp_pr = self.tariff_priority
         self.tariff_priority = target_abtar.tariff_priority
         target_abtar.tariff_priority = tmp_pr
-        target_abtar.save()
-        self.save()
+        target_abtar.save(update_fields=['tariff_priority'])
+        self.save(update_fields=['tariff_priority'])
 
     # Считает текущую стоимость услуг согласно выбранной для тарифа логики оплаты (см. в документации)
     def calc_amount_service(self):
@@ -133,33 +133,21 @@ class AbonTariff(models.Model):
         amount = calc_obj.calc_amount(self)
         return round(amount, 2)
 
-    # досрочно завершает услугу
-    def finish_and_activate_next_tariff(self, author):
+    # Активируем тариф
+    def activate(self, current_user):
+        amnt = self.calc_amount_service()
+        # если не хватает денег
+        if self.abon.ballance > amnt:
+            raise LogicError(u'Не хватает денег на счету')
+        # дата активации услуги
+        self.time_start = timezone.now()
+        # снимаем деньги за услугу
+        self.abon.make_pay(current_user, amnt)
+        self.save()
 
-        # выберем следующие по приоритету услуги
-        next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)[:1]
-
-        if next_tarifs.count() < 1:
-            raise LogicError('У абонента нет следующих назначенных услуг')
-
-        # 0й элемент это следующая подключаемая услуга
-        next_tarifs[0].time_start = timezone.now()
-        next_tarifs[0].save()
-
-        # сколько денег стоят потраченные ресурсы
-        used_services = self.calc_amount_service()
-
-        #теперь к текущему баллансу добавляем сумму не потраченных ресурсов, т.к. полная сумма тарифа списывается при покупке тарифа
-        ret_amount = self.tariff.amount - used_services
-        self.abon.ballance += ret_amount
-        self.abon.save()
-
-        AbonLog.objects.create(
-            abon   = self.abon,
-            amount = ret_amount,
-            author = author,
-            comment = u'Досрочное завершение услуги %s' % (self.tariff.title)
-        )
+    # Используется-ли услуга сейчас, если время старта есть то он активирован
+    def is_started(self):
+        return True if self.time_start is not None else False
 
     def __unicode__(self):
         return "%d: '%s' - '%s'" % (
@@ -184,11 +172,11 @@ class Abon(UserProfile):
     _act_tar_cache = None
 
     # возвращает текущий тариф для абонента
-    def active_tariff(self):
-        if self._act_tar_cache:
+    def active_tariff(self, use_cache=True):
+        if self._act_tar_cache and use_cache:
             return self._act_tar_cache
 
-        ats = AbonTariff.objects.filter(abon=self)[:1]
+        ats = AbonTariff.objects.filter(abon=self).exclude(time_start=None)
 
         if ats.count() > 0:
             self._act_tar_cache = ats[0].tariff
@@ -217,6 +205,7 @@ class Abon(UserProfile):
     class Meta:
         db_table = 'abonent'
 
+    # Платим за что-то
     def make_pay(self, curuser, how_match_to_pay=0.0):
         AbonLog.objects.create(
             abon   =  self,
@@ -226,6 +215,7 @@ class Abon(UserProfile):
         )
         self.ballance -= how_match_to_pay
 
+    # Пополняем счёт
     def add_ballance(self, current_user, amount):
         AbonLog.objects.create(
             abon   = self,
@@ -235,55 +225,34 @@ class Abon(UserProfile):
         )
         self.ballance += amount
 
+    # покупаем тариф
     def buy_tariff(self, tariff, author):
-        if self.ballance >= tariff.amount:
-            # денег достаточно, можно покупать
-            self.ballance -= tariff.amount
+        assert isinstance(tariff, Tariff)
 
-            # Пытаемся подключиться к NAS агенту
-            tc = get_TransmitterClientKlass()()
+        # выбераем связь ТарифАбонент с самым низким приоритетом
+        abtrf = AbonTariff.objects.filter(abon=self).order_by('-tariff_priority')[:1]
+        abtrf = abtrf[0] if abtrf.count() > 0 else None
 
-            # выбераем связь ТарифАбонент с самым низким приоритетом
-            abtrf = AbonTariff.objects.filter(abon=self).order_by('-tariff_priority')[:1]
-            abtrf = abtrf[0] if abtrf.count() > 0 else None
+        # создаём новую связь с приоритетом ещё ниже
+        new_abtar = AbonTariff(
+            abon=self,
+            tariff=tariff,
+            tariff_priority=abtrf.tariff_priority+1 if abtrf else -1
+        )
 
-            # создаём новую связь с приоритетом ещё ниже
-            new_abtar = AbonTariff(
-                abon=self,
-                tariff=tariff,
-                tariff_priority=abtrf.tariff_priority+1 if abtrf else -1
-            )
+        # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
+        if not abtrf:
+            # значит она сразу стаёт активной
+            new_abtar.time_start = timezone.now()
 
-            # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
-            if not abtrf:
-                # значит она сразу стаёт активной
-                new_abtar.time_start = timezone.now()
+        new_abtar.save()
 
-            new_abtar.save()
-
-            # шлём сигнал о том что абонент купил первую услугу, а значит можно пользоваться инетом
-            # сигнал можно слать только после того как будет сохранён новый объект AbonTariff
-            if self.is_active and not abtrf:
-                act_tar = self.active_tariff()
-                agent_abon = Abonent(
-                    self.id,
-                    self.ip_address.int_ip(),
-                    AgentTariff(
-                        act_tar.id if act_tar else 0,
-                        act_tar.speedIn if act_tar else 0.0,
-                        act_tar.speedOut if act_tar else 0.0
-                    )
-                )
-                tc.signal_abon_refresh(agent_abon)
-
-            # Запись об этом в лог
-            AbonLog.objects.create(
-                abon = self, amount = -tariff.amount,
-                author = author,
-                comment = u'Покупка тарифного плана через админку, тариф "%s"' % tariff.title
-            )
-        else:
-            raise LogicError(u'Недостаточно денег на счету абонента')
+        # Запись об этом в лог
+        AbonLog.objects.create(
+            abon = self, amount = -tariff.amount,
+            author = author,
+            comment = u'Покупка тарифного плана через админку, тариф "%s"' % tariff.title
+        )
 
     # Пробует подключить новую услугу если пришло время
     def activate_next_tariff(self, author):
@@ -292,8 +261,8 @@ class Abon(UserProfile):
         nw = datetime.now(tz=timezone.get_current_timezone())
 
         for at in ats:
-            # Если времени активации нет, то это ещё не активированный тариф
-            if not at.time_start:
+            # Если активированный тариф
+            if not at.is_started():
                 return
 
             # время к началу месяца
@@ -363,13 +332,13 @@ class InvoiceForPayment(models.Model):
 
 def abon_post_save(sender, instance, **kwargs):
     if kwargs['created']:
-        print 'abon_pre_save CREATED'
+        print 'abon_post_save CREATED'
     else:
-        print 'abon_pre_save CHANGED'
-        # подключение к NAS'у в начале для того чтоб если исключение то ничего не сохранялось и сразу показать ошибку
+        print 'abon_post_save CHANGED'
         tc = get_TransmitterClientKlass()()
         # обновляем абонента на NAS
         tc.signal_abon_refresh(instance)
+
 
 
 def abon_del_signal(sender, instance, **kwargs):
@@ -388,14 +357,24 @@ def abon_del_signal(sender, instance, **kwargs):
     #tc = get_TransmitterClientKlass()()'''
 
 
-def tarif_del_signal(sender, instance, **kwargs):
-    print 'tarif_del_signal'
-    abon = instance.abon
-    abon.save()
+def abontariff_post_save(sender, instance, **kwargs):
+    if kwargs['created']:
+        print('abontariff CREATED', kwargs)
+    else:
+        print('abontariff CHANGED', kwargs)
+    # Тут или подключение абону услуги, или изменение приоритета
+    tc = get_TransmitterClientKlass()()
+    tc.signal_abon_refresh(instance.abon)
+
+
+def abontariff_del_signal(sender, instance, **kwargs):
+    print('abontariff_del_signal', instance.abon)
+    tc = get_TransmitterClientKlass()()
+    tc.signal_abon_refresh(instance.abon)
 
 
 models.signals.post_save.connect(abon_post_save, sender=Abon)
 models.signals.post_delete.connect(abon_del_signal, sender=Abon)
 
-#models.signals.pre_save.connect(tarif_pre_save, sender=AbonTariff)
-models.signals.post_delete.connect(tarif_del_signal, sender=AbonTariff)
+models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
+models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)

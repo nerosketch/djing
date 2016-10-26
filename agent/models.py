@@ -80,13 +80,14 @@ class Abonent(Serializer):
     # Включён-ли абонент
     is_active = True
 
-    def __init__(self, uid=None, ip=None, tariff=None):
+    def __init__(self, uid=None, ip=None, tariff=None, is_active=True):
         # none потому что может инициализироваться пустым, чтоб быть распакованным через deserialize()
         if tariff:
             assert isinstance(tariff, Tariff)
         self.ip = ip
         self.uid = uid
         self.tariff = tariff
+        self.is_active = is_active
 
     def ip_str(self):
         return socket.inet_ntoa(struct.pack("!I", self.ip))
@@ -94,7 +95,7 @@ class Abonent(Serializer):
     def _serializable_obj(self):
         return {
             'id': self.uid,
-            'is_active': self.is_active,
+            'is_active': bool(self.is_active),
             'ip': self.ip,
             'tarif_id': self.tariff.tid if self.tariff else 0
         }
@@ -116,6 +117,14 @@ class Abonent(Serializer):
         else:
             self.tariff = None
         return self
+
+    def is_access(self):
+        # Доступ в интернет происходит по наличию подключённого тарифа
+        # если тарифа нет, то и инета нет
+        if self.is_active and self.tariff is not None:
+            return True
+        else:
+            return False
 
 
 class EventNAS(Serializer):
