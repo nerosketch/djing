@@ -4,12 +4,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
-from agent import get_TransmitterClientKlass
-from ip_pool.models import IpPoolItem
-from tariff_app.models import Tariff
 from django.db import models
 from django.conf import settings
 from django.core.validators import DecimalValidator
+
+from agent import get_TransmitterClientKlass
+from ip_pool.models import IpPoolItem
+from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 
 
@@ -206,12 +207,12 @@ class Abon(UserProfile):
         db_table = 'abonent'
 
     # Платим за что-то
-    def make_pay(self, curuser, how_match_to_pay=0.0):
+    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=u'Снятие со счёта средств'):
         AbonLog.objects.create(
             abon   =  self,
             amount = -how_match_to_pay,
             author =  curuser,
-            comment = u'Снятие со счёта средств'
+            comment = u_comment
         )
         self.ballance -= how_match_to_pay
 

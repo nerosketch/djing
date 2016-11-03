@@ -2,6 +2,7 @@
 import ssl
 import socket
 from multiprocessing import Process, Manager
+
 import settings
 from models import EventNAS, Abonent, Tariff
 

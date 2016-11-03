@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
-import requests
 from json import loads
+
+import requests
 from requests.exceptions import ConnectionError
+
 from models import deserialize_tariffs, deserialize_abonents
 import settings
 

@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 from sys import stdout
+from time import sleep
+
 from db import load_from_db
 from firewall import FirewallManager
-from time import sleep
 from sslTransmitter import TransmitServer
 from agent.models import Abonent, Tariff
 

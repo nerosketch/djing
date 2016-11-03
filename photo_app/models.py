@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
-from django.db import models
-from djing.settings import BASE_DIR
 import os
-from PIL import Image
 import time
 import hashlib
+
+from django.db import models
+from PIL import Image
+
+from djing.settings import BASE_DIR
 
 
 class Photo(models.Model):

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
+
 from django import forms
+
 from models import TASK_PRIORITIES, TASK_STATES
 from accounts_app.models import UserProfile
 from devapp.models import Device

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+
 from base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
 from dev_types import DEVICE_TYPES

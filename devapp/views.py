@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+
 from models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins
 from forms import DeviceForm

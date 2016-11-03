@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+
 from custom_tariffs import TariffBase, TARIFF_CHOICES
 from mydefs import MyChoicesAdapter
 from agent import get_TransmitterClientKlass
+
 
 
 # Класс похож на адаптер. Предназначен для Django CHOICES чтоб можно было передавать классывместо просто описания поля,

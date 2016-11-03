@@ -1,4 +1,5 @@
 from django.db import models, connection
+
 from mydefs import ip2int, MyGenericIPAddressField
 
 

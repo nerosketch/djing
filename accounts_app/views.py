@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required#, permission_required
 from django.contrib.auth import authenticate, login, logout
-from photo_app.models import Photo
 from django.core.urlresolvers import NoReverseMatch
-from models import UserProfile
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.template.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
+
+from photo_app.models import Photo
+from models import UserProfile
 import mydefs
-from taskapp.models import Task
 
 
 @login_required

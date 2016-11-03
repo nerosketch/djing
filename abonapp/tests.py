@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404
 from django.test import TestCase
+
 from models import Abon, AbonTariff
 from tariff_app.models import Tariff
 

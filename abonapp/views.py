@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from json import dumps
+
 from django.db import IntegrityError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from accounts_app.models import UserProfile
-from ip_pool.models import IpPoolItem
-from tariff_app.models import Tariff
 from django.template.context_processors import csrf
 from django.http import HttpResponse, Http404
+
+from django.contrib.auth import get_user_model
+from ip_pool.models import IpPoolItem
+from tariff_app.models import Tariff
 from agent import NetExcept
 import forms
 import models
@@ -266,7 +268,7 @@ def terminal_pay(request):
     username = request.GET.get('username')
     amount = mydefs.safe_float(request.GET.get('amount'))
 
-    kernel_user = get_object_or_404(UserProfile, username='kernel')
+    kernel_user = get_object_or_404(get_user_model(), username='kernel')
     abon = get_object_or_404(models.Abon, username=username)
 
     abon.add_ballance(kernel_user, amount)

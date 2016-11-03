@@ -1,11 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
-DUMP_DIR="/var/db/flows"
+FNAME="$1"
 
-DUMP_FILE="$DUMP_DIR/$1"
-PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+if [[ -z "$FNAME" ]]; then
+  echo "Нужно имя файла дампа netflow"
+  exit 1
+fi
+
 CUR_DIR=`dirname $0`
 
+DUMP_FILE="$CUR_DIR/$FNAME"
+PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
 
-flow-print -f3 < ${DUMP_FILE} | ${CUR_DIR}/netflow_handler.py \
+
+flow-print -f3 < ${DUMP_FILE} | ${CUR_DIR}/to_mysql \
 | mysql -uroot -p jungagent --password=ps

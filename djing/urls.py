@@ -1,7 +1,9 @@
 from django.conf.urls import url, include
 from django.contrib import admin
+
 import settings
 from views import home
+
 
 urlpatterns = [
     url(r'^$', home),
@@ -16,7 +18,7 @@ urlpatterns = [
     url(r'^statistic/', include('statistics.urls')),
     url(r'^tasks/', include('taskapp.urls')),
     url(r'^client/', include('clientsideapp.urls')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls)
 ]
 
 

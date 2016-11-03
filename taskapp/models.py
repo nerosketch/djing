@@ -1,10 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
+from datetime import datetime, timedelta
+
 from django.db import models
 from django.conf import settings
+
 from devapp.models import Device
-from datetime import datetime, timedelta
 
 
 TASK_PRIORITIES = (

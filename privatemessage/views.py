@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+from json import dumps
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from models import PrivateMessages
 from django.http import HttpResponse
-from json import dumps
 from django.template.context_processors import csrf
+
+from models import PrivateMessages
 import mydefs
-from accounts_app.models import UserProfile
+from django.contrib.auth import get_user_model
 
 
 @login_required
@@ -36,6 +38,7 @@ def delitem(request, id=0):
 @login_required
 @mydefs.only_admins
 def send_message(request):
+    UserModel = get_user_model()
     if request.method == 'GET':
         return HttpResponse(render_to_string('private_messages/send_form.html',{
             'csrf_token': csrf(request)['csrf_token'],
@@ -47,11 +50,11 @@ def send_message(request):
             a = 0 if a is None or a == '' else int(a)
             msg = PrivateMessages()
             msg.sender = request.user
-            msg.recepient = UserProfile.objects.get(id=a)
+            msg.recepient = UserModel.objects.get(id=a)
             msg.text = request.POST.get('msg_text')
             msg.save()
             return redirect('privmsg_home')
-        except UserProfile.DoesNotExist:
+        except UserModel.DoesNotExist:
             return mydefs.res_error(request, u'Адресат не найден')
     else:
         return mydefs.res_error(request, u'Ошибка типа запроса')

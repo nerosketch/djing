@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-from django.conf.urls import patterns, url
 
 urlpatterns = [
     #url(r'^$', 'photo_albums', name='media_home_link'),

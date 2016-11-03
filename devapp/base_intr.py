@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
+
 from netsnmp import Session, VarList, Varbind
 
 

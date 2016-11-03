@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.utils import timezone
 from datetime import datetime, timedelta
+
+from django.utils import timezone
+
 from base_intr import TariffBase
+
 #from abonapp import AbonTariff
 
 

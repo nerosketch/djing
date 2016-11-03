@@ -1,8 +1,10 @@
+import re
+
 from django.db.models import Q
 from django.shortcuts import render
-from abonapp.models import Abon
 from django.utils.html import escape
-import re
+
+from abonapp.models import Abon
 
 
 def replace_without_case(orig, old, new):

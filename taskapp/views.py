@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from accounts_app.models import UserProfile
+
 from models import Task
 from mydefs import pag_mn, only_admins, safe_int
 from forms import TaskFrm

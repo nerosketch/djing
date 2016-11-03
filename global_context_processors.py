@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from abonapp.models import Abon
 from django.shortcuts import get_object_or_404
+from abonapp.models import Abon
 
 
 def context_processor_client_ipaddress(request):

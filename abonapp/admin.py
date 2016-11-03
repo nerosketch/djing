@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 import models
+
 
 admin.site.register(models.AbonGroup)
 admin.site.register(models.Abon)
