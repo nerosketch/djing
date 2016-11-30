@@ -11,7 +11,7 @@
                 <th class="col-sm-1">Кто назначил</th>
                 <th class="col-sm-1">Состояние</th>
                 <th class="col-sm-1">Приоритет</th>
-                <th class="col-sm-1">Истечение срока</th>
+                <th class="col-sm-1">Устройство</th>
                 <th class="col-sm-1">Дата создания</th>
                 <th class="col-sm-1">Приложение</th>
                 <th class="col-sm-2" colspan="3">Действия</th>
@@ -21,15 +21,15 @@
             {% for task in tasks %}
 
                 {% if task.priority == 'E' %}
-                    <tr class="danger">
+                    <tr class="success">
                     {% elif task.priority == 'D' %}
-                    <tr class="warning">
-                    {% elif task.priority == 'C' %}
                     <tr class="info">
+                    {% elif task.priority == 'C' %}
+                    <tr class="warning">
                     {% elif task.priority == 'B' %}
                     <tr>
                     {% elif task.priority == 'A' %}
-                    <tr class="success">
+                    <tr class="danger">
                     {% else %}
                     <tr>{% endif %}
 
@@ -39,7 +39,7 @@
                 <td><a href="{% url 'other_profile' task.author.id %}" title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
-                <td>{{ task.out_date|date:'d N yг' }}</td>
+                <td><a href="{% url 'devs_view_link' task.device.id %}" target="_blank">{{ task.device.ip_address }}</a></td>
                 <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td colspan="3" class="btn-group btn-group-justified">
