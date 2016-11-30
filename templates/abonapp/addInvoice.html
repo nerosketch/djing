@@ -3,48 +3,53 @@
 
 
     <ol class="breadcrumb">
-      <li><span class="glyphicon glyphicon-home"></span></li>
-      <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-      <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
-      <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
-      <li class="active">Добавить долг</li>
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li class="active">Добавить долг</li>
     </ol>
 
 
     <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Добавьте платёж на оплату для
-            <u><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></u>
-        </h3>
-    </div>
-    <div class="panel-body">
-        <form role="form" action="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}" method="post">{% csrf_token %}
-            <div class="form-group">
-                <label for="pamount">Сумма для платежа</label>
-                <div class="input-group">
-                    <span class="input-group-addon">&#8381;</span>
-                    <input id="pamount" type="text" name="curr_amount" placeholder="0" required pattern="^\d+$" class="form-control">
+        <div class="panel-heading">
+            <h3 class="panel-title">Добавьте платёж на оплату для
+                <u><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></u>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <form role="form" action="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}"
+                  method="post">{% csrf_token %}
+                <div class="form-group">
+                    <label for="pamount">Сумма для платежа</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">&#8381;</span>
+                        <input id="pamount" type="text" name="curr_amount" placeholder="0" required pattern="^\d+$"
+                               class="form-control">
+                    </div>
                 </div>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input id="paystat" type="checkbox" name="status"{% if invcount == 0 %} checked{% endif %}> Статус оплаты
-                </label>
-            </div>
-            <div class="form-group">
-                <label for="comm">Комментарий</label>
-                <textarea id="comm" name="comment" required maxlength="128" rows="3" class="form-control"></textarea>
-            </div>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <span class="glyphicon glyphicon-save"></span> Сохранить
-                </button>
-                <button type="reset" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
-                </button>
-            </div>
-        </form>
+                <div class="checkbox">
+                    <label>
+                        <input id="paystat" type="checkbox" name="status"{% if invcount == 0 %} checked{% endif %}>
+                        Статус оплаты
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="comm">Комментарий</label>
+                    <textarea id="comm" name="comment" required maxlength="128" rows="3"
+                              class="form-control"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                    </button>
+                    <button type="reset" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
 {% endblock %}

@@ -8,7 +8,6 @@ from photo_app.models import Photo
 
 
 class MyUserManager(BaseUserManager):
-
     def create_user(self, telephone, username, password=None):
         """
         Creates and saves a User with the given email, date of
@@ -32,8 +31,8 @@ class MyUserManager(BaseUserManager):
         birth and password.
         """
         user = self.create_user(telephone,
-            password=password,
-            username=username
+                                password=password,
+                                username=username
         )
         user.is_admin = True
         user.is_superuser = True
@@ -95,7 +94,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 
-#from django.db.models.signals import post_save
+# from django.db.models.signals import post_save
 
 
 '''def create_custom_user(sender, instance, created, **kwargs):

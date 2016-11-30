@@ -2,68 +2,74 @@
 {% block content %}
 
     <div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr><th>#</th>
-                <th class="col-sm-4">Пару слов..</th>
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th class="col-sm-3">Пару слов..</th>
                 <th class="col-sm-1">Кому назначена</th>
                 <th class="col-sm-1">Кто назначил</th>
                 <th class="col-sm-1">Состояние</th>
                 <th class="col-sm-1">Приоритет</th>
                 <th class="col-sm-1">Истечение срока</th>
                 <th class="col-sm-1">Дата создания</th>
+                <th class="col-sm-1">Приложение</th>
                 <th class="col-sm-2" colspan="3">Действия</th>
             </tr>
-        </thead>
-        <tbody>
-        {% for task in tasks %}
+            </thead>
+            <tbody>
+            {% for task in tasks %}
 
-        {% if task.priority == 'E' %}<tr class="danger">
-        {% elif task.priority == 'D' %}<tr class="warning">
-        {% elif task.priority == 'C' %}<tr class="info">
-        {% elif task.priority == 'B' %}<tr>
-        {% elif task.priority == 'A' %}<tr class="success">
-        {% else %}<tr>{% endif %}
+                {% if task.priority == 'E' %}
+                    <tr class="danger">
+                    {% elif task.priority == 'D' %}
+                    <tr class="warning">
+                    {% elif task.priority == 'C' %}
+                    <tr class="info">
+                    {% elif task.priority == 'B' %}
+                    <tr>
+                    {% elif task.priority == 'A' %}
+                    <tr class="success">
+                    {% else %}
+                    <tr>{% endif %}
 
-            <td>{{ task.id }}</td>
-            <td>{{ task.descr }}</td>
-            <td><a href="{% url 'other_profile' task.recipient.id %}" title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
-            <td><a href="{% url 'other_profile' task.author.id %}" title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
-            <td>{{ task.get_state_display }}</td>
-            <td>{{ task.get_priority_display }}</td>
-            <td>{{ task.out_date|date:'d N yг' }}</td>
-            <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
-            <td colspan="3" class="btn-group">
-                <a href="{% url 'task_begin' task.id %}" class="btn btn-sm btn-primary" title="Начать">
-                    <span class="glyphicon glyphicon-cog"></span>
-                </a>
-                <a href="{% url 'task_finish' task.id %}" class="btn btn-sm btn-success" title="Завершить">
-                    <span class="glyphicon glyphicon-ok"></span>
-                </a>
-                <a href="{% url 'task_edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
-                    <span class="glyphicon glyphicon-edit"></span>
-                </a>
-                <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-danger" title="Удалить">
-                    <span class="glyphicon glyphicon-remove-circle"></span>
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="11">Список пуст</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="11">
-                <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </a>
-            </td>
-        </tr>
-        </tfoot>
-    </table>
+                <td>{{ task.id }}</td>
+                <td>{{ task.descr }}</td>
+                <td><a href="{% url 'other_profile' task.recipient.id %}" title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
+                <td><a href="{% url 'other_profile' task.author.id %}" title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
+                <td>{{ task.get_state_display }}</td>
+                <td>{{ task.get_priority_display }}</td>
+                <td>{{ task.out_date|date:'d N yг' }}</td>
+                <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
+                <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
+                <td colspan="3" class="btn-group btn-group-justified">
+                    <a href="{% url 'task_begin' task.id %}" class="btn btn-primary btn-xs" title="Начать">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </a>
+                    <a href="{% url 'task_finish' task.id %}" class="btn btn-success btn-xs" title="Завершить">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </a>
+                    <a href="{% url 'task_edit' task.id %}" class="btn btn-default btn-xs" title="Редактировать">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+                </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12">Список пуст</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="12">
+                    <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
     </div>
 
     {% include 'toolbar_page.html' with pag=tasks %}

@@ -3,13 +3,12 @@ from agent.models import Abonent, Tariff
 
 
 class FirewallManager(object):
-
     f = r'/sbin/ipfw -q'
 
     # вызывает комманду shell
     def exec_cmd(self, cmd):
         print cmd
-        #os.execv(cmd, [''])
+        # os.execv(cmd, [''])
 
     # ставит заглушку на абонента
     def set_cap(self, user):
@@ -23,7 +22,7 @@ class FirewallManager(object):
             return
         cmd = r"%s table 12 add %s/32 %d && %s table 13 add %s/32 %d" % (
             self.f, user.ip_str(), user.tariff.tid,
-            self.f, user.ip_str(), user.tariff.tid+1000
+            self.f, user.ip_str(), user.tariff.tid + 1000
         )
         self.exec_cmd(cmd)
 

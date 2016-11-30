@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.template.context_processors import csrf
 from django.http import HttpResponse, Http404
-
 from django.contrib.auth import get_user_model
+
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from agent import NetExcept
@@ -239,7 +239,7 @@ def abonhome(request, gid, uid):
                 abon.is_active = 1 if cd['is_active'] else 0
                 abon.save()
 
-                #return redirect('abonhome_link', gid, uid)
+                # return redirect('abonhome_link', gid, uid)
             else:
                 warntext = u'Не правильные значения, проверте поля и попробуйте ещё'
         else:
@@ -332,8 +332,8 @@ def buy_tariff(request, gid, uid):
         warntext = e.value
 
     except NetExcept as e:
-        warntext = e.value+u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.'\
-        u' <a href="%s">Вернуться</a>' % resolve_url('abonhome_link', gid=gid, uid=abon.id)
+        warntext = e.value + u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.' \
+                             u' <a href="%s">Вернуться</a>' % resolve_url('abonhome_link', gid=gid, uid=abon.id)
 
     return render(request, 'abonapp/buy_tariff.html', {
         'warntext': warntext,
@@ -449,7 +449,7 @@ def log_page(request):
 @login_required
 @mydefs.only_admins
 def debtors(request):
-    #peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
+    # peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
     #peoples_list = mydefs.pag_mn(request, peoples_list)
 
     invs = models.InvoiceForPayment.objects.filter(status=True)

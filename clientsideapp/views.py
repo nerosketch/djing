@@ -47,7 +47,7 @@ def debts_list(request):
 
 @login_required
 def debt_buy(request, d_id):
-    warntext=u''
+    warntext = u''
     debt = get_object_or_404(InvoiceForPayment, id=d_id)
     abon = get_object_or_404(Abon, id=request.user.id)
     if request.method == 'POST':
@@ -64,7 +64,7 @@ def debt_buy(request, d_id):
             debt.save(update_fields=['status', 'date_pay'])
             return redirect('client_debts')
         except LogicError, e:
-            warntext=e.value
+            warntext = e.value
     return render(request, 'clientsideapp/debt_buy.html', {
         'warntext': warntext,
         'debt': debt,

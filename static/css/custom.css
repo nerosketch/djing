@@ -4,17 +4,16 @@
 
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
-
 
 /*
  * Global add-ons
  */
 
 .sub-header {
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
 }
 
 /*
@@ -26,75 +25,79 @@ body {
     background-position-x: 16px;
 }
 
-
 /*
  * Sidebar
  */
 
 /* Hide for mobile, show later */
 .sidebar {
-  display: none;
+    display: none;
 }
+
 @media (min-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 39px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #303840;
-    border-right: 1px solid #eee;
-  }
+    .sidebar {
+        position: fixed;
+        top: 39px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        background-color: #303840;
+        border-right: 1px solid #eee;
+    }
 }
 
 /* Sidebar navigation */
 .nav-sidebar {
-  margin-right: -21px; /* 20px padding + 1px border */
-  margin-bottom: 20px;
-  margin-left: -20px;
-  border-top: 1px solid #576a7d;
+    margin-right: -21px; /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+    border-top: 1px solid #576a7d;
 }
+
 .nav-sidebar > li > a {
-  padding-right: 20px;
-  padding-left: 20px;
-  color: #b3c3d2;
+    padding-right: 20px;
+    padding-left: 20px;
+    color: #b3c3d2;
 }
-.nav>li>a:focus, .nav>li>a:hover {
+
+.nav > li > a:focus, .nav > li > a:hover {
     background-color: #1f2429;
     color: #b2bfcc;
 }
+
 .nav-sidebar > .active > a {
-  background-color: #44596b;
+    background-color: #44596b;
 }
 
-
-
-.profile_img{
+.profile_img {
     color: aliceblue;
     padding-bottom: 9px;
 }
-.main{
+
+.main {
     margin-top: 10px;
 }
-.table-responsive thead{
+
+.table-responsive thead {
     background-color: gainsboro;
 }
-td.btn-group{
+
+td.btn-group {
     display: table-cell;
 }
+
 .table > tbody > tr > td {
     vertical-align: middle;
 }
 
-.modal-header.warning{
+.modal-header.warning {
     background-color: #d2322d;
     border-radius: 4px 4px 0 0;
 }
-
 
 .tab-pane {
     border-left: 1px solid #ddd;
@@ -104,21 +107,21 @@ td.btn-group{
     padding: 10px;
 }
 
-
 /* search form */
-.stylish-input-group .input-group-addon{
-    background: white !important; 
-}
-.stylish-input-group .form-control{
-	border-right:0; 
-	box-shadow:0 0 0; 
-	border-color:#ccc;
-}
-.stylish-input-group button{
-    border:0;
-    background:transparent;
+.stylish-input-group .input-group-addon {
+    background: white !important;
 }
 
+.stylish-input-group .form-control {
+    border-right: 0;
+    box-shadow: 0 0 0;
+    border-color: #ccc;
+}
+
+.stylish-input-group button {
+    border: 0;
+    background: transparent;
+}
 
 /*---------Switch----------*/
 .switch_ports {
@@ -126,9 +129,11 @@ td.btn-group{
     border-radius: 7px;
     box-shadow: 3px 3px 8px #2B2B2B;
 }
+
 .switch_ports h4 {
     margin: 10px 0 3px 10px;
 }
+
 .port {
     display: inline-block;
     margin: 10px;
@@ -138,19 +143,22 @@ td.btn-group{
     width: 64px;
     height: 64px;
 }
+
 .port.giga {
     background-color: #B5FFB5;
 }
+
 .port.kilo {
     background-color: #FBEB79;
 }
+
 /*-------END-Switch--------*/
 
-
 /* Table filter */
-.table th>a {
+.table th > a {
     color: inherit;
     cursor: pointer;
     text-decoration: none;
 }
+
 /* end */

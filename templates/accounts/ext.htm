@@ -1,11 +1,11 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
-  <li class="active">{{ userprofile.username }}</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+        <li class="active">{{ userprofile.username }}</li>
+    </ol>
 
 
     <div class="row">
@@ -16,9 +16,11 @@
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
-                <div class="caption">
-                  <a href="{% url 'settings_chinfo_link' %}" class="btn btn-primary" role="button">Редактировать</a>
-                  <a href="#" class="btn btn-default" role="button" data-toggle="modal" data-target="#modFrm">###</a>
+                <div class="caption btn-group btn-group-sm">
+                    <a href="{% url 'settings_chinfo_link' %}" class="btn btn-primary btn-sm" role="button">
+                        <span class="glyphicon glyphicon-edit"></span> Редактировать</a>
+                    <a href="{% url 'task_add' %}?rp={{ userprofile.id }}" class="btn btn-default btn-sm" role="button">
+                        <span class="glyphicon glyphicon-star-empty"></span> Дать задачу</a>
                 </div>
             </div>
         </div>
@@ -27,12 +29,14 @@
             <h3>{{ userprofile.username|default:"&lt;Нет ника&gt;" }}</h3>
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a href="#livetab_content" data-tab-remote="{% url 'other_profile' uid %}" role="tab" data-toggle="tab">
+                    <a href="#livetab_content" data-tab-remote="{% url 'other_profile' uid %}" role="tab"
+                       data-toggle="tab">
                         Администратор
                     </a>
                 </li>
                 <li>
-                    <a href="#livetab_content" data-tab-remote="{% url 'profile_chgroup_link' uid %}" role="tab" data-toggle="tab">
+                    <a href="#livetab_content" data-tab-remote="{% url 'profile_chgroup_link' uid %}" role="tab"
+                       data-toggle="tab">
                         Группы
                     </a>
                 </li>

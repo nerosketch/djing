@@ -9,14 +9,14 @@ from agent.models import Abonent, Tariff
 
 
 def filter_user_by_id(users, uid):
-    #users = filter(lambda usr: isinstance(usr, Abonent), users)
+    # users = filter(lambda usr: isinstance(usr, Abonent), users)
     users = filter(lambda usr: usr.uid == uid, users)
     if len(users) > 0:
         return users[0]
 
 
 def filter_tariff_by_id(tariffs, tid):
-    #tariffs = filter(lambda trf: isinstance(trf, Tariff), tariffs)
+    # tariffs = filter(lambda trf: isinstance(trf, Tariff), tariffs)
     tariffs = filter(lambda trf: trf.tid == tid, tariffs)
     if len(tariffs) > 0:
         return tariffs[0]
@@ -63,11 +63,12 @@ def main(debug=False):
         events = ts.get_data()
         # Проходим по появившимся событиям
         for event in events:
-            #event.toa, event.id, event.dt
+            # event.toa, event.id, event.dt
 
             # Смотрим тип события
             toa = int(event.toa)
-            if toa == 0: continue
+            if toa == 0:
+                continue
 
             # создаём абонента
             elif toa == 1:

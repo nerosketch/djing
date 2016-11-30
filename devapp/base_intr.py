@@ -33,7 +33,6 @@ class DevBase(object):
 
 
 class Port(object):
-
     def __init__(self, num, name, status, mac, speed):
         self.num = int(num)
         self.nm = name

@@ -4,7 +4,6 @@ from mydefs import ip2int, MyGenericIPAddressField
 
 
 class IpPoolItemManager(models.Manager):
-
     def get_pools(self):
         ips = self.raw(r'SELECT id, ip FROM ip_pool_ippoolitem ORDER BY id')
         ips_len = len(list(ips))
@@ -27,12 +26,12 @@ class IpPoolItemManager(models.Manager):
 
     def add_pool(self, start_ip, end_ip):
         start_ip = ip2int(start_ip)
-        end_ip   = ip2int(end_ip)
+        end_ip = ip2int(end_ip)
 
         if (end_ip - start_ip) > 5000:
             raise Exception(u'Not add over 5000 ip\'s')
 
-        sql_strs = map(lambda tip: r"(%d)" % tip, range(start_ip, end_ip+1))
+        sql_strs = map(lambda tip: r"(%d)" % tip, range(start_ip, end_ip + 1))
         sql = r'INSERT INTO ip_pool_ippoolitem (ip) VALUES %s' % r",".join(sql_strs)
         print sql
 

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block main %}
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script>
+
+        var markers = {
+            dev_ok: 'dev_ok.png',
+            dev_bug: 'dev_bug.png',
+            dev: 'dev.png',
+            disabled: 'flag_black.png'
+        };
+
+        google.maps.Map.prototype.onMapDblClick = function (e) {
+        };
+
+
+        google.maps.Map.prototype.SetStaticMarker = function (wlink, type, x, y) {
+            var dot = new google.maps.LatLng(x, y);
+
+            var m = new google.maps.Marker({icon: '/static/img/gmarkers/' + type, position: dot});
+
+            var iw = new google.maps.InfoWindow();
+
+            google.maps.event.addListener(m, 'click', function () {
+                var mp = this.map;
+                $.get(wlink, function (r) {
+                    iw.setContent(r);
+                    iw.open(mp, m);
+                });
+            });
+
+            m.setMap(this);
+        };
+
+        function myISGmap(elId) {
+
+            this.map = new google.maps.Map(document.getElementById(elId), {
+                center: new google.maps.LatLng(45.4489018, 34.7880390),
+                zoom: 11,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            this.map.set("disableDoubleClickZoom", true);
+
+            google.maps.event.addListener(this.map, 'dblclick', this.map.onMapDblClick);
+
+        }
+
+        function initialize() {
+            var mm = new myISGmap("maincontent");
+
+            $.getJSON("{% url 'maps_get_dots' %}", function (r) {
+                for (var n in r.dots) {
+                    var el = r.dots[n];
+                    mm.map.SetStaticMarker("/", markers.disabled, el[1], el[2]);
+                }
+            });
+        }
+
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
+
+
+
+{% endblock %}

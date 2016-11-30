@@ -7,7 +7,7 @@ SELF_PORT = 2134
 
 # Main server ip and port
 SERVER_IP = '127.0.0.1'
-SERVER_PORT = 8000 #8443
+SERVER_PORT = 8000  # 8443
 
 # Certificates
 CERTFILE = "/etc/ssl/server.crt"

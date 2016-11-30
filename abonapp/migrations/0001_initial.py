@@ -9,7 +9,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -23,7 +22,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Abon',
             fields=[
-                ('userprofile_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
+                ('userprofile_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
                 ('ballance', models.FloatField(default=0.0, validators=[django.core.validators.DecimalValidator])),
                 ('address', models.CharField(max_length=256)),
             ],
@@ -51,7 +52,8 @@ class Migration(migrations.Migration):
                 ('comment', models.CharField(max_length=128)),
                 ('date', models.DateTimeField(auto_now_add=True)),
                 ('abon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='abonapp.Abon')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+',
+                                             to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'abonent_log',
@@ -64,7 +66,8 @@ class Migration(migrations.Migration):
                 ('tariff_priority', models.PositiveSmallIntegerField(default=0)),
                 ('time_start', models.DateTimeField(blank=True, default=None, null=True)),
                 ('abon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='abonapp.Abon')),
-                ('tariff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='linkto_tariff', to='tariff_app.Tariff')),
+                ('tariff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='linkto_tariff',
+                                             to='tariff_app.Tariff')),
             ],
             options={
                 'ordering': ('tariff_priority',),
@@ -81,7 +84,8 @@ class Migration(migrations.Migration):
                 ('date_create', models.DateTimeField(auto_now_add=True)),
                 ('date_pay', models.DateTimeField(blank=True, null=True)),
                 ('abon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='abonapp.Abon')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+',
+                                             to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ('date_create',),
@@ -96,12 +100,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='abon',
             name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.AbonGroup'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='abonapp.AbonGroup'),
         ),
         migrations.AddField(
             model_name='abon',
             name='ip_address',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='ip_pool.IpPoolItem'),
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                       to='ip_pool.IpPoolItem'),
         ),
         migrations.AlterUniqueTogether(
             name='abontariff',

@@ -128,7 +128,6 @@ class Abonent(Serializer):
 
 
 class EventNAS(Serializer):
-
     # Type Of Action
     toa = 0
 

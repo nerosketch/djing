@@ -43,8 +43,8 @@ class Photo(models.Model):
         super(Photo, self).save()
 
 
-    #class Meta:
-    #    unique_together = (('image',),)
+        # class Meta:
+        #    unique_together = (('image',),)
 
 
 def resize_image(sender, instance, **kwargs):
@@ -56,7 +56,6 @@ def resize_image(sender, instance, **kwargs):
         im.save(fullpath)
 
 
-
 def post_delete_photo(sender, instance, **kwargs):
     min_fname = instance.image.path.split('/')[-1:][0]
     try:
@@ -64,7 +63,6 @@ def post_delete_photo(sender, instance, **kwargs):
         os.remove(instance.image.path)
     except OSError:
         pass
-
 
 
 models.signals.post_save.connect(resize_image, sender=Photo)

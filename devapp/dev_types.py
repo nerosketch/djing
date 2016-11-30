@@ -3,7 +3,6 @@ from base_intr import DevBase, SNMPBaseWorker
 
 
 class DLinkDevice(DevBase):
-
     @staticmethod
     def description():
         return u"Свич D'Link"

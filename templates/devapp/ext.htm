@@ -2,9 +2,9 @@
 {% block main %}
 
     <ol class="breadcrumb">
-      <li><span class="glyphicon glyphicon-home"></span></li>
-      <li><a href="{% url 'devs_link' %}">Устройства</a></li>
-      <li class="active">{{ dev.ip_address }}</li>
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'devs_link' %}">Устройства</a></li>
+        <li class="active">{{ dev.ip_address }}</li>
     </ol>
 
 
@@ -13,8 +13,10 @@
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'devs_view_link' dev.id %}" role="tab" data-toggle="tab">Порты {{ dev.ip_address }}</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'devs_edit_link' dev.id %}" role="tab" data-toggle="tab">Редактировать</a></li>
+        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'devs_view_link' dev.id %}" role="tab"
+                              data-toggle="tab">Порты {{ dev.ip_address }}</a></li>
+        <li><a href="#livetab_content" data-tab-remote="{% url 'devs_edit_link' dev.id %}" role="tab" data-toggle="tab">Редактировать</a>
+        </li>
     </ul>
 
     <div class="tab-content">

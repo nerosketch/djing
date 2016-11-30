@@ -5,11 +5,10 @@ from django.utils import timezone
 
 from base_intr import TariffBase
 
-#from abonapp import AbonTariff
+# from abonapp import AbonTariff
 
 
 class TariffDefault(TariffBase):
-
     # Базовый функционал считает стоимость пропорционально использованному времени
     def calc_amount(self, abon_tariff):
         #assert isinstance(abon_tariff, AbonTariff)
@@ -20,7 +19,7 @@ class TariffDefault(TariffBase):
         time_diff = nw - abon_tariff.time_start
 
         # времени в этом месяце
-        curr_month_time = datetime(nw.year, nw.month+1, 1) - timedelta(days = 1)
+        curr_month_time = datetime(nw.year, nw.month + 1, 1) - timedelta(days=1)
         curr_month_time = timedelta(days=curr_month_time.day)
 
         # Сколько это в процентах от всего месяца (k - коеффициент, т.е. без %)
@@ -49,7 +48,6 @@ class TariffDp(TariffBase):
 
 
 class TariffCp(TariffBase):
-
     def calc_amount(self, abon_tariff):
         return 12.6
 

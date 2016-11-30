@@ -7,7 +7,6 @@ from dev_types import DEVICE_TYPES
 
 
 class _DeviceChoicesAdapter(MyChoicesAdapter):
-
     def __init__(self):
         super(_DeviceChoicesAdapter, self).__init__(DEVICE_TYPES)
 
@@ -17,7 +16,7 @@ class Device(models.Model):
     comment = models.CharField(max_length=256)
     devtype = models.CharField(max_length=2, default=DEVICE_TYPES[0][0], choices=_DeviceChoicesAdapter())
     man_passw = models.CharField(max_length=16, null=True, blank=True)
-    #map_dot = models.ForeignKey()
+    # map_dot = models.ForeignKey()
 
     class Meta:
         db_table = 'dev'

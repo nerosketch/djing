@@ -25,7 +25,7 @@ def home(request):
 @mydefs.only_admins
 def ips(request):
     ip_start = request.GET.get('ips')
-    ip_end   = request.GET.get('ipe')
+    ip_end = request.GET.get('ipe')
 
     pool_ips = IpPoolItem.objects.filter(ip__gte=ip_start)
     pool_ips = pool_ips.filter(ip__lte=ip_end)
@@ -43,7 +43,7 @@ def ips(request):
 @mydefs.only_admins
 def del_pool(request):
     ip_start = request.GET.get('ips')
-    ip_end   = request.GET.get('ipe')
+    ip_end = request.GET.get('ipe')
 
     pool_ips = IpPoolItem.objects.filter(ip__gte=ip_start)
     pool_ips = pool_ips.filter(ip__lte=ip_end)

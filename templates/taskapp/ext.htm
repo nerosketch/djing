@@ -1,18 +1,18 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li class="active">Задачи</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">Задачи</li>
+    </ol>
 
 
 
     {% if warntext %}
-    <div class="alert alert-danger alert-dismissable">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        <strong>Предупреждение!</strong> {{ warntext }}
-    </div>
+        <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <strong>Предупреждение!</strong> {{ warntext }}
+        </div>
     {% endif %}
 
     <div class="page-header">

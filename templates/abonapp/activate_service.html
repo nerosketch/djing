@@ -2,35 +2,37 @@
 {% block main %}
 
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-  <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
-  <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
-  <li class="active">Активировать услугу</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li class="active">Активировать услугу</li>
+    </ol>
 
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Активировать услугу</h3>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Активировать услугу</h3>
+        </div>
+        <div class="panel-body">
+            {% if warntext %}
+                <div class="alert-danger">{{ warntext }}</div>
+            {% endif %}
+            <form role="form" action="{% url 'abonapp_activate_service' abon_group.id abon.id abtar.id %}"
+                  method="post">{% csrf_token %}
+                <input name="finish_confirm" value="yes" type="hidden">
+
+                <p>Вы уверены что хотите активировать абоненту эту услугу?<br>
+                    Обратите внимание что с его счёта <b>снимутся деньги</b> и откроется доступ к ресурсам оплаченной
+                    услуги.<br>
+                    Стоимость услуги: {{ amount }}руб. На счету {{ abon.ballance }} руб, останется {{ diff }} руб.</p>
+
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> Подтвердить
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="panel-body">
-        {% if warntext %}
-            <div class="alert-danger">{{ warntext }}</div>
-        {% endif %}
-        <form role="form" action="{% url 'abonapp_activate_service' abon_group.id abon.id abtar.id %}" method="post">{% csrf_token %}
-            <input name="finish_confirm" value="yes" type="hidden">
-
-            <p>Вы уверены что хотите активировать абоненту эту услугу?<br>
-                Обратите внимание что с его счёта <b>снимутся деньги</b> и откроется доступ к ресурсам оплаченной услуги.<br>
-            Стоимость услуги: {{ amount }}руб. На счету {{ abon.ballance }} руб, останется {{ diff }} руб.</p>
-
-            <button type="submit" class="btn btn-sm btn-primary">
-                <span class="glyphicon glyphicon-save"></span> Подтвердить
-            </button>
-        </form>
-    </div>
-</div>
 
 {% endblock %}

@@ -5,7 +5,6 @@ import models
 
 
 class PaysTest(TestCase):
-
     def setUp(self):
         self.msg = models.PrivateMessages.objects.create(
             sender=User.objects.all()[0],

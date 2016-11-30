@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 urlpatterns = [
-    #url(r'^$', 'photo_albums', name='media_home_link'),
+    # url(r'^$', 'photo_albums', name='media_home_link'),
     #url(r'^(?P<id>\d+)$', 'photo_albums', name='media_home_link_by_id'),
     #url(r'^album(?P<id>\d+)$', 'photos', name='media_photos_link'),
 

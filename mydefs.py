@@ -38,13 +38,13 @@ def res_success(request, redirect_to='/'):
 
 def res_error(request, text):
     if request.is_ajax():
-        return HttpResponse(dumps({'errnum':1, 'errtext':text}))
+        return HttpResponse(dumps({'errnum': 1, 'errtext': text}))
     else:
         raise Http404(text)
 
 
 # Pagination
-def pag_mn(request, objs, count_per_page=10):
+def pag_mn(request, objs, count_per_page=50):
     page = request.GET.get('p')
     pgn = Paginator(objs, count_per_page)
     try:
@@ -57,7 +57,6 @@ def pag_mn(request, objs, count_per_page=10):
 
 
 class MyGenericIPAddressField(models.GenericIPAddressField):
-
     description = "Int32 notation ip address"
 
     def __init__(self, protocol='IPv4', *args, **kwargs):
@@ -130,4 +129,5 @@ def only_admins(fn):
             return fn(request, *args, **kwargs)
         else:
             return redirect('client_home')
+
     return wrapped

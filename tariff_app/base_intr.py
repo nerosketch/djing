@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
-#from abonapp import Abon
+# from abonapp import Abon
 
 
 class TariffBase:

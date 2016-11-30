@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -23,17 +22,27 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+                ('is_superuser', models.BooleanField(default=False,
+                                                     help_text='Designates that this user has all permissions without explicitly assigning them.',
+                                                     verbose_name='superuser status')),
                 ('username', models.CharField(max_length=127, unique=True)),
                 ('fio', models.CharField(max_length=256)),
                 ('birth_day', models.DateField(auto_now_add=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('is_admin', models.BooleanField(default=False)),
-                ('telephone', models.CharField(max_length=16, unique=True, validators=[django.core.validators.RegexValidator(b'^\\+[7,8,9,3]\\d{10,11}$')], verbose_name=b'Telephone number')),
+                ('telephone', models.CharField(max_length=16, unique=True, validators=[
+                    django.core.validators.RegexValidator(b'^\\+[7,8,9,3]\\d{10,11}$')],
+                                               verbose_name=b'Telephone number')),
                 ('skype', models.CharField(blank=True, max_length=20)),
-                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='photo_app.Photo')),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
+                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                             to='photo_app.Photo')),
+                ('groups', models.ManyToManyField(blank=True,
+                                                  help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+                                                  related_name='user_set', related_query_name='user', to='auth.Group',
+                                                  verbose_name='groups')),
+                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.',
+                                                            related_name='user_set', related_query_name='user',
+                                                            to='auth.Permission', verbose_name='user permissions')),
             ],
             options={
                 'abstract': False,

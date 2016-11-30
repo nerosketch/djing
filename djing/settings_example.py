@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'ip_pool',
     'searchapp',
     'devapp',
-    'mapapp',
+    'gmap',
     'statistics',
     'taskapp',
     'clientsideapp'
@@ -80,12 +80,12 @@ WSGI_APPLICATION = 'djing.wsgi.application'
 
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djingdb',
-        'USER': 'USER',             # You can change the user name
-        'PASSWORD': 'PASSWORD',     # You can change the password
+        'USER': 'USER',  # You can change the user name
+        'PASSWORD': 'PASSWORD',  # You can change the password
         'HOST': 'localhost'
     }
 }
@@ -137,7 +137,6 @@ if DEBUG:
 
 # Пример вывода: 16 сентября 2012
 DATE_FORMAT = 'd E Y'
-
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

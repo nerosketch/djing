@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+
 import django
 
 
@@ -12,7 +13,6 @@ if __name__ == "__main__":
     users = Abon.objects.all()
 
     for usr in users:
-
         usr.activate_next_tariff()
 
         AbonTariff.objects.update_priorities(usr)

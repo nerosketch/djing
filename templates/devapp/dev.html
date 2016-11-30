@@ -1,64 +1,68 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Инфа о железке</h3>
-    </div>
-    <div class="panel-body">
-        {% if warntext %}
-            <div class="alert-danger">{{ warntext }}</div>
-        {% endif %}
-        <form role="form" action="
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Инфа о железке</h3>
+        </div>
+        <div class="panel-body">
+            {% if warntext %}
+                <div class="alert-danger">{{ warntext }}</div>
+            {% endif %}
+            <form role="form" action="
             {% if devid == 0 %}
                 {% url 'devs_add_link' %}
             {% else %}
                 {% url 'devs_edit_link' devid %}
             {% endif %}" method="post">{% csrf_token %}
 
-            <div class="form-group">
-                <label for="ip_address">Ip адрес</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
-                    {{ form.ip_address }}{{ form.ip_address.errors }}
+                <div class="form-group">
+                    <label for="ip_address">Ip адрес</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+                        {{ form.ip_address }}{{ form.ip_address.errors }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="comment">Комментарий</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
-                    {{ form.comment }}{{ form.comment.errors }}
+                <div class="form-group">
+                    <label for="comment">Комментарий</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
+                        {{ form.comment }}{{ form.comment.errors }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="devtype">Тип устройства</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
-                    {{ form.devtype }}{{ form.devtype.errors }}
+                <div class="form-group">
+                    <label for="devtype">Тип устройства</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
+                        {{ form.devtype }}{{ form.devtype.errors }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="man_passw">Пароль SNMP</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                    {{ form.man_passw }}{{ form.man_passw.errors }}
+                <div class="form-group">
+                    <label for="man_passw">Пароль SNMP</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        {{ form.man_passw }}{{ form.man_passw.errors }}
+                    </div>
                 </div>
-            </div>
 
-            <div class="btn-group">
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <span class="glyphicon glyphicon-save"></span> Сохранить
-                </button>
-                <button type="reset" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-remove-circle"></span> Отменить
-                </button>
-            </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                    </button>
+                    <button type="reset" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Отменить
+                    </button>
+                </div>
 
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
 {% endblock %}

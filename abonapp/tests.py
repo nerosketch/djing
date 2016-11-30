@@ -7,7 +7,6 @@ from tariff_app.models import Tariff
 
 
 class AbonTariffTestCase(TestCase):
-
     def setUp(self):
         abon1 = Abon.objects.create(
             telephone='+79784653751',
@@ -44,7 +43,6 @@ class AbonTariffTestCase(TestCase):
         # берём купленные услуги
         ats = AbonTariff.objects.filter(abon=abn)
         for at in ats:
-
             # и пробуем назначить
             at.activate_next_tariff()
 

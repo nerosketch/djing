@@ -48,7 +48,7 @@ class AbonForm(forms.Form):
     address = forms.CharField(
         max_length=256,
         required=False,
-        widget = forms.TextInput(attrs={'class': 'form-control', 'id': 'address'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'address'})
     )
 
 

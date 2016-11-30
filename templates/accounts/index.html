@@ -1,8 +1,8 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
 {% block content %}
 
-<table class="table table-striped table-bordered">
-    <tbody>
+    <table class="table table-striped table-bordered">
+        <tbody>
         <tr>
             <td class="col-sm-4">Телефон</td>
             <td><a href="tel:{{ userprofile.telephone }}">{{ userprofile.telephone }}</a></td>
@@ -28,12 +28,12 @@
             <td>&lt;10.155.13.43&gt;</td>
         </tr>
         {% if request.user.is_superuser %}
-        <tr>
-            <td>Административный доступ (все права)</td>
-            <td><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
-        </tr>
+            <tr>
+                <td>Административный доступ (все права)</td>
+                <td><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
+            </tr>
         {% endif %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
 {% endblock %}

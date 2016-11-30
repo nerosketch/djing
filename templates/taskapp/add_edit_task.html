@@ -1,31 +1,32 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li><a href="{% url 'task_home' %}">Задачи</a></li>
-  <li class="active">{% if task.id %}Редактировать{% else %}Создать{% endif %}</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'task_home' %}">Задачи</a></li>
+        <li class="active">{% if task_id %}Редактировать{% else %}Создать{% endif %}</li>
+    </ol>
 
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Добавьте новую задачу</h3>
-    </div>
-    <div class="panel-body">
-        {% if warntext %}
-            <div class="alert-danger">{{ warntext }}</div>
-        {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Добавьте новую задачу</h3>
+        </div>
+        <div class="panel-body">
+            {% if warntext %}
+                <div class="alert-danger">{{ warntext }}</div>
+            {% endif %}
 
-        {% if task.id %}
-            <form role="form" action="{% url 'task_edit' task.id %}" method="post">
-        {% else %}
-            <form role="form" action="{% url 'task_add' %}" method="post">
-        {% endif %}
-        {% csrf_token %}
+            {% if task_id %}
+                <form role="form" action="{% url 'task_edit' task_id %}"
+            {% else %}
+                <form role="form" action="{% url 'task_add' %}"
+            {% endif %} method="post" enctype="multipart/form-data">
+            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="4194304"/>
 
             <div class="form-group">
                 <label for="id_descr">Пару слов...</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
                     {{ form.descr }}{{ form.descr.errors }}
@@ -33,6 +34,7 @@
             </div>
             <div class="form-group">
                 <label for="id_recipient">Цель, на кого назначаем</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                     {{ form.recipient }}{{ form.recipient.errors }}
@@ -40,6 +42,7 @@
             </div>
             <div class="form-group">
                 <label for="id_device">С каким устройством связано</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
                     {{ form.device }}{{ form.device.errors }}
@@ -47,6 +50,7 @@
             </div>
             <div class="form-group">
                 <label for="id_priority">Приоритет</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
                     {{ form.priority }}{{ form.priority.errors }}
@@ -54,6 +58,7 @@
             </div>
             <div class="form-group">
                 <label for="id_state">Состояние</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-retweet"></span></span>
                     {{ form.state }}{{ form.state.errors }}
@@ -61,18 +66,26 @@
             </div>
             <div class="form-group">
                 <label for="id_out_date">Актуальность (дата, до которой нужно завершить задачу)</label>
+
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     {{ form.out_date }}{{ form.out_date.errors }}
                 </div>
                 <script type="text/javascript">
-                    $(function(){
+                    $(function () {
                         $('#id_out_date').datetimepicker({
                             format: 'YYYY-MM-DD',
                             locale: 'ru'
                         });
                     });
                 </script>
+            </div>
+            <div class="form-group">
+                <label for="id_attachment">Прикреплённое изображение</label>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-picture"></span></span>
+                    {{ form.attachment }}{{ form.attachment.errors }}
+                </div>
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-sm btn-primary">
@@ -82,8 +95,8 @@
                     <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
                 </button>
             </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
 {% endblock %}

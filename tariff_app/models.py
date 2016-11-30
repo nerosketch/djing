@@ -10,7 +10,6 @@ from agent import get_TransmitterClientKlass
 # Класс похож на адаптер. Предназначен для Django CHOICES чтоб можно было передавать классывместо просто описания поля,
 # классы передавать для того чтоб по значению из базы понять какой класс нужно взять для расчёта стоимости тарифа.
 class _TariffChoicesAdapter(MyChoicesAdapter):
-
     # На вход принимает кортеж кортежей, вложенный из 2х элементов: кода и класса, как: TARIFF_CHOICES
     def __init__(self):
         super(_TariffChoicesAdapter, self).__init__(TARIFF_CHOICES)

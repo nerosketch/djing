@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block main %}
 
-<table class="myChecker">
-    <thead>
+    <table class="myChecker">
+        <thead>
         <tr>
             <th width="35"><input type="checkbox" id="chkall"><label for="chkall" class="checkbox"></label></th>
             <th>Сообщение</th>
@@ -10,25 +10,25 @@
             <th width="150">Когда</th>
             <th width="30">Do</th>
         </tr>
-    </thead>
-    <tbody>
-    {% for msg in msgs %}{% include 'private_messages/item.html' %}
-    {% empty %}
-        <tr>
-            <td><input type="checkbox" id="c0"><label for="c0" class="checkbox"></label></td>
-            <td colspan="3"><a href="#">Нет сообщений</a></td>
-            <td><a href="#" class="btn btn-blue"><i class="icon-pencil"></i></a></td>
-        </tr>
-    {% endfor %}
+        </thead>
+        <tbody>
+        {% for msg in msgs %}{% include 'private_messages/item.html' %}
+        {% empty %}
+            <tr>
+                <td><input type="checkbox" id="c0"><label for="c0" class="checkbox"></label></td>
+                <td colspan="3"><a href="#">Нет сообщений</a></td>
+                <td><a href="#" class="btn btn-blue"><i class="icon-pencil"></i></a></td>
+            </tr>
+        {% endfor %}
 
-    </tbody>
-    <tfoot>
+        </tbody>
+        <tfoot>
         <tr>
             <th><input type="checkbox" id="chkallb"><label for="chkallb" class="checkbox"></label></th>
             <th colspan="3">{% include 'toolbar_page.html' with pag=msgs %}</th>
             <th><a href="#" class="btn btn-red" title="Удаляет выделенные"><i class="icon-trash"></i></a></th>
         </tr>
-    </tfoot>
-</table>
+        </tfoot>
+    </table>
 
 {% endblock %}

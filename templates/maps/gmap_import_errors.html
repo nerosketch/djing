@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}CSV Import Summary{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <p>The following entries could not be imported:</p>
+        <ul>
+            {% for error in errors %}
+                <li>{% autoescape off %} {{ error }} {% endautoescape %}</p></li>
+            {% endfor %}
+        </ul>
+        <p>Return to the <a href="{% url admin:index %}">Administration Page</a>.</p>
+    </div>
+{% endblock %}

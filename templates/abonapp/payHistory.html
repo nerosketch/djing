@@ -1,30 +1,33 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
 {% block content %}
 
-<table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <th>Абонент</th>
-        <th>Сумма</th>
-        <th>Дата транзакции</th>
-        <th>Автор платежа</th>
-        <th>Комментарий</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for ph in pay_history %}<tr>
-        <td><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ ph.abon.username }}</a></td>
-        <td>{{ ph.amount }}</td>
-        <td>{{ ph.date|date:'d F Y, H:i:s' }}</td>
-        <td><a target="_blank" href="{% url 'other_profile' ph.author.id %}">{{ ph.author.username }}</a></td>
-        <td>{{ ph.comment }}</td>
-    </tr>
-    {% empty %}
-        <tr><td colspan="5">История платежей пуста</td></tr>
-    {% endfor %}
-    </tbody>
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Абонент</th>
+            <th>Сумма</th>
+            <th>Дата транзакции</th>
+            <th>Автор платежа</th>
+            <th>Комментарий</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ph in pay_history %}
+            <tr>
+            <td><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ ph.abon.username }}</a></td>
+            <td>{{ ph.amount }}</td>
+            <td>{{ ph.date|date:'d F Y, H:i:s' }}</td>
+            <td><a target="_blank" href="{% url 'other_profile' ph.author.id %}">{{ ph.author.username }}</a></td>
+            <td>{{ ph.comment }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">История платежей пуста</td>
+            </tr>
+        {% endfor %}
+        </tbody>
 
-</table>
+    </table>
 
-{% include 'toolbar_page.html' with pag=pay_history %}
+    {% include 'toolbar_page.html' with pag=pay_history %}
 {% endblock %}

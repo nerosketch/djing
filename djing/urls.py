@@ -14,13 +14,12 @@ urlpatterns = [
     url(r'^ip_pool/', include('ip_pool.urls')),
     url(r'^search/', include('searchapp.urls')),
     url(r'^dev/', include('devapp.urls')),
-    url(r'^map/', include('mapapp.urls')),
+    url(r'^gmap/', include('gmap.urls')),
     url(r'^statistic/', include('statistics.urls')),
     url(r'^tasks/', include('taskapp.urls')),
     url(r'^client/', include('clientsideapp.urls')),
     url(r'^admin/', admin.site.urls)
 ]
-
 
 if settings.DEBUG:
     from django.conf.urls.static import static

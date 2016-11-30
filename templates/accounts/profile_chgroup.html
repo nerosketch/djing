@@ -6,7 +6,8 @@
         <div class="form-group">
             <label for="sel_left">Доступные группы</label>
             <select name="allgroups" multiple id="sel_left" class="form-group">
-                {% for gr in allgroups %}<option value="{{ gr.id }}">{{ gr.name }}</option>
+                {% for gr in allgroups %}
+                    <option value="{{ gr.id }}">{{ gr.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -21,10 +22,12 @@
         <div class="form-group">
             <label for="sel_right">Группы пользователя</label>
             <select name="ingroups" multiple id="sel_right" class="form-group">
-                {% for gr in usergroups %}<option value="{{ gr.id }}">{{ gr.name }}</option>
+                {% for gr in usergroups %}
+                    <option value="{{ gr.id }}">{{ gr.name }}</option>
                 {% endfor %}
             </select>
-        </div><br/>
+        </div>
+        <br/>
         <input type="submit" value="Сохранить"> <input type="reset" value="Сбросить">
     </form>
 

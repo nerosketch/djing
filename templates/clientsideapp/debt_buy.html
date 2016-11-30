@@ -1,47 +1,48 @@
 {% extends 'clientsideapp/ext.html' %}
 {% block client_main %}
 
-<div class="page-header">
-  <h3>Задолженность</h3>
-    {% if warntext %}
-        <div class="alert alert-danger alert-dismissable">
-            <button class="close" type="button" aria-hidden="true" data-dismiss="alert">&times;</button>
-            <strong>Ошибка!</strong> {{ warntext|safe }}
+    <div class="page-header">
+        <h3>Задолженность</h3>
+        {% if warntext %}
+            <div class="alert alert-danger alert-dismissable">
+                <button class="close" type="button" aria-hidden="true" data-dismiss="alert">&times;</button>
+                <strong>Ошибка!</strong> {{ warntext|safe }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Оплатить задолженность</h3>
         </div>
-    {% endif %}
-</div>
+        <div class="panel-body">
+            <form role="form" action="{% url 'client_debt_buy' debt.id %}" method="post">{% csrf_token %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" checked name="sure">
+                        Вы уверены что хотите провести платёж?
+                    </label>
+                </div>
+                <p>
+                    С вашего счёта снимутся средства в размере <b>{{ amount }}</b> руб.<br/>
+                    В результате у вас на счету останется {{ ballance_after }} руб.<br/>
+                    Администратор сразу сможет видеть что у вас закрыта задолженность.
+                </p>
+                <h4>Описание платежа</h4>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Оплатить задолженность</h3>
-    </div>
-    <div class="panel-body">
-        <form role="form" action="{% url 'client_debt_buy' debt.id %}" method="post">{% csrf_token %}
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" checked name="sure">
-                    Вы уверены что хотите провести платёж?
-                </label>
-            </div>
-            <p>
-                С вашего счёта снимутся средства в размере <b>{{ amount }}</b> руб.<br/>
-                В результате у вас на счету останется {{ ballance_after }} руб.<br/>
-                Администратор сразу сможет видеть что у вас закрыта задолженность.
-            </p>
-            <h4>Описание платежа</h4>
-            <div class="alert alert-info">
-                {{ debt.comment }}
-            </div>
+                <div class="alert alert-info">
+                    {{ debt.comment }}
+                </div>
 
-            <div class="btn-group">
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <span class="glyphicon glyphicon-save"></span> Подтвердить
-                </button>
-                <a href="{% url 'client_debts' %}" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-remove-circle"></span> Отменить
-                </a>
-            </div>
-        </form>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> Подтвердить
+                    </button>
+                    <a href="{% url 'client_debts' %}" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Отменить
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}

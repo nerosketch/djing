@@ -9,7 +9,6 @@ import mydefs
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -22,7 +21,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('ip_address', mydefs.MyGenericIPAddressField(max_length=8, protocol=b'IPv4')),
                 ('comment', models.CharField(max_length=256)),
-                ('devtype', models.CharField(choices=[(b'Dl', "\u0421\u0432\u0438\u0447 D'Link")], default=b'Dl', max_length=2)),
+                ('devtype',
+                 models.CharField(choices=[(b'Dl', "\u0421\u0432\u0438\u0447 D'Link")], default=b'Dl', max_length=2)),
                 ('man_passw', models.CharField(blank=True, max_length=16, null=True)),
             ],
         ),
@@ -31,7 +31,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('num', models.PositiveSmallIntegerField(default=0)),
-                ('speed', models.CharField(choices=[(b'h', b'100Mbps'), (b'k', b'1Gbps'), (b'd', b'10Gbps')], default=b'h', max_length=1)),
+                ('speed',
+                 models.CharField(choices=[(b'h', b'100Mbps'), (b'k', b'1Gbps'), (b'd', b'10Gbps')], default=b'h',
+                                  max_length=1)),
                 ('device', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='devapp.Device')),
             ],
         ),

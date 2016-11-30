@@ -3,7 +3,6 @@ from django.conf import settings
 
 
 class MessagesManager(models.Manager):
-
     def get_my_messages(self, request):
         if request.user.is_authenticated():
             num = self.filter(recepient=request.user, is_viewed=False).count()

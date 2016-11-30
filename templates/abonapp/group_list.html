@@ -3,74 +3,74 @@
 
 
     <ol class="breadcrumb">
-      <li><span class="glyphicon glyphicon-home"></span></li>
-      <li class="active">Группы абонентов</li>
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">Группы абонентов</li>
     </ol>
 
 
     <h3>Группы абонентов</h3>
 
     <div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-            <th width="50">#</th>
-            <th>
-                <a href="{% url 'abongroup_list_link' %}?order_by=title&dir={{ dir|default:"down" }}">
-                    Название группы
-                </a>
-                {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
-            </th>
-            <th>
-                <a href="{% url 'abongroup_list_link' %}?order_by=address&dir={{ dir|default:"down" }}">
-                    Адресс группы
-                </a>
-                {% if order_by == 'address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
-            </th>
-            <th>
-                Количество абонентов
-            </th>
-            <th width="100">Do</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for gr in groups %}
+        <table class="table table-striped table-bordered">
+            <thead>
             <tr>
-                <td>{{ gr.id }}</td>
-                <td><a href="{% url 'people_list_link' gr.id %}">{{ gr.title }}</a></td>
-                <td>{{ gr.address }}</td>
-                <td>{{ gr.usercount }}</td>
-                <td>
-                    {% if gr.usercount > 0 %}
-                        <a href="#" class="btn btn-sm btn-default disabled">
-                    {% else %}
-                        <a href="{% url 'people_delgroup_link' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
-                    {% endif %}
-                    <span class="glyphicon glyphicon-remove-circle"></span></a>
+                <th width="50">#</th>
+                <th>
+                    <a href="{% url 'abongroup_list_link' %}?order_by=title&dir={{ dir|default:"down" }}">
+                        Название группы
+                    </a>
+                    {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+                </th>
+                <th>
+                    <a href="{% url 'abongroup_list_link' %}?order_by=address&dir={{ dir|default:"down" }}">
+                        Адресс группы
+                    </a>
+                    {% if order_by == 'address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+                </th>
+                <th>
+                    Количество абонентов
+                </th>
+                <th width="100">Do</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for gr in groups %}
+                <tr>
+                    <td>{{ gr.id }}</td>
+                    <td><a href="{% url 'people_list_link' gr.id %}">{{ gr.title }}</a></td>
+                    <td>{{ gr.address }}</td>
+                    <td>{{ gr.usercount }}</td>
+                    <td>
+                        {% if gr.usercount > 0 %}
+                            <a href="#" class="btn btn-sm btn-default disabled">
+                        {% else %}
+                            <a href="{% url 'people_delgroup_link' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
+                        {% endif %}
+                        <span class="glyphicon glyphicon-remove-circle"></span></a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5"><a href="#">Ещё нет групп</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5" class="btn-group">
+                    <a href="{% url 'addgroup_link' %}" class="btn btn-success btn-sm">
+                        <span class="glyphicon glyphicon-plus"></span> Создать группу
+                    </a>
+                    <a href="{% url 'abonapp_log_link' %}" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-record"></span> Действия абонентов
+                    </a>
+                    <a href="{% url 'abonapp_debtors' %}" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span> Список должников
+                    </a>
                 </td>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="5"><a href="#">Ещё нет групп</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="5" class="btn-group">
-                <a href="{% url 'addgroup_link' %}" class="btn btn-success btn-sm">
-                    <span class="glyphicon glyphicon-plus"></span> Создать группу
-                </a>
-                <a href="{% url 'abonapp_log_link' %}" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-record"></span> Действия абонентов
-                </a>
-                <a href="{% url 'abonapp_debtors' %}" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-exclamation-sign"></span> Список должников
-                </a>
-            </td>
-        </tr>
-        </tfoot>
-    </table>
+            </tfoot>
+        </table>
     </div>
 
     {% include 'toolbar_page.html' with pag=groups %}

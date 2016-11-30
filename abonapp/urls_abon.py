@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='abonapp_compl_srv'),
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='abonapp_activate_service'),
 
-    url(r'^(?P<uid>\d+)/unsubscribe_service(?P<srvid>\d+)$', views.unsubscribe_service, name='abonapp_unsubscribe_service')
+    url(r'^(?P<uid>\d+)/unsubscribe_service(?P<srvid>\d+)$', views.unsubscribe_service,
+        name='abonapp_unsubscribe_service')
 ]

@@ -2,46 +2,51 @@
 {% block main %}
 
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
-  <li><a href="{% url 'profile_groups_list' %}">Группы</a></li>
-  <li class="active">{{ group.name }}</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+        <li><a href="{% url 'profile_groups_list' %}">Группы</a></li>
+        <li class="active">{{ group.name }}</li>
+    </ol>
 
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Действующее распределение прав для группы <b>{{ group.name }}</b></h3>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Действующее распределение прав для группы <b>{{ group.name }}</b></h3>
+        </div>
+        <div class="panel-body">
+            {% if warntext %}
+                <div class="alert-danger">{{ warntext }}</div>
+            {% endif %}
+            <form role="form" action="{% url 'profile_group_link' group.id %}" method="post">{% csrf_token %}
+
+                <div class="choice_wrapper">
+                    <label for="sel_left">Доступные права</label>
+                    <select name="allrights" multiple id="sel_left">
+                        {% for rgt in all_rights %}
+                            <option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <ul class="select_choose">
+                    <li><a href="javascript:chooser_select('sel_left','sel_right');" class="btn btn-blue"><i
+                            class="black icon-arrow-right"></i></a></li>
+                    <li><a href="javascript:chooser_select('sel_right','sel_left');" class="btn btn-blue"><i
+                            class="black icon-arrow-left"></i></a></li>
+                </ul>
+                <div class="choice_wrapper">
+                    <label for="sel_right">Права группы</label>
+                    <select name="group_rights" multiple id="sel_right">
+                        {% for rgt in grp_rights %}
+                            <option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br/>
+                <input type="submit" value="Сохранить"> <input type="reset" value="Сбросить">
+
+            </form>
+        </div>
     </div>
-    <div class="panel-body">
-        {% if warntext %}
-            <div class="alert-danger">{{ warntext }}</div>
-        {% endif %}
-        <form role="form" action="{% url 'profile_group_link' group.id %}" method="post">{% csrf_token %}
-
-            <div class="choice_wrapper">
-                <label for="sel_left">Доступные права</label>
-                <select name="allrights" multiple id="sel_left">
-                    {% for rgt in all_rights %}<option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <ul class="select_choose">
-                <li><a href="javascript:chooser_select('sel_left','sel_right');" class="btn btn-blue"><i class="black icon-arrow-right"></i></a></li>
-                <li><a href="javascript:chooser_select('sel_right','sel_left');" class="btn btn-blue"><i class="black icon-arrow-left"></i></a></li>
-            </ul>
-            <div class="choice_wrapper">
-                <label for="sel_right">Права группы</label>
-                <select name="group_rights" multiple id="sel_right">
-                    {% for rgt in grp_rights %}<option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
-                    {% endfor %}
-                </select>
-            </div><br/>
-            <input type="submit" value="Сохранить"> <input type="reset" value="Сбросить">
-
-        </form>
-    </div>
-</div>
 
 {% endblock %}

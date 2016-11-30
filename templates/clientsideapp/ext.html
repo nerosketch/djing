@@ -13,82 +13,84 @@
     <link rel="shortcut icon" href="/static/img/favicon_m.ico">
 </head>
 <body>
-    <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-      <div class="container">
+<!-- Fixed navbar -->
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <img src="/static/clientside/bc.png" class="navbar-brand">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <img src="/static/clientside/bc.png" class="navbar-brand">
         </div>
         <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav">
 
-            {% url 'client_home' as client_home %}
-            <li{% if client_home == request.path %} class="active"{% endif %}>
-                <a href="{{ client_home }}">Личный кабинет</a>
-            </li>
+                {% url 'client_home' as client_home %}
+                <li{% if client_home == request.path %} class="active"{% endif %}>
+                    <a href="{{ client_home }}">Личный кабинет</a>
+                </li>
 
-            {% url 'client_pays' as client_pays %}
-            <li{% if client_pays == request.path %} class="active"{% endif %}>
-                <a href="{{ client_pays }}">Платежи</a>
-            </li>
+                {% url 'client_pays' as client_pays %}
+                <li{% if client_pays == request.path %} class="active"{% endif %}>
+                    <a href="{{ client_pays }}">Платежи</a>
+                </li>
 
-            {% url 'client_buy' as client_buy %}
-            <li{% if client_buy == request.path %} class="active"{% endif %}>
-                <a href="{{ client_buy }}">Подключить услугу</a>
-            </li>
+                {% url 'client_buy' as client_buy %}
+                <li{% if client_buy == request.path %} class="active"{% endif %}>
+                    <a href="{{ client_buy }}">Подключить услугу</a>
+                </li>
 
-            <li>
-                <a href="#">
-                    Сообщения из администрации
-                    <span class="badge">14</span>
-                </a>
-            </li>
+                <li>
+                    <a href="#">
+                        Сообщения из администрации
+                        <span class="badge">14</span>
+                    </a>
+                </li>
 
-            <li><a href="#contact">График трафика</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Подать заявку</a></li>
-                <li><a href="{% url 'client_debts' %}">Просмотреть и оплатить долги <span class="badge">2</span></a></li>
-                <li><a href="#">Сеансы подключений</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="{% url 'logout_link' %}">Выйти</a></li>
-              </ul>
-            </li>
-          </ul>
-          <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance }}</b> руб.</span>
-        </div><!--/.nav-collapse -->
-      </div>
+                <li><a href="#contact">График трафика</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Подать заявку</a></li>
+                        <li><a href="{% url 'client_debts' %}">Просмотреть и оплатить долги <span class="badge">2</span></a>
+                        </li>
+                        <li><a href="#">Сеансы подключений</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Nav header</li>
+                        <li><a href="#">Separated link</a></li>
+                        <li><a href="{% url 'logout_link' %}">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance }}</b> руб.</span>
+        </div>
+        <!--/.nav-collapse -->
     </div>
+</div>
 
 
-    <!-- Begin page content -->
+<!-- Begin page content -->
+<div class="container">
+
+    {% if request.user.is_staff %}
+        <div class="alert alert-info">
+            <strong>Кстати.</strong>
+            Вы администратор, и не должны производить действия из кабинета пользователя, производите их из админки.
+            Кабинет клиента для вас только для ознакомления.
+        </div>
+    {% endif %}
+
+    {% block client_main %}{% endblock %}
+</div>
+
+<div id="footer">
     <div class="container">
-
-        {% if request.user.is_staff %}
-            <div class="alert alert-info">
-                <strong>Кстати.</strong>
-                Вы администратор, и не должны производить действия из кабинета пользователя, производите их из админки.
-                Кабинет клиента для вас только для ознакомления.
-            </div>
-        {% endif %}
-
-        {% block client_main %}{% endblock %}
-    </div>
-
-    <div id="footer">
-      <div class="container">
         <p class="text-muted">DN&copy;</p>
-      </div>
     </div>
+</div>
 
 
 </body>

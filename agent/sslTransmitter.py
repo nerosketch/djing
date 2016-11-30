@@ -26,7 +26,7 @@ class SSLTransmitterServer(object):
     @staticmethod
     def _on_data_recive(v, data):
         print "do_something:", data
-        #with lock:
+        # with lock:
         dat = EventNAS().deserialize(data)
         if dat is not None:
             v.append(dat)
@@ -45,9 +45,9 @@ class SSLTransmitterServer(object):
         while True:
             newsocket, fromaddr = self.bindsocket.accept()
             connstream = ssl.wrap_socket(newsocket,
-                 server_side=True,
-                 certfile=settings.CERTFILE,
-                 keyfile=settings.KEYFILE)
+                                         server_side=True,
+                                         certfile=settings.CERTFILE,
+                                         keyfile=settings.KEYFILE)
             try:
                 self._deal_with_client(connstream, v)
             finally:
@@ -56,7 +56,6 @@ class SSLTransmitterServer(object):
 
 
 class PlainTransmitterServer(SSLTransmitterServer):
-
     def process(self, v):
         while True:
             newsocket, fromaddr = self.bindsocket.accept()
@@ -82,6 +81,7 @@ def agent_abon_typer(fn):
                 abon.is_active
             )
             fn(self, abn)
+
     return wrapped
 
 
@@ -98,6 +98,7 @@ def agent_tariff_typer(fn):
                 tariff.speedOut
             )
             fn(self, trf)
+
     return wrapped
 
 
@@ -110,8 +111,8 @@ class SSLTransmitterClient(object):
             # Require a certificate from the server. We used a self-signed certificate
             # so here ca_certs must be the server certificate itself.
             self.s = ssl.wrap_socket(s,
-                ca_certs=settings.CERTFILE,
-                cert_reqs=ssl.CERT_REQUIRED)
+                                     ca_certs=settings.CERTFILE,
+                                     cert_reqs=ssl.CERT_REQUIRED)
             self.s.connect((
                 ip or settings.SELF_IP,
                 port or settings.SELF_PORT
@@ -180,7 +181,6 @@ class SSLTransmitterClient(object):
 
 
 class PlainTransmitterClient(SSLTransmitterClient):
-
     def __init__(self, ip=None, port=None):
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -220,12 +220,11 @@ def proc_entrypoint(obj, v, lock, ip, port):
 
 
 class TransmitServer(object):
-
     def __init__(self, ip, port):
         mngr = Manager()
         self.v = mngr.list()
-        #self.lock = Lock()
-        self.p = Process(target=proc_entrypoint, args=(self, self.v, None, ip, port))#self.lock))
+        # self.lock = Lock()
+        self.p = Process(target=proc_entrypoint, args=(self, self.v, None, ip, port))  #self.lock))
 
     def get_data(self):
         if len(self.v) > 0:

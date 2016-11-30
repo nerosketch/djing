@@ -3,7 +3,8 @@
 */*/*.txt
 media/*
 media/min/*
-~*/migrations/000*.py
+~*/migrations/00*.py
 .idea/
 djing/settings.py
-*/migrations/000*.py
+*/migrations/00*.py
+gmap/fixtures

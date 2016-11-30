@@ -1,93 +1,111 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% block main %}
 
-<ol class="breadcrumb">
-  <li><span class="glyphicon glyphicon-home"></span></li>
-  <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
-  <li class="active">Добавить</li>
-</ol>
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+        <li class="active">Добавить</li>
+    </ol>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Создайте новый аккаунт</h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-sm-3">
-                <div class="thumbnail">
-                    <img alt="Avatar" src="/static/img/user_ava.gif"/>
-                    <div class="caption">
-                      <input type="file" name="avatar"/>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Создайте новый аккаунт</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="thumbnail">
+                        <img alt="Avatar" src="/static/img/user_ava.gif"/>
+
+                        <div class="caption">
+                            <input type="file" name="avatar"/>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-9">
-                {% if warntext %}
-                    <div class="alert-info">{{ warntext }}</div>
-                {% endif %}
+                <div class="col-sm-9">
+                    {% if warntext %}
+                        <div class="alert-info">{{ warntext }}</div>
+                    {% endif %}
 
-                <form role="form" action="{% url 'create_profile_link' %}" method="post">{% csrf_token %}
-                    <div class="form-group">
-                        <label for="login">Логин</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                            <input id="login" type="text" name="username" placeholder="Имя пользователя" required value="{{ newuser.username }}" class="form-control">
+                    <form role="form" action="{% url 'create_profile_link' %}" method="post">{% csrf_token %}
+                        <div class="form-group">
+                            <label for="login">Логин</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                <input id="login" type="text" name="username" placeholder="Имя пользователя" required
+                                       value="{{ newuser.username }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="fio">Фамилия Имя</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-folder-close"></span></span>
-                            <input id="fio" type="text" name="fio" placeholder="ФИО" value="{{ newuser.fio }}" class="form-control">
+                        <div class="form-group">
+                            <label for="fio">Фамилия Имя</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-folder-close"></span></span>
+                                <input id="fio" type="text" name="fio" placeholder="ФИО" value="{{ newuser.fio }}"
+                                       class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="mail">Почта</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-                            <input id='mail' type="text" name="email" placeholder="Email" value="{{ newuser.email }}" class="form-control">
+                        <div class="form-group">
+                            <label for="mail">Почта</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-envelope"></span></span>
+                                <input id='mail' type="text" name="email" placeholder="Email"
+                                       value="{{ newuser.email }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="tel">Телефон</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
-                            <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone" placeholder="+[7,8,9,3] и 10,11 цифр" value="{{ newuser.telephone }}" class="form-control" required>
+                        <div class="form-group">
+                            <label for="tel">Телефон</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+                                <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone"
+                                       placeholder="+[7,8,9,3] и 10,11 цифр" value="{{ newuser.telephone }}"
+                                       class="form-control" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="skype"><a title="Что это" target="_blank" href="http://lurkmore.to/Skype">Skype</a></label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-earphone"></span></span>
-                            <input id="skype" type="text" value="{{ newuser.skype }}" name="skype" placeholder="Skype" class="form-control">
+                        <div class="form-group">
+                            <label for="skype"><a title="Что это" target="_blank"
+                                                  href="http://lurkmore.to/Skype">Skype</a></label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-earphone"></span></span>
+                                <input id="skype" type="text" value="{{ newuser.skype }}" name="skype"
+                                       placeholder="Skype" class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="passw1">Введите пароль</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                            <input id="passw1" type="password" name="passwd" required class="form-control">
+                        <div class="form-group">
+                            <label for="passw1">Введите пароль</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                <input id="passw1" type="password" name="passwd" required class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="passw2">Повторите пароль</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                            <input id="passw2" type="password" name="conpasswd" required class="form-control">
+                        <div class="form-group">
+                            <label for="passw2">Повторите пароль</label>
+
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                <input id="passw2" type="password" name="conpasswd" required class="form-control">
+                            </div>
                         </div>
-                    </div>
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="glyphicon glyphicon-floppy-disk"></span> Сохранить
-                        </button>
-                        <button type="reset" class="btn btn-default">
-                            <span class="glyphicon glyphicon-remove"></span> Сбросить
-                        </button>
-                    </div>
-                </form>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-floppy-disk"></span> Сохранить
+                            </button>
+                            <button type="reset" class="btn btn-default">
+                                <span class="glyphicon glyphicon-remove"></span> Сбросить
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock %}

@@ -1,50 +1,54 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
 {% block content %}
 
-<table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-        <th>Статус</th>
-        <th>Месяц</th>
-        <th>Стоимость</th>
-        <th>Комментарий</th>
-        <th>Дата создания</th>
-        <th>Дата оплаты</th>
-        <th>Назначил</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for inv in invoices %}
-    <tr>
-        <td>{% if inv.status %}
-            <span class="glyphicon glyphicon-ok"></span>
-        {% else %}
-            <span class="glyphicon glyphicon-time"></span>
-        {% endif %}</td>
-        <td>{{ inv.date_create|date:"F" }}</td>
-        <td>{{ inv.amount }}</td>
-        <td>{{ inv.comment }}</td>
-        <td>{{ inv.date_create|date:"D d E Y H:i:s" }}</td>
-        <td>
-            {% if inv.date_pay %}
-                {{ inv.date_pay|date:"D d M Y H:i:s" }}
-            {% else %}
-                {{ inv.status|yesno:'Создан оплаченным,Ещё не оплачено' }}
-            {% endif %}
-        </td>
-        <td><a href="{% url 'other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a></td>
-    </tr>
-    {% empty %}
-        <tr><td colspan="7">Назначенные платежи отсутствуют</td></tr>
-    {% endfor %}
-    </tbody>
-    <tfoot>
-    <tr><th colspan="7">
-        <a href="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}" class="btn btn-success btn-sm">
-            <span class="glyphicon glyphicon-plus"></span> Добавить
-        </a>
-    </th></tr>
-    </tfoot>
-</table>
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Статус</th>
+            <th>Месяц</th>
+            <th>Стоимость</th>
+            <th>Комментарий</th>
+            <th>Дата создания</th>
+            <th>Дата оплаты</th>
+            <th>Назначил</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for inv in invoices %}
+            <tr>
+                <td>{% if inv.status %}
+                    <span class="glyphicon glyphicon-ok"></span>
+                {% else %}
+                    <span class="glyphicon glyphicon-time"></span>
+                {% endif %}</td>
+                <td>{{ inv.date_create|date:"F" }}</td>
+                <td>{{ inv.amount }}</td>
+                <td>{{ inv.comment }}</td>
+                <td>{{ inv.date_create|date:"D d E Y H:i:s" }}</td>
+                <td>
+                    {% if inv.date_pay %}
+                        {{ inv.date_pay|date:"D d M Y H:i:s" }}
+                    {% else %}
+                        {{ inv.status|yesno:'Создан оплаченным,Ещё не оплачено' }}
+                    {% endif %}
+                </td>
+                <td><a href="{% url 'other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a></td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">Назначенные платежи отсутствуют</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th colspan="7">
+                <a href="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}" class="btn btn-success btn-sm">
+                    <span class="glyphicon glyphicon-plus"></span> Добавить
+                </a>
+            </th>
+        </tr>
+        </tfoot>
+    </table>
 
 {% endblock %}

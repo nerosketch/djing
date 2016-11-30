@@ -30,7 +30,7 @@ def convert(query):
     return sql
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     f = sys.stdin
     table_name = "flowstat_%s" % datetime.now().strftime("%d%m%Y")
     print("CREATE TABLE IF NOT EXISTS %s (" % table_name)
@@ -50,7 +50,7 @@ if __name__=='__main__':
     f.readline()
 
     while True:
-        n=0xfff
+        n = 0xfff
         rs = convert(f.readline())
         if not rs: exit()
         # without first comma

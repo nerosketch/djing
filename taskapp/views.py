@@ -13,7 +13,7 @@ def home(request):
     tasks = Task.objects.filter(recipient=request.user, state='S')  # Новые задачи
 
     # filter
-    #dir, field = order_helper(request)
+    # dir, field = order_helper(request)
     #if field:
     #    tasks = tasks.order_by(field)
 
@@ -67,7 +67,9 @@ def all_tasks(request):
 @login_required
 @only_admins
 def task_delete(request, task_id):
-    get_object_or_404(Task, id=task_id).delete()
+    task = get_object_or_404(Task, id=task_id)
+    if request.user != task.recipient:
+        task.delete()
     return redirect('task_home')
 
 
@@ -79,40 +81,31 @@ def task_add_edit(request, task_id=0):
 
     # чтоб при добавлении сразу был выбран исполнитель
     frm_recipient_id = safe_int(request.GET.get('rp'))
+    if task_id == 0:
+        tsk = Task()
+        tsk.author = request.user
+    else:
+        tsk = get_object_or_404(Task, id=task_id)
 
     if request.method == 'POST':
-        frm = TaskFrm(request.POST)
+        frm = TaskFrm(request.POST, request.FILES, instance=tsk)
         if frm.is_valid():
-            if task_id == 0:
-                tsk = Task()
-            else:
-                tsk = get_object_or_404(Task, id=task_id)
-            tsk.save_form(frm, request.user)
-            tsk.save()
+            frm.save()
             return redirect('task_home')
         else:
             warntext = u'Исправте ошибки'
-
-    if task_id == 0:
-        task = Task()
-        frm = TaskFrm(initial={
-            'recipient': frm_recipient_id
-        })
     else:
-        task = get_object_or_404(Task, id=task_id)
-        frm = TaskFrm({
-            'descr': task.descr,
-            'recipient': task.recipient.id,
-            'device': task.device.id,
-            'priority': task.priority,
-            'out_date': task.out_date,
-            'state': task.state
-        })
+        if task_id == 0:
+            frm = TaskFrm(initial={
+                'recipient': frm_recipient_id
+            })
+        else:
+            frm = TaskFrm(instance=tsk)
 
     return render(request, 'taskapp/add_edit_task.html', {
         'warntext': warntext,
         'form': frm,
-        'task': task
+        'task_id': tsk.id
     })
 
 

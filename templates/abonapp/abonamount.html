@@ -4,25 +4,29 @@
 
     <legend>Начисление средств на счёт</legend>
     {% if warntext %}
-    <div class="alert alert-warning alert-dismissable">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        {{ warntext }}
-    </div>
+        <div class="alert alert-warning alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ warntext }}
+        </div>
     {% endif %}
 
 
     <div class="row">
         <div class="col-sm-4">
-            <form role="form" action="{% url 'abon_amount_link' abon_group.id abon.id %}" method="post"> {% csrf_token %}
+            <form role="form" action="{% url 'abon_amount_link' abon_group.id abon.id %}"
+                  method="post"> {% csrf_token %}
 
                 <div class="form-group-sm">
                     <label for="amount">Количество денег</label>
+
                     <div class="input-group">
                         <span class="input-group-addon">&#8399;</span>
-                        <input id="amount" type="text" name="amount" placeholder="0.0" class="form-control" required pattern="\d+">
+                        <input id="amount" type="text" name="amount" placeholder="0.0" class="form-control" required
+                               pattern="\d+">
                     </div>
                 </div>
                 <input type="hidden" name="abonid" value="{{ abon.id }}"><br>
+
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> Пополнить
