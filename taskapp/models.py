@@ -2,11 +2,13 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-
+import os
+from subprocess import call
 from django.db import models
 from django.conf import settings
 
 from devapp.models import Device
+from djing.settings import BASE_DIR
 
 
 TASK_PRIORITIES = (
@@ -23,6 +25,18 @@ TASK_STATES = (
     (b'F', u'Выполнена')
 )
 
+TASK_TYPES = (
+    (b'na', u'не выбрано'),
+    (b'yt', u'жёлтый треугольник'),
+    (b'rc', u'красный крестик'),
+    (b'ls', u'слабая скорость'),
+    (b'cf', u'обрыв кабеля'),
+    (b'cn', u'подключение'),
+    (b'pf', u'переодическое пропадание'),
+    (b'cr', u'настройка роутера'),
+    (b'ot', u'другое')
+)
+
 
 class Task(models.Model):
     descr = models.CharField(max_length=128)
@@ -34,6 +48,7 @@ class Task(models.Model):
     time_of_create = models.DateTimeField(auto_now_add=True)
     state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
     attachment = models.ImageField(upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
+    mode = models.CharField(max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
 
     def __unicode__(self):
         return self.descr
@@ -48,3 +63,18 @@ class Task(models.Model):
 
     def begin(self, current_user):
         self.state = 'C'  # Начата
+
+
+def task_handler(sender, instance, **kwargs):
+    cur_dir = os.path.join(BASE_DIR, "taskapp")
+    if kwargs['created']:
+        call(['%s/handle.sh' % cur_dir, 'start', instance.mode, instance.device.ip_address,
+              instance.state, instance.descr])
+        print 'Create task from', instance.author, ' to ', instance.recipient
+    else:
+        call(['%s/handle.sh' % cur_dir, 'change', instance.mode, instance.device.ip_address,
+              instance.state, instance.descr])
+        print 'Change task'
+
+
+models.signals.post_save.connect(task_handler, sender=Task)

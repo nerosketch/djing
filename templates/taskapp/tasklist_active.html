@@ -6,9 +6,10 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-sm-3">Пару слов..</th>
+                <th class="col-sm-2">Пару слов..</th>
                 <th class="col-sm-1">Кому назначена</th>
                 <th class="col-sm-1">Кто назначил</th>
+                <th class="col-sm-1">Характер поломки</th>
                 <th class="col-sm-1">Состояние</th>
                 <th class="col-sm-1">Приоритет</th>
                 <th class="col-sm-1">Устройство</th>
@@ -39,6 +40,7 @@
                        title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
                 <td><a href="{% url 'other_profile' task.author.id %}"
                        title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
+                <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
                 <td><a href="{% url 'devs_view_link' task.device.id %}" target="_blank">{{ task.device.ip_address }}</a></td>
@@ -58,13 +60,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="12">Список пуст</td>
+                    <td colspan="13">Список пуст</td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="12">
+                <td colspan="13">
                     <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>

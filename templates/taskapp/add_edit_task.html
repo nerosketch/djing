@@ -49,6 +49,14 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="id_mode">Характер поломки</label>
+
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-pawn"></span></span>
+                    {{ form.mode }}{{ form.mode.errors }}
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="id_priority">Приоритет</label>
 
                 <div class="input-group">

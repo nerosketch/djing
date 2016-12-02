@@ -20,7 +20,8 @@ class TaskFrm(forms.ModelForm):
             'priority': forms.Select(attrs={'class': 'form-control'}),
             'state': forms.Select(attrs={'class': 'form-control'}),
             'out_date': forms.DateInput(attrs={'class': 'form-control'}),
-            'attachment': forms.FileInput(attrs={'class': 'form-control'})
+            'attachment': forms.FileInput(attrs={'class': 'form-control'}),
+            'mode': forms.Select(attrs={'class': 'form-control'})
         }
         initials = {
             'out_date': datetime.now()+timedelta(days=7)
