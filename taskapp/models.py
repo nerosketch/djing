@@ -68,13 +68,11 @@ class Task(models.Model):
 def task_handler(sender, instance, **kwargs):
     cur_dir = os.path.join(BASE_DIR, "taskapp")
     if kwargs['created']:
-        call(['%s/handle.sh' % cur_dir, 'start', instance.mode, instance.device.ip_address,
-              instance.state, instance.descr])
-        print 'Create task from', instance.author, ' to ', instance.recipient
+        first_param = 'start'
     else:
-        call(['%s/handle.sh' % cur_dir, 'change', instance.mode, instance.device.ip_address,
-              instance.state, instance.descr])
-        print 'Change task'
+        first_param = 'change'
+    call(['%s/handle.sh' % cur_dir, first_param, instance.get_mode_display(), instance.device.ip_address,
+          instance.state, instance.recipient.telephone, instance.descr])
 
 
 models.signals.post_save.connect(task_handler, sender=Task)
