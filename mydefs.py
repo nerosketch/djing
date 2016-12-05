@@ -22,11 +22,17 @@ def int2ip(addr):
 
 
 def safe_float(fl):
-    return 0.0 if fl is None or fl == '' else float(fl)
+    try:
+        return 0.0 if fl is None or fl == '' else float(fl)
+    except ValueError:
+        return 0.0
 
 
 def safe_int(i):
-    return 0 if i is None or i == '' else int(i)
+    try:
+        return 0 if i is None or i == '' else int(i)
+    except ValueError:
+        return 0
 
 
 def res_success(request, redirect_to='/'):
