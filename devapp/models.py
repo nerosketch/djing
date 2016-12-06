@@ -35,6 +35,9 @@ class Device(models.Model):
                 return res
         return
 
+    def __unicode__(self):
+        return u"%s: %s" % (self.get_devtype_display(), self.ip_address)
+
 
 class Port(models.Model):
     PORT_SPEEDS = (
