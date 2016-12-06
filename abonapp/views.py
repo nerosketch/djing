@@ -2,7 +2,7 @@
 from json import dumps
 
 from django.db import IntegrityError
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -483,3 +483,10 @@ def abons(request):
     }
     del ablist, tarlist
     return HttpResponse(dumps(data))
+
+
+def search_abon(request):
+    word = request.GET.get('s')
+    results = models.Abon.objects.filter(fio__icontains=word)
+    results = [{'id':usr.id, 'fio':usr.fio} for usr in results]
+    return HttpResponse(dumps(results))

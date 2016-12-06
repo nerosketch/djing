@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 from django import forms
+from abonapp.models import Abon
 from models import Task
+from accounts_app.models import UserProfile
 
 
 class TaskFrm(forms.ModelForm):
+    abon = forms.ModelChoiceField(
+        queryset=Abon.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control selectpicker',
+            'data-live-search':'true','title':"Выберите абонента"})
+    )
+    recipient = forms.ModelChoiceField(
+        queryset=UserProfile.objects.filter(is_admin=True),
+        widget=forms.Select(attrs={'class': 'form-control', 'required':''})
+    )
 
     class Meta:
         model = Task
@@ -15,7 +27,6 @@ class TaskFrm(forms.ModelForm):
                 'class': "form-control",
                 'required': ''
             }),
-            'recipient': forms.Select(attrs={'class': 'form-control', 'required':''}),
             'device': forms.Select(attrs={'class': 'form-control', 'required':''}),
             'priority': forms.Select(attrs={'class': 'form-control'}),
             'state': forms.Select(attrs={'class': 'form-control'}),

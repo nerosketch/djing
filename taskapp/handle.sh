@@ -6,17 +6,20 @@
 # $4 - state
 # $5 - recipient telephone
 # $6 - description
+# $7 - abon fio
+# $8 - abon address
+# $9 - abon telephone
 
 
 text=''
 if [[ "$1" == "start" ]]
 then
-  text="Новая задача"
+  text="Нов:"
 else
-  text="Изменение задачи"
+  text="Изм:"
 fi
 
-FULLTEXT="TO $5: $text: $3, $2. $6"
+FULLTEXT="TO $5: $text: $7. $8 $9. $2. $6"
 
 echo "$FULLTEXT" >> /tmp/task_sms.log
 

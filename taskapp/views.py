@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from abonapp.models import Abon
 
 from models import Task
 from mydefs import pag_mn, only_admins, safe_int
@@ -76,8 +77,10 @@ def task_delete(request, task_id):
 @login_required
 @only_admins
 def task_add_edit(request, task_id=0):
-    task_id = int(task_id)
+    task_id = safe_int(task_id)
     warntext = ''
+
+    uid = request.GET.get('uid')
 
     # чтоб при добавлении сразу был выбран исполнитель
     frm_recipient_id = safe_int(request.GET.get('rp'))
@@ -96,9 +99,17 @@ def task_add_edit(request, task_id=0):
             warntext = u'Исправте ошибки'
     else:
         if task_id == 0:
-            frm = TaskFrm(initial={
-                'recipient': frm_recipient_id
-            })
+            try:
+                uid = int(uid or 0)
+                frm = TaskFrm(initial={
+                    'recipient': frm_recipient_id,
+                    'abon': None if uid == 0 else get_object_or_404(Abon, username=str(uid))
+                })
+            except ValueError:
+                warntext=u'Передаваемый логин абонента должен состоять только из цифр'
+                frm = TaskFrm(initial={
+                    'recipient': frm_recipient_id
+                })
         else:
             frm = TaskFrm(instance=tsk)
 

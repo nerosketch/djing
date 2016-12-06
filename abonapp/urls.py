@@ -20,6 +20,6 @@ urlpatterns = [
     url(r'^debtors$', views.debtors, name='abonapp_debtors'),
 
     # Api's
-    url(r'^api/abons$', views.abons)
-
+    url(r'^api/abons$', views.abons),
+    url(r'^api/abon_filter$', views.search_abon)
 ]
