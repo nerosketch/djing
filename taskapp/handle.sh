@@ -14,13 +14,13 @@
 text=''
 if [[ "$1" == "start" ]]
 then
-  text="Нов:"
+  text="Нов"
 else
-  text="Изм:"
+  text="Изм"
 fi
 
-FULLTEXT="TO $5: $text: $7. $8 $9. $2. $6"
+FULLTEXT="$text: $7. $8 $9. $2. $6"
 
-echo "$FULLTEXT" >> /tmp/task_sms.log
+echo "TO $5: $FULLTEXT" >> /tmp/task_sms.log
 
-#/usr/bin/gammu-smsd-inject TEXT $5 -text "$FULLTEXT" -unicode
+/usr/bin/gammu-smsd-inject TEXT $5 -text "$FULLTEXT" -unicode
