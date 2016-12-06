@@ -16,7 +16,7 @@
                 <th>Ник</th>
                 <th>ФИО (или ник если нет)</th>
                 <th class="col-sm-2">Телефон</th>
-                <th class="col-sm-2">Skype</th>
+                <th class="col-sm-2">Email</th>
                 <th width="150">&mdash;</th>
             </tr>
             </thead>
@@ -31,7 +31,7 @@
                     <td>{{ usr.get_full_name }}</td>
                     <td>{% if usr.telephone %}<a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>{% else %}
                         Нету{% endif %}</td>
-                    <td>{% if usr.skype %}<a href="skype:{{ usr.skype }}?call">{{ usr.skype }}{% else %}
+                    <td>{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
                         Нету{% endif %}</a></td>
                     <td class="btn-group">
                         <a href="{% url 'profile_appoint_task' usr.id %}" class="btn btn-sm btn-default"

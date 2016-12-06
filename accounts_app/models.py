@@ -49,10 +49,9 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     telephone = models.CharField(
         max_length=16,
         verbose_name='Telephone number',
-        unique=True,
+        #unique=True,
         validators=[RegexValidator(r'^\+[7,8,9,3]\d{10,11}$')]
     )
-    skype = models.CharField(max_length=20, blank=True)
     avatar = models.ForeignKey(Photo, null=True, blank=True)
     email = models.EmailField()
 
