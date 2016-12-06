@@ -121,7 +121,6 @@ def ch_info(request):
         user.fio = request.POST.get('fio')
         user.email = request.POST.get('email')
         user.telephone = request.POST.get('telephone')
-        user.skype = request.POST.get('skype')
 
         psw = request.POST.get('oldpasswd')
         if psw != '':
@@ -151,7 +150,6 @@ def create_profile(request):
         user.fio = request.POST.get('fio')
         user.email = request.POST.get('email')
         user.telephone = request.POST.get('telephone')
-        user.skype = request.POST.get('skype')
         user.is_admin = True
 
         passwd = request.POST.get('passwd')
