@@ -91,7 +91,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
             return DEFAULT_PICTURE
 
     def __unicode__(self):
-        return self.username
+        return self.get_full_name()
 
 
 # from django.db.models.signals import post_save
