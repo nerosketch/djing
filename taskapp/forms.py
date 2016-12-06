@@ -35,5 +35,5 @@ class TaskFrm(forms.ModelForm):
             'mode': forms.Select(attrs={'class': 'form-control'})
         }
         initials = {
-            'out_date': datetime.now()+timedelta(days=7)
+            'out_date': datetime.now()+timedelta(days=3)
         }
