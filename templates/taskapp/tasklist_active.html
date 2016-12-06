@@ -23,11 +23,7 @@
 
                 {% if task.priority == 'E' %}
                     <tr class="success">
-                    {% elif task.priority == 'D' %}
-                    <tr class="info">
                     {% elif task.priority == 'C' %}
-                    <tr class="warning">
-                    {% elif task.priority == 'B' %}
                     <tr>
                     {% elif task.priority == 'A' %}
                     <tr class="danger">
@@ -68,7 +64,7 @@
             <tr>
                 <td colspan="13">
                     <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
-                        <span class="glyphicon glyphicon-plus"></span>
+                        <span class="glyphicon glyphicon-plus"></span> Добавить задачу
                     </a>
                 </td>
             </tr>
