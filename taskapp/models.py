@@ -50,7 +50,7 @@ class Task(models.Model):
     state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
     attachment = models.ImageField(upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
     mode = models.CharField(max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
-    abon = models.ForeignKey(Abon, on_delete=models.SET_NULL, null=True, blank=True)
+    abon = models.ForeignKey(Abon, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
     def __unicode__(self):
         return self.descr
@@ -70,6 +70,7 @@ class Task(models.Model):
 def task_handler(sender, instance, **kwargs):
     cur_dir = os.path.join(BASE_DIR, "taskapp")
     if instance.state == 'F':
+        # выполнена
         return
     if kwargs['created']:
         first_param = 'start'
@@ -77,8 +78,10 @@ def task_handler(sender, instance, **kwargs):
         first_param = 'change'
     call(['%s/handle.sh' % cur_dir, first_param, instance.get_mode_display(),
           instance.device.ip_address if instance.mode != 'cr' or instance.mode != 'ot' else '',
-          instance.state, instance.recipient.telephone, instance.descr, instance.abon.fio, instance.abon.address,
-          instance.abon.telephone])
+          instance.state, instance.recipient.telephone, instance.descr,
+          instance.abon.fio if instance.abon else '<нет фио>',
+          instance.abon.address if instance.abon else '<нет адреса>',
+          instance.abon.telephone if instance.abon else '<нет телефона>'])
 
 
 models.signals.post_save.connect(task_handler, sender=Task)
