@@ -55,7 +55,7 @@ class AbonForm(forms.Form):
 class AbonGroupForm(forms.ModelForm):
     class Meta:
         model = models.AbonGroup
-        fields = ['title', 'address']
+        fields = '__all__'
         widgets = {
             'class': 'form-control'
         }

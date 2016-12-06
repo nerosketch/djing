@@ -28,8 +28,7 @@ class LogicError(Exception):
 
 
 class AbonGroup(models.Model):
-    title = models.CharField(max_length=127)
-    address = models.CharField(max_length=256, blank=True, null=True)
+    title = models.CharField(max_length=127, unique=True)
 
     class Meta:
         db_table = 'abonent_groups'

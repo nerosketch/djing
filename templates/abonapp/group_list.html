@@ -21,13 +21,7 @@
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th>
-                    <a href="{% url 'abongroup_list_link' %}?order_by=address&dir={{ dir|default:"down" }}">
-                        Адресс группы
-                    </a>
-                    {% if order_by == 'address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
-                </th>
-                <th>
+                <th width="100">
                     Количество абонентов
                 </th>
                 <th width="100">Do</th>
@@ -38,7 +32,6 @@
                 <tr>
                     <td>{{ gr.id }}</td>
                     <td><a href="{% url 'people_list_link' gr.id %}">{{ gr.title }}</a></td>
-                    <td>{{ gr.address }}</td>
                     <td>{{ gr.usercount }}</td>
                     <td>
                         {% if gr.usercount > 0 %}
@@ -51,13 +44,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5"><a href="#">Ещё нет групп</a></td>
+                    <td colspan="4"><a href="#">Ещё нет групп</a></td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="5" class="btn-group">
+                <td colspan="4" class="btn-group">
                     <a href="{% url 'addgroup_link' %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> Создать группу
                     </a>
