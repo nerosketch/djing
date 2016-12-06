@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 from django import forms
-from abonapp.models import Abon
 from models import Task
 from accounts_app.models import UserProfile
 
 
 class TaskFrm(forms.ModelForm):
-    abon = forms.ModelChoiceField(
-        queryset=Abon.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control selectpicker',
-            'data-live-search':'true','title':"Выберите абонента"})
-    )
     recipient = forms.ModelChoiceField(
         queryset=UserProfile.objects.filter(is_admin=True),
         widget=forms.Select(attrs={'class': 'form-control', 'required':''})
@@ -32,7 +25,9 @@ class TaskFrm(forms.ModelForm):
             'state': forms.Select(attrs={'class': 'form-control'}),
             'out_date': forms.DateInput(attrs={'class': 'form-control'}),
             'attachment': forms.FileInput(attrs={'class': 'form-control'}),
-            'mode': forms.Select(attrs={'class': 'form-control'})
+            'mode': forms.Select(attrs={'class': 'form-control'}),
+            'abon': forms.Select(attrs={'class': 'form-control selectpicker',
+                    'data-live-search':'true'})
         }
         initials = {
             'out_date': datetime.now()+timedelta(days=3)
