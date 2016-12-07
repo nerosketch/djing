@@ -69,16 +69,19 @@ class Task(models.Model):
 
 def task_handler(sender, instance, **kwargs):
     cur_dir = os.path.join(BASE_DIR, "taskapp")
-    if instance.state == 'F':
-        # выполнена
-        return
     if kwargs['created']:
         first_param = 'start'
     else:
         first_param = 'change'
-    call(['%s/handle.sh' % cur_dir, first_param, instance.get_mode_display(),
-          instance.device.ip_address if instance.mode != 'cr' or instance.mode != 'ot' else '',
-          instance.state, instance.recipient.telephone, instance.descr,
+    call(['%s/handle.sh' % cur_dir,
+        first_param,                    # start or change
+        instance.get_mode_display(),    # mode - Характер поломки
+          instance.device.ip_address if instance.mode != 'cr' or instance.mode != 'ot' else '', # ip устройства
+          instance.state,               # Состояние задачи (новая|выполнена)
+          instance.author.telephone,    # Телефон автора задачи
+          instance.recipient.telephone, # Телефон ответственного монтажника
+          instance.descr,               # Описание задачи
+          # Если указан абонент то инфа о нём
           instance.abon.fio if instance.abon else '<нет фио>',
           instance.abon.address if instance.abon else '<нет адреса>',
           instance.abon.telephone if instance.abon else '<нет телефона>'])
