@@ -125,7 +125,7 @@ def task_add_edit(request, task_id=0):
 def task_finish(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.finish(request.user)
-    task.save()
+    task.save(update_fields=['state', 'out_date'])
     return redirect('task_home')
 
 
@@ -134,5 +134,5 @@ def task_finish(request, task_id):
 def task_begin(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.begin(request.user)
-    task.save()
+    task.save(update_fields=['state'])
     return redirect('task_home')
