@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import os
-from json import loads
+from json import load
 import django
 #from django.db.utils import IntegrityError
 
@@ -12,11 +12,9 @@ if __name__ == "__main__":
     django.setup()
     from abonapp.models import Abon, AbonGroup
 
-    f = open('dump.json', 'r')
-    dat = f.readlines()
-    f.close()
+    with open('dump.json', 'r') as f:
+        dat = load(f)
 
-    dat = loads(dat[0])
     for dt in dat['groups']:
         try:
             grp = AbonGroup.objects.get(title=dt['gname'])
