@@ -25,7 +25,7 @@
             {% else %}
                 <form role="form" action="{% url 'task_add' %}"
             {% endif %} method="post" enctype="multipart/form-data">
-            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="4194304"/>
+            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="409600"/>
 
             <div class="form-group">
                 <label for="id_descr">Пару слов...</label>
