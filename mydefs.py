@@ -14,11 +14,17 @@ ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|
 
 
 def ip2int(addr):
-    return struct.unpack("!I", socket.inet_aton(addr))[0]
+    try:
+        return struct.unpack("!I", socket.inet_aton(addr))[0]
+    except:
+        return 0
 
 
 def int2ip(addr):
-    return socket.inet_ntoa(struct.pack("!I", addr))
+    try:
+        return socket.inet_ntoa(struct.pack("!I", addr))
+    except:
+        return ''
 
 
 def safe_float(fl):
