@@ -21,6 +21,12 @@ else
   text="Изм"
 fi
 
+# Если задача 'На выполнении' то молчим
+if [[ "$STATE" == "C" ]]
+then
+  exit
+fi
+
 # Если задача завершена
 if [[ "$STATE" == "F" ]]
 then
@@ -32,7 +38,6 @@ fi
 
 FULLTEXT="$text: $ABON_FIO. $ABON_ADDR $ABON_TEL. $ABON_GRP. $FAIL_MODE. $DESCR"
 
-echo "DEBUG '$ABON_TEL'" >> /tmp/task_sms.log
 echo "TO $RECIPIENT_TEL: $FULLTEXT" >> /tmp/task_sms.log
 
 /usr/bin/gammu-smsd-inject TEXT $RECIPIENT_TEL -text "$FULLTEXT" -unicode
