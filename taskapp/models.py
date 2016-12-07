@@ -69,6 +69,10 @@ class Task(models.Model):
 
 def task_handler(sender, instance, **kwargs):
     cur_dir = os.path.join(BASE_DIR, "taskapp")
+    group_name = ''
+    if instance.abon:
+        if instance.abon.group:
+            group_name = instance.abon.group.title
     if kwargs['created']:
         first_param = 'start'
     else:
@@ -76,7 +80,7 @@ def task_handler(sender, instance, **kwargs):
     call(['%s/handle.sh' % cur_dir,
         first_param,                    # start or change
         instance.get_mode_display(),    # mode - Характер поломки
-          instance.device.ip_address if instance.mode != 'cr' or instance.mode != 'ot' else '', # ip устройства
+          instance.device.ip_address,   # ip устройства
           instance.state,               # Состояние задачи (новая|выполнена)
           instance.author.telephone,    # Телефон автора задачи
           instance.recipient.telephone, # Телефон ответственного монтажника
@@ -84,7 +88,8 @@ def task_handler(sender, instance, **kwargs):
           # Если указан абонент то инфа о нём
           instance.abon.fio if instance.abon else '<нет фио>',
           instance.abon.address if instance.abon else '<нет адреса>',
-          instance.abon.telephone if instance.abon else '<нет телефона>'])
+          instance.abon.telephone if instance.abon else '<нет телефона>',
+          group_name])                  # Имя группы абонента
 
 
 models.signals.post_save.connect(task_handler, sender=Task)
