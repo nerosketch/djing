@@ -17,8 +17,10 @@
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
                 <div class="caption btn-group btn-group-sm">
+                    {% if userprofile == request.user %}
                     <a href="{% url 'settings_chinfo_link' %}" class="btn btn-primary btn-sm" role="button">
                         <span class="glyphicon glyphicon-edit"></span> Редактировать</a>
+                    {% endif %}
                     <a href="{% url 'task_add' %}?rp={{ userprofile.id }}" class="btn btn-default btn-sm" role="button">
                         <span class="glyphicon glyphicon-star-empty"></span> Дать задачу</a>
                 </div>
