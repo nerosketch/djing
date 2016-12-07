@@ -36,7 +36,7 @@ class Device(models.Model):
         return
 
     def __unicode__(self):
-        return u"%s: %s" % (self.get_devtype_display(), self.ip_address)
+        return u"%s: (%s) %s" % (self.comment, self.get_devtype_display(), self.ip_address)
 
 
 class Port(models.Model):
