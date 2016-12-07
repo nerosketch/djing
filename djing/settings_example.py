@@ -126,6 +126,14 @@ USE_L10N = False
 
 USE_TZ = True
 
+DEFAULT_FROM_EMAIL = 'nerosketch@gmail.com'
+
+# Максимальный загружаемый файл 3.90625M (кратно размеру блока диска 4kb, 4000 блоков)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 4096000
+
+# Время жизни сессии, 1 сутки
+SESSION_COOKIE_AGE = 60 * 60 * 24
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
