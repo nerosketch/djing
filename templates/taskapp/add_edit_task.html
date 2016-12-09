@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_recipient">Цель, на кого назначаем</label>
+                <label for="id_recipient">Ответственный за выполнение задачи</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -80,9 +80,14 @@
 
                 <div class="input-group selectajax">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                    <input type="hidden" name="abon" class="selectajax-hid">
+                    <input type="hidden" name="abon" class="selectajax-hid"{% if selected_abon %} value="{{ selected_abon.id }}"{% endif %}>
+                {% if selected_abon %}
+                    <button class="selectajax-btn form-control btn btn-default">{{ selected_abon.fio }}</button>
+                    <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_abon" placeholder="Найти абонента">
+                {% else %}
                     <button class="selectajax-btn form-control btn btn-default hidden"></button>
                     <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_abon" placeholder="Найти абонента">
+                {% endif %}
                     <ul class="dropdown-menu selectajax-ul"></ul>{{ form.abon.errors }}
                 </div>
             </div>
