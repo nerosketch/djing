@@ -50,7 +50,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
             $.getJSON(settings.url, {'s': this.value}, function (r) {
                 selectul.empty();
                 r.forEach(function (o) {
-                    var li = $('<li><a href="#' + o.id + '">' + o.fio + '</a></li>');
+                    var li = $('<li><a href="#' + o.id + '">' + o.name + ": " + o.fio + '</a></li>');
                     selectul.append(li);
                     li.on('click', selectajax_click)
                 });
