@@ -26,8 +26,7 @@ class TaskFrm(forms.ModelForm):
             'out_date': forms.DateInput(attrs={'class': 'form-control'}),
             'attachment': forms.FileInput(attrs={'class': 'form-control'}),
             'mode': forms.Select(attrs={'class': 'form-control'}),
-            'abon': forms.Select(attrs={'class': 'form-control selectpicker',
-                    'data-live-search':'true'})
+            'abon': forms.Select(attrs={'class': 'form-control'})
         }
         initials = {
             'out_date': datetime.now()+timedelta(days=3)
