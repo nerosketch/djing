@@ -487,6 +487,6 @@ def abons(request):
 
 def search_abon(request):
     word = request.GET.get('s')
-    results = models.Abon.objects.filter(fio__icontains=word)
+    results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id':usr.id, 'fio':usr.fio} for usr in results]
-    return HttpResponse(dumps(results))
+    return HttpResponse(dumps(results, ensure_ascii=False))
