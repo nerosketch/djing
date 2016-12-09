@@ -162,3 +162,8 @@ td.btn-group {
 }
 
 /* end */
+
+/* в модуле для живого поиска надпись на кнопке выравнивается по левой стороне */
+.selectajax button.selectajax-btn{
+    text-align: left;
+}

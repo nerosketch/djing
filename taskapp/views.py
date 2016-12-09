@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.contrib.auth.decorators import login_required
+from django.forms.boundfield import BoundField
 from django.shortcuts import render, redirect, get_object_or_404
 from abonapp.models import Abon
 
@@ -81,6 +82,7 @@ def task_add_edit(request, task_id=0):
     warntext = ''
 
     uid = request.GET.get('uid')
+    selected_abon = None
 
     # чтоб при добавлении сразу был выбран исполнитель
     frm_recipient_id = safe_int(request.GET.get('rp'))
@@ -101,9 +103,10 @@ def task_add_edit(request, task_id=0):
         if task_id == 0:
             try:
                 uid = int(uid or 0)
+                selected_abon = None if uid == 0 else get_object_or_404(Abon, username=str(uid))
                 frm = TaskFrm(initial={
                     'recipient': frm_recipient_id,
-                    'abon': None if uid == 0 else get_object_or_404(Abon, username=str(uid))
+                    'abon': selected_abon
                 })
             except ValueError:
                 warntext=u'Передаваемый логин абонента должен состоять только из цифр'
@@ -112,11 +115,13 @@ def task_add_edit(request, task_id=0):
                 })
         else:
             frm = TaskFrm(instance=tsk)
+            selected_abon = tsk.abon
 
     return render(request, 'taskapp/add_edit_task.html', {
         'warntext': warntext,
         'form': frm,
-        'task_id': tsk.id
+        'task_id': tsk.id,
+        'selected_abon': selected_abon
     })
 
 
