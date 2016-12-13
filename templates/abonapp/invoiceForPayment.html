@@ -32,7 +32,7 @@
                         {{ inv.status|yesno:'Создан оплаченным,Ещё не оплачено' }}
                     {% endif %}
                 </td>
-                <td><a href="{% url 'other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a></td>
+                <td><a href="{% url 'acc_app:other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a></td>
             </tr>
         {% empty %}
             <tr>
@@ -43,7 +43,7 @@
         <tfoot>
         <tr>
             <th colspan="7">
-                <a href="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}" class="btn btn-success btn-sm">
+                <a href="{% url 'abonapp:add_invoice' abon_group.id abon.id %}" class="btn btn-success btn-sm">
                     <span class="glyphicon glyphicon-plus"></span> Добавить
                 </a>
             </th>

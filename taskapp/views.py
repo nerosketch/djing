@@ -1,6 +1,5 @@
 # coding=utf-8
-from django.contrib.auth.decorators import login_required
-from django.forms.boundfield import BoundField
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from abonapp.models import Abon
 
@@ -58,7 +57,7 @@ def own_tasks(request):
 
 @login_required
 @only_admins
-def all_tasks(request):
+def my_tasks(request):
     tasks = Task.objects.filter(recipient=request.user)  # Все задачи
     tasks = pag_mn(request, tasks)
     return render(request, 'taskapp/tasklist.html', {
@@ -67,16 +66,25 @@ def all_tasks(request):
 
 
 @login_required
-@only_admins
+@permission_required('taskapp.can_viewall')
+def all_tasks(request):
+    tasks = Task.objects.all()
+    return render(request, 'taskapp/tasklist_all.html', {
+        'tasks': tasks
+    })
+
+
+@login_required
+@permission_required('taskapp.can_delete_task')
 def task_delete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.user != task.recipient:
         task.delete()
-    return redirect('task_home')
+    return redirect('taskapp:home')
 
 
 @login_required
-@only_admins
+@permission_required('taskapp.can_change_task')
 def task_add_edit(request, task_id=0):
     task_id = safe_int(task_id)
     warntext = ''
@@ -96,7 +104,7 @@ def task_add_edit(request, task_id=0):
         frm = TaskFrm(request.POST, request.FILES, instance=tsk)
         if frm.is_valid():
             frm.save()
-            return redirect('task_home')
+            return redirect('taskapp:home')
         else:
             warntext = u'Исправте ошибки'
     else:
@@ -131,7 +139,7 @@ def task_finish(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.finish(request.user)
     task.save(update_fields=['state', 'out_date'])
-    return redirect('task_home')
+    return redirect('taskapp:home')
 
 
 @login_required
@@ -140,4 +148,4 @@ def task_begin(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.begin(request.user)
     task.save(update_fields=['state'])
-    return redirect('task_home')
+    return redirect('taskapp:home')

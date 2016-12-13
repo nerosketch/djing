@@ -13,7 +13,7 @@
 
     <div class="row">
         <div class="col-sm-4">
-            <form role="form" action="{% url 'abon_amount_link' abon_group.id abon.id %}"
+            <form role="form" action="{% url 'abonapp:abon_amount' abon_group.id abon.id %}"
                   method="post"> {% csrf_token %}
 
                 <div class="form-group-sm">

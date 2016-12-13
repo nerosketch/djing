@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
         <li class="active">Группы</li>
     </ol>
 
@@ -26,7 +26,7 @@
             {% for grp in groups %}
                 <tr>
                     <td>{{ grp.id }}</td>
-                    <td><a href="{% url 'profile_group_link' grp.id %}">{{ grp.name }}</a></td>
+                    <td><a href="{% url 'acc_app:group_link' grp.id %}">{{ grp.name }}</a></td>
                     <td class="btn-group">
                         <a href="#" class="btn btn-sm btn-info">
                             <span class="glyphicon glyphicon-edit"></span>

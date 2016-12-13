@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'tarifs_link' %}">Тарифы</a></li>
+        <li><a href="{% url 'tarifs:home' %}">Тарифы</a></li>
         <li class="active">
             {% if tarif_id == 0 %}
                 Добавить
@@ -23,7 +23,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'tarifs_edit_link' tarif_id %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
                     <label for="id_title">Название тарифа</label>

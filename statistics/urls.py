@@ -4,5 +4,5 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='stat_home'),
+    url(r'^$', views.home, name='home'),
 ]

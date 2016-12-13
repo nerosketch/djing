@@ -4,9 +4,9 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
-        <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
         <li class="active">Заказать услугу</li>
     </ol>
 
@@ -15,7 +15,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Купить новую услугу (заказать тариф) для <a
-                    href="{% url 'abonhome_link' abon_group.id abon.id %}" title="На страницу абонента">абонента</a>
+                    href="{% url 'abonapp:abon_home' abon_group.id abon.id %}" title="На страницу абонента">абонента</a>
             </h3>
         </div>
         <div class="panel-body">
@@ -25,7 +25,7 @@
                     <strong>Внимание!</strong> {{ warntext|safe }}
                 </div>
             {% endif %}
-            <form role="form" action="{% url 'abonapp_buy_tariff' abon_group.id abon.id %}"
+            <form role="form" action="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="tariff">Выбирите тарифф</label>

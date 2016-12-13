@@ -58,6 +58,9 @@ class Task(models.Model):
     class Meta:
         db_table = 'task'
         ordering = ('-id',)
+        permissions = (
+            ('can_viewall', 'Доступ ко всем задачам'),
+        )
 
     def finish(self, current_user):
         self.state = 'F'  # Выполнена
@@ -65,6 +68,21 @@ class Task(models.Model):
 
     def begin(self, current_user):
         self.state = 'C'  # Начата
+
+
+class ChangeLog(models.Model):
+    task = models.ForeignKey(Task)
+    ACT_CHOICES = (
+        (b'e', u'Изменение задачи'),
+        (b'c', u'Создание задачи'),
+        (b'd', u'Удаление задачи')
+    )
+    act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
+    when = models.DateTimeField(auto_now_add=True)
+    who = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
+
+    def __unicode__(self):
+        return self.get_act_type_display()
 
 
 def task_handler(sender, instance, **kwargs):
@@ -75,8 +93,18 @@ def task_handler(sender, instance, **kwargs):
             group_name = instance.abon.group.title
     if kwargs['created']:
         first_param = 'start'
+        ChangeLog.objects.create(
+            task=instance,
+            act_type=b'c',
+            who=instance.author
+        )
     else:
         first_param = 'change'
+        ChangeLog.objects.create(
+            task=instance,
+            act_type=b'e',
+            who=instance.author
+        )
     call(['%s/handle.sh' % cur_dir,
         first_param,                    # start or change
         instance.get_mode_display(),    # mode - Характер поломки

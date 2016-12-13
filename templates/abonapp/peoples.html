@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
         <li class="active">{{ abon_group.title }}</li>
     </ol>
 
@@ -16,25 +16,25 @@
             <tr>
                 <th width="15">#</th>
                 <th>
-                    <a href="{% url 'people_list_link' abon_group.id %}?order_by=username&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=username&dir={{ dir|default:"down" }}">
                         Абонент
                     </a>
                     {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'people_list_link' abon_group.id %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ip_address&dir={{ dir|default:"down" }}">
                         IP Адрес
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'people_list_link' abon_group.id %}?order_by=fio&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=fio&dir={{ dir|default:"down" }}">
                         ФИО
                     </a>
                     {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="50">
-                    <a href="{% url 'people_list_link' abon_group.id %}?order_by=ballance&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ballance&dir={{ dir|default:"down" }}">
                         Балланс
                     </a>
                     {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -52,25 +52,25 @@
                     <tr class="danger">
                 {% endif %}
                 <td>{{ human.id }}</td>
-                <td><a href="{% url 'abonhome_link' human.group.id human.id %}">{{ human.username }}</a></td>
+                <td><a href="{% url 'abonapp:abon_home' human.group.id human.id %}">{{ human.username }}</a></td>
                 <td>{{ human.ip_address|default:'Не назначен' }}</td>
                 <td>{{ human.fio }}</td>
                 <td>{{ human.ballance }}</td>
                 <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                 <td>
                     {% if human.active_tariff %}
-                        <a href="{% url 'tarifs_edit_link' human.active_tariff.id %}">{{ human.active_tariff.title }}</a>
+                        <a href="{% url 'tarifs:edit' human.active_tariff.id %}">{{ human.active_tariff.title }}</a>
                         {% else %}&mdash;&mdash;&mdash;
                     {% endif %}
                 </td>
-                <td><a href="{% url 'abonapp_del_link' %}?t=a&id={{ human.id }}" class="btn btn-danger btn-sm">
+                <td><a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.id }}" class="btn btn-danger btn-sm">
                     <span class="glyphicon glyphicon-remove"></span>
                 </a></td>
                 </tr>
             {% empty %}
                 <tr>
                     <td colspan="8">
-                        Ещё нет абонентов, <a href="{% url 'addabon_link' abon_group.id %}">добавить</a>
+                        Ещё нет абонентов, <a href="{% url 'abonapp:add_abon' abon_group.id %}">добавить</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -78,7 +78,7 @@
             <tfoot>
             <tr>
                 <td colspan="8">
-                    <a href="{% url 'addabon_link' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
+                    <a href="{% url 'abonapp:add_abon' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
                         <span class="glyphicon glyphicon-plus"></span> Добавить абонента
                     </a>
                 </td>

@@ -2,7 +2,7 @@
 {% block content %}
 
     <legend>Принадлежность аккаунта группам</legend>
-    <form action="{% url 'profile_perms_link' userprofile.id %}" method="post" role="form">{% csrf_token %}
+    <form action="{% url 'acc_app:profile_permissions' userprofile.id %}" method="post" role="form">{% csrf_token %}
         <div class="form-group">
             <label for="sel_left">Доступные группы</label>
             <select name="allgroups" multiple id="sel_left" class="form-group">

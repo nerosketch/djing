@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
         <li class="active">Должники</li>
     </ol>
 
@@ -26,12 +26,12 @@
             {% for invoice in invoices %}
                 <tr>
                     <td>{{ invoice.id }}</td>
-                    <td><a href="{% url 'abonhome_link' invoice.abon.group.id invoice.abon.id %}"
+                    <td><a href="{% url 'abonapp:abon_home' invoice.abon.group.id invoice.abon.id %}"
                            target="_blank">{{ invoice.abon.username }}</a></td>
                     <td>{{ invoice.amount }}</td>
                     <td>{{ invoice.comment }}</td>
                     <td>{{ invoice.date_create|date:'d b H:i' }}</td>
-                    <td><a href="{% url 'other_profile' invoice.author.id %}"
+                    <td><a href="{% url 'acc_app:other_profile' invoice.author.id %}"
                            target="_blank">{{ invoice.author.username }}</a></td>
                 </tr>
             {% empty %}

@@ -24,7 +24,7 @@
             <div><i class="black icon-cross"></i> ваш ip <b>{{ client_ipaddress }}</b></div>
             <div><i class="black icon-trash"></i> траффик за сегодня <b>45 Tb</b></div>
         </section>
-        <form action="{% url 'search_home_link' %}" method="get" id="searchform">
+        <form action="{% url 'searchapp:home' %}" method="get" id="searchform">
             <input type="text" name="s" placeholder="Введите текст сюда">
             <input type="submit" class="btn btn-blue" value="Найти">
         </form>
@@ -39,16 +39,16 @@
             <a href="dfdfsdf">Движение средств</a>
         </li>
         <li>
-            <a href="{% url 'stat_home' %}">График траффика</a>
+            <a href="{% url 'statistics:home' %}">График траффика</a>
         </li>
         <!--<li>
             <a target="_blank" href="{ % url 'gmap:index' %}">Карта</a>
         </li>-->
         <li>
-            <a href="{% url 'settings_chinfo_link' %}">Настройки</a>
+            <a href="{% url 'acc_app:setup_info' %}">Настройки</a>
         </li>
         <li>
-            <a href="{% url 'logout_link' %}">Выйти</a>
+            <a href="{% url 'acc_app:logout' %}">Выйти</a>
         </li>
     </ul>
 </nav>

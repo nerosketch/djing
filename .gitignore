@@ -8,3 +8,4 @@ media/min/*
 djing/settings.py
 */migrations/00*.py
 gmap/fixtures
+*.sqlite3

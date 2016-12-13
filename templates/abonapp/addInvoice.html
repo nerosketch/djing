@@ -4,9 +4,9 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
-        <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
         <li class="active">Добавить долг</li>
     </ol>
 
@@ -14,11 +14,11 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Добавьте платёж на оплату для
-                <u><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></u>
+                <u><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></u>
             </h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'abonapp_addinvoice_link' abon_group.id abon.id %}"
+            <form role="form" action="{% url 'abonapp:add_invoice' abon_group.id abon.id %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="pamount">Сумма для платежа</label>

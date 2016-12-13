@@ -4,7 +4,7 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='privmsg_home'),
-    url(r'^delitem_(?P<id>\d+)$', views.delitem, name='privmsg_delitem'),
-    url(r'^write', views.send_message, name='privmsg_send_message')
+    url(r'^$', views.home, name='home'),
+    url(r'^delitem_(?P<id>\d+)$', views.delitem, name='delitem'),
+    url(r'^write', views.send_message, name='send_message')
 ]

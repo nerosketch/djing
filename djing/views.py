@@ -5,9 +5,9 @@ from django.shortcuts import redirect
 @login_required
 def home(request):
     if request.user.is_staff:
-        return redirect('profile')
+        return redirect('acc_app:profile')
     else:
-        return redirect('client_home')
+        return redirect('client_side:home')
 
 
 def finance_report(request):

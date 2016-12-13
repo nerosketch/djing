@@ -5,9 +5,9 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='client_home'),
-    url(r'^pays$', views.pays, name='client_pays'),
-    url(r'^buy$', views.buy_service, name='client_buy'),
-    url(r'^debts$', views.debts_list, name='client_debts'),
-    url(r'^debts/(?P<d_id>\d+)$', views.debt_buy, name='client_debt_buy')
+    url(r'^$', views.home, name='home'),
+    url(r'^pays$', views.pays, name='pays'),
+    url(r'^buy$', views.buy_service, name='buy'),
+    url(r'^debts$', views.debts_list, name='debts'),
+    url(r'^debts/(?P<d_id>\d+)$', views.debt_buy, name='debt_buy')
 ]

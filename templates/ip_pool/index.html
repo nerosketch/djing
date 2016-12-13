@@ -27,11 +27,11 @@
                     <td>{{ pl.1 }}</td>
                     <td>{{ pl.2 }}</td>
                     <td colspan="2" class="btn-group">
-                        <a href="{% url 'pool_ips_link' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
+                        <a href="{% url 'ip_pool:ips' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
                            class="btn btn-sm btn-primary">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
-                        <a href="{% url 'pool_ips_del_link' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
+                        <a href="{% url 'ip_pool:ips_del' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
                            class="btn btn-sm btn-danger">
                             <span class="glyphicon glyphicon-remove-circle"></span>
                         </a>
@@ -40,14 +40,14 @@
             {% empty %}
                 <tr>
                     <td colspan="5">Нет ни одного пула зарезервированных ip адресов. <a
-                            href="{% url 'pool_add_link' %}">Создать</a></td>
+                            href="{% url 'ip_pool:add' %}">Создать</a></td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
                 <td colspan="5">
-                    <a href="{% url 'pool_add_link' %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'ip_pool:add' %}" class="btn btn-sm btn-success">
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>
                 </td>

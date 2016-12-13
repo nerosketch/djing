@@ -51,7 +51,7 @@ def del_pool(request):
 
     pool_ips.delete()
 
-    return mydefs.res_success(request, 'pool_home_link')
+    return mydefs.res_success(request, 'ip_pool:home')
 
 
 @login_required
@@ -62,7 +62,7 @@ def add_pool(request):
         if frm.is_valid():
             cd = frm.cleaned_data
             IpPoolItem.objects.add_pool(cd['start_ip'], cd['end_ip'])
-            return redirect('pool_home_link')
+            return redirect('ip_pool:home')
         else:
             warntext = u'Form is not valid'
     else:
@@ -79,4 +79,4 @@ def add_pool(request):
 def delip(request):
     ipid = request.GET.get('id')
     get_object_or_404(IpPoolItem, id=ipid).delete()
-    return mydefs.res_success(request, 'pool_home_link')
+    return mydefs.res_success(request, 'ip_pool:home')

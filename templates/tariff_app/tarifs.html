@@ -14,31 +14,31 @@
             <thead>
             <tr>
                 <th>
-                    <a href="{% url 'tarifs_link' %}?order_by=title&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'tarifs:home' %}?order_by=title&dir={{ dir|default:"down" }}">
                         Тариф
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs_link' %}?order_by=speedIn&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'tarifs:home' %}?order_by=speedIn&dir={{ dir|default:"down" }}">
                         Входящая скорость
                     </a>
                     {% if order_by == 'speedIn' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs_link' %}?order_by=speedOut&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'tarifs:home' %}?order_by=speedOut&dir={{ dir|default:"down" }}">
                         Исходящая скорость
                     </a>
                     {% if order_by == 'speedOut' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs_link' %}?order_by=amount&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'tarifs:home' %}?order_by=amount&dir={{ dir|default:"down" }}">
                         Стоимость
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs_link' %}?order_by=time_of_action&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'tarifs:home' %}?order_by=time_of_action&dir={{ dir|default:"down" }}">
                         Время действия
                     </a>
                     {% if order_by == 'time_of_action' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -50,19 +50,19 @@
             <tbody>
             {% for tar in tariflist %}
                 <tr>
-                    <td><a href="{% url 'tarifs_edit_link' tar.id %}"><b>{{ tar.title }}</b></a></td>
+                    <td><a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a></td>
                     <td>{{ tar.speedIn }}</td>
                     <td>{{ tar.speedOut }}</td>
                     <td>{{ tar.amount }} руб</td>
                     <td>{{ tar.time_of_action }} дней</td>
                     <td>{{ tar.calc_type }}</td>
-                    <td><a href="{% url 'tarifs_del_link' tar.id %}" class="btn btn-sm btn-danger">
+                    <td><a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger">
                         <span class="glyphicon glyphicon-remove-circle"></span>
                     </a></td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="7">Ещё нет созданных тарифов, <a href="{% url 'tarifs_add_link' %}" class="lgtbx">создать</a>
+                    <td colspan="7">Ещё нет созданных тарифов, <a href="{% url 'tarifs:add' %}" class="lgtbx">создать</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -71,7 +71,7 @@
             <tfoot>
             <tr>
                 <td colspan="7">
-                    <a href="{% url 'tarifs_add_link' %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
                         <span class="glyphicon glyphicon-plus"></span> Добавить
                     </a>
                 </td>

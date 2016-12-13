@@ -6,7 +6,7 @@
             <h3 class="panel-title">Поиск по &quot;{{ s }}&quot;</h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'search_home_link' %}" method="get">
+            <form role="form" action="{% url 'searchapp:home' %}" method="get">
                 <div class="form-group">
                     <label for="srfield">Измените тут строку поиска</label>
 
@@ -22,7 +22,7 @@
             </form>
             <div class="list-group">
                 {% for ab in abons %}
-                    <a href="{% url 'abonhome_link' ab.group.id ab.id %}" target="_blank" class="list-group-item">
+                    <a href="{% url 'abonapp:abon_home' ab.group.id ab.id %}" target="_blank" class="list-group-item">
                         <h4 class="list-group-item-heading">{{ ab.username|safe }}</h4>
 
                         <p class="list-group-item-text">

@@ -2,7 +2,7 @@
 from json import dumps
 
 from django.db import IntegrityError
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -48,7 +48,7 @@ def addgroup(request):
         frm = forms.AbonGroupForm(request.POST)
         if frm.is_valid():
             frm.save()
-            return redirect('abongroup_list_link')
+            return redirect('abonapp:group_list')
         else:
             warntext = u'Исправьте ошибки'
     return render(request, 'abonapp/addGroup.html', {
@@ -82,7 +82,7 @@ def grouplist(request):
 def delgroup(request):
     agd = mydefs.safe_int(request.GET.get('id'))
     get_object_or_404(models.AbonGroup, id=agd).delete()
-    return mydefs.res_success(request, 'abongroup_list_link')
+    return mydefs.res_success(request, 'abonapp:group_list')
 
 
 @login_required
@@ -102,7 +102,7 @@ def addabon(request, gid):
                 prf.group = group
                 prf.save_form(frm)
                 prf.save()
-                return redirect('people_list_link', group.id)
+                return redirect('abonapp:people_list', group.id)
             else:
                 warning_text = u'Некоторые поля заполнены не правильно, проверте ещё раз'
 
@@ -138,10 +138,10 @@ def delentity(request):
         abon = get_object_or_404(models.Abon, id=uid)
         gid = abon.group.id
         abon.delete()
-        return mydefs.res_success(request, resolve_url('people_list_link', gid))
+        return mydefs.res_success(request, resolve_url('abonapp:people_list', gid))
     elif typ == 'g':
         get_object_or_404(models.AbonGroup, id=uid).delete()
-    return mydefs.res_success(request, 'abongroup_list_link')
+    return mydefs.res_success(request, 'abonapp:group_list')
 
 
 @login_required
@@ -155,7 +155,7 @@ def abonamount(request, gid, uid):
             amnt = mydefs.safe_float(request.POST.get('amount'))
             abon.add_ballance(request.user, amnt)
             abon.save(update_fields=['ballance'])
-            return redirect('abonhome_link', gid=gid, uid=uid)
+            return redirect('abonapp:abon_home', gid=gid, uid=uid)
         else:
             warning_text = u'Не правильно выбран абонент как цель для пополнения'
     return render(request, 'abonapp/abonamount.html', {
@@ -239,7 +239,7 @@ def abonhome(request, gid, uid):
                 abon.is_active = 1 if cd['is_active'] else 0
                 abon.save()
 
-                # return redirect('abonhome_link', gid, uid)
+                # return redirect('abonapp:abon_home', gid, uid)
             else:
                 warntext = u'Не правильные значения, проверте поля и попробуйте ещё'
         else:
@@ -299,7 +299,7 @@ def add_invoice(request, gid, uid):
 
         newinv.author = request.user
         newinv.save()
-        return redirect('abonhome_link', gid=gid, uid=uid)
+        return redirect('abonapp:abon_home', gid=gid, uid=uid)
     else:
         return render(request, 'abonapp/addInvoice.html', {
             'csrf_token': csrf(request)['csrf_token'],
@@ -323,7 +323,7 @@ def buy_tariff(request, gid, uid):
                 cd = frm.cleaned_data
                 abon.buy_tariff(cd['tariff'], request.user)
                 abon.save()
-                return redirect('abonhome_link', gid=gid, uid=abon.id)
+                return redirect('abonapp:abon_home', gid=gid, uid=abon.id)
             else:
                 warntext = u'Что-то не так при покупке услуги, проверьте и попробуйте ещё'
         else:
@@ -333,7 +333,7 @@ def buy_tariff(request, gid, uid):
 
     except NetExcept as e:
         warntext = e.value + u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.' \
-                             u' <a href="%s">Вернуться</a>' % resolve_url('abonhome_link', gid=gid, uid=abon.id)
+                             u' <a href="%s">Вернуться</a>' % resolve_url('abonapp:abon_home', gid=gid, uid=abon.id)
 
     return render(request, 'abonapp/buy_tariff.html', {
         'warntext': warntext,
@@ -356,7 +356,7 @@ def chpriority(request, gid, uid):
     elif act == 'down':
         current_abon_tariff.priority_down()
 
-    return redirect('abonhome_link', gid=gid, uid=uid)
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 @login_required
@@ -374,7 +374,7 @@ def complete_service(request, gid, uid, srvid):
             if finish_confirm == 'yes':
                 # удаляем запись о текущей услуге.
                 abtar.delete()
-                return redirect('abonhome_link', gid, uid)
+                return redirect('abonapp:abon_home', gid, uid)
             else:
                 raise models.LogicError('Действие не подтверждено')
 
@@ -415,7 +415,7 @@ def activate_service(request, gid, uid, srvid):
             return HttpResponse('<h1>Request not confirmed</h1>')
 
         abtar.activate(request.user)
-        return redirect('abonhome_link', gid, uid)
+        return redirect('abonapp:abon_home', gid, uid)
 
     amount = abtar.calc_amount_service()
     return render(request, 'abonapp/activate_service.html', {
@@ -431,7 +431,7 @@ def activate_service(request, gid, uid, srvid):
 @mydefs.only_admins
 def unsubscribe_service(request, gid, uid, srvid):
     get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
-    return redirect('abonhome_link', gid=gid, uid=uid)
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 @login_required

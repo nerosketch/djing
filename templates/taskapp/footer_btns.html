@@ -1,0 +1,8 @@
+<a href="{% url 'taskapp:add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
+    <span class="glyphicon glyphicon-plus"></span> Добавить задачу
+</a>
+{% if perms.taskapp.can_viewall %}
+<a href="{% url 'taskapp:all_tasks' %}" class="btn btn-sm btn-info">
+    <span class="glyphicon glyphicon-baby-formula"></span> Просмотреть все задачи
+</a>
+{% endif %}

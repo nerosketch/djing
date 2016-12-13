@@ -23,7 +23,7 @@ def devices(request):
 def devdel(request, did):
     try:
         get_object_or_404(Device, id=did).delete()
-        return res_success(request, 'devs_link')
+        return res_success(request, 'devapp:devs')
     except:
         return res_error(request, u'Неизвестная ошибка при удалении :(')
 
@@ -38,7 +38,7 @@ def dev(request, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
-            return redirect('devs_link')
+            return redirect('devapp:devs')
         else:
             warntext = u'Ошибка в данных, проверте их ещё раз'
     else:

@@ -4,9 +4,9 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
-        <li><a href="{% url 'abonhome_link' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
         <li class="active">Активировать услугу</li>
     </ol>
 
@@ -19,7 +19,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'abonapp_activate_service' abon_group.id abon.id abtar.id %}"
+            <form role="form" action="{% url 'abonapp:activate_service' abon_group.id abon.id abtar.id %}"
                   method="post">{% csrf_token %}
                 <input name="finish_confirm" value="yes" type="hidden">
 

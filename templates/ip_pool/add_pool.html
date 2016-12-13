@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'pool_home_link' %}">IP Пул</a></li>
+        <li><a href="{% url 'ip_pool:home' %}">IP Пул</a></li>
         <li class="active">Добавить</li>
     </ol>
 
@@ -18,7 +18,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'pool_add_link' %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'ip_pool:add' %}" method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="start_ip">Начальный ip</label>
 

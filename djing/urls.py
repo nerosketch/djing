@@ -7,17 +7,17 @@ from views import home
 
 urlpatterns = [
     url(r'^$', home),
-    url(r'^accounts/', include('accounts_app.urls')),
-    url(r'^im/', include('privatemessage.urls')),
-    url(r'^abons/', include('abonapp.urls')),
-    url(r'^tarifs/', include('tariff_app.urls')),
-    url(r'^ip_pool/', include('ip_pool.urls')),
-    url(r'^search/', include('searchapp.urls')),
-    url(r'^dev/', include('devapp.urls')),
+    url(r'^accounts/', include('accounts_app.urls', namespace='acc_app')),
+    url(r'^im/', include('privatemessage.urls', namespace='privmsg')),
+    url(r'^abons/', include('abonapp.urls', namespace='abonapp')),
+    url(r'^tarifs/', include('tariff_app.urls', namespace='tarifs')),
+    url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
+    url(r'^search/', include('searchapp.urls', namespace='searchapp')),
+    url(r'^dev/', include('devapp.urls', namespace='devapp')),
     url(r'^gmap/', include('gmap.urls')),
-    url(r'^statistic/', include('statistics.urls')),
-    url(r'^tasks/', include('taskapp.urls')),
-    url(r'^client/', include('clientsideapp.urls')),
+    url(r'^statistic/', include('statistics.urls', namespace='statistics')),
+    url(r'^tasks/', include('taskapp.urls', namespace='taskapp')),
+    url(r'^client/', include('clientsideapp.urls', namespace='client_side')),
     url(r'^admin/', admin.site.urls)
 ]
 

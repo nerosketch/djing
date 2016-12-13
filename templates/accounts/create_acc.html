@@ -3,7 +3,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
         <li class="active">Добавить</li>
     </ol>
 
@@ -27,7 +27,7 @@
                         <div class="alert-info">{{ warntext }}</div>
                     {% endif %}
 
-                    <form role="form" action="{% url 'create_profile_link' %}" method="post">{% csrf_token %}
+                    <form role="form" action="{% url 'acc_app:create_profile' %}" method="post">{% csrf_token %}
                         <div class="form-group">
                             <label for="login">Логин</label>
 

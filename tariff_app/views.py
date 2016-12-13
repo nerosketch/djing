@@ -36,7 +36,7 @@ def edit_tarif(request, tarif_id=0):
         frm = forms.TariffForm(request.POST)
         if frm.is_valid():
             frm.save()
-            return redirect('tarifs_link')
+            return redirect('tarifs:home')
         else:
             warntext = u'Не все поля заполнены правильно, проверте и попробуйте ещё раз'
     else:
@@ -58,4 +58,4 @@ def edit_tarif(request, tarif_id=0):
 def del_tarif(request, id):
     tar_id = mydefs.safe_int(id)
     get_object_or_404(Tariff, id=tar_id).delete()
-    return mydefs.res_success(request, 'tarifs_link')
+    return mydefs.res_success(request, 'tarifs:home')

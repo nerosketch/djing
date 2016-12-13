@@ -16,7 +16,7 @@
             <tr>
                 <th width="50">#</th>
                 <th>
-                    <a href="{% url 'abongroup_list_link' %}?order_by=title&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:group_list' %}?order_by=title&dir={{ dir|default:"down" }}">
                         Название группы
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -31,13 +31,13 @@
             {% for gr in groups %}
                 <tr>
                     <td>{{ gr.id }}</td>
-                    <td><a href="{% url 'people_list_link' gr.id %}">{{ gr.title }}</a></td>
+                    <td><a href="{% url 'abonapp:people_list' gr.id %}">{{ gr.title }}</a></td>
                     <td>{{ gr.usercount }}</td>
                     <td>
                         {% if gr.usercount > 0 %}
                             <a href="#" class="btn btn-sm btn-default disabled">
                         {% else %}
-                            <a href="{% url 'people_delgroup_link' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
+                            <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
                         {% endif %}
                         <span class="glyphicon glyphicon-remove-circle"></span></a>
                     </td>
@@ -51,13 +51,13 @@
             <tfoot>
             <tr>
                 <td colspan="4" class="btn-group">
-                    <a href="{% url 'addgroup_link' %}" class="btn btn-success btn-sm">
+                    <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> Создать группу
                     </a>
-                    <a href="{% url 'abonapp_log_link' %}" class="btn btn-default btn-sm">
+                    <a href="{% url 'abonapp:log' %}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-record"></span> Действия абонентов
                     </a>
-                    <a href="{% url 'abonapp_debtors' %}" class="btn btn-default btn-sm">
+                    <a href="{% url 'abonapp:debtors' %}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-exclamation-sign"></span> Список должников
                     </a>
                 </td>

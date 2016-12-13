@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.template.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
+from accounts_app.forms import SetupPerms
 
 from photo_app.models import Photo
 from models import UserProfile
@@ -15,7 +16,7 @@ import mydefs
 @login_required
 @mydefs.only_admins
 def home(request):
-    return redirect('profile')
+    return redirect('acc_app:profile')
 
 
 def to_signin(request):
@@ -29,9 +30,9 @@ def to_signin(request):
                 login(request, auser)
                 if nextl == 'None' or nextl is None or nextl == '':
                     if request.user.is_staff:
-                        return redirect('profile')
+                        return redirect('acc_app:profile')
 
-                    return redirect('client_home')
+                    return redirect('client_side:home')
 
                 return redirect(nextl)
 
@@ -48,7 +49,7 @@ def to_signin(request):
 
 def sign_out(request):
     logout(request)
-    return redirect('login_link')
+    return redirect('acc_app:login')
 
 
 @login_required
@@ -68,7 +69,7 @@ def profile_show(request, id=0):
         usr.is_active = request.POST.get('stat')
         usr.is_admin = request.POST.get('is_admin')
         usr.save()
-        return redirect('other_profile', id=id)
+        return redirect('acc_app:other_profile', id=id)
 
     return render(request, 'accounts/index.html', {
         'uid': id,
@@ -172,7 +173,7 @@ def create_profile(request):
             if user_qs.count() == 0:
                 user.set_password(passwd)
                 user.save()
-                return redirect('accounts_list')
+                return redirect('acc_app:accounts_list')
             else:
                 return render(request, 'accounts/create_acc.html', {
                     'warntext': u'Пользователь с таким именем уже есть',
@@ -194,7 +195,7 @@ def create_profile(request):
 def delete_profile(request, uid):
     prf = get_object_or_404(UserProfile, id=uid)
     prf.delete()
-    return redirect('accounts_list')
+    return redirect('acc_app:accounts_list')
 
 
 @login_required
@@ -213,18 +214,15 @@ def acc_list(request):
 @mydefs.only_admins
 # @permission_required('accounts_app.change_userprofile')
 def perms(request, id):
-    ingroups = filter(lambda x: x[0] == 'ingroups', request.POST.lists())[0][1]
-    id = mydefs.safe_int(id)
-
     profile = get_object_or_404(UserProfile, id=id)
-    profile.groups.clear()
+    frm = SetupPerms()
+    own_permissions = UserProfile.get_all_permissions(profile)
 
-    for group_id in ingroups:
-        gid = mydefs.safe_int(group_id)
-        profile.groups.add(gid)
-    profile.save()
-
-    return redirect('other_profile', id)
+    return render(request, 'accounts/settings/permissions.html', {
+        'uid': id,
+        'form': frm,
+        'own_permissions': own_permissions
+    })
 
 
 @login_required
@@ -253,7 +251,7 @@ def group(request, id):
             rid = mydefs.safe_int(grr)
             grp.permissions.add(rid)
         grp.save()
-        return redirect('profile_group_link', id=id)
+        return redirect('acc_app:profile_group_link', id=id)
 
     grp_rights = grp.permissions.all()
     all_rights = Permission.objects.exclude(group=grp)
@@ -274,5 +272,5 @@ def group(request, id):
 @mydefs.only_admins
 def appoint_task(req, uid):
     uid = mydefs.safe_int(uid)
-    url = resolve_url('task_add')
+    url = resolve_url('taskapp:add')
     return redirect("%s?rp=%d" % (url, uid))

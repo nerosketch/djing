@@ -23,16 +23,16 @@
             <tbody>
             {% for dev in devices %}
                 <tr>
-                    <td><a href="{% url 'devs_view_link' dev.id %}">{{ dev.ip_address }}</a></td>
+                    <td><a href="{% url 'devapp:view' dev.id %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
-                    <td><a href="{% url 'devs_del_link' dev.id %}" class="btn btn-danger btn-sm">
+                    <td><a href="{% url 'devapp:del' dev.id %}" class="btn btn-danger btn-sm">
                         <span class="glyphicon glyphicon-remove"></span>
                     </a></td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="4">Нет созданных устройств, <a href="{% url 'devs_add_link' %}">создать</a></td>
+                    <td colspan="4">Нет созданных устройств, <a href="{% url 'devapp:add' %}">создать</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -40,7 +40,7 @@
             <tfoot>
             <tr>
                 <td colspan="4">
-                    <a href="{% url 'devs_add_link' %}" class="btn btn-success btn-sm">
+                    <a href="{% url 'devapp:add' %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> Добавить
                     </a>
                 </td>

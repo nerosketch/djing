@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts_app',
+    'acc_app',
     'photo_app',
     'privatemessage',
     'abonapp',
@@ -152,6 +152,6 @@ MEDIA_URL = '/media/'
 DEFAULT_PICTURE = '/static/images/default-avatar.png'
 AUTH_USER_MODEL = 'accounts_app.UserProfile'
 
-LOGIN_URL = reverse_lazy('login_link')
-LOGIN_REDIRECT_URL = reverse_lazy('profile')
-LOGOUT_URL = reverse_lazy('logout_link')
+LOGIN_URL = reverse_lazy('acc_app:login')
+LOGIN_REDIRECT_URL = reverse_lazy('acc_app:profile')
+LOGOUT_URL = reverse_lazy('acc_app:logout_link')
