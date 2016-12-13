@@ -4,6 +4,6 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='search_home_link'),
+    url(r'^$', views.home, name='home'),
 
 ]

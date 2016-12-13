@@ -53,7 +53,7 @@ def send_message(request):
             msg.recepient = UserModel.objects.get(id=a)
             msg.text = request.POST.get('msg_text')
             msg.save()
-            return redirect('privmsg_home')
+            return redirect('privmsg:home')
         except UserModel.DoesNotExist:
             return mydefs.res_error(request, u'Адресат не найден')
     else:

@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'pool_home_link' %}">IP Пул</a></li>
+        <li><a href="{% url 'ip_pool:home' %}">IP Пул</a></li>
         <li class="active">Редактировать/Просмотреть</li>
     </ol>
 
@@ -26,7 +26,7 @@
                     <td>{{ pi.id }}</td>
                     <td>{{ pi.ip }}</td>
                     <td>{% if pi.abon %}
-                        <a href="{% url 'abonhome_link' pi.abon.group.id pi.abon.id %}">{{ pi.abon.username }}</a>
+                        <a href="{% url 'abonapp:abon_home' pi.abon.group.id pi.abon.id %}">{{ pi.abon.username }}</a>
                     {% else %}---{% endif %}
                     </td>
                     <td>
@@ -35,7 +35,7 @@
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </button>
                         {% else %}
-                            <a href="{% url 'pool_del_ip_link' %}?id={{ pi.id }}" class="btn btn-sm btn-danger">
+                            <a href="{% url 'ip_pool:del_ip' %}?id={{ pi.id }}" class="btn btn-sm btn-danger">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </a>
                         {% endif %}
@@ -44,7 +44,7 @@
             {% empty %}
                 <tr>
                     <td colspan="4">Нет ни одного пула зарезервированных ip адресов. <a
-                            href="{% url 'pool_add_link' %}">Создать</a></td>
+                            href="{% url 'ip_pool:add' %}">Создать</a></td>
                 </tr>
             {% endfor %}
             </tbody>

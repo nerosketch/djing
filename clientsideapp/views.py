@@ -62,7 +62,7 @@ def debt_buy(request, d_id):
             debt.set_ok()
             abon.save(update_fields=['ballance'])
             debt.save(update_fields=['status', 'date_pay'])
-            return redirect('client_debts')
+            return redirect('client_side:debts')
         except LogicError, e:
             warntext = e.value
     return render(request, 'clientsideapp/debt_buy.html', {

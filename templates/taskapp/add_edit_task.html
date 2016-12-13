@@ -3,7 +3,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'task_home' %}">Задачи</a></li>
+        <li><a href="{% url 'taskapp:home' %}">Задачи</a></li>
         <li class="active">{% if task_id %}Редактировать{% else %}Создать{% endif %}</li>
     </ol>
 
@@ -21,9 +21,9 @@
         <div class="panel-body">
 
             {% if task_id %}
-                <form role="form" action="{% url 'task_edit' task_id %}"
+                <form role="form" action="{% url 'taskapp:edit' task_id %}"
             {% else %}
-                <form role="form" action="{% url 'task_add' %}"
+                <form role="form" action="{% url 'taskapp:add' %}"
             {% endif %} method="post" enctype="multipart/form-data">
             {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="409600"/>
 

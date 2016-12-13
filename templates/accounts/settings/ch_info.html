@@ -8,7 +8,7 @@
         </div>
     {% endif %}
 
-    <form role="form" action="{% url 'settings_chinfo_link' %}" method="post">{% csrf_token %}
+    <form role="form" action="{% url 'acc_app:setup_info' %}" method="post">{% csrf_token %}
 
         <div class="form-group">
             <label for="login">Логин</label>

@@ -11,7 +11,7 @@
 
     <div class="row">
         <div class="col-sm-4">
-            <form role="form" action="{% url 'abonhome_link' abon_group.id abon.id %}" method="post"> {% csrf_token %}
+            <form role="form" action="{% url 'abonapp:abon_home' abon_group.id abon.id %}" method="post"> {% csrf_token %}
 
                 <div class="form-group-sm">
                     <label for="grp">Группа</label>

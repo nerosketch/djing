@@ -1,0 +1,21 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/settings/ext.htm' %}
+{% block content %}
+
+    {% if warntext %}
+        <div class="alert alert-warning alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ warntext }}
+        </div>
+    {% endif %}
+
+    <form role="form" action="{% url 'acc_app:setup_perms' uid %}" method="post">{% csrf_token %}
+        {% for perm, pname in form.user_permissions.field.choices %}
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox">
+                    {{ pname }}
+                </label>
+            </div>
+        {% endfor %}
+    </form>
+{% endblock %}

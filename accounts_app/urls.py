@@ -6,27 +6,27 @@ import views
 
 urlpatterns = [
 
-    url(r'^login/', views.to_signin, name='login_link'),
-    url(r'^logout/', views.sign_out, name='logout_link'),
+    url(r'^login/', views.to_signin, name='login'),
+    url(r'^logout/', views.sign_out, name='logout'),
 
     url(r'^me$', views.profile_show, name='profile'),
 
     url(r'^$', views.acc_list, name='accounts_list'),
 
-    url(r'^add$', views.create_profile, name='create_profile_link'),
+    url(r'^add$', views.create_profile, name='create_profile'),
 
-    url(r'^settings$', views.ch_info, name='settings_chinfo_link'),
-    url(r'^settings/change_ava$', views.ch_ava, name='settings_chava_link'),
+    url(r'^settings$', views.ch_info, name='setup_info'),
+    url(r'^settings/change_ava$', views.ch_ava, name='setup_avatar'),
 
     url(r'^(?P<id>\d+)$', views.profile_show, name='other_profile'),
-    url(r'^(?P<id>\d+)/perms$', views.perms, name='profile_perms_link'),
-    url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_chgroup_link'),
-    url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile_link'),
+    url(r'^(?P<id>\d+)/perms$', views.perms, name='setup_perms'),
+    url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_setup_group'),
+    url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile'),
 
     # назначить задание
-    url(r'^(?P<uid>\d+)/appoint_task$', views.appoint_task, name='profile_appoint_task'),
+    url(r'^(?P<uid>\d+)/appoint_task$', views.appoint_task, name='appoint_task'),
 
-    url(r'^group/$', views.groups, name='profile_groups_list'),
-    url(r'^group/(?P<id>\d+)$', views.group, name='profile_group_link')
+    url(r'^group/$', views.groups, name='groups_list'),
+    url(r'^group/(?P<id>\d+)$', views.group, name='group_link')
 
 ]

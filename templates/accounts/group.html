@@ -4,8 +4,8 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'accounts_list' %}">Администраторы</a></li>
-        <li><a href="{% url 'profile_groups_list' %}">Группы</a></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
+        <li><a href="{% url 'acc_app:groups_list' %}">Группы</a></li>
         <li class="active">{{ group.name }}</li>
     </ol>
 
@@ -18,7 +18,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'profile_group_link' group.id %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'acc_app:group_link' group.id %}" method="post">{% csrf_token %}
 
                 <div class="choice_wrapper">
                     <label for="sel_left">Доступные права</label>

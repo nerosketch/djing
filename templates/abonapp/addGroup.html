@@ -4,7 +4,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
         <li class="active">Добавить группу</li>
     </ol>
 
@@ -17,7 +17,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'addgroup_link' %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'abonapp:add_group' %}" method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="gtitle">Название группы</label>
 

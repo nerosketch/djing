@@ -4,8 +4,8 @@ import views
 
 
 urlpatterns = [
-    url(r'^$', views.tarifs, name='tarifs_link'),
-    url(r'^(?P<tarif_id>\d+)$', views.edit_tarif, name='tarifs_edit_link'),
-    url(r'^add$', views.edit_tarif, name='tarifs_add_link'),
-    url(r'^del(?P<id>\d+)$', views.del_tarif, name='tarifs_del_link')
+    url(r'^$', views.tarifs, name='home'),
+    url(r'^(?P<tarif_id>\d+)$', views.edit_tarif, name='edit'),
+    url(r'^add$', views.edit_tarif, name='add'),
+    url(r'^del(?P<id>\d+)$', views.del_tarif, name='del')
 ]

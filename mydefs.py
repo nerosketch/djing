@@ -140,6 +140,6 @@ def only_admins(fn):
         if request.user.is_admin:
             return fn(request, *args, **kwargs)
         else:
-            return redirect('client_home')
+            return redirect('client_side:home')
 
     return wrapped

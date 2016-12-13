@@ -16,7 +16,7 @@
             <h3 class="panel-title">Оплатить задолженность</h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'client_debt_buy' debt.id %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'client_side:debt_buy' debt.id %}" method="post">{% csrf_token %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" checked name="sure">
@@ -38,7 +38,7 @@
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> Подтвердить
                     </button>
-                    <a href="{% url 'client_debts' %}" class="btn btn-sm btn-default">
+                    <a href="{% url 'client_side:debts' %}" class="btn btn-sm btn-default">
                         <span class="glyphicon glyphicon-remove-circle"></span> Отменить
                     </a>
                 </div>

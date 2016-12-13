@@ -32,26 +32,30 @@
 
                 <td>{{ task.id }}</td>
                 <td>{{ task.descr }}</td>
-                <td><a href="{% url 'other_profile' task.recipient.id %}"
+                <td><a href="{% url 'acc_app:other_profile' task.recipient.id %}"
                        title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
-                <td><a href="{% url 'other_profile' task.author.id %}"
+                <td><a href="{% url 'acc_app:other_profile' task.author.id %}"
                        title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
-                <td><a href="{% url 'devs_view_link' task.device.id %}" target="_blank">{{ task.device.ip_address }}</a></td>
+                <td><a href="{% url 'devapp:view' task.device.id %}" target="_blank">{{ task.device.ip_address }}</a></td>
                 <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td colspan="3" class="btn-group">
-                    <a href="{% url 'task_finish' task.id %}" class="btn btn-sm btn-success" title="Завершить">
+                    <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-sm btn-success" title="Завершить">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
-                    <a href="{% url 'task_edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </a>
-                    <a href="#" class="btn btn-sm btn-danger disabled" title="Удалить">
-                        <span class="glyphicon glyphicon-remove-circle"></span>
-                    </a>
+                    {% if perms.taskapp.can_change_task %}
+                        <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    {% endif %}
+                    {% if perms.taskapp.can_delete_task %}
+                        <a href="#" class="btn btn-sm btn-danger disabled" title="Удалить">
+                            <span class="glyphicon glyphicon-remove-circle"></span>
+                        </a>
+                    {% endif %}
                 </td>
                 </tr>
             {% empty %}
@@ -63,9 +67,7 @@
             <tfoot>
             <tr>
                 <td colspan="13">
-                    <a href="{% url 'task_add' %}" class="btn btn-sm btn-success" title="Создать новую задачу">
-                        <span class="glyphicon glyphicon-plus"></span> Добавить задачу
-                    </a>
+                    {% include 'taskapp/footer_btns.html' %}
                 </td>
             </tr>
             </tfoot>

@@ -3,7 +3,7 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
         <li class="active">История действий абонентов</li>
     </ol>
 
@@ -28,10 +28,10 @@
                     {% else %}
                         <span class="glyphicon glyphicon-hand-down"></span>
                     {% endif %} {{ l.amount }}</td>
-                    <td><a href="{% url 'abonhome_link' l.abon.group.id l.abon.id %}">{{ l.abon.username }}</a></td>
+                    <td><a href="{% url 'abonapp:abon_home' l.abon.group.id l.abon.id %}">{{ l.abon.username }}</a></td>
                     <td>{{ l.comment }}</td>
                     <td>{{ l.date|date:"D d E Y H:i:s" }}</td>
-                    <td><a href="{% url 'other_profile' l.author.id %}">{{ l.author.username }}</a></td>
+                    <td><a href="{% url 'acc_app:other_profile' l.author.id %}">{{ l.author.username }}</a></td>
                 </tr>
             {% empty %}
                 <tr>

@@ -53,19 +53,19 @@
             <ul class="nav navbar-nav">
                 <li class="active"><a href="/">Главная</a></li>
                 <!--<li><a href="{ % url 'gmap:index' %}" target="_blank">Карта</a></li>
-                <li><a href="{ % url 'stat_home' %}" target="_blank">График траффика</a></li>-->
-                <li><a href="{% url 'client_home' %}" target="_blank">Кабинет клиента</a></li>
+                <li><a href="{ % url 'statistics:home' %}" target="_blank">График траффика</a></li>-->
+                <li><a href="{% url 'client_side:home' %}" target="_blank">Кабинет клиента</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'settings_chinfo_link' %}">Настройки</a></li>
+                        <li><a href="{% url 'acc_app:setup_info' %}">Настройки</a></li>
                         <li class="divider"></li>
                         <li class="dropdown-header">Действия аккаунта</li>
-                        <li><a href="{% url 'logout_link' %}">Выйти</a></li>
+                        <li><a href="{% url 'acc_app:logout' %}">Выйти</a></li>
                     </ul>
                 </li>
             </ul>
-            <form class="navbar-form navbar-right" action="{% url 'search_home_link' %}" method="get">
+            <form class="navbar-form navbar-right" action="{% url 'searchapp:home' %}" method="get">
                 <div class="input-group stylish-input-group">
                     <input type="text" class="form-control" placeholder="Search..." name="s">
                   <span class="input-group-addon">
@@ -89,7 +89,7 @@
             <div class="row profile_img">
                 <div class="col-sm-5">
 
-                    <a href="{% url 'profile' %}">
+                    <a href="{% url 'acc_app:profile' %}">
                         {% if user.avatar %}
                             <img alt="{{ user.avatar.min }}" class="img-circle img-responsive"
                                  src="{{ user.avatar.min }}"/>
@@ -109,7 +109,7 @@
 
             <ul class="nav nav-sidebar">
 
-                {% url 'accounts_list' as accounts_list %}
+                {% url 'acc_app:accounts_list' as accounts_list %}
                 <li{% if accounts_list in request.path %} class="active"{% endif %}>
                     <a href="{{ accounts_list }}">
                         <span class="glyphicon glyphicon-eye-open"></span> администраторы
@@ -117,42 +117,42 @@
                 </li>
 
 
-                {% url 'abongroup_list_link' as abongroup_list_link %}
+                {% url 'abonapp:group_list' as abongroup_list_link %}
                 <li{% if abongroup_list_link in request.path %} class="active"{% endif %}>
                     <a href="{{ abongroup_list_link }}">
                         <span class="glyphicon glyphicon-user"></span> абоненты
                     </a></li>
 
-                {% url 'task_home' as task_home %}
+                {% url 'taskapp:home' as task_home %}
                 <li{% if task_home in request.path %} class="active"{% endif %}>
                     <a href="{{ task_home }}">
                         <span class="glyphicon glyphicon-tasks"></span> Задачи
                         {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
                     </a></li>
 
-                {% url 'tarifs_link' as tarifs_link %}
-                <li{% if tarifs_link in request.path %} class="active"{% endif %}>
-                    <a href="{{ tarifs_link }}">
+                {% url 'tarifs:home' as tarifs_home %}
+                <li{% if tarifs_home in request.path %} class="active"{% endif %}>
+                    <a href="{{ tarifs_home }}">
                         <span class="glyphicon glyphicon-usd"></span> тарифы
                     </a></li>
 
 
-                {% url 'privmsg_home' as privmsg_home %}
+                {% url 'privmsg:home' as privmsg_home %}
                 <li{% if privmsg_home in request.path %} class="active"{% endif %}>
                     <a href="{{ privmsg_home }}">
                         <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
                     </a></li>
 
 
-                {% url 'pool_home_link' as pool_home_link %}
-                <li{% if pool_home_link in request.path %} class="active"{% endif %}>
-                    <a href="{{ pool_home_link }}">
+                {% url 'ip_pool:home' as ip_pool_home %}
+                <li{% if ip_pool_home in request.path %} class="active"{% endif %}>
+                    <a href="{{ ip_pool_home }}">
                         <span class="glyphicon glyphicon-compressed"></span> ip пул
                     </a></li>
 
-                {% url 'devs_link' as devs_link %}
-                <li{% if devs_link in request.path %} class="active"{% endif %}>
-                    <a href="{{ devs_link }}">
+                {% url 'devapp:devs' as devapp_devs %}
+                <li{% if devapp_devs in request.path %} class="active"{% endif %}>
+                    <a href="{{ devapp_devs }}">
                         <span class="glyphicon glyphicon-hdd"></span> железки
                     </a></li>
 

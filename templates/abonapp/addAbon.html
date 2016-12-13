@@ -3,8 +3,8 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abongroup_list_link' %}">Группы абонентов</a></li>
-        <li><a href="{% url 'people_list_link' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
         <li class="active">Добавить абонента</li>
     </ol>
 
@@ -17,7 +17,7 @@
             {% if warntext %}
                 <div class="alert-danger">{{ warntext }}</div>
             {% endif %}
-            <form role="form" action="{% url 'addabon_link' abon_group.id %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'abonapp:add_abon' abon_group.id %}" method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="login">Логин абонента</label>
 

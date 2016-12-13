@@ -47,7 +47,7 @@
     </style>
 </head>
 <body>
-<form id="frm" action="{% url 'login_link' %}?next={{ next }}" method="POST" accept-charset="utf-8">{% csrf_token %}
+<form id="frm" action="{% url 'acc_app:login' %}?next={{ next }}" method="POST" accept-charset="utf-8">{% csrf_token %}
     {% if errmsg %}
         <div class="err">
         <h4>{{ errmsg }}</h4>

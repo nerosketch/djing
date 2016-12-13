@@ -11,9 +11,9 @@
             {% endif %}
             <form role="form" action="
             {% if devid == 0 %}
-                {% url 'devs_add_link' %}
+                {% url 'devapp:add' %}
             {% else %}
-                {% url 'devs_edit_link' devid %}
+                {% url 'devapp:edit' devid %}
             {% endif %}" method="post">{% csrf_token %}
 
                 <div class="form-group">

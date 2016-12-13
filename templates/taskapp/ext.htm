@@ -21,27 +21,27 @@
 
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="#livetab_content" data-tab-remote="{% url 'task_home' %}" role="tab" data-toggle="tab">
+            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:home' %}" role="tab" data-toggle="tab">
                 Новые задачи
             </a>
         </li>
         <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'active_tasks' %}" role="tab" data-toggle="tab">
+            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:active_tasks' %}" role="tab" data-toggle="tab">
                 Активные задачи
             </a>
         </li>
         <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'finished_tasks' %}" role="tab" data-toggle="tab">
+            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:finished_tasks' %}" role="tab" data-toggle="tab">
                 Выполненные задачи
             </a>
         </li>
         <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'own_tasks' %}" role="tab" data-toggle="tab">
+            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:own_tasks' %}" role="tab" data-toggle="tab">
                 Назначенные мной задачи
             </a>
         </li>
         <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'all_tasks' %}" role="tab" data-toggle="tab">
+            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:my_tasks' %}" role="tab" data-toggle="tab">
                 Все мои задачи
             </a>
         </li>
