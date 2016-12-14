@@ -33,7 +33,6 @@ class IpPoolItemManager(models.Manager):
 
         sql_strs = map(lambda tip: r"(%d)" % tip, range(start_ip, end_ip + 1))
         sql = r'INSERT INTO ip_pool_ippoolitem (ip) VALUES %s' % r",".join(sql_strs)
-        print sql
 
         cursor = connection.cursor()
         cursor.execute(sql)
