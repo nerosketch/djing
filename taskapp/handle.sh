@@ -21,6 +21,12 @@ else
   text="Изм"
 fi
 
+# Если сигнал самому себе то молчим
+if [[ "$AUTHOR_TEL" == "$RECIPIENT_TEL" ]]
+then
+  exit
+fi
+
 # Если задача 'На выполнении' то молчим
 if [[ "$STATE" == "C" ]]
 then
