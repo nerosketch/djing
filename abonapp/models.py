@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
 from django.db import models
-from django.conf import settings
 from django.core.validators import DecimalValidator
 
 from agent import get_TransmitterClientKlass, NetExcept
@@ -29,6 +28,7 @@ class LogicError(Exception):
 
 class AbonGroup(models.Model):
     title = models.CharField(max_length=127, unique=True)
+    profiles = models.ManyToManyField(UserProfile, related_name='abon_groups')
 
     class Meta:
         db_table = 'abonent_groups'
@@ -40,7 +40,7 @@ class AbonGroup(models.Model):
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon')
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
+    author = models.ForeignKey(UserProfile, related_name='+')
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -310,7 +310,7 @@ class InvoiceForPayment(models.Model):
     comment = models.CharField(max_length=128)
     date_create = models.DateTimeField(auto_now_add=True)
     date_pay = models.DateTimeField(blank=True, null=True)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
+    author = models.ForeignKey(UserProfile, related_name='+')
 
     def __unicode__(self):
         return "%s -> %d $" % (self.abon.username, self.amount)

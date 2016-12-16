@@ -81,10 +81,10 @@
 
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="row row-offcanvas row-offcanvas-left">
 
         <!-- Left menu -->
-        <div class="col-sm-2 sidebar">
+        <div class="col-sm-2 sidebar sidebar-offcanvas" role="navigation">
 
             <div class="row profile_img">
                 <div class="col-sm-5">
@@ -163,6 +163,9 @@
 
         <!-- Main content -->
         <div class="col-sm-10 col-sm-offset-2 main">
+            <p class="pull-left visible-xs">
+                <button type="button" data-toggle="offcanvas"></button>
+            </p>
 
             {% block main %}{% endblock %}
 

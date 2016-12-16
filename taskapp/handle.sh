@@ -2,7 +2,7 @@
 
 FIRST="$1"              # $1 - 'start' or 'change'
 FAIL_MODE="$2"          # $2 - mode
-DEVICE_IP="$3"          # $3 - dev ip
+RESERVED="$3"           # $3 - (dev ip)
 STATE="$4"              # $4 - state
 AUTHOR_TEL="$5"         # $5 - author telephone
 RECIPIENT_TEL="$6"      # $6 - recipient telephone
@@ -19,6 +19,12 @@ then
   text="Нов"
 else
   text="Изм"
+fi
+
+# Если сигнал самому себе то молчим
+if [[ "$AUTHOR_TEL" == "$RECIPIENT_TEL" ]]
+then
+  exit
 fi
 
 # Если задача 'На выполнении' то молчим

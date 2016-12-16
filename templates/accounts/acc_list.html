@@ -33,15 +33,15 @@
                     <td>{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
                         Нету{% endif %}</a></td>
                     <td class="btn-group">
-                        <a href="{% url 'acc_app:appoint_task' usr.id %}" class="btn btn-sm btn-default"
+                        <a href="#" class="btn btn-sm btn-default disabled"
                            title="Дать задание">
                             <span class="glyphicon glyphicon-tasks"></span>
                         </a>
-                        <a href="{% url 'privmsg:send_message' %}?a={{ usr.id }}" class="btn btn-sm btn-info"
+                        <a href="{% url 'privmsg:send_message' %}?a={{ usr.id }}" class="btn btn-sm btn-info disabled"
                            title="Отправить сообщение">
                             <span class="glyphicon glyphicon-envelope"></span>
                         </a>
-                        <a href="#" class="btn btn-sm btn-danger">
+                        <a href="#" class="btn btn-sm btn-danger disabled">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     </td>

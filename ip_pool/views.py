@@ -10,7 +10,6 @@ import mydefs
 @mydefs.only_admins
 def home(request):
     pools = IpPoolItem.objects.get_pools()
-    print pools
 
     if pools:
         pools = map(lambda ip: (mydefs.int2ip(ip[0]), mydefs.int2ip(ip[1]), ip[2]), pools)

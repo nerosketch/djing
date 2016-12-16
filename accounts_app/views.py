@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.template.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
-from accounts_app.forms import SetupPerms
+from abonapp.models import AbonGroup
 
 from photo_app.models import Photo
 from models import UserProfile
@@ -81,15 +81,16 @@ def profile_show(request, id=0):
 @mydefs.only_admins
 def chgroup(request, uid):
     usr = get_object_or_404(UserProfile, id=uid)
-    usergroups = usr.groups.all()
-    othergroups = filter(lambda g: g not in usergroups, Group.objects.all())
-    # Group.objects.exclude(user__in=usergroups)
-
+    if request.method == 'POST':
+        ag = request.POST.getlist('ag')
+        usr.abon_groups.clear()
+        usr.abon_groups.add(*[int(d) for d in ag])
+        usr.save()
+    abongroups = AbonGroup.objects.all()
     return render(request, 'accounts/profile_chgroup.html', {
         'uid': uid,
         'userprofile': usr,
-        'allgroups': othergroups,
-        'usergroups': usergroups
+        'abongroups': abongroups
     })
 
 
@@ -215,12 +216,10 @@ def acc_list(request):
 # @permission_required('accounts_app.change_userprofile')
 def perms(request, id):
     profile = get_object_or_404(UserProfile, id=id)
-    frm = SetupPerms()
     own_permissions = UserProfile.get_all_permissions(profile)
 
     return render(request, 'accounts/settings/permissions.html', {
         'uid': id,
-        'form': frm,
         'own_permissions': own_permissions
     })
 

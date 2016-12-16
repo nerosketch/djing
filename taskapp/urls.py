@@ -5,6 +5,7 @@ import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
+    url(r'^(?P<task_id>\d+)$', views.view, name='view'),
     url(r'^(?P<task_id>\d+)/edit$', views.task_add_edit, name='edit'),
     url(r'^(?P<task_id>\d+)/delete$', views.task_delete, name='delete'),
     url(r'^(?P<task_id>\d+)/fin$', views.task_finish, name='finish'),
