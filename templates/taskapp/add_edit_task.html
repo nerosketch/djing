@@ -21,10 +21,10 @@
         <div class="panel-body">
 
             {% if task_id %}
-                <form role="form" action="{% url 'taskapp:edit' task_id %}"
+                <form role="form" action="{% url 'taskapp:edit' task_id %}" method="post" enctype="multipart/form-data">
             {% else %}
-                <form role="form" action="{% url 'taskapp:add' %}"
-            {% endif %} method="post" enctype="multipart/form-data">
+                <form role="form" action="{% url 'taskapp:add' %}" method="post" enctype="multipart/form-data">
+            {% endif %}
             {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="409600"/>
 
             <div class="form-group">
@@ -35,22 +35,14 @@
                     {{ form.descr }}{{ form.descr.errors }}
                 </div>
             </div>
-            <div class="form-group">
-                <label for="id_recipient">Ответственный за выполнение задачи</label>
-
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                    {{ form.recipient }}{{ form.recipient.errors }}
-                </div>
-            </div>
-            <div class="form-group">
+            <!--<div class="form-group">
                 <label for="id_device">С каким устройством связано</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
-                    {{ form.device }}{{ form.device.errors }}
+                    { { form.device }}{ { form.device.errors }}
                 </div>
-            </div>
+            </div>-->
             <div class="form-group">
                 <label for="id_mode">Характер поломки</label>
 

@@ -6,12 +6,10 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-sm-4">Пару слов..</th>
-                <th class="col-sm-1">Кому назначена</th>
+                <th class="col-sm-6">Пару слов..</th>
                 <th class="col-sm-1">Характер поломки</th>
                 <th class="col-sm-1">Состояние</th>
                 <th class="col-sm-1">Приоритет</th>
-                <th class="col-sm-1">Устройство</th>
                 <th class="col-sm-1">Дата создания</th>
                 <th class="col-sm-1">Приложение</th>
                 <th class="col-sm-1">Действия</th>
@@ -29,14 +27,11 @@
                     {% else %}
                     <tr>{% endif %}
 
-                <td>{{ task.id }}</td>
+                <td><a href="{% url 'taskapp:view' task.id %}" target="_blank">{{ task.id }}</a></td>
                 <td>{{ task.descr }}</td>
-                <td><a href="{% url 'acc_app:other_profile' task.recipient.id %}"
-                       title="{{ task.recipient.get_full_name }}">{{ task.recipient.username }}</a></td>
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
-                <td><a href="{% url 'devapp:view' task.device.id %}" target="_blank">{{ task.device.ip_address }}</a></td>
                 <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td class="btn-group">
@@ -50,13 +45,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="10">Все ваши задачи выполнены</td>
+                    <td colspan="8">Все ваши задачи выполнены</td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="10">
+                <td colspan="8">
                     {% include 'taskapp/footer_btns.html' %}
                 </td>
             </tr>
