@@ -1,34 +1,23 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
 {% block content %}
 
-    <legend>Принадлежность аккаунта группам</legend>
-    <form action="{% url 'acc_app:profile_permissions' userprofile.id %}" method="post" role="form">{% csrf_token %}
-        <div class="form-group">
-            <label for="sel_left">Доступные группы</label>
-            <select name="allgroups" multiple id="sel_left" class="form-group">
-                {% for gr in allgroups %}
-                    <option value="{{ gr.id }}">{{ gr.name }}</option>
-                {% endfor %}
-            </select>
+    <legend>Ответственность администратора к группам абонентов</legend>
+    <form action="{% url 'acc_app:profile_setup_group' userprofile.id %}" method="post" role="form">{% csrf_token %}
+        {% for ag in abongroups %}
+            <div class="checkbox">
+                <label>
+                    {% if userprofile in ag.profiles.all %}
+                        <input name="ag" type="checkbox" value="{{ ag.id }}" checked/>
+                    {% else %}
+                        <input name="ag" type="checkbox" value="{{ ag.id }}"/>
+                    {% endif %}
+                    {{ ag.title }}
+                </label>
+            </div>
+        {% endfor %}
+        <div class="btn-group">
+            <input type="submit" class="btn btn-primary" value="Сохранить"> <input type="reset" class="btn btn-default" value="Сбросить">
         </div>
-        <ul class="form-group">
-            <li><a href="javascript:chooser_select('sel_left','sel_right');" class="btn btn-sm btn-default">
-                <span class="glyphicon glyphicon-chevron-right"></span>
-            </a></li>
-            <li><a href="javascript:chooser_select('sel_right','sel_left');" class="btn btn-sm btn-default">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-            </a></li>
-        </ul>
-        <div class="form-group">
-            <label for="sel_right">Группы пользователя</label>
-            <select name="ingroups" multiple id="sel_right" class="form-group">
-                {% for gr in usergroups %}
-                    <option value="{{ gr.id }}">{{ gr.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <br/>
-        <input type="submit" value="Сохранить"> <input type="reset" value="Сбросить">
     </form>
 
 {% endblock %}
