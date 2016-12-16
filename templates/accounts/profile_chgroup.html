@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
 {% block content %}
 
-    <legend>Ответственность администратора к группам абонентов</legend>
+    <legend>Ответственность администратора за группы абонентов</legend>
     <form action="{% url 'acc_app:profile_setup_group' userprofile.id %}" method="post" role="form">{% csrf_token %}
         {% for ag in abongroups %}
             <div class="checkbox">

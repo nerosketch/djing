@@ -58,10 +58,9 @@ def profile_show(request, id=0):
     id = mydefs.safe_int(id)
 
     if id == 0:
-        usr = request.user
-    else:
-        usr = get_object_or_404(UserProfile, id=id)
+        return redirect('acc_app:other_profile', id=request.user.id)
 
+    usr = get_object_or_404(UserProfile, id=id)
     if request.method == 'POST':
         usr.username = request.POST.get('username')
         usr.fio = request.POST.get('fio')
@@ -80,7 +79,11 @@ def profile_show(request, id=0):
 @login_required
 @mydefs.only_admins
 def chgroup(request, uid):
-    usr = get_object_or_404(UserProfile, id=uid)
+    uid = mydefs.safe_int(uid)
+    if uid == 0:
+        usr = request.user
+    else:
+        usr = get_object_or_404(UserProfile, id=uid)
     if request.method == 'POST':
         ag = request.POST.getlist('ag')
         usr.abon_groups.clear()

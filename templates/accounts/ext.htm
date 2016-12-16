@@ -12,7 +12,9 @@
         <div class="col-sm-3">
             <div class="thumbnail">
                 {% if userprofile.avatar %}
-                    <img alt="ava" src="{{ userprofile.avatar.min }}"/>
+                    <a href="{{ userprofile.avatar.big }}" class="thumbnail" target="_blank">
+                        <img alt="ava" src="{{ userprofile.avatar.min }}"/>
+                    </a>
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
