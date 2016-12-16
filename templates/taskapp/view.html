@@ -1,0 +1,43 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'taskapp:home' %}">Задачи</a></li>
+        <li class="active">#{{ task.id }}</li>
+    </ol>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Описание задачи</h3>
+        </div>
+        <div class="panel-body">
+
+            <p>Описание: {{ task.descr }}</p>
+            Исполнители:
+            <ul>
+                {% for recipient in task.recipients.all %}
+                <li><a href="{% url 'acc_app:other_profile' recipient.id %}" target="_blank">{{ recipient.get_full_name }}</a></li>
+                {% endfor %}
+            </ul>
+            Задача действительна до {{ task.out_date|date:'d E Y' }}<br>
+            Дата создания {{ task.time_of_create|date:'d E Y' }}<br>
+            Времени осталось {{ time_diff }}<br>
+            Тип задачи: {{ task.get_mode_display }}<br>
+            Абонент
+            {% if task.abon %}
+                <a href="{% url 'abonapp:abon_home' task.abon.group.id task.abon.id %}" target="_blank">{{ task.abon.get_full_name }}</a>
+            {% else %}
+                <i>&lt;Не выбран&gt;</i>
+            {% endif %}<br>
+            {% if task.attachment %}
+                Приложение:
+                <a href="{{ task.attachment.url }}" class="thumbnail" target="_blank">
+                    <img src="{{ task.attachment.url }}">
+                </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}
