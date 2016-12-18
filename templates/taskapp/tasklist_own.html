@@ -34,10 +34,15 @@
                 <td>{{ task.get_priority_display }}</td>
                 <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
-                <td class="btn-group">
+                <td class="btn-group btn-group-justified">
                     <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
+                    {% if perms.taskapp.can_viewall %}
+                        <a href="{% url 'taskapp:remind' task.id %}" class="btn btn-default btn-sm" title="Напомнить">
+                            <span class="glyphicon glyphicon-bell"></span>
+                        </a>
+                    {% endif %}
                     <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-sm btn-danger" title="Удалить">
                         <span class="glyphicon glyphicon-remove-circle"></span>
                     </a>
