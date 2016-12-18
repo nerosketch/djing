@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^(?P<task_id>\d+)/delete$', views.task_delete, name='delete'),
     url(r'^(?P<task_id>\d+)/fin$', views.task_finish, name='finish'),
     url(r'^(?P<task_id>\d+)/begin$', views.task_begin, name='begin'),
+    url(r'^(?P<task_id>\d+)/remind', views.remind, name='remind'),
     url(r'^add$', views.task_add_edit, name='add'),
     url(r'^active$', views.active_tasks, name='active_tasks'),
     url(r'^finished$', views.finished_tasks, name='finished_tasks'),
