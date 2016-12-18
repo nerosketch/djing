@@ -19,23 +19,7 @@
 <body>
 
 <!-- Modal -->
-<div class="modal fade" id="modFrm" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" id="modContent">
-            <div class="modal-header warning">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><span class="glyphicon glyphicon-warning-sign"></span>
-                    Надпись вверху</h4>
-            </div>
-            <div class="modal-body">
-                тут содержимое блока
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="modal fade" id="modFrm" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
 <!-- Fixed navbar -->
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -91,11 +75,9 @@
 
                     <a href="{% url 'acc_app:profile' %}">
                         {% if user.avatar %}
-                            <img alt="{{ user.avatar.min }}" class="img-circle img-responsive"
-                                 src="{{ user.avatar.min }}"/>
+                            <img alt="авка" class="img-circle img-responsive" src="{{ user.avatar.min }}"/>
                         {% else %}
-                            <img src="/static/img/user_ava_min.gif" class="img-circle img-responsive"
-                                 alt="user avatar"/>
+                            <img src="/static/img/user_ava_min.gif" class="img-circle img-responsive" alt="авка"/>
                         {% endif %}
                     </a>
 
@@ -115,7 +97,6 @@
                         <span class="glyphicon glyphicon-eye-open"></span> администраторы
                     </a>
                 </li>
-
 
                 {% url 'abonapp:group_list' as abongroup_list_link %}
                 <li{% if abongroup_list_link in request.path %} class="active"{% endif %}>
