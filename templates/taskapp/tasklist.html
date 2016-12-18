@@ -37,9 +37,11 @@
                 <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td colspan="3" class="btn-group btn-group-justified">
+                    {% if perms.taskapp.can_change_task %}
                     <a href="{% url 'taskapp:begin' task.id %}" class="btn btn-primary btn-xs" title="Начать">
                         <span class="glyphicon glyphicon-cog"></span>
                     </a>
+                    {% endif %}
                     <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success btn-xs" title="Завершить">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
