@@ -118,4 +118,13 @@ def task_handler(sender, instance, **kwargs):
               group_name])                  # Имя группы абонента
 
 
+def task_delete(sender, instance, **kwargs):
+    ChangeLog.objects.create(
+        task=instance,
+        act_type=b'd',
+        who=instance.author
+    )
+
+
 models.signals.post_save.connect(task_handler, sender=Task)
+models.signals.post_delete.connect(task_delete, sender=Task)
