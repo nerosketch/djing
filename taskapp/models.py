@@ -57,6 +57,7 @@ class Task(models.Model):
         ordering = ('-id',)
         permissions = (
             ('can_viewall', 'Доступ ко всем задачам'),
+            ('can_remind', 'Напоминания о задачах')
         )
 
     def finish(self, current_user):

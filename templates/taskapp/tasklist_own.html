@@ -38,7 +38,7 @@
                     <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
-                    {% if perms.taskapp.can_viewall %}
+                    {% if perms.taskapp.can_remind %}
                         <a href="{% url 'taskapp:remind' task.id %}" class="btn btn-default btn-sm" title="Напомнить">
                             <span class="glyphicon glyphicon-bell"></span>
                         </a>

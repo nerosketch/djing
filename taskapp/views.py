@@ -173,7 +173,7 @@ def task_begin(request, task_id):
 
 
 @login_required
-@permission_required('taskapp.can_viewall')
+@permission_required('taskapp.can_remind')
 def remind(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.save(update_fields=['state'])
