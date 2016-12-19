@@ -40,7 +40,7 @@ TASK_TYPES = (
 
 
 class ChangeLog(models.Model):
-    task = models.ForeignKey(Task)
+    task = models.ForeignKey('Task')
     ACT_CHOICES = (
         (b'e', u'Изменение задачи'),
         (b'c', u'Создание задачи'),
@@ -56,13 +56,16 @@ class ChangeLog(models.Model):
         return self.get_act_type_display()
 
 
+def _delta_add_days():
+    return datetime.now() + timedelta(days=3)
+
 class Task(models.Model):
     descr = models.CharField(max_length=128)
     recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='them_task')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
     #device = models.ForeignKey(Device, related_name='dev')
     priority = models.CharField(max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
-    out_date = models.DateField(null=True, blank=True, default=datetime.now() + timedelta(days=3))
+    out_date = models.DateField(null=True, blank=True, default=_delta_add_days)
     time_of_create = models.DateTimeField(auto_now_add=True)
     state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
     attachment = models.ImageField(upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
