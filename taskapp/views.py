@@ -70,6 +70,7 @@ def my_tasks(request):
 @permission_required('taskapp.can_viewall')
 def all_tasks(request):
     tasks = Task.objects.all()
+    tasks = pag_mn(request, tasks)
     return render(request, 'taskapp/tasklist_all.html', {
         'tasks': tasks
     })
@@ -110,11 +111,11 @@ def task_add_edit(request, task_id=0):
     #frm_recipient_id = safe_int(request.GET.get('rp'))
 
     if task_id == 0:
-        if not request.user.has_perm('taskapp:add_task'):
+        if not request.user.has_perm('taskapp.add_task'):
             raise PermissionDenied
         tsk = Task()
     else:
-        if not request.user.has_perm('taskapp:change_task'):
+        if not request.user.has_perm('taskapp.change_task'):
             raise PermissionDenied
         tsk = get_object_or_404(Task, id=task_id)
         frm = TaskFrm(instance=tsk)
