@@ -7,7 +7,6 @@
     </ol>
 
 
-
     {% if warntext %}
         <div class="alert alert-danger alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -20,31 +19,42 @@
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active">
-            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:home' %}" role="tab" data-toggle="tab">
+
+        {% url 'taskapp:home' as taskhome %}
+        <li{% if taskhome == request.path %} class="active"{% endif %}>
+            <a href="{{ taskhome }}">
                 Новые задачи
             </a>
         </li>
-        <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:active_tasks' %}" role="tab" data-toggle="tab">
+
+        {% url 'taskapp:active_tasks' as taskactive %}
+        <li{% if taskactive == request.path %} class="active"{% endif %}>
+            <a href="{{ taskactive }}">
                 Активные задачи
             </a>
         </li>
-        <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:finished_tasks' %}" role="tab" data-toggle="tab">
+
+        {% url 'taskapp:finished_tasks' as taskfin %}
+        <li{% if taskfin == request.path %} class="active"{% endif %}>
+            <a href="{{ taskfin }}">
                 Выполненные задачи
             </a>
         </li>
-        <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:own_tasks' %}" role="tab" data-toggle="tab">
+
+        {% url 'taskapp:own_tasks' as taskown %}
+        <li{% if taskown == request.path %} class="active"{% endif %}>
+            <a href="{{ taskown }}">
                 Назначенные мной задачи
             </a>
         </li>
-        <li>
-            <a href="#livetab_content" data-tab-remote="{% url 'taskapp:my_tasks' %}" role="tab" data-toggle="tab">
+
+        {% url 'taskapp:my_tasks' as taskmy %}
+        <li{% if taskmy == request.path %} class="active"{% endif %}>
+            <a href="{{ taskmy }}">
                 Все мои задачи
             </a>
         </li>
+
     </ul>
 
     <div class="tab-content">
