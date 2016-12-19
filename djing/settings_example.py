@@ -155,3 +155,5 @@ AUTH_USER_MODEL = 'accounts_app.UserProfile'
 LOGIN_URL = reverse_lazy('acc_app:login')
 LOGIN_REDIRECT_URL = reverse_lazy('acc_app:profile')
 LOGOUT_URL = reverse_lazy('acc_app:logout_link')
+
+PAGINATION_ITEMS_PER_PAGE=10
