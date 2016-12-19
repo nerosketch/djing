@@ -39,6 +39,23 @@ TASK_TYPES = (
 )
 
 
+class ChangeLog(models.Model):
+    task = models.ForeignKey(Task)
+    ACT_CHOICES = (
+        (b'e', u'Изменение задачи'),
+        (b'c', u'Создание задачи'),
+        (b'd', u'Удаление задачи'),
+        (b'f', u'Завершение задачи'),
+        (b'b', u'Задача начата')
+    )
+    act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
+    when = models.DateTimeField(auto_now_add=True)
+    who = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
+
+    def __unicode__(self):
+        return self.get_act_type_display()
+
+
 class Task(models.Model):
     descr = models.CharField(max_length=128)
     recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='them_task')
@@ -61,26 +78,23 @@ class Task(models.Model):
         )
 
     def finish(self, current_user):
-        self.state = 'F'  # Выполнена
+        self.state = b'F'  # Выполнена
         self.out_date = datetime.now()  # Время завершения
+        ChangeLog.objects.create(
+            task=self,
+            act_type=b'f',
+            who=current_user
+        )
+        self.save(update_fields=['state', 'out_date'])
 
     def begin(self, current_user):
-        self.state = 'C'  # Начата
-
-
-class ChangeLog(models.Model):
-    task = models.ForeignKey(Task)
-    ACT_CHOICES = (
-        (b'e', u'Изменение задачи'),
-        (b'c', u'Создание задачи'),
-        (b'd', u'Удаление задачи')
-    )
-    act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
-    when = models.DateTimeField(auto_now_add=True)
-    who = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
-
-    def __unicode__(self):
-        return self.get_act_type_display()
+        self.state = b'C'  # Начата
+        ChangeLog.objects.create(
+            task=self,
+            act_type=b'b',
+            who=current_user
+        )
+        self.save(update_fields=['state'])
 
 
 def task_handler(sender, instance, **kwargs):
