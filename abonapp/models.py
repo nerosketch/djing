@@ -28,7 +28,7 @@ class LogicError(Exception):
 
 class AbonGroup(models.Model):
     title = models.CharField(max_length=127, unique=True)
-    profiles = models.ManyToManyField(UserProfile, related_name='abon_groups')
+    profiles = models.ManyToManyField(UserProfile, blank=True, related_name='abon_groups')
 
     class Meta:
         db_table = 'abonent_groups'
