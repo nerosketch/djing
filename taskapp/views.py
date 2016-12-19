@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from abonapp.models import Abon
 from datetime import date
@@ -58,7 +59,7 @@ def own_tasks(request):
 @login_required
 @only_admins
 def my_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user)  # Все задачи
+    tasks = Task.objects.filter(recipients=request.user)  # Задачи где я учавствовал
     tasks = pag_mn(request, tasks)
     return render(request, 'taskapp/tasklist.html', {
         'tasks': tasks
@@ -75,7 +76,7 @@ def all_tasks(request):
 
 
 @login_required
-@permission_required('taskapp.can_delete_task')
+@permission_required('taskapp.delete_task')
 def task_delete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     # нельзя удалить назначенную мне задачу
@@ -95,8 +96,9 @@ def view(request, task_id):
         'time_diff': time_diff
     })
 
+
 @login_required
-@permission_required('taskapp.can_change_task')
+@only_admins
 def task_add_edit(request, task_id=0):
     task_id = safe_int(task_id)
     warntext = ''
@@ -108,8 +110,12 @@ def task_add_edit(request, task_id=0):
     #frm_recipient_id = safe_int(request.GET.get('rp'))
 
     if task_id == 0:
+        if not request.user.has_perm('taskapp:can_add_task'):
+            raise PermissionDenied
         tsk = Task()
     else:
+        if not request.user.has_perm('taskapp:can_change_task'):
+            raise PermissionDenied
         tsk = get_object_or_404(Task, id=task_id)
         frm = TaskFrm(instance=tsk)
         selected_abon = tsk.abon
@@ -159,7 +165,6 @@ def task_add_edit(request, task_id=0):
 def task_finish(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.finish(request.user)
-    task.save(update_fields=['state', 'out_date'])
     return redirect('taskapp:home')
 
 
@@ -168,7 +173,6 @@ def task_finish(request, task_id):
 def task_begin(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.begin(request.user)
-    task.save(update_fields=['state'])
     return redirect('taskapp:home')
 
 
