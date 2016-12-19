@@ -41,14 +41,9 @@
                     <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-sm btn-success" title="Завершить">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
-                    {% if perms.taskapp.can_change_task %}
+                    {% if perms.taskapp.change_task %}
                         <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
                             <span class="glyphicon glyphicon-edit"></span>
-                        </a>
-                    {% endif %}
-                    {% if perms.taskapp.can_delete_task %}
-                        <a href="#" class="btn btn-sm btn-danger disabled" title="Удалить">
-                            <span class="glyphicon glyphicon-remove-circle"></span>
                         </a>
                     {% endif %}
                 </td>
