@@ -8,6 +8,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import models
+from djing.settings import PAGINATION_ITEMS_PER_PAGE
 
 
 ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
@@ -56,7 +57,7 @@ def res_error(request, text):
 
 
 # Pagination
-def pag_mn(request, objs, count_per_page=50):
+def pag_mn(request, objs, count_per_page=PAGINATION_ITEMS_PER_PAGE):
     page = request.GET.get('p')
     pgn = Paginator(objs, count_per_page)
     try:
