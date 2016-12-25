@@ -3,7 +3,7 @@ from json import dumps
 import socket
 import struct
 from collections import Iterator
-
+import os
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -144,3 +144,8 @@ def only_admins(fn):
             return redirect('client_side:home')
 
     return wrapped
+
+
+def ping(hostname):
+    response = os.system("`which ping` -c 1 " + hostname)
+    return True if response == 0 else False
