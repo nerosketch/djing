@@ -77,9 +77,14 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="8">
-                    <a href="{% url 'abonapp:add_abon' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
-                        <span class="glyphicon glyphicon-plus"></span> Добавить абонента
+                <td colspan="8" class="btn-group">
+                    {% if perms.abonapp.add_abon %}
+                        <a href="{% url 'abonapp:add_abon' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
+                            <span class="glyphicon glyphicon-plus"></span> Добавить абонента
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'abonapp:update_nas' abon_group.id %}" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-refresh"></span> Обновить абонентов в NAS
                     </a>
                 </td>
             </tr>
