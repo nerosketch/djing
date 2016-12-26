@@ -4,8 +4,15 @@ from structs import AbonStruct, TariffStruct
 
 
 # Всплывает если из NAS вернулся не удачный результат
-class NasFailedResult(BaseException):
-    pass
+class NasFailedResult(Exception):
+    def __init__(self, message):
+        super(NasFailedResult, self).__init__(message)
+
+
+# Всплывает когда нет связи с сервером доступа к инету (NAS)
+class NasNetworkError(Exception):
+    def __init__(self, message):
+        super(NasNetworkError, self).__init__(message)
 
 
 # Проверяет входной тип на принадлежность классу.
@@ -52,6 +59,16 @@ class BaseTransmitter(object):
     @check_input_type(AbonStruct)
     def update_user(self, user):
         """чтоб обновить абонента надо изменить всё кроме его uid, по uid абонент будет найден"""
+
+    @abstractmethod
+    @check_input_type(AbonStruct)
+    def pause_user(self, user):
+        """Приостановить обслуживание абонента"""
+
+    @abstractmethod
+    @check_input_type(AbonStruct)
+    def start_user(self, user):
+        """Продолжить обслуживание абонента"""
 
     @abstractmethod
     @check_input_type(TariffStruct)
