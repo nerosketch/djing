@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from json import dumps
+from django.core.exceptions import PermissionDenied
 
 from django.db import IntegrityError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.template.context_processors import csrf
 from django.http import HttpResponse, Http404
@@ -12,7 +13,7 @@ from django.contrib.auth import get_user_model
 
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
-from agent import NetExcept
+from agent import NasFailedResult, AbonStruct, Transmitter, TariffStruct, NasNetworkError
 import forms
 import models
 import mydefs
@@ -39,8 +40,7 @@ def peoples(request, gid):
 
 
 @login_required
-@mydefs.only_admins
-# @permission_required('abonapp.add_abongroup')
+@permission_required('abonapp.add_abongroup')
 def addgroup(request):
     warntext = ''
     frm = forms.AbonGroupForm()
@@ -78,7 +78,7 @@ def grouplist(request):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.delete_abongroup')
 def delgroup(request):
     agd = mydefs.safe_int(request.GET.get('id'))
     get_object_or_404(models.AbonGroup, id=agd).delete()
@@ -112,6 +112,11 @@ def addabon(request, gid):
     except models.LogicError as e:
         warning_text = e.value
 
+    except NasFailedResult as e:
+        warning_text = e.message
+    except NasNetworkError as e:
+        warning_text = e.message
+
     if not frm:
         frm = forms.AbonForm(initial={
             'ip_address': IpPoolItem.objects.get_free_ip(),
@@ -128,24 +133,26 @@ def addabon(request, gid):
 
 @login_required
 @mydefs.only_admins
-# @permission_required('abonapp.delete_abon')
-# @permission_required('abonapp.delete_abongroup')
 def delentity(request):
     typ = request.GET.get('t')
     uid = request.GET.get('id')
 
     if typ == 'a':
+        if not request.user.has_perm('abonapp.delete_abon'):
+            raise PermissionDenied
         abon = get_object_or_404(models.Abon, id=uid)
         gid = abon.group.id
         abon.delete()
         return mydefs.res_success(request, resolve_url('abonapp:people_list', gid))
     elif typ == 'g':
+        if not request.user.has_perm('abonapp.delete_abongroup'):
+            raise PermissionDenied
         get_object_or_404(models.AbonGroup, id=uid).delete()
     return mydefs.res_success(request, 'abonapp:group_list')
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_add_ballance')
 def abonamount(request, gid, uid):
     warning_text = ''
     abon = get_object_or_404(models.Abon, id=uid)
@@ -208,7 +215,7 @@ def abon_services(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.change_abon')
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
@@ -252,8 +259,10 @@ def abonhome(request, gid, uid):
         warntext = u'Ip адрес не найден в списке IP адресов'
         frm = forms.AbonForm(initial=init_frm_dat)
 
-    except NetExcept as e:
-        warntext = e.value
+    except NasFailedResult as e:
+        warntext = e.message
+    except NasNetworkError as e:
+        warntext = e.message
 
     return render(request, 'abonapp/editAbon.html', {
         'warntext': warntext,
@@ -278,8 +287,7 @@ def terminal_pay(request):
 
 
 @login_required
-@mydefs.only_admins
-# @permission_required('abonapp.add_invoiceforpayment')
+@permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid, uid):
     uid = mydefs.safe_int(uid)
     abon = get_object_or_404(models.Abon, id=uid)
@@ -310,7 +318,7 @@ def add_invoice(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_buy_tariff')
 def buy_tariff(request, gid, uid):
     warntext = ''
     frm = None
@@ -330,10 +338,11 @@ def buy_tariff(request, gid, uid):
             frm = forms.BuyTariff()
     except models.LogicError as e:
         warntext = e.value
-
-    except NetExcept as e:
-        warntext = e.value + u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.' \
+    except NasFailedResult as e:
+        warntext = e.message + u', но услуга уже подключена, она будет применена когда будет восстановлен доступ к NAS серверу.' \
                              u' <a href="%s">Вернуться</a>' % resolve_url('abonapp:abon_home', gid=gid, uid=abon.id)
+    except NasNetworkError as e:
+        warntext = e.message
 
     return render(request, 'abonapp/buy_tariff.html', {
         'warntext': warntext,
@@ -360,7 +369,7 @@ def chpriority(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_complete_service')
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
 
@@ -393,9 +402,10 @@ def complete_service(request, gid, uid, srvid):
 
     except models.LogicError as e:
         warntext = e.value
-
-    except NetExcept as e:
-        warntext = e.value
+    except NasFailedResult as e:
+        warntext = e.message
+    except NasNetworkError as e:
+        warntext = e.message
 
     return render(request, 'abonapp/complete_service.html', {
         'abtar': abtar,
@@ -406,7 +416,7 @@ def complete_service(request, gid, uid, srvid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_activate_service')
 def activate_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
 
@@ -428,7 +438,7 @@ def activate_service(request, gid, uid, srvid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uid, srvid):
     get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
@@ -459,6 +469,28 @@ def debtors(request):
         #'peoples': peoples_list
         'invoices': invs
     })
+
+@login_required
+@mydefs.only_admins
+def update_nas(request, group_id):
+    users = models.Abon.objects.filter(group=group_id)
+    tm = Transmitter()
+    for usr in users:
+        if usr.ip_address:
+            user_ip = usr.ip_address.int_ip()
+        else:
+            continue
+        tariff = usr.active_tariff()
+        if tariff:
+            agent_trf = TariffStruct(tariff.id, tariff.speedIn, tariff.speedOut)
+        else:
+            agent_trf = TariffStruct()
+        agent_abon = AbonStruct(usr.id, user_ip, agent_trf)
+        try:
+            tm.update_user(agent_abon)
+        except NasFailedResult:
+            tm.add_user(agent_abon)
+    return redirect('abonapp:people_list', gid=group_id)
 
 
 # API's
