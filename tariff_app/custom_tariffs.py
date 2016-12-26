@@ -16,10 +16,11 @@ class TariffDefault(TariffBase):
         nw = datetime.now(tz=timezone.get_current_timezone())
 
         # сколько прошло с начала действия услуги
-        time_diff = nw - abon_tariff.time_start
+        # если времени начала нет то это начало действия, использованное время 0
+        time_diff = nw - abon_tariff.time_start if abon_tariff.time_start else timedelta(0)
 
         # времени в этом месяце
-        curr_month_time = datetime(nw.year, nw.month + 1, 1) - timedelta(days=1)
+        curr_month_time = datetime(nw.year, nw.month if nw.month == 12 else nw.month + 1, 1) - timedelta(days=1)
         curr_month_time = timedelta(days=curr_month_time.day)
 
         # Сколько это в процентах от всего месяца (k - коеффициент, т.е. без %)
