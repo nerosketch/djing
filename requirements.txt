@@ -2,4 +2,3 @@ Django==1.9
 requests
 Pillow
 MySQL-python
-pyping
