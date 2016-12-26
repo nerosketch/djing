@@ -2,8 +2,10 @@
 import socket
 import binascii
 from hashlib import md5
-from core import BaseTransmitter, NasFailedResult
+from core import BaseTransmitter, NasFailedResult, NasNetworkError
+from mydefs import ping
 from structs import TariffStruct, IpStruct
+import settings
 
 
 class ApiRos:
@@ -138,19 +140,23 @@ class ApiRos:
         return ret
 
 
+# TODO: Реализовать передачу в шейпер срок действия тарифа
 class MikrotikTransmitter(BaseTransmitter):
-    def __init__(self, login, password, ip, port=8728):
+    def __init__(self, login=None, password=None, ip=None, port=None):
+        ip = ip or settings.NAS_IP
+        if not ping(ip):
+            raise NasNetworkError(u'NAS %s не пингуется' % ip)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((ip, port))
+        s.connect((ip, port or settings.NAS_PORT))
         self.ar = ApiRos(s)
-        self.ar.login(login, password)
+        self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
 
     def _exec_cmd(self, cmd):
         assert isinstance(cmd, list)
         result = self.ar.talk(cmd)
         for rt in result:
             if rt[0] == '!trap':
-                raise NasFailedResult, rt[1]['=message']
+                raise NasFailedResult(rt[1]['=message'])
         return result
 
     # ищем правило по имени, и возвращаем всю инфу о найденном правиле
@@ -189,6 +195,14 @@ class MikrotikTransmitter(BaseTransmitter):
             '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn),
             '=target=%s/32' % user.ip.get_str()
         ])
+
+    # приостановливаем обслуживание абонента
+    def pause_user(self, user):
+        self._exec_cmd(['/queue/simple/disable', '=.id=uid%d' % user.uid])
+
+    # продолжаем обслуживание абонента
+    def start_user(self, user):
+        self._exec_cmd(['/queue/simple/enable', '=.id=uid%d' % user.uid])
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
     def add_tariff_range(self, tariff_list):
