@@ -194,6 +194,8 @@ td.btn-group {
     top: 0;
     width: 50%; /* 6 columns */
   }
+
+  body{overflow-x: hidden;}
 }
 
 button[data-toggle=offcanvas]{
