@@ -7,7 +7,7 @@ from django.utils.datetime_safe import datetime
 from django.db import models
 from django.core.validators import DecimalValidator
 
-from agent import get_TransmitterClientKlass, NetExcept
+from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
@@ -32,6 +32,9 @@ class AbonGroup(models.Model):
 
     class Meta:
         db_table = 'abonent_groups'
+        permissions = (
+            ('can_add_ballance', 'Пополнение счёта'),
+        )
 
     def __unicode__(self):
         return self.title
@@ -51,19 +54,6 @@ class AbonLog(models.Model):
         return self.comment
 
 
-class AbonTariffManager(models.Manager):
-    @staticmethod
-    def update_priorities(abonent):
-        abon_tariff_list = AbonTariff.objects.filter(abon=abonent).order_by('tariff_priority')
-
-        # Обновляем приоритеты, чтоб по порядку были
-        at_pr = 0
-        for at in abon_tariff_list:
-            at.tariff_priority = at_pr
-            at_pr += 1
-            at.save(update_fields=['tariff_priority'])
-
-
 class AbonTariff(models.Model):
     abon = models.ForeignKey('Abon')
     tariff = models.ForeignKey(Tariff, related_name='linkto_tariff')
@@ -71,8 +61,6 @@ class AbonTariff(models.Model):
 
     # время начала действия, остальные что не начали действие - NULL
     time_start = models.DateTimeField(null=True, blank=True, default=None)
-
-    objects = AbonTariffManager()
 
     def priority_up(self):
         # ищем услугу с большим приоритетом(число приоритета меньше)
@@ -158,6 +146,10 @@ class AbonTariff(models.Model):
         ordering = ('tariff_priority',)
         db_table = 'abonent_tariff'
         unique_together = (('abon', 'tariff', 'tariff_priority'),)
+        permissions = (
+            ('can_complete_service', u'Досрочное завершение услуги абонента'),
+            ('can_activate_service', u'Активация услуги абонента')
+        )
 
 
 class Abon(UserProfile):
@@ -202,6 +194,9 @@ class Abon(UserProfile):
 
     class Meta:
         db_table = 'abonent'
+        permissions = (
+            ('can_buy_tariff', u'Покупка тарифа абоненту'),
+        )
 
     # Платим за что-то
     def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=u'Снятие со счёта средств'):
@@ -277,7 +272,7 @@ class Abon(UserProfile):
                 next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
 
                 # и если что-нибудь вернулось то активируем, давая время начала действия
-                if next_tarifs.count() > 0:
+                if len(next_tarifs) > 0:
                     next_tarifs[0].time_start = nw
                     next_tarifs[0].save()
 
@@ -328,47 +323,54 @@ class InvoiceForPayment(models.Model):
 
 
 def abon_post_save(sender, instance, **kwargs):
-    try:
-        tc = get_TransmitterClientKlass()()
+    if instance.ip_address:
+        user_ip = instance.ip_address.int_ip()
+    else:
+        return
+    inst_tariff = instance.active_tariff()
+    if inst_tariff:
+        agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
+    else:
+        agent_trf = TariffStruct()
+    agent_abon = AbonStruct(instance.id, user_ip, agent_trf)
+    tm = Transmitter()
+    if kwargs['created']:
+        # создаём абонента
+        tm.add_user(agent_abon)
+    else:
         # обновляем абонента на NAS
-        tc.signal_abon_refresh(instance)
-    except NetExcept:
-        pass
+        try:
+            tm.update_user(agent_abon)
+        except NasFailedResult:
+            tm.add_user(agent_abon)
+        # если не активен то приостановим услугу
+        if instance.is_active:
+            tm.start_user(agent_abon)
+        else:
+            tm.pause_user(agent_abon)
 
 
 def abon_del_signal(sender, instance, **kwargs):
-    try:
-        # подключаемся к NAS'у
-        tc = get_TransmitterClientKlass()()
-        # удаляем абонента на NAS
-        tc.signal_abon_remove(instance)
-    except NetExcept:
-        pass
-
-
-'''def tarif_pre_save(sender, instance, **kwargs):
-    print 'tarif_pre_save'
-    abon = instance.abon
-    abon.save()
     # подключаемся к NAS'у
-    #tc = get_TransmitterClientKlass()()'''
+    tm = Transmitter()
+    # удаляем абонента на NAS
+    tm.remove_user(instance.id)
 
 
 def abontariff_post_save(sender, instance, **kwargs):
-    try:
-        # Тут или подключение абону услуги, или изменение приоритета
-        tc = get_TransmitterClientKlass()()
-        tc.signal_abon_refresh(instance.abon)
-    except NetExcept:
-        pass
+    # Тут или подключение абону услуги, или изменение приоритета
+    agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
+    agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
+    tm = Transmitter()
+    tm.update_user(agent_abon)
+    tm.start_user(agent_abon)
 
 
 def abontariff_del_signal(sender, instance, **kwargs):
-    try:
-        tc = get_TransmitterClientKlass()()
-        tc.signal_abon_refresh(instance.abon)
-    except NetExcept:
-        pass
+    agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
+    agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
+    tm = Transmitter()
+    tm.pause_user(agent_abon)
 
 
 models.signals.post_save.connect(abon_post_save, sender=Abon)
