@@ -59,7 +59,6 @@ def profile_show(request, uid=0):
     uid = mydefs.safe_int(uid)
 
     if uid == 0:
-        print type(request.user.id), request.user.id
         return redirect('acc_app:other_profile', uid=request.user.id)
 
     usr = get_object_or_404(UserProfile, id=uid)
@@ -110,7 +109,7 @@ def ch_ava(request):
         photo.image = request.FILES.get('avatar')
         photo.save()
         user.avatar = photo
-        user.save()
+        user.save(update_fields=['avatar'])
         request.user = user
 
     return render(request, 'accounts/settings/ch_info.html', {
