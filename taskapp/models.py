@@ -2,14 +2,15 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-import os
-from subprocess import call
+#import os
+#from subprocess import call
 from django.db import models
 from django.conf import settings
 from abonapp.models import Abon
 
 #from devapp.models import Device
-from djing.settings import BASE_DIR
+#from djing.settings import BASE_DIR
+from handle import handle as task_handle
 
 
 TASK_PRIORITIES = (
@@ -60,7 +61,7 @@ def _delta_add_days():
     return datetime.now() + timedelta(days=3)
 
 class Task(models.Model):
-    descr = models.CharField(max_length=128)
+    descr = models.CharField(max_length=128, null=True, blank=True)
     recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='them_task')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
     #device = models.ForeignKey(Device, related_name='dev')
@@ -101,26 +102,28 @@ class Task(models.Model):
 
 
 def task_handler(sender, instance, **kwargs):
-    cur_dir = os.path.join(BASE_DIR, "taskapp")
-    group_name = ''
+    #cur_dir = os.path.join(BASE_DIR, "taskapp")
+    group = ''
     if instance.abon:
-        if instance.abon.group:
-            group_name = instance.abon.group.title
+        group = instance.abon.group
     if kwargs['created']:
-        first_param = 'start'
         ChangeLog.objects.create(
             task=instance,
             act_type=b'c',
             who=instance.author
         )
     else:
-        first_param = 'change'
         ChangeLog.objects.create(
             task=instance,
             act_type=b'e',
             who=instance.author
         )
     for recipient in instance.recipients.all():
+        task_handle(
+            instance, instance.author,
+            recipient, group
+        )
+        '''
         call(['%s/handle.sh' % cur_dir,
             first_param,                    # start or change
             instance.get_mode_display(),    # mode - Характер поломки
@@ -134,6 +137,7 @@ def task_handler(sender, instance, **kwargs):
               instance.abon.address if instance.abon else '<нет адреса>',
               instance.abon.telephone if instance.abon else '<нет телефона>',
               group_name])                  # Имя группы абонента
+              '''
 
 
 def task_delete(sender, instance, **kwargs):
