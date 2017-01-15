@@ -158,6 +158,7 @@ def delentity(request):
         messages.error(request, e.message)
     return redirect('abonapp:group_list')
 
+
 @login_required
 @permission_required('abonapp.can_add_ballance')
 def abonamount(request, gid, uid):
