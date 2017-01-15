@@ -37,9 +37,9 @@
                     <a href="{{ client_side_pays }}">Платежи</a>
                 </li>
 
-                {% url 'client_side:buy' as client_side_buy %}
-                <li{% if client_side_buy == request.path %} class="active"{% endif %}>
-                    <a href="{{ client_side_buy }}">Подключить услугу</a>
+                {% url 'client_side:services' as client_side_services %}
+                <li{% if client_side_services == request.path %} class="active"{% endif %}>
+                    <a href="{{ client_side_services }}">Услуги</a>
                 </li>
 
                 <li>
@@ -60,7 +60,7 @@
                         <li class="divider"></li>
                         <li class="dropdown-header">Nav header</li>
                         <li><a href="#">Separated link</a></li>
-                        <li><a href="{% url 'logout_link' %}">Выйти</a></li>
+                        <li><a href="{% url 'acc_app:logout' %}">Выйти</a></li>
                     </ul>
                 </li>
             </ul>
@@ -82,12 +82,14 @@
         </div>
     {% endif %}
 
+    {% include 'message_block.html' %}
+
     {% block client_main %}{% endblock %}
 </div>
 
 <div id="footer">
     <div class="container">
-        <p class="text-muted">DN&copy;</p>
+        <p class="text-muted">&copy;DN</p>
     </div>
 </div>
 

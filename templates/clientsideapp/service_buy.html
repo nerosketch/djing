@@ -2,13 +2,12 @@
 {% block client_main %}
 
     <div class="page-header">
-        <h3>Заказать услугу</h3>
+        <h3>Вы уверены что хотите заказать услугу</h3>
         {% if current_service %}
             <p>Ваша текущая услуга <a href="#dv">{{ current_service.tariff.title }}</a>
                 за <b>{{ current_service.tariff.amount }}</b> руб.</p>
         {% else %}
-            <p>У вас нет активной услуги, для использования ресурсов приобретите нужную услугу из представленных
-                ниже.<br>
+            <p>У вас нет активной услуги, для использования ресурсов приобретите нужную услугу из представленных ниже.<br>
                 А если уже заказали то просто активируйте услугу из списка заказанных.</p>
         {% endif %}
     </div>
@@ -52,7 +51,7 @@
                                 <p>Входящая скорость: {{ tarif.speedIn }} MBit/s<br>
                                     Исходящая скорость: {{ tarif.speedOut }} MBit/s<br>
                                     Стоимость: {{ tarif.amount }} руб.</p>
-                                <a href="#" class="btn btn-primary">
+                                <a href="{% url 'client_side:buy_service' tarif.id %}" class="btn btn-primary">
                                     <span class="glyphicon glyphicon-shopping-cart"></span> Заказать
                                 </a>
                             </div>
@@ -64,7 +63,6 @@
                     </div>
                 </div>
             </div>
-
 
         </div>
     </div>

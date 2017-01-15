@@ -8,16 +8,14 @@
         <li class="active">Добавить</li>
     </ol>
 
-
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Добавить IP пул</h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
+
             <form role="form" action="{% url 'ip_pool:add' %}" method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="start_ip">Начальный ip</label>

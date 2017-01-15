@@ -8,15 +8,13 @@
         <li class="active">Добавить абонента</li>
     </ol>
 
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Добавьте аккаунт абонента</h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
             <form role="form" action="{% url 'abonapp:add_abon' abon_group.id %}" method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="login">Логин абонента</label>

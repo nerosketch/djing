@@ -1,13 +1,6 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/settings/ext.htm' %}
 {% block content %}
 
-    {% if warntext %}
-        <div class="alert alert-warning alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            {{ warntext }}
-        </div>
-    {% endif %}
-
     <form role="form" action="{% url 'acc_app:setup_info' %}" method="post">{% csrf_token %}
 
         <div class="form-group">

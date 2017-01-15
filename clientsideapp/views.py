@@ -1,10 +1,12 @@
 # coding=utf-8
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 
 from abonapp.models import AbonLog, AbonTariff, InvoiceForPayment, Abon, LogicError
 from tariff_app.models import Tariff
 from mydefs import pag_mn
+from agent import NasFailedResult, NasNetworkError
 
 
 @login_required
@@ -22,18 +24,24 @@ def pays(request):
 
 
 @login_required
-def buy_service(request):
+def services(request):
     all_tarifs = Tariff.objects.all()
-
     own_abon_tariffs = AbonTariff.objects.filter(abon_id=request.user.id)
-
     current_service = own_abon_tariffs.exclude(time_start=None)
     current_service = current_service[0] if current_service.count() > 0 else None
 
-    return render(request, 'clientsideapp/buy.html', {
+    return render(request, 'clientsideapp/services.html', {
         'tarifs': all_tarifs,
         'own_abon_tariffs': own_abon_tariffs,
         'current_service': current_service
+    })
+
+
+@login_required
+def buy_service(request, srv_id):
+    service = get_object_or_404(Tariff, id=srv_id)
+    return render(request, 'clientsideapp/service_buy.html', {
+        'service': service
     })
 
 
@@ -47,7 +55,6 @@ def debts_list(request):
 
 @login_required
 def debt_buy(request, d_id):
-    warntext = u''
     debt = get_object_or_404(InvoiceForPayment, id=d_id)
     abon = get_object_or_404(Abon, id=request.user.id)
     if request.method == 'POST':
@@ -64,9 +71,12 @@ def debt_buy(request, d_id):
             debt.save(update_fields=['status', 'date_pay'])
             return redirect('client_side:debts')
         except LogicError, e:
-            warntext = e.value
+            messages.error(request, e.value)
+        except NasFailedResult as e:
+            messages.error(request, e.message)
+        except NasNetworkError as e:
+            messages.error(request, e.message)
     return render(request, 'clientsideapp/debt_buy.html', {
-        'warntext': warntext,
         'debt': debt,
         'amount': debt.amount,
         'ballance_after': abon.ballance - debt.amount

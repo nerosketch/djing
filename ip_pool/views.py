@@ -1,5 +1,7 @@
-from django.contrib.auth.decorators import login_required
+# -*- coding: utf-8 -*-
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 from forms import PoolForm
 from models import IpPoolItem
@@ -39,7 +41,7 @@ def ips(request):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('ip_pool.delete_ippoolitem')
 def del_pool(request):
     ip_start = request.GET.get('ips')
     ip_end = request.GET.get('ipe')
@@ -54,7 +56,7 @@ def del_pool(request):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('ip_pool.add_ippoolitem')
 def add_pool(request):
     if request.method == 'POST':
         frm = PoolForm(request.POST)
@@ -63,18 +65,16 @@ def add_pool(request):
             IpPoolItem.objects.add_pool(cd['start_ip'], cd['end_ip'])
             return redirect('ip_pool:home')
         else:
-            warntext = u'Form is not valid'
+            messages.error(request, u'Исправьте ошибки')
     else:
         frm = PoolForm()
-        warntext = ''
     return render(request, 'ip_pool/add_pool.html', {
-        'form': frm,
-        'warntext': warntext
+        'form': frm
     })
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('ip_pool.delete_ippoolitem')
 def delip(request):
     ipid = request.GET.get('id')
     get_object_or_404(IpPoolItem, id=ipid).delete()

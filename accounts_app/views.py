@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import login_required  # , permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import NoReverseMatch
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.template.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
+from django.contrib import messages
 from abonapp.models import AbonGroup
 
 from photo_app.models import Photo
@@ -54,13 +55,14 @@ def sign_out(request):
 
 @login_required
 @mydefs.only_admins
-def profile_show(request, id=0):
-    id = mydefs.safe_int(id)
+def profile_show(request, uid=0):
+    uid = mydefs.safe_int(uid)
 
-    if id == 0:
-        return redirect('acc_app:other_profile', id=request.user.id)
+    if uid == 0:
+        print type(request.user.id), request.user.id
+        return redirect('acc_app:other_profile', uid=request.user.id)
 
-    usr = get_object_or_404(UserProfile, id=id)
+    usr = get_object_or_404(UserProfile, id=uid)
     if request.method == 'POST':
         usr.username = request.POST.get('username')
         usr.fio = request.POST.get('fio')
@@ -68,10 +70,10 @@ def profile_show(request, id=0):
         usr.is_active = request.POST.get('stat')
         usr.is_admin = request.POST.get('is_admin')
         usr.save()
-        return redirect('acc_app:other_profile', id=id)
+        return redirect('acc_app:other_profile', uid=uid)
 
     return render(request, 'accounts/index.html', {
-        'uid': id,
+        'uid': uid,
         'userprofile': usr
     })
 
@@ -119,7 +121,6 @@ def ch_ava(request):
 @login_required
 @mydefs.only_admins
 def ch_info(request):
-    warntext = ''
     if request.method == 'POST':
         user = request.user
         user.username = request.POST.get('username')
@@ -133,19 +134,17 @@ def ch_info(request):
                 newpasswd = request.POST.get('newpasswd')
                 user.set_password(newpasswd)
             else:
-                warntext = u'Неправильный пароль'
+                messages.error(request, u'Неправильный пароль')
         user.save()
         request.user = user
 
     return render(request, 'accounts/settings/ch_info.html', {
-        'user': request.user,
-        'warntext': warntext
+        'user': request.user
     })
 
 
 @login_required
-@mydefs.only_admins
-##@permission_required('accounts_app.add_userprofile')
+@permission_required('acc_app.add_userprofile')
 def create_profile(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -160,17 +159,10 @@ def create_profile(request):
         passwd = request.POST.get('passwd')
         conpasswd = request.POST.get('conpasswd')
         if not passwd:
-            return render(request, 'accounts/create_acc.html', {
-                'warntext': u'Забыли указать пароль для нового аккаунта',
-                'csrf_token': csrf(request)['csrf_token'],
-                'newuser': user
-            })
+            messages.error(request, u'Забыли указать пароль для нового аккаунта')
+
         if not conpasswd:
-            return render(request, 'accounts/create_acc.html', {
-                'warntext': u'Забыли повторить пароль для нового аккаунта',
-                'csrf_token': csrf(request)['csrf_token'],
-                'newuser': user
-            })
+            messages.error(request, u'Забыли повторить пароль для нового аккаунта')
 
         if passwd == conpasswd:
             user_qs = UserProfile.objects.filter(username=username)[:1]
@@ -179,24 +171,21 @@ def create_profile(request):
                 user.save()
                 return redirect('acc_app:accounts_list')
             else:
-                return render(request, 'accounts/create_acc.html', {
-                    'warntext': u'Пользователь с таким именем уже есть',
-                    'csrf_token': csrf(request)['csrf_token'],
-                    'newuser': user
-                })
+                messages.error(request, u'Пользователь с таким именем уже есть')
         else:
-            return render(request, 'accounts/create_acc.html', {
-                'warntext': u'Пароли не совпадают, попробуйте ещё раз',
-                'csrf_token': csrf(request)['csrf_token'],
-                'newuser': user
-            })
-    return render(request, 'accounts/create_acc.html', {'csrf_token': csrf(request)['csrf_token'], })
+            messages.error(request, u'Пароли не совпадают, попробуйте ещё раз')
+        return render(request, 'accounts/create_acc.html', {
+            'newuser': user
+        })
+    return render(request, 'accounts/create_acc.html')
 
 
 @login_required
 @mydefs.only_admins
-# @permission_required('accounts_app.del_userprofile')
 def delete_profile(request, uid):
+    if uid != request.user.id:
+        if not request.user.has_perm('acc_app.delete_userprofile'):
+            raise PermissionDenied
     prf = get_object_or_404(UserProfile, id=uid)
     prf.delete()
     return redirect('acc_app:accounts_list')
@@ -216,13 +205,12 @@ def acc_list(request):
 
 @login_required
 @mydefs.only_admins
-# @permission_required('accounts_app.change_userprofile')
-def perms(request, id):
-    profile = get_object_or_404(UserProfile, id=id)
+def perms(request, uid):
+    profile = get_object_or_404(UserProfile, id=uid)
     own_permissions = UserProfile.get_all_permissions(profile)
 
     return render(request, 'accounts/settings/permissions.html', {
-        'uid': id,
+        'uid': uid,
         'own_permissions': own_permissions
     })
 
@@ -241,10 +229,9 @@ def groups(request):
 
 @login_required
 @mydefs.only_admins
-# @permission_required('auth.change_group')
-def group(request, id):
-    id = mydefs.safe_int(id)
-    grp = get_object_or_404(Group, id=id)
+def group(request, uid):
+    uid = mydefs.safe_int(uid)
+    grp = get_object_or_404(Group, id=uid)
 
     if request.method == 'POST':
         group_rights = filter(lambda x: x[0] == 'group_rights', request.POST.lists())[0][1]
@@ -253,7 +240,7 @@ def group(request, id):
             rid = mydefs.safe_int(grr)
             grp.permissions.add(rid)
         grp.save()
-        return redirect('acc_app:profile_group_link', id=id)
+        return redirect('acc_app:profile_group_link', id=uid)
 
     grp_rights = grp.permissions.all()
     all_rights = Permission.objects.exclude(group=grp)
@@ -263,7 +250,6 @@ def group(request, id):
     #    print u"%s   |   %s" % (pr.name, pr.codename)
 
     return render(request, 'accounts/group.html', {
-        'csrf_token': csrf(request)['csrf_token'],
         'group': grp,
         'all_rights': all_rights,
         'grp_rights': grp_rights

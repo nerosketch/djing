@@ -33,23 +33,27 @@
                                 <i class="glyphicon glyphicon-shopping-cart"></i>
                             </a>
                         {% endif %}
-                        <a href="{% url 'abonapp:chpriority_tariff' abon_group.id abon.id %}?t={{ trf.id }}&a=up"
-                           class="btn btn-default btn-sm" title="Повысить приоритет">
+
+                        <!-- "{ % url 'abonapp:chpriority_tariff' abon_group.id abon.id % }?t={ { trf.id } }&a=up" -->
+                        <a href="#"
+                           class="btn btn-default btn-sm disabled" title="Повысить приоритет">
                             <i class="glyphicon glyphicon-hand-up"></i>
                         </a>
-                        <a href="{% url 'abonapp:chpriority_tariff' abon_group.id abon.id %}?t={{ trf.id }}&a=down"
-                           class="btn btn-default btn-sm" title="Понизить приоритет">
+
+                        <!-- "{ % url 'abonapp:chpriority_tariff' abon_group.id abon.id % }?t={ { trf.id } }&a=down" -->
+                        <a href="#"
+                           class="btn btn-default btn-sm disabled" title="Понизить приоритет">
                             <i class="glyphicon glyphicon-hand-down"></i>
                         </a>
+
                         <a href="{% url 'abonapp:unsubscribe_service' abon_group.id abon.id trf.id %}"
                            class="btn btn-danger btn-sm" title="Удалить услугу">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a>
                     </td>
                 {% else %}
-                    <td>
-                        <a href="{% url 'abonapp:compl_srv' abon_group.id abon.id trf.id %}"
-                           title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
+                    <td>        <!--{ % url 'abonapp:compl_srv' abon_group.id abon.id trf.id % }-->
+                        <a href="#" title="Завершить услугу досрочно" class="btn btn-danger btn-sm disabled">
                             <i class="glyphicon glyphicon-remove"></i> Завершить
                         </a>
                     </td>

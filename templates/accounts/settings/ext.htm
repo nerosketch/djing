@@ -8,6 +8,8 @@
         <li class="active">Настройки</li>
     </ol>
 
+    {% include 'message_block.html' %}
+
     <div class="row">
         <div class="col-sm-3">
             <form action="{% url 'acc_app:setup_avatar' %}" method="post" class="thumbnail"

@@ -10,15 +10,13 @@
         <li class="active">Активировать услугу</li>
     </ol>
 
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Активировать услугу</h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
             <form role="form" action="{% url 'abonapp:activate_service' abon_group.id abon.id abtar.id %}"
                   method="post">{% csrf_token %}
                 <input name="finish_confirm" value="yes" type="hidden">

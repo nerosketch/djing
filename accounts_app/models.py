@@ -59,10 +59,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['telephone']
 
     def get_full_name(self):
-        if self.fio:
-            return "%s: %s" % (self.username, self.fio)
-        else:
-            return self.username
+        return self.fio if self.fio else self.username
 
     def get_short_name(self):
         return self.username or self.telephone
@@ -91,17 +88,3 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __unicode__(self):
         return self.get_full_name()
-
-
-# from django.db.models.signals import post_save
-
-
-'''def create_custom_user(sender, instance, created, **kwargs):
-    if created:
-        values = {}
-        for field in sender._meta.local_fields:
-            values[field.attname] = getattr(instance, field.attname)
-        user = UserProfile(**values)
-        user.save()'''
-
-#post_save.connect(create_custom_user, User)

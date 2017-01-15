@@ -15,15 +15,15 @@ from accounts_app.models import UserProfile
 
 class LogicError(Exception):
     def __init__(self, value, err_id=None):
-        self.value = value
+        self.message = value
         if err_id:
             self.err_id = err_id
 
     def __unicode__(self):
-        return repr(self.value)
+        return repr(self.message)
 
     def __str__(self):
-        return repr(self.value)
+        return repr(self.message)
 
 
 class AbonGroup(models.Model):
@@ -123,7 +123,7 @@ class AbonTariff(models.Model):
     def activate(self, current_user):
         amnt = self.calc_amount_service()
         # если не хватает денег
-        if self.abon.ballance > amnt:
+        if self.abon.ballance < amnt:
             raise LogicError(u'Не хватает денег на счету')
         # дата активации услуги
         self.time_start = timezone.now()
@@ -359,6 +359,9 @@ def abon_del_signal(sender, instance, **kwargs):
 
 def abontariff_post_save(sender, instance, **kwargs):
     # Тут или подключение абону услуги, или изменение приоритета
+    if not kwargs['created']:
+        # если изменение приоритета то не говорим об этом NAS'у
+        return
     agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
     agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
     tm = Transmitter()
@@ -367,6 +370,9 @@ def abontariff_post_save(sender, instance, **kwargs):
 
 
 def abontariff_del_signal(sender, instance, **kwargs):
+    if not instance.is_started():
+        # если удаляем не активную услугу то говорить об этом NAS'у не обязательно
+        return
     agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
     agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
     tm = Transmitter()

@@ -14,15 +14,13 @@
         </li>
     </ol>
 
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% if tarif_id == 0 %}Создать{% else %}Редактировать{% endif %} тариф</h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
             <form role="form" action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
 
                 <div class="form-group">

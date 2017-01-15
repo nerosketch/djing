@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 from models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins
@@ -19,7 +21,7 @@ def devices(request):
 
 
 @login_required
-@only_admins
+@permission_required('devapp.delete_device')
 def devdel(request, did):
     try:
         get_object_or_404(Device, id=did).delete()
@@ -31,21 +33,25 @@ def devdel(request, did):
 @login_required
 @only_admins
 def dev(request, devid=0):
-    warntext = ''
     devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
 
     if request.method == 'POST':
+        if devid == 0:
+            if not request.user.has_perm('devapp.add_device'):
+                raise PermissionDenied
+        else:
+            if not request.user.has_perm('devapp.change_device'):
+                raise PermissionDenied
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
             return redirect('devapp:devs')
         else:
-            warntext = u'Ошибка в данных, проверте их ещё раз'
+            messages.error(request, u'Ошибка в данных, проверте их ещё раз')
     else:
         frm = DeviceForm(instance=devinst)
 
     return render(request, 'devapp/dev.html', {
-        'warntext': warntext,
         'form': frm,
         'devid': devid
     })
@@ -54,11 +60,9 @@ def dev(request, devid=0):
 @login_required
 @only_admins
 def devview(request, did):
-    warntext = ''
 
     dev = get_object_or_404(Device, id=did)
 
     return render(request, 'devapp/ports.html', {
-        'warntext': warntext,
         'dev': dev
     })

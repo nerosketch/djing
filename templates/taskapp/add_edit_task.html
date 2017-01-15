@@ -7,12 +7,7 @@
         <li class="active">{% if task_id %}Редактировать{% else %}Создать{% endif %}</li>
     </ol>
 
-    {% if warntext %}
-        <div class="alert alert-danger alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            {{ warntext }}
-        </div>
-    {% endif %}
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">

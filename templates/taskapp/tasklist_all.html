@@ -7,12 +7,7 @@
         <li class="active">Все задачи</li>
     </ol>
 
-    {% if warntext %}
-        <div class="alert alert-danger alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <strong>Важно!</strong> {{ warntext }}
-        </div>
-    {% endif %}
+    {% include 'message_block.html' %}
 
     <div class="page-header">
         <h2>Лог всех задач в системе</h2>

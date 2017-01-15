@@ -9,15 +9,13 @@
         <li class="active">{{ group.name }}</li>
     </ol>
 
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Действующее распределение прав для группы <b>{{ group.name }}</b></h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
             <form role="form" action="{% url 'acc_app:group_link' group.id %}" method="post">{% csrf_token %}
 
                 <div class="choice_wrapper">

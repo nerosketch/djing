@@ -18,8 +18,8 @@ urlpatterns = [
     url(r'^settings$', views.ch_info, name='setup_info'),
     url(r'^settings/change_ava$', views.ch_ava, name='setup_avatar'),
 
-    url(r'^(?P<id>\d+)$', views.profile_show, name='other_profile'),
-    url(r'^(?P<id>\d+)/perms$', views.perms, name='setup_perms'),
+    url(r'^(?P<uid>\d+)$', views.profile_show, name='other_profile'),
+    url(r'^(?P<uid>\d+)/perms$', views.perms, name='setup_perms'),
     url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_setup_group'),
     url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile'),
 
@@ -27,6 +27,6 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/appoint_task$', views.appoint_task, name='appoint_task'),
 
     url(r'^group/$', views.groups, name='groups_list'),
-    url(r'^group/(?P<id>\d+)$', views.group, name='group_link')
+    url(r'^group/(?P<uid>\d+)$', views.group, name='group_link')
 
 ]

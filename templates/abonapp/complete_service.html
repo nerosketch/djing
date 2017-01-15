@@ -10,18 +10,15 @@
         <li class="active">Завершить услугу</li>
     </ol>
 
-
+    {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Завершить услугу</h3>
         </div>
         <div class="panel-body">
-            {% if warntext %}
-                <div class="alert-danger">{{ warntext }}</div>
-            {% endif %}
-            <form role="form" action="{% url 'abonapp:compl_srv' abon_group.id abon.id abtar.id %}"
-                  method="post">{% csrf_token %}
+
+            <form role="form" action="{% url 'abonapp:compl_srv' abon_group.id abon.id abtar.id %}" method="post">{% csrf_token %}
                 <input name="finish_confirm" value="yes" type="hidden">
 
                 <p>Досрочное завершение текущей услуги приведёт к тому что пользователю будет запрещён доступ к ресурсам

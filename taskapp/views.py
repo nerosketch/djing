@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from abonapp.models import Abon
 from datetime import date
 from models import Task
@@ -102,7 +103,6 @@ def view(request, task_id):
 @only_admins
 def task_add_edit(request, task_id=0):
     task_id = safe_int(task_id)
-    warntext = ''
     uid = request.GET.get('uid')
     selected_abon = None
     frm = TaskFrm()
@@ -147,14 +147,13 @@ def task_add_edit(request, task_id=0):
                     task_instance.save()
                     return redirect('taskapp:home')
                 else:
-                    warntext=u'Нет ответственных за группу, в которой находится выбранный абонент'
+                    messages.error(request, u'Нет ответственных за группу, в которой находится выбранный абонент')
             else:
-                warntext=u'Нужно выбрать абонента'
+                messages.error(request, u'Нужно выбрать абонента')
         else:
-            warntext = u'Ошибка в полях формы в задаче'
+            messages.error(request, u'Ошибка в полях формы в задаче')
 
     return render(request, 'taskapp/add_edit_task.html', {
-        'warntext': warntext,
         'form': frm,
         'task_id': tsk.id,
         'selected_abon': selected_abon

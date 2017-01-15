@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Аутентификация</title>
+    <meta name="robots" content="noindex">
     <link rel="shortcut icon" href="/static/img/favicon_m.ico">
     <style>
         h3, h4, label {
@@ -47,7 +48,7 @@
     </style>
 </head>
 <body>
-<form id="frm" action="{% url 'acc_app:login' %}?next={{ next }}" method="POST" accept-charset="utf-8">{% csrf_token %}
+<form action="{% url 'acc_app:login' %}{% if next %}?next={{ next }}{% endif %}" method="POST">{% csrf_token %}
     {% if errmsg %}
         <div class="err">
         <h4>{{ errmsg }}</h4>

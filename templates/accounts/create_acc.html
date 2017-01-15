@@ -7,6 +7,8 @@
         <li class="active">Добавить</li>
     </ol>
 
+    {% include 'message_block.html' %}
+
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Создайте новый аккаунт</h3>
@@ -23,9 +25,6 @@
                     </div>
                 </div>
                 <div class="col-sm-9">
-                    {% if warntext %}
-                        <div class="alert-info">{{ warntext }}</div>
-                    {% endif %}
 
                     <form role="form" action="{% url 'acc_app:create_profile' %}" method="post">{% csrf_token %}
                         <div class="form-group">
