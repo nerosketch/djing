@@ -274,7 +274,7 @@ class Abon(UserProfile):
                 # и если что-нибудь вернулось то активируем, давая время начала действия
                 if len(next_tarifs) > 0:
                     next_tarifs[0].time_start = nw
-                    next_tarifs[0].save()
+                    next_tarifs[0].save(update_fields=['time_start'])
 
                 # завершаем текущую услугу.
                 at.delete()
