@@ -13,7 +13,7 @@ class TaskFrm(forms.ModelForm):
             'descr': forms.TextInput(attrs={
                 'placeholder': u'Краткое описание',
                 'class': "form-control",
-                'required': ''
+                'autofocus': ''
             }),
             #'device': forms.Select(attrs={'class': 'form-control', 'required':''}),
             'priority': forms.Select(attrs={'class': 'form-control'}),
