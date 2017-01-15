@@ -3,7 +3,6 @@ from chatbot.telebot import send_notify
 
 
 def handle(task, author, recipient, abon_group):
-    print author, recipient
     dst_account = recipient
     text = u'Задача'
     # Если сигнал самому себе то молчим

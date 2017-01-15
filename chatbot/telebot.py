@@ -20,16 +20,13 @@ class DjingTelebot(helper.ChatHandler):
             'ping': self.ping,
             'iam': self.say_me
         }
-        print 'Constructor'
 
     # отвечаем пользователю
     def _sent_reply(self, text):
-        print('CALL: _sent_reply')
         self.sender.sendMessage(text)
 
     # задаём вопрос пользователю, и ожидаем ответ в fn
     def _question(self, text, fn):
-        print('CALL: _question')
         assert callable(fn)
         self._dialog_fn = fn
         if text is not None:
@@ -37,7 +34,6 @@ class DjingTelebot(helper.ChatHandler):
 
     # сохраняем сообщение в базе
     def _message_log(self, msg):
-        print('CALL: _message_log')
         if self._current_user is None:
             self._question(None, self.question_name)
             return False
@@ -50,7 +46,6 @@ class DjingTelebot(helper.ChatHandler):
     # Начинаем диалог
     # @seed - chat_id
     def open(self, initial_msg, seed):
-        print('CALL: open')
         content_type, chat_type, chat_id = glance(initial_msg)
         if content_type != 'text':
             return True
@@ -66,7 +61,6 @@ class DjingTelebot(helper.ChatHandler):
 
     # получаем сообщение
     def on_chat_message(self, msg):
-        print('CALL: on_chat_message')
         content_type, chat_type, chat_id = glance(msg)
         if content_type != 'text':
             return
@@ -87,14 +81,12 @@ class DjingTelebot(helper.ChatHandler):
 
     # спрашиваем имя пользователя
     def question_name(self, username):
-        print('CALL: question_name')
         try:
             profile = UserProfile.objects.get(username=username)
             self._current_user = profile
             try:
                 TelegramBot.objects.get(user=profile)
             except TelegramBot.DoesNotExist:
-                print '_chat_id', self._chat_id
                 assert self._chat_id != 0
                 TelegramBot.objects.create(
                     user=profile,
@@ -113,11 +105,9 @@ class DjingTelebot(helper.ChatHandler):
         self._current_user = None
         self._dialog_fn = None
         self._chat_id = 0
-        print 'Destructor'
 
     # пингуем адрес
     def ping(self, ip=None):
-        print('CALL: ping')
         if ip is None:
             self._question(u'Давай пинганём, напиши ip. Нужно будет подождать 10 сек', self.ping)
             return
@@ -129,7 +119,6 @@ class DjingTelebot(helper.ChatHandler):
             self._question(u'Это не похоже на ip адрес, попробуй ещё', self.ping)
 
     def say_me(self):
-        print('CALL: say_me')
         self._sent_reply(u'Ты ведь %s ?' % self._current_user.get_full_name())
 
 
