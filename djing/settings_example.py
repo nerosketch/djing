@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'acc_app',
+    'accounts_app',
     'photo_app',
     'privatemessage',
     'abonapp',
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'gmap',
     'statistics',
     'taskapp',
-    'clientsideapp'
+    'clientsideapp',
+    'chatbot'
 ]
 
 MIDDLEWARE_CLASSES = [
