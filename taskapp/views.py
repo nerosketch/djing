@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
 from datetime import date
+from chatbot.models import TelegramBot
 from models import Task
 from mydefs import pag_mn, only_admins, safe_int
 from forms import TaskFrm
@@ -125,33 +126,35 @@ def task_add_edit(request, task_id=0):
         selected_abon = get_object_or_404(Abon, username=str(uid))
 
     if request.method == 'POST':
+        try:
+            tsk.author = request.user
+            frm = TaskFrm(request.POST, request.FILES, instance=tsk)
 
-        tsk.author = request.user
-        frm = TaskFrm(request.POST, request.FILES, instance=tsk)
+            if frm.is_valid():
+                task_instance = frm.save()
+                # получим абонента, выбранного в форме
+                selected_abon = task_instance.abon
+                if selected_abon:
+                    # получаем аккаунты назначенные на группу выбранного абонента
+                    profiles = selected_abon.group.profiles.filter(is_active=True).filter(is_admin=True)
 
-        if frm.is_valid():
-            task_instance = frm.save()
-            # получим абонента, выбранного в форме
-            selected_abon = task_instance.abon
-            if selected_abon:
-                # получаем аккаунты назначенные на группу выбранного абонента
-                profiles = selected_abon.group.profiles.filter(is_active=True).filter(is_admin=True)
-
-                # если нашли кого-нибудь
-                if profiles.count() > 0:
-                    # выбираем их id в базе
-                    profile_ids = [prof.id for prof in profiles]
-                    # добавляем найденных работников в задачу
-                    task_instance.recipients.add(*profile_ids)
-                    # окончательно сохраняемся
-                    task_instance.save()
-                    return redirect('taskapp:home')
+                    # если нашли кого-нибудь
+                    if profiles.count() > 0:
+                        # выбираем их id в базе
+                        profile_ids = [prof.id for prof in profiles]
+                        # добавляем найденных работников в задачу
+                        task_instance.recipients.add(*profile_ids)
+                        # окончательно сохраняемся
+                        task_instance.save()
+                        return redirect('taskapp:home')
+                    else:
+                        messages.error(request, u'Нет ответственных за группу, в которой находится выбранный абонент')
                 else:
-                    messages.error(request, u'Нет ответственных за группу, в которой находится выбранный абонент')
+                    messages.error(request, u'Нужно выбрать абонента')
             else:
-                messages.error(request, u'Нужно выбрать абонента')
-        else:
-            messages.error(request, u'Ошибка в полях формы в задаче')
+                messages.error(request, u'Ошибка в полях формы в задаче')
+        except TelegramBot.DoesNotExist:
+            messages.error(request, u'Исполнитель ещё не подписался на оповещения')
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
