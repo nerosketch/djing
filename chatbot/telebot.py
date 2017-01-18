@@ -65,7 +65,7 @@ class DjingTelebot(helper.ChatHandler):
         if content_type != 'text':
             return
         self._chat_id = chat_id
-        text = msg['text']
+        text = msg['text'].lower()
 
         # выполняем комманды если они есть
         if text in self.cmds.keys():
