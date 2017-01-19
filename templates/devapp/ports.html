@@ -5,34 +5,37 @@
     <div class="switch_ports">
         <h4>{{ dev.get_devtype_display|default:'Название типа свича' }}</h4>
 
-        <div class="port"></div>
-        <div class="port giga"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port kilo"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
-        <div class="port"></div>
+        {% for port in ports %}
+            {% if port.st %}
+                {% if port.sp == 10 %}
+                    <div class="port kilo">
+                {% elif port.sp == 100 %}
+                    <div class="port mega">
+                {% elif port.sp == 1000 %}
+                    <div class="port giga">
+                {% else %}
+                    <div class="port">
+                {% endif %}
+            {% else %}
+                <div class="port dis">
+            {% endif %}
+
+                <a href="#" class="port-img" title="{{ port.nm }}">
+                    <b>{{ port.num }}</b>
+                </a>
+                <div class="btn-group btn-group-xs btn-group-justified">
+                    <a href="#" class="btn btn-success">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </a>
+                    <a href="#" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-off"></span>
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <h3>Порты не найдены :(</h3>
+        {% endfor %}
+
 
     </div>
 {% endblock %}

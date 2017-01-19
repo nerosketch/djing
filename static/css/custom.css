@@ -134,18 +134,40 @@ td.btn-group {
     margin: 10px;
     border: 1px solid #7B7B7B;
     border-radius: 3px;
+    padding: 6px;
+    width: 79px;
+}
+.port .port-img{
     background-image: url(/static/img/icon-port-64x64-grey.png);
     width: 64px;
     height: 64px;
+    text-align: center;
+}
+.port-img b {
+    color: #ebe8d8;
+    position: relative;
+    top: 27px;
+}
+a.port-img{
+    display: block;
+    text-decoration: none;
 }
 
-.port.giga {
-    background-color: #B5FFB5;
-}
+/* 1GBit/s */
+.port.giga{background-color: #caccfb;}
 
-.port.kilo {
-    background-color: #FBEB79;
-}
+/* 100 MBit/s */
+.port.mega{background-color: #B5FFB5;}
+
+/* 10 MBit/s */
+.port.kilo{background-color: #f9c76e;}
+
+/* Disabled */
+.port.dis{background-color: #ff9c99;}
+
+/* Not connected */
+.port.na{background-color: white;}
+
 
 /*-------END-Switch--------*/
 

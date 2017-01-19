@@ -61,8 +61,13 @@ def dev(request, devid=0):
 @only_admins
 def devview(request, did):
 
+    ports = None
     dev = get_object_or_404(Device, id=did)
+    if dev.man_passw:
+        manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+        ports = manager.get_ports()
 
     return render(request, 'devapp/ports.html', {
-        'dev': dev
+        'dev': dev,
+        'ports': ports
     })
