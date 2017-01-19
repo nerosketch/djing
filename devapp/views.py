@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 from models import Device
-from mydefs import pag_mn, res_success, res_error, only_admins
+from mydefs import pag_mn, res_success, res_error, only_admins, ping
 from forms import DeviceForm
 
 
@@ -45,7 +45,7 @@ def dev(request, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
-            return redirect('devapp:devs')
+            return redirect('devapp:view', did=devid)
         else:
             messages.error(request, u'Ошибка в данных, проверте их ещё раз')
     else:
@@ -53,7 +53,7 @@ def dev(request, devid=0):
 
     return render(request, 'devapp/dev.html', {
         'form': frm,
-        'devid': devid
+        'dev': devinst
     })
 
 
@@ -62,12 +62,41 @@ def dev(request, devid=0):
 def devview(request, did):
 
     ports = None
+    uptime = 0
     dev = get_object_or_404(Device, id=did)
-    if dev.man_passw:
-        manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
-        ports = manager.get_ports()
+    if ping(dev.ip_address):
+        if dev.man_passw:
+            manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+            uptime = manager.uptime()
+            ports = manager.get_ports()
+        else:
+            messages.warning(request, u'Не указан snmp пароль для устройства')
+    else:
+        messages.error(request, u'Эта точка не пингуется')
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,
-        'ports': ports
+        'ports': ports,
+        'uptime': uptime
     })
+
+
+@login_required
+@only_admins
+def toggle_port(request, did, portid, status=0):
+    portid = int(portid)
+    status = int(status)
+    dev = get_object_or_404(Device, id=int(did))
+    if ping(dev.ip_address):
+        if dev.man_passw:
+            manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+            ports = manager.get_ports()
+            if status:
+                ports[portid-1].enable()
+            else:
+                ports[portid-1].disable()
+        else:
+            messages.warning(request, u'Не указан snmp пароль для устройства')
+    else:
+        messages.error(request, u'Эта точка не пингуется')
+    return redirect('devapp:view', did=did)

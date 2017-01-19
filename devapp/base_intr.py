@@ -22,6 +22,10 @@ class DevBase(object):
     def get_device_name(self):
         """Получаем имя устройства по snmp"""
 
+    @abstractmethod
+    def uptime(self):
+        pass
+
 
 class BasePort(object):
     __metaclass__ = ABCMeta
@@ -67,5 +71,4 @@ class SNMPBaseWorker(object):
 
     def get_item(self, oid):
         var = VarList(Varbind(oid))
-        return self.ses.get(var)
-
+        return self.ses.get(var)[0]

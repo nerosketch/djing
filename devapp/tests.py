@@ -8,7 +8,7 @@ class DevTest(TestCase):
         pass
 
     def snmp(self):
-        dev = dev_types.DLinkDevice('10.115.1.105', 'ertNjuWr', 2)
+        dev = dev_types.DLinkDevice('10.115.1.105', '<community>', 2)
 
         print('DevName:', dev.get_device_name())
         ports = dev.get_ports()

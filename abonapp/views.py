@@ -405,12 +405,7 @@ def complete_service(request, gid, uid, srvid):
             else:
                 raise models.LogicError(u'Действие не подтверждено')
 
-        time_use = timezone.now() - abtar.time_start
-        time_use = {
-            'days': time_use.days,
-            'hours': time_use.seconds / 3600,
-            'minutes': time_use.seconds / 60 % 60
-        }
+        time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
     except models.LogicError as e:
         messages.error(request, e.message)

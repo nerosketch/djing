@@ -1,7 +1,5 @@
-{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-{% block main %}
-
-    {% include 'message_block.html' %}
+{% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% block content %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -10,10 +8,10 @@
         <div class="panel-body">
 
             <form role="form" action="
-            {% if devid == 0 %}
+            {% if dev.id == 0 %}
                 {% url 'devapp:add' %}
             {% else %}
-                {% url 'devapp:edit' devid %}
+                {% url 'devapp:edit' dev.id %}
             {% endif %}" method="post">{% csrf_token %}
 
                 <div class="form-group">

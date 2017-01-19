@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
+from mydefs import RuTimedelta
 from base_intr import DevBase, SNMPBaseWorker, BasePort
+
 
 
 oids = {
     'reboot': '.1.3.6.1.4.1.2021.8.1.101.1',
     'get_ports': {
-        'names': 'IF-MIB::ifDescr',
-        'stats': 'IF-MIB::ifAdminStatus',
-        'macs': 'IF-MIB::ifPhysAddress',
-        'speeds': 'IF-MIB::ifHighSpeed'
+        'names': '.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3',
+        'stats': '.1.3.6.1.2.1.2.2.1.7',
+        'macs': '.1.3.6.1.2.1.2.2.1.6',
+        'speeds': '.1.3.6.1.2.1.31.1.1.1.15'
     },
-    'name': 'SNMPv2-SMI::mib-2.47.1.1.1.1.7.1',
-    'toggle_port': '.1.3.6.1.2.1.2.2.1.7'
+    'name': '.1.3.6.1.2.1.1.1.0',
+    'position': '.1.3.6.1.2.1.1.5.0',
+    'toggle_port': '.1.3.6.1.2.1.2.2.1.7',
+    'uptime': '.1.3.6.1.2.1.1.8.0'
 }
 
 
@@ -56,34 +60,27 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         macs = self.get_list(oids['get_ports']['macs'])
         speeds = self.get_list(oids['get_ports']['speeds'])
         res = []
-        ln = len(nams)
+        ln = len(speeds)
         for n in range(0, ln):
             status = True if int(stats[n]) == 1 else False
-            res.append(DLinkPort(n+1, nams[n], status, macs[n], int(speeds[n]), self))
+            res.append(DLinkPort(
+                n+1,
+                nams[n] if len(nams) > 0 else u'не получил имя',
+                status,
+                macs[n] if len(macs) > 0 else u'не нашёл мак',
+                int(speeds[n]) if len(speeds) > 0 else 0,
+            self))
         return res
 
     def get_device_name(self):
         return self.get_item(oids['name'])
 
+    def uptime(self):
+        uptimestamp = int(self.get_item(oids['uptime']))
+        tm = RuTimedelta(seconds=uptimestamp/100)
+        return tm
+
 
 DEVICE_TYPES = (
     ('Dl', DLinkDevice),
 )
-
-
-# Example usage
-if __name__ == '__main__':
-    dev = DLinkDevice('10.115.1.105', 'ertNjuWr', 2)
-
-    print('DevName:', dev.get_device_name())
-    ports = dev.get_ports()
-    print 'gports'
-    for port in ports:
-        assert issubclass(port.__class__, BasePort)
-        print('\tPort:', port.nm, port.st, port.mac(), port.sp)
-
-
-    # Disable 2 port
-    #print ports[1].disable()
-    # Enable 2 port
-    print ports[1].enable()

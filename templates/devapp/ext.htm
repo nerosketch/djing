@@ -14,9 +14,17 @@
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'devapp:view' dev.id %}" role="tab"
-                              data-toggle="tab">Порты {{ dev.ip_address }}</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'devapp:edit' dev.id %}" role="tab" data-toggle="tab">Редактировать</a>
+
+        {% url 'devapp:view' dev.id as devapp_view %}
+        <li{% if devapp_view == request.path %} class="active"{% endif %}>
+            <a href="{{ devapp_view }}">
+                Порты {{ dev.ip_address }}
+            </a>
+        </li>
+
+        {% url 'devapp:edit' dev.id as devapp_edit %}
+        <li{% if devapp_edit == request.path %} class="active"{% endif %}>
+            <a href="{{ devapp_edit }}">Редактировать</a>
         </li>
     </ul>
 

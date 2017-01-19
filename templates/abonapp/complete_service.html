@@ -31,8 +31,7 @@
 
                     Услуга была подключена: {{ abtar.time_start|date:'d F Y, H:i:s' }}<br/>
                     Сегодня: {% now "d F Y, H:i:s" %}<br/>
-                    Время использования: {% if time_use.days %}{{ time_use.days }} дней.{% endif %}
-                    {{ time_use.hours }} часов и {{ time_use.minutes }} минут.<br/>
+                    Время использования: {{ time_use }}<br/>
                     Полная стоимость услуги: {{ abtar.tariff.amount }}<br/>
                     Итоговая стоимость: {{ abtar.calc_amount_service }}
                 </p>
