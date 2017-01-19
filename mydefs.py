@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
 from json import dumps
 import socket
 import struct
@@ -149,3 +150,27 @@ def only_admins(fn):
 def ping(hostname):
     response = os.system("`which ping` -c 1 " + hostname)
     return True if response == 0 else False
+
+
+# Русифицированный вывод timedelta
+class RuTimedelta(timedelta):
+
+    def __init__(self, *args, **kwargs):
+        super(RuTimedelta, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        hours, remainder = divmod(self.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        text_date = "%d:%d:%d" % (
+            hours,
+            minutes,
+            seconds
+        )
+        if self.days > 1:
+            ru_days = u'дней'
+            if 5 > self.days > 1:
+                ru_days = u'дня'
+            elif self.days == 1:
+                ru_days = u'день'
+            text_date = u'%d %s %s' % (self.days, ru_days, text_date)
+        return text_date
