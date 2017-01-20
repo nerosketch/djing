@@ -11,7 +11,7 @@ if __name__ == "__main__":
     django.setup()
     from devapp.models import Device
 
-    with open('places.json', 'r') as f:
+    with open('../../places.json', 'r') as f:
         dat = load(f)
 
     for dt in dat:
@@ -26,4 +26,4 @@ if __name__ == "__main__":
             )
         dev.comment=dt['loc']
         dev.save()
-        print dt['descr'], dt['loc'], dev
+        print(dt['descr'], dt['loc'], dev)

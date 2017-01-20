@@ -12,7 +12,7 @@ if __name__ == "__main__":
     django.setup()
     from abonapp.models import Abon, AbonGroup
 
-    with open('dump.json', 'r') as f:
+    with open('../../dump.json', 'r') as f:
         dat = load(f)
 
     for dt in dat['groups']:
@@ -35,4 +35,4 @@ if __name__ == "__main__":
         abon.address=dt['addr']
         abon.group=grp
         abon.save()
-        print abon.username, abon.fio, abon.group
+        print(abon.username, abon.fio, abon.group)

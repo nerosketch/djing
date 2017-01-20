@@ -27,6 +27,6 @@ if __name__ == "__main__":
         res = cursor.fetchone()
 
     db.close()
-    f = open('places.json', 'w')
+    f = open('../../places.json', 'w')
     f.write(dumps(places, ensure_ascii=False).encode('utf8'))
     f.close()

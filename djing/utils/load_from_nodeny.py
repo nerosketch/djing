@@ -43,6 +43,6 @@ if __name__ == "__main__":
         res = cursor.fetchone()
 
     db.close()
-    f = open('dump.json', 'w')
+    f = open('../../dump.json', 'w')
     f.write(dumps(result, ensure_ascii=False).encode('utf8'))
     f.close()
