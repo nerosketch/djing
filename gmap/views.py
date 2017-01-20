@@ -103,7 +103,7 @@ def gmap_search(request):
 def dump_csv(request):
     all_markers = MapMarker.objects.all()
 
-    print '# markers: ', len(all_markers)
+    print(('# markers: ', len(all_markers)))
 
     # all_markers should now have all the things...
     response = HttpResponse(mimetype='text/csv')
@@ -179,7 +179,7 @@ def process_row(row_id, row, errors):
 
 
 def read_csv(request):
-    if request.method == 'POST' and request.FILES.has_key('datafile'):
+    if request.method == 'POST' and 'datafile' in request.FILES:
 
         # it's conceivable the user could upload a file large enough
         # it gets split into chunks - to handle this we just direct all

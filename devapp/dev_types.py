@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mydefs import RuTimedelta, safe_int
-from base_intr import DevBase, SNMPBaseWorker, BasePort
+from .base_intr import DevBase, SNMPBaseWorker, BasePort
 
 
 
@@ -49,7 +49,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
     @staticmethod
     def description():
-        return u"Свич D'Link"
+        return "Свич D'Link"
 
     def reboot(self):
         pass
@@ -61,13 +61,13 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         speeds = self.get_list(oids['get_ports']['speeds'])
         res = []
         ln = len(speeds)
-        for n in range(0, ln):
+        for n in range(ln):
             status = True if int(stats[n]) == 1 else False
             res.append(DLinkPort(
                 n+1,
-                nams[n] if len(nams) > 0 else u'не получил имя',
+                nams[n] if len(nams) > 0 else 'не получил имя',
                 status,
-                macs[n] if len(macs) > 0 else u'не нашёл мак',
+                macs[n] if len(macs) > 0 else 'не нашёл мак',
                 int(speeds[n]) if len(speeds) > 0 else 0,
             self))
         return res

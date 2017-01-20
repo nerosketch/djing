@@ -4,9 +4,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
-from models import Tariff
+from .models import Tariff
 import mydefs
-import forms
+from . import forms
 
 
 @login_required
@@ -45,7 +45,7 @@ def edit_tarif(request, tarif_id=0):
             frm.save()
             return redirect('tarifs:home')
         else:
-            messages.warning(request, u'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
+            messages.warning(request, 'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
     else:
         if tarif_id == 0:
             tarif = Tariff()

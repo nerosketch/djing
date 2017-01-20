@@ -2,9 +2,10 @@
 from telepot import helper, glance, Bot
 import os
 import socket
-from models import TelegramBot
+from .models import TelegramBot, ChatException
 from chatbot.models import MessageHistory
 from accounts_app.models import UserProfile
+import collections
 
 token = '285129725:AAF9Si5_b1n1_cN3vJtwXt0gkgsqKBptut4'
 
@@ -15,7 +16,7 @@ class DjingTelebot(helper.ChatHandler):
     _chat_id = 0
 
     def __init__(self, seed_tuple, **kwargs):
-        super(DjingTelebot, self).__init__(seed_tuple, **kwargs)
+        super().__init__(seed_tuple, **kwargs)
         self.cmds = {
             'ping': self.ping,
             'iam': self.say_me
@@ -27,7 +28,7 @@ class DjingTelebot(helper.ChatHandler):
 
     # задаём вопрос пользователю, и ожидаем ответ в fn
     def _question(self, text, fn):
-        assert callable(fn)
+        assert isinstance(fn, collections.Callable)
         self._dialog_fn = fn
         if text is not None:
             self._sent_reply(text)
@@ -55,7 +56,7 @@ class DjingTelebot(helper.ChatHandler):
             self._current_user = tbot.user
             self._message_log(initial_msg['text'])
         except TelegramBot.DoesNotExist:
-            self._question(u'Давай знакомиться, как тебя зовут? Напиши свой логин из биллинга.',
+            self._question('Давай знакомиться, как тебя зовут? Напиши свой логин из биллинга.',
                            self.question_name)
         return True  # prevent on_message() from being called on the initial message
 
@@ -68,13 +69,14 @@ class DjingTelebot(helper.ChatHandler):
         text = msg['text'].lower()
 
         # выполняем комманды если они есть
-        if text in self.cmds.keys():
+        if text in list(self.cmds.keys()):
             self.cmds[text]()
         elif self._dialog_fn is not None:
+            assert callable(self._dialog_fn)
             self._dialog_fn(text)
             self._dialog_fn = None
         else:
-            self._sent_reply(u'Я пока не знаю ответа на это')
+            self._sent_reply('Я пока не знаю ответа на это')
 
         if not self._message_log(text):
             return
@@ -93,10 +95,10 @@ class DjingTelebot(helper.ChatHandler):
                     chat_id=self._chat_id
                 )
         except UserProfile.DoesNotExist:
-            self._question(u'Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. Попробуй ещё',
+            self._question('Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. Попробуй ещё',
                            self.question_name)
             return
-        self._sent_reply(u'Да, приятно познакомиться %s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)'
+        self._sent_reply('Да, приятно познакомиться %s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)'
                          % profile.get_full_name())
 
     # заканчивается время диалога
@@ -109,22 +111,25 @@ class DjingTelebot(helper.ChatHandler):
     # пингуем адрес
     def ping(self, ip=None):
         if ip is None:
-            self._question(u'Давай пинганём, напиши ip. Нужно будет подождать 10 сек', self.ping)
+            self._question('Давай пинганём, напиши ip. Нужно будет подождать 10 сек', self.ping)
             return
         try:
             socket.inet_aton(ip)
             ret = os.popen('`which ping` -c 10 ' + ip).read()
             self._sent_reply(ret)
         except socket.error:
-            self._question(u'Это не похоже на ip адрес, попробуй ещё', self.ping)
+            self._question('Это не похоже на ip адрес, попробуй ещё', self.ping)
 
     def say_me(self):
-        self._sent_reply(u'Ты ведь %s ?' % self._current_user.get_full_name())
+        self._sent_reply('Ты ведь %s ?' % self._current_user.get_full_name())
 
 
 # Просто отправляем текст оповещения указанному админу
 def send_notify(msg_text, account):
-    tb = TelegramBot.objects.get(user=account)
-    tbot = Bot(token)
-    tbot.sendMessage(tb.chat_id, msg_text)
-
+    print(account)
+    try:
+        tb = TelegramBot.objects.get(user=account)
+        tbot = Bot(token)
+        tbot.sendMessage(tb.chat_id, msg_text)
+    except TelegramBot.DoesNotExist:
+        raise ChatException('Цель оповещения не подписан на оповещения')

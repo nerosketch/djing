@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 from django import forms
-from models import Task
+from .models import Task
 
 
 class TaskFrm(forms.ModelForm):
@@ -11,7 +11,7 @@ class TaskFrm(forms.ModelForm):
         exclude = ['time_of_create', 'author', 'recipients', 'device']
         widgets = {
             'descr': forms.TextInput(attrs={
-                'placeholder': u'Краткое описание',
+                'placeholder': 'Краткое описание',
                 'class': "form-control",
                 'autofocus': ''
             }),

@@ -3,11 +3,7 @@ from abc import ABCMeta, abstractmethod
 # from abonapp import Abon
 
 
-class TariffBase:
-    __metaclass__ = ABCMeta
-
-    # Принимает на вход:
-    # abon_tariff - models.AbonTariff object
+class TariffBase(metaclass=ABCMeta):
     @abstractmethod
     def calc_amount(self, abon_tariff):
         """Считает итоговую сумму платежа"""

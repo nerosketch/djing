@@ -1,12 +1,10 @@
 # -*- coding: utf8 -*-
 from abc import ABCMeta, abstractmethod
 from struct import pack, unpack
-from utils import int2ip, ip2int
+from .utils import int2ip, ip2int
 
 
-class BaseStruct(object):
-    __metaclass__ = ABCMeta
-
+class BaseStruct(object, metaclass=ABCMeta):
     @abstractmethod
     def serialize(self):
         """привращаем инфу в бинарную строку"""
@@ -55,7 +53,7 @@ class TariffStruct(BaseStruct):
 class AbonStruct(BaseStruct):
 
     def __init__(self, uid=None, ip=None, tariff=None):
-        self.uid = long(uid)
+        self.uid = int(uid)
         self.ip = IpStruct(ip)
         assert isinstance(tariff, TariffStruct)
         self.tariff = tariff
@@ -70,7 +68,7 @@ class AbonStruct(BaseStruct):
         dt = unpack("!LII", data)
         self.uid = dt[0]
         self.ip = IpStruct(dt[1])
-        tarifs = filter(lambda trf: trf.tid == dt[2], all_tarifs)
+        tarifs = [trf for trf in all_tarifs if trf.tid == dt[2]]
         if len(tarifs) < 1:
             raise IndexError
         assert isinstance(tarifs[0], TariffStruct)

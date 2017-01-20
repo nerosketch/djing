@@ -14,7 +14,7 @@ class Photo(models.Model):
     wdth = models.PositiveSmallIntegerField(null=True, blank=True, editable=False, default="759")
     heigt = models.PositiveSmallIntegerField(null=True, blank=True, editable=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0}".format(self.image)
 
     def big(self):
@@ -28,7 +28,7 @@ class Photo(models.Model):
         if not self.image:
             return
 
-        super(Photo, self).save()
+        super().save()
 
         im = Image.open(self.image.path)
         im.thumbnail((759, 759), Image.ANTIALIAS)
@@ -40,7 +40,7 @@ class Photo(models.Model):
         im.save(fname)
         os.remove(self.image.path)
         self.image = "%s.%s" % (hs, ext)
-        super(Photo, self).save()
+        super().save()
 
 
         # class Meta:

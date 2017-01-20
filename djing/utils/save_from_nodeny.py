@@ -24,7 +24,7 @@ if __name__ == "__main__":
         dt['obj'] = grp
 
     for dt in dat['users']:
-        grp = filter(lambda gr: dt['grp']==gr['gid'], dat['groups'])
+        grp = [gr for gr in dat['groups'] if dt['grp']==gr['gid']]
         grp = grp[0]['obj'] if len(grp)>0 else None
         try:
             abon = Abon.objects.get(username=dt['name'])
@@ -35,4 +35,4 @@ if __name__ == "__main__":
         abon.address=dt['addr']
         abon.group=grp
         abon.save()
-        print(abon.username, abon.fio, abon.group)
+        print((abon.username, abon.fio, abon.group))

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
-from mod_mikrotik import MikrotikTransmitter
-from core import NasFailedResult, NasNetworkError
-from structs import TariffStruct, AbonStruct
+from .mod_mikrotik import MikrotikTransmitter
+from .core import NasFailedResult, NasNetworkError
+from .structs import TariffStruct, AbonStruct
 
 
 # Transmitter мы будем импортировать в других местах

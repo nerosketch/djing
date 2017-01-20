@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import PrivateMessages, Dialog
+from .models import PrivateMessages, Dialog
 
 
 admin.site.register(PrivateMessages)

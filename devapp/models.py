@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-from base_intr import DevBase
+from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
-from dev_types import DEVICE_TYPES
+from .dev_types import DEVICE_TYPES
 
 
 class _DeviceChoicesAdapter(MyChoicesAdapter):
     def __init__(self):
-        super(_DeviceChoicesAdapter, self).__init__(DEVICE_TYPES)
+        super().__init__(DEVICE_TYPES)
 
 
 class Device(models.Model):
@@ -28,15 +28,15 @@ class Device(models.Model):
         pass
 
     def get_manager_klass(self):
-        klasses = filter(lambda kl: kl[0] == self.devtype, DEVICE_TYPES)
+        klasses = [kl for kl in DEVICE_TYPES if kl[0] == self.devtype]
         if len(klasses) > 0:
             res = klasses[0][1]
             if issubclass(res, DevBase):
                 return res
         return
 
-    def __unicode__(self):
-        return u"%s: (%s) %s" % (self.comment, self.get_devtype_display(), self.ip_address)
+    def __str__(self):
+        return "%s: (%s) %s" % (self.comment, self.get_devtype_display(), self.ip_address)
 
 
 class Port(models.Model):

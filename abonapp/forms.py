@@ -2,24 +2,24 @@
 from django import forms
 from django.core.validators import RegexValidator
 
-import models
+from . import models
 from mydefs import ip_addr_regex
 
 
 class AbonForm(forms.Form):
     username = forms.CharField(max_length=127, required=False, widget=forms.TextInput(attrs={
-        'placeholder': u'Логин',
+        'placeholder': 'Логин',
         'class': "form-control",
         'id': "login"
     }))
     fio = forms.CharField(max_length=256, widget=forms.TextInput(attrs={
-        'placeholder': u'ФИО',
+        'placeholder': 'ФИО',
         'class': "form-control",
         'id': "fio"
     }), required=False)
-    ip_address = forms.GenericIPAddressField(protocol='IPv4', required=False, widget=forms.TextInput(attrs={
+    ip_address = forms.GenericIPAddressField(protocol='ipv4', required=False, widget=forms.TextInput(attrs={
         'pattern': ip_addr_regex,
-        'placeholder': u'127.0.0.1',
+        'placeholder': '127.0.0.1',
         'class': "form-control",
         'id': "ip"
     }))
@@ -28,7 +28,7 @@ class AbonForm(forms.Form):
         max_length=16,
         validators=[RegexValidator(r'^\+[7,8,9,3]\d{10,11}$')],
         widget=forms.TextInput(attrs={
-            'placeholder': u'+[7,8,9,3] и 10,11 цифр',
+            'placeholder': '+[7,8,9,3] и 10,11 цифр',
             'pattern': r'^\+[7,8,9,3]\d{10,11}$',
             'required': '',
             'class': 'form-control',

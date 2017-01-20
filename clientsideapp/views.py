@@ -61,21 +61,21 @@ def debt_buy(request, d_id):
         try:
             sure = request.POST.get('sure')
             if sure != 'on':
-                raise LogicError(u'Вы не уверены что хотите оплатить долг?')
+                raise LogicError('Вы не уверены что хотите оплатить долг?')
             if abon.ballance < debt.amount:
-                raise LogicError(u'Не достаточно средств на счету')
+                raise LogicError('Не достаточно средств на счету')
 
             abon.make_pay(request.user, debt.amount, debt.comment)
             debt.set_ok()
             abon.save(update_fields=['ballance'])
             debt.save(update_fields=['status', 'date_pay'])
             return redirect('client_side:debts')
-        except LogicError, e:
-            messages.error(request, e.value)
+        except LogicError as e:
+            messages.error(request, e)
         except NasFailedResult as e:
-            messages.error(request, e.message)
+            messages.error(request, e)
         except NasNetworkError as e:
-            messages.error(request, e.message)
+            messages.error(request, e)
     return render(request, 'clientsideapp/debt_buy.html', {
         'debt': debt,
         'amount': debt.amount,

@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.template.context_processors import csrf
 from django.contrib.auth import get_user_model
 
-from models import PrivateMessages
+from .models import PrivateMessages
 import mydefs
 
 
@@ -24,13 +24,13 @@ def home(request):
 @login_required
 @mydefs.only_admins
 def delitem(request, id=0):
-    r = {'errnum': 0, 'errtext': u''}
+    r = {'errnum': 0, 'errtext': ''}
     try:
         PrivateMessages.objects.get(id=id).delete()
     except PrivateMessages.DoesNotExist:
         r = {
             'errnum': 1,
-            'errtext': u'Error while deleting, item does not exist'
+            'errtext': 'Error while deleting, item does not exist'
         }
     return HttpResponse(dumps(r))
 
@@ -55,6 +55,6 @@ def send_message(request):
             msg.save()
             return redirect('privmsg:home')
         except UserModel.DoesNotExist:
-            return mydefs.res_error(request, u'Адресат не найден')
+            return mydefs.res_error(request, 'Адресат не найден')
     else:
-        return mydefs.res_error(request, u'Ошибка типа запроса')
+        return mydefs.res_error(request, 'Ошибка типа запроса')

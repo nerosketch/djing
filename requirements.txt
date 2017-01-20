@@ -2,3 +2,4 @@ Django==1.9
 Pillow
 MySQL-python
 telepot
+python3-netsnmp

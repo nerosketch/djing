@@ -4,9 +4,9 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from models import Device
+from .models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins, ping
-from forms import DeviceForm
+from .forms import DeviceForm
 
 
 @login_required
@@ -27,7 +27,7 @@ def devdel(request, did):
         get_object_or_404(Device, id=did).delete()
         return res_success(request, 'devapp:devs')
     except:
-        return res_error(request, u'Неизвестная ошибка при удалении :(')
+        return res_error(request, 'Неизвестная ошибка при удалении :(')
 
 
 @login_required
@@ -47,7 +47,7 @@ def dev(request, devid=0):
             frm.save()
             return redirect('devapp:view', did=devid)
         else:
-            messages.error(request, u'Ошибка в данных, проверте их ещё раз')
+            messages.error(request, 'Ошибка в данных, проверте их ещё раз')
     else:
         frm = DeviceForm(instance=devinst)
 
@@ -70,9 +70,9 @@ def devview(request, did):
             uptime = manager.uptime()
             ports = manager.get_ports()
         else:
-            messages.warning(request, u'Не указан snmp пароль для устройства')
+            messages.warning(request, 'Не указан snmp пароль для устройства')
     else:
-        messages.error(request, u'Эта точка не пингуется')
+        messages.error(request, 'Эта точка не пингуется')
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,
@@ -96,7 +96,7 @@ def toggle_port(request, did, portid, status=0):
             else:
                 ports[portid-1].disable()
         else:
-            messages.warning(request, u'Не указан snmp пароль для устройства')
+            messages.warning(request, 'Не указан snmp пароль для устройства')
     else:
-        messages.error(request, u'Эта точка не пингуется')
+        messages.error(request, 'Эта точка не пингуется')
     return redirect('devapp:view', did=did)

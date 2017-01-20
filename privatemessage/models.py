@@ -17,7 +17,7 @@ class Dialog(models.Model):
     recepient = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
     date_create = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -29,5 +29,5 @@ class PrivateMessages(models.Model):
 
     objects = MessagesManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text

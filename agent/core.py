@@ -1,18 +1,16 @@
 # -*- coding: utf8 -*-
 from abc import ABCMeta, abstractmethod
-from structs import AbonStruct, TariffStruct
+from .structs import AbonStruct, TariffStruct
 
 
 # Всплывает если из NAS вернулся не удачный результат
 class NasFailedResult(Exception):
-    def __init__(self, message):
-        super(NasFailedResult, self).__init__(message)
+    pass
 
 
 # Всплывает когда нет связи с сервером доступа к инету (NAS)
 class NasNetworkError(Exception):
-    def __init__(self, message):
-        super(NasNetworkError, self).__init__(message)
+    pass
 
 
 # Проверяет входной тип на принадлежность классу.
@@ -32,9 +30,7 @@ def check_input_type(class_or_type):
 
 
 # Общается с NAS'ом
-class BaseTransmitter(object):
-    __metaclass__ = ABCMeta
-
+class BaseTransmitter(metaclass=ABCMeta):
     @abstractmethod
     @check_input_type(AbonStruct)
     def add_user_range(self, user_list):

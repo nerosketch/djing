@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 
-from base_intr import TariffBase
+from .base_intr import TariffBase
 
 # from abonapp import AbonTariff
 
@@ -33,7 +33,7 @@ class TariffDefault(TariffBase):
 
     @staticmethod
     def description():
-        return u'Базовый расчётный функционал'
+        return 'Базовый расчётный функционал'
 
 
 class TariffDp(TariffBase):
@@ -45,7 +45,7 @@ class TariffDp(TariffBase):
 
     @staticmethod
     def description():
-        return u'Как в IS'
+        return 'Как в IS'
 
 
 class TariffCp(TariffBase):
@@ -54,7 +54,7 @@ class TariffCp(TariffBase):
 
     @staticmethod
     def description():
-        return u'Пользовательский'
+        return 'Пользовательский'
 
 
 # Первый - всегда по умолчанию

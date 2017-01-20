@@ -73,13 +73,13 @@ def pag_mn(request, objs, count_per_page=PAGINATION_ITEMS_PER_PAGE):
 class MyGenericIPAddressField(models.GenericIPAddressField):
     description = "Int32 notation ip address"
 
-    def __init__(self, protocol='IPv4', *args, **kwargs):
-        super(MyGenericIPAddressField, self).__init__(protocol=protocol, *args, **kwargs)
+    def __init__(self, protocol='ipv4', *args, **kwargs):
+        super().__init__(protocol=protocol, *args, **kwargs)
         self.max_length = 8
 
     def get_prep_value(self, value):
         # strIp to Int
-        value = super(models.GenericIPAddressField, self).get_prep_value(value)
+        value = super().get_prep_value(value)
         return ip2int(value)
 
     def to_python(self, addr):
@@ -106,7 +106,7 @@ class MyChoicesAdapter(Iterator):
         self._max_index = len(choices)
         self.chs = choices
 
-    def next(self):
+    def __next__(self):
         if self.current_index >= self._max_index:
             raise StopIteration
         else:
@@ -121,19 +121,19 @@ class MyChoicesAdapter(Iterator):
 # через get должно быть передано order_by=<поле в бд> а в dir=<up|down> направление сортировки
 # возвращает новое направление сортировки и поле для сортировки с направлением
 def order_helper(request):
-    dir = request.GET.get('dir')
+    dr = request.GET.get('dir')
     dfx = ''
-    if dir == 'down':
-        dir = 'up'
+    if dr == 'down':
+        dr = 'up'
         dfx = '-'
     else:
-        dir = 'down'
+        dr = 'down'
 
     orby = request.GET.get('order_by')
     if orby:
-        return dir, dfx + orby
+        return dr, dfx + orby
     else:
-        return dir, orby
+        return dr, orby
 
 
 # Декоратор проверяет аккаунт, чтоб не пускать клиентов в страницы администрации
@@ -155,10 +155,7 @@ def ping(hostname):
 # Русифицированный вывод timedelta
 class RuTimedelta(timedelta):
 
-    def __init__(self, *args, **kwargs):
-        super(RuTimedelta, self).__init__(*args, **kwargs)
-
-    def __unicode__(self):
+    def __str__(self):
         hours, remainder = divmod(self.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         text_date = "%d:%d:%d" % (
@@ -167,10 +164,10 @@ class RuTimedelta(timedelta):
             seconds
         )
         if self.days > 1:
-            ru_days = u'дней'
+            ru_days = 'дней'
             if 5 > self.days > 1:
-                ru_days = u'дня'
+                ru_days = 'дня'
             elif self.days == 1:
-                ru_days = u'день'
-            text_date = u'%d %s %s' % (self.days, ru_days, text_date)
+                ru_days = 'день'
+            text_date = '%d %s %s' % (self.days, ru_days, text_date)
         return text_date

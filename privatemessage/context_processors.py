@@ -1,4 +1,4 @@
-from models import PrivateMessages
+from .models import PrivateMessages
 
 
 def avail_messages(request):

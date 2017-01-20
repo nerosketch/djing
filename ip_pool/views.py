@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from forms import PoolForm
-from models import IpPoolItem
+from .forms import PoolForm
+from .models import IpPoolItem
 import mydefs
 
 
@@ -14,7 +14,7 @@ def home(request):
     pools = IpPoolItem.objects.get_pools()
 
     if pools:
-        pools = map(lambda ip: (mydefs.int2ip(ip[0]), mydefs.int2ip(ip[1]), ip[2]), pools)
+        pools = [(mydefs.int2ip(ip[0]), mydefs.int2ip(ip[1]), ip[2]) for ip in pools]
         pools = mydefs.pag_mn(request, pools)
 
     return render(request, 'ip_pool/index.html', {
@@ -65,7 +65,7 @@ def add_pool(request):
             IpPoolItem.objects.add_pool(cd['start_ip'], cd['end_ip'])
             return redirect('ip_pool:home')
         else:
-            messages.error(request, u'Исправьте ошибки')
+            messages.error(request, 'Исправьте ошибки')
     else:
         frm = PoolForm()
     return render(request, 'ip_pool/add_pool.html', {

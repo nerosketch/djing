@@ -9,3 +9,4 @@ djing/settings.py
 gmap/fixtures
 *.sqlite3
 *.json
+*.bak

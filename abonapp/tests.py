@@ -2,7 +2,7 @@
 from django.shortcuts import get_object_or_404
 from django.test import TestCase
 
-from models import Abon, AbonTariff
+from .models import Abon, AbonTariff
 from tariff_app.models import Tariff
 
 
@@ -10,17 +10,17 @@ class AbonTariffTestCase(TestCase):
     def setUp(self):
         abon1 = Abon.objects.create(
             telephone='+79784653751',
-            fio=u'ФИО абона',
+            fio='ФИО абона',
             username='аго мучич'
         )
         tarif1 = Tariff.objects.create(
-            title=u'Тариф 1',
+            title='Тариф 1',
             speedIn=120.3,
             speedOut=53,
             amount=38
         )
         tarif2 = Tariff.objects.create(
-            title=u'Тариф 2',
+            title='Тариф 2',
             speedIn=130.3,
             speedOut=23,
             amount=82
@@ -38,7 +38,7 @@ class AbonTariffTestCase(TestCase):
 
     def test_activate_next(self):
         # возьмём абонента для опытов
-        abn = get_object_or_404(Abon, username=u'аго мучич')
+        abn = get_object_or_404(Abon, username='аго мучич')
 
         # берём купленные услуги
         ats = AbonTariff.objects.filter(abon=abn)

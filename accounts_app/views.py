@@ -10,7 +10,7 @@ from django.contrib import messages
 from abonapp.models import AbonGroup
 
 from photo_app.models import Photo
-from models import UserProfile
+from .models import UserProfile
 import mydefs
 
 
@@ -39,13 +39,13 @@ def to_signin(request):
 
             return render(request, 'accounts/login.html', {
                 'next': nextl,
-                'errmsg': u'Неправильный логин или пароль, попробуйте ещё раз'
+                'errmsg': 'Неправильный логин или пароль, попробуйте ещё раз'
             })
         return render(request, 'accounts/login.html', {
             'next': nextl
         })
     except NoReverseMatch:
-        raise Http404(u"Destination page does not exist")
+        raise Http404("Destination page does not exist")
 
 
 def sign_out(request):
@@ -133,7 +133,7 @@ def ch_info(request):
                 newpasswd = request.POST.get('newpasswd')
                 user.set_password(newpasswd)
             else:
-                messages.error(request, u'Неправильный пароль')
+                messages.error(request, 'Неправильный пароль')
         user.save()
         request.user = user
 
@@ -158,10 +158,10 @@ def create_profile(request):
         passwd = request.POST.get('passwd')
         conpasswd = request.POST.get('conpasswd')
         if not passwd:
-            messages.error(request, u'Забыли указать пароль для нового аккаунта')
+            messages.error(request, 'Забыли указать пароль для нового аккаунта')
 
         if not conpasswd:
-            messages.error(request, u'Забыли повторить пароль для нового аккаунта')
+            messages.error(request, 'Забыли повторить пароль для нового аккаунта')
 
         if passwd == conpasswd:
             user_qs = UserProfile.objects.filter(username=username)[:1]
@@ -170,9 +170,9 @@ def create_profile(request):
                 user.save()
                 return redirect('acc_app:accounts_list')
             else:
-                messages.error(request, u'Пользователь с таким именем уже есть')
+                messages.error(request, 'Пользователь с таким именем уже есть')
         else:
-            messages.error(request, u'Пароли не совпадают, попробуйте ещё раз')
+            messages.error(request, 'Пароли не совпадают, попробуйте ещё раз')
         return render(request, 'accounts/create_acc.html', {
             'newuser': user
         })

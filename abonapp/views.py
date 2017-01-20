@@ -14,8 +14,8 @@ from django.contrib import messages
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from agent import NasFailedResult, AbonStruct, Transmitter, TariffStruct, NasNetworkError
-import forms
-import models
+from . import forms
+from . import models
 import mydefs
 
 
@@ -48,14 +48,14 @@ def addgroup(request):
             frm = forms.AbonGroupForm(request.POST)
             if frm.is_valid():
                 frm.save()
-                messages.success(request, u'Группа успешно создана')
+                messages.success(request, 'Группа успешно создана')
                 return redirect('abonapp:group_list')
             else:
-                messages.error(request, u'Исправьте ошибки')
+                messages.error(request, 'Исправьте ошибки')
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return render(request, 'abonapp/addGroup.html', {
         'form': frm
     })
@@ -88,9 +88,9 @@ def delgroup(request):
         get_object_or_404(models.AbonGroup, id=agd).delete()
         return mydefs.res_success(request, 'abonapp:group_list')
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return mydefs.res_error(request, 'abonapp:group_list')
 
 
@@ -110,16 +110,16 @@ def addabon(request, gid):
                 prf.save()
                 return redirect('abonapp:people_list', group.id)
             else:
-                messages.error(request, u'Некоторые поля заполнены не правильно, проверте ещё раз')
+                messages.error(request, 'Некоторые поля заполнены не правильно, проверте ещё раз')
 
     except IntegrityError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except models.LogicError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
 
     if not frm:
         frm = forms.AbonForm(initial={
@@ -153,9 +153,9 @@ def delentity(request):
             get_object_or_404(models.AbonGroup, id=uid).delete()
         return mydefs.res_success(request, 'abonapp:group_list')
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return redirect('abonapp:group_list')
 
 
@@ -170,14 +170,14 @@ def abonamount(request, gid, uid):
                 amnt = mydefs.safe_float(request.POST.get('amount'))
                 abon.add_ballance(request.user, amnt)
                 abon.save(update_fields=['ballance'])
-                messages.success(request, u'Счёт успешно пополнен на %d' % amnt)
+                messages.success(request, 'Счёт успешно пополнен на %d' % amnt)
                 return redirect('abonapp:abon_home', gid=gid, uid=uid)
             else:
-                messages.error(request, u'Не могу разобрать id абонента')
+                messages.error(request, 'Не могу разобрать id абонента')
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return render(request, 'abonapp/abonamount.html', {
         'abon': abon,
         'abon_group': get_object_or_404(models.AbonGroup, id=gid)
@@ -236,7 +236,7 @@ def abonhome(request, gid, uid):
     init_frm_dat = {
         'username': abon.username,
         'fio': abon.fio,
-        'ip_address': abon.ip_address or u'Не назначен',
+        'ip_address': abon.ip_address or 'Не назначен',
         'telephone': abon.telephone,
         'group': abon.group,
         'address': abon.address,
@@ -259,21 +259,21 @@ def abonhome(request, gid, uid):
 
                 # return redirect('abonapp:abon_home', gid, uid)
             else:
-                messages.warning(request, u'Не правильные значения, проверте поля и попробуйте ещё')
+                messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
         else:
             frm = forms.AbonForm(initial=init_frm_dat)
     except IntegrityError as e:
-        messages.error(request, u'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e.message)
+        messages.error(request, 'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e)
         frm = forms.AbonForm(initial=init_frm_dat)
 
     except Http404:
-        messages.error(request, u'Ip адрес не найден в списке IP адресов')
+        messages.error(request, 'Ip адрес не найден в списке IP адресов')
         frm = forms.AbonForm(initial=init_frm_dat)
 
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
 
     return render(request, 'abonapp/editAbon.html', {
         'form': frm or forms.AbonForm(initial=init_frm_dat),
@@ -313,7 +313,7 @@ def add_invoice(request, gid, uid):
             newinv.amount = curr_amount
             newinv.comment = comment
 
-            if request.POST.get('status') == u'on':
+            if request.POST.get('status') == 'on':
                 newinv.status = True
 
             newinv.author = request.user
@@ -321,9 +321,9 @@ def add_invoice(request, gid, uid):
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return render(request, 'abonapp/addInvoice.html', {
         'abon': abon,
         'invcount': models.InvoiceForPayment.objects.filter(abon=abon).count(),
@@ -346,15 +346,15 @@ def buy_tariff(request, gid, uid):
                 abon.save()
                 return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
             else:
-                messages.error(request, u'Что-то не так при покупке услуги, проверьте и попробуйте ещё')
+                messages.error(request, 'Что-то не так при покупке услуги, проверьте и попробуйте ещё')
         else:
             frm = forms.BuyTariff()
     except models.LogicError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
         return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
 
     return render(request, 'abonapp/buy_tariff.html', {
@@ -378,9 +378,9 @@ def chpriority(request, gid, uid):
         elif act == 'down':
             current_abon_tariff.priority_down()
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
 
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
@@ -400,19 +400,19 @@ def complete_service(request, gid, uid, srvid):
             if finish_confirm == 'yes':
                 # удаляем запись о текущей услуге.
                 abtar.delete()
-                messages.success(request, u'Услуга успешно завершена')
+                messages.success(request, 'Услуга успешно завершена')
                 return redirect('abonapp:abon_home', gid, uid)
             else:
-                raise models.LogicError(u'Действие не подтверждено')
+                raise models.LogicError('Действие не подтверждено')
 
         time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
     except models.LogicError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.warning(request, e.message)
+        messages.warning(request, e)
         return redirect('abonapp:abon_home', gid, uid)
 
     return render(request, 'abonapp/complete_service.html', {
@@ -438,11 +438,11 @@ def activate_service(request, gid, uid, srvid):
             return redirect('abonapp:abon_home', gid, uid)
 
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.warning(request, e.message)
+        messages.warning(request, e)
     except models.LogicError as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     return render(request, 'abonapp/activate_service.html', {
         'abon': abtar.abon,
         'abon_group': abtar.abon.group,
@@ -458,9 +458,9 @@ def unsubscribe_service(request, gid, uid, srvid):
     try:
         get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.warning(request, e.message)
+        messages.warning(request, e)
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
@@ -512,27 +512,27 @@ def update_nas(request, group_id):
             except NasFailedResult:
                 tm.add_user(agent_abon)
     except NasFailedResult as e:
-        messages.error(request, e.message)
+        messages.error(request, e)
     except NasNetworkError as e:
-        messages.warning(request, e.message)
+        messages.warning(request, e)
     return redirect('abonapp:people_list', gid=group_id)
 
 
 # API's
 
 def abons(request):
-    ablist = map(lambda abn: {
+    ablist = [{
         'id': abn.id,
         'tarif_id': abn.active_tariff().id if abn.active_tariff() else 0,
         'ip': abn.ip_address.int_ip(),
         'is_active': abn.is_active
-    }, models.Abon.objects.all())
+    } for abn in models.Abon.objects.all()]
 
-    tarlist = map(lambda trf: {
+    tarlist = [{
         'id': trf.id,
         'speedIn': trf.speedIn,
         'speedOut': trf.speedOut
-    }, Tariff.objects.all())
+    } for trf in Tariff.objects.all()]
 
     data = {
         'subscribers': ablist,

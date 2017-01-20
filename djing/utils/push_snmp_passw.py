@@ -21,7 +21,7 @@ def cmd(ip):
     tn.write("save config config_id 1\n")
 
     tn.write("log\n")
-    print(tn.read_all())
+    print((tn.read_all()))
     tn.close()
 
 
@@ -30,7 +30,7 @@ def prc(ip):
         if ping(ip):
             cmd(ip)
     except error:
-        print('Error connect to', ip)
+        print(('Error connect to', ip))
 
 
 if __name__ == '__main__':

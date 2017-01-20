@@ -24,7 +24,7 @@ if __name__ == "__main__":
             'name': res[0],
             'fio': res[1],
             'tel': res[2],
-            'addr': u"ул. %s д. %s" % (res[3], res[4]),
+            'addr': "ул. %s д. %s" % (res[3], res[4]),
             'birth': int(res[5]),
             'grp': int(res[6])
         })

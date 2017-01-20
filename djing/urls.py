@@ -1,8 +1,8 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 
-import settings
-from views import home
+from . import settings
+from .views import home
 
 
 urlpatterns = [

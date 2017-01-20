@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 
-import models
+from . import models
 from mydefs import ip_addr_regex
 
 

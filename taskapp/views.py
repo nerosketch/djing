@@ -6,9 +6,10 @@ from django.contrib import messages
 from abonapp.models import Abon
 from datetime import date
 from chatbot.models import TelegramBot
-from models import Task
+from .models import Task
 from mydefs import pag_mn, only_admins, safe_int
-from forms import TaskFrm
+from .forms import TaskFrm
+from .handle import TaskException
 
 
 @login_required
@@ -148,13 +149,13 @@ def task_add_edit(request, task_id=0):
                         task_instance.save()
                         return redirect('taskapp:home')
                     else:
-                        messages.error(request, u'Нет ответственных за группу, в которой находится выбранный абонент')
+                        messages.error(request, 'Нет ответственных за группу, в которой находится выбранный абонент')
                 else:
-                    messages.error(request, u'Нужно выбрать абонента')
+                    messages.error(request, 'Нужно выбрать абонента')
             else:
-                messages.error(request, u'Ошибка в полях формы в задаче')
+                messages.error(request, 'Ошибка в полях формы в задаче')
         except TelegramBot.DoesNotExist:
-            messages.error(request, u'Исполнитель ещё не подписался на оповещения')
+            messages.error(request, 'Исполнитель ещё не подписался на оповещения')
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
@@ -166,8 +167,11 @@ def task_add_edit(request, task_id=0):
 @login_required
 @only_admins
 def task_finish(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    task.finish(request.user)
+    try:
+        task = get_object_or_404(Task, id=task_id)
+        task.finish(request.user)
+    except TaskException as e:
+        messages.error(request, e)
     return redirect('taskapp:home')
 
 

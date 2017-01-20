@@ -33,7 +33,7 @@ def convert(query):
 if __name__ == '__main__':
     f = sys.stdin
     table_name = "flowstat_%s" % datetime.now().strftime("%d%m%Y")
-    print("CREATE TABLE IF NOT EXISTS %s (" % table_name)
+    print(("CREATE TABLE IF NOT EXISTS %s (" % table_name))
     print("`id` int(10) AUTO_INCREMENT NOT NULL,")
     print("`src_ip` INT(10) UNSIGNED NOT NULL,")
     print("`dst_ip` INT(10) UNSIGNED NOT NULL,")
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         if not rs: exit()
         # without first comma
         print(ins_sql)
-        print(rs[1:])
+        print((rs[1:]))
         while n > 0:
             rs = convert(f.readline())
             if not rs: exit()

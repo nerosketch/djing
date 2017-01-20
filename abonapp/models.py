@@ -14,12 +14,10 @@ from accounts_app.models import UserProfile
 
 
 class LogicError(Exception):
-    def __init__(self, value, err_id=None):
+    def __init__(self, value):
         self.message = value
-        if err_id:
-            self.err_id = err_id
 
-    def __unicode__(self):
+    def __str__(self):
         return repr(self.message)
 
     def __str__(self):
@@ -36,7 +34,7 @@ class AbonGroup(models.Model):
             ('can_add_ballance', 'Пополнение счёта'),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
@@ -50,7 +48,7 @@ class AbonLog(models.Model):
     class Meta:
         db_table = 'abonent_log'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.comment
 
 
@@ -124,7 +122,7 @@ class AbonTariff(models.Model):
         amnt = self.calc_amount_service()
         # если не хватает денег
         if self.abon.ballance < amnt:
-            raise LogicError(u'Не хватает денег на счету')
+            raise LogicError('Не хватает денег на счету')
         # дата активации услуги
         self.time_start = timezone.now()
         # снимаем деньги за услугу
@@ -135,7 +133,7 @@ class AbonTariff(models.Model):
     def is_started(self):
         return True if self.time_start is not None else False
 
-    def __unicode__(self):
+    def __str__(self):
         return "%d: '%s' - '%s'" % (
             self.tariff_priority,
             self.tariff.title,
@@ -147,8 +145,8 @@ class AbonTariff(models.Model):
         db_table = 'abonent_tariff'
         unique_together = (('abon', 'tariff', 'tariff_priority'),)
         permissions = (
-            ('can_complete_service', u'Досрочное завершение услуги абонента'),
-            ('can_activate_service', u'Активация услуги абонента')
+            ('can_complete_service', 'Досрочное завершение услуги абонента'),
+            ('can_activate_service', 'Активация услуги абонента')
         )
 
 
@@ -188,18 +186,18 @@ class Abon(UserProfile):
             self.group = cd['group']
             self.address = cd['address']
         except Http404:
-            raise LogicError(u'Введённый IP адрес не добавлен в ip pool')
+            raise LogicError('Введённый IP адрес не добавлен в ip pool')
         except MultipleObjectsReturned:
-            raise LogicError(u'Введённый IP адрес не определён')
+            raise LogicError('Введённый IP адрес не определён')
 
     class Meta:
         db_table = 'abonent'
         permissions = (
-            ('can_buy_tariff', u'Покупка тарифа абоненту'),
+            ('can_buy_tariff', 'Покупка тарифа абоненту'),
         )
 
     # Платим за что-то
-    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=u'Снятие со счёта средств'):
+    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment='Снятие со счёта средств'):
         AbonLog.objects.create(
             abon=self,
             amount=-how_match_to_pay,
@@ -214,7 +212,7 @@ class Abon(UserProfile):
             abon=self,
             amount=amount,
             author=current_user,
-            comment=u'Пополнение счёта через админку'
+            comment='Пополнение счёта через админку'
         )
         self.ballance += amount
 
@@ -244,7 +242,7 @@ class Abon(UserProfile):
         AbonLog.objects.create(
             abon=self, amount=-tariff.amount,
             author=author,
-            comment=u'Покупка тарифного плана через админку, тариф "%s"' % tariff.title
+            comment='Покупка тарифного плана через админку, тариф "%s"' % tariff.title
         )
 
     # Пробует подключить новую услугу если пришло время
@@ -265,7 +263,7 @@ class Abon(UserProfile):
             # И от заказа тарифа до начала этого месяца
             if (nw - at.time_start) > (nw - to_start_month):
                 # Заказ из прошлого месяца, срок действия закончен
-                print u'Заказ из прошлого месяца, срок действия закончен'
+                print('Заказ из прошлого месяца, срок действия закончен')
 
                 # выберем следующую по приоритету
                 # next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)
@@ -284,7 +282,7 @@ class Abon(UserProfile):
                     abon=self,
                     amount=0,
                     author=author,
-                    comment=u'Завершение услуги по истечению срока действия'
+                    comment='Завершение услуги по истечению срока действия'
                 )
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
@@ -307,7 +305,7 @@ class InvoiceForPayment(models.Model):
     date_pay = models.DateTimeField(blank=True, null=True)
     author = models.ForeignKey(UserProfile, related_name='+')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s -> %d $" % (self.abon.username, self.amount)
 
     def set_ok(self):

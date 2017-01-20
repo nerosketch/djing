@@ -2,15 +2,14 @@
 import socket
 import binascii
 from hashlib import md5
-from core import BaseTransmitter, NasFailedResult, NasNetworkError
+from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
-from structs import TariffStruct, IpStruct
-import settings
+from .structs import TariffStruct, IpStruct
+from . import settings
 
 
 class ApiRos:
     "Routeros api"
-
     def __init__(self, sk):
         self.sk = sk
         self.currenttag = 0
@@ -19,11 +18,11 @@ class ApiRos:
         for repl, attrs in self.talk(["/login"]):
             chal = binascii.unhexlify(attrs['=ret'])
         md = md5()
-        md.update('\x00')
-        md.update(pwd)
+        md.update(b'\x00')
+        md.update(bytes(pwd, 'utf-8'))
         md.update(chal)
         self.talk(["/login", "=name=" + username,
-                   "=response=00" + binascii.hexlify(md.digest())])
+                   "=response=00" + binascii.hexlify(md.digest()).decode('utf-8')])
 
     def talk(self, words):
         if self.writeSentence(words) == 0: return
@@ -35,10 +34,10 @@ class ApiRos:
             attrs = {}
             for w in i[1:]:
                 j = w.find('=', 1)
-                if j == -1:
+                if (j == -1):
                     attrs[w] = ''
                 else:
-                    attrs[w[:j]] = w[j + 1:]
+                    attrs[w[:j]] = w[j+1:]
             r.append((reply, attrs))
             if reply == '!done': return r
 
@@ -58,84 +57,75 @@ class ApiRos:
             r.append(w)
 
     def writeWord(self, w):
-        print "<<< " + w
-        self.writeLen(len(w))
-        self.writeStr(w)
+        print("<<< " + w)
+        b = bytes(w, "utf-8")
+        self.writeLen(len(b))
+        self.writeBytes(b)
 
     def readWord(self):
-        ret = self.readStr(self.readLen())
-        print ">>> " + ret
+        ret = self.readBytes(self.readLen()).decode('utf-8')
+        print(">>> " + ret)
         return ret
 
     def writeLen(self, l):
         if l < 0x80:
-            self.writeStr(chr(l))
+            self.writeBytes(bytes([l]))
         elif l < 0x4000:
             l |= 0x8000
-            self.writeStr(chr((l >> 8) & 0xFF))
-            self.writeStr(chr(l & 0xFF))
+            self.writeBytes(bytes([(l >> 8) & 0xff, l & 0xff]))
         elif l < 0x200000:
             l |= 0xC00000
-            self.writeStr(chr((l >> 16) & 0xFF))
-            self.writeStr(chr((l >> 8) & 0xFF))
-            self.writeStr(chr(l & 0xFF))
+            self.writeBytes(bytes([(l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
         elif l < 0x10000000:
             l |= 0xE0000000
-            self.writeStr(chr((l >> 24) & 0xFF))
-            self.writeStr(chr((l >> 16) & 0xFF))
-            self.writeStr(chr((l >> 8) & 0xFF))
-            self.writeStr(chr(l & 0xFF))
+            self.writeBytes(bytes([(l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
         else:
-            self.writeStr(chr(0xF0))
-            self.writeStr(chr((l >> 24) & 0xFF))
-            self.writeStr(chr((l >> 16) & 0xFF))
-            self.writeStr(chr((l >> 8) & 0xFF))
-            self.writeStr(chr(l & 0xFF))
+            self.writeBytes(bytes([0xf0, (l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
 
     def readLen(self):
-        c = ord(self.readStr(1))
+        c = self.readBytes(1)[0]
         if (c & 0x80) == 0x00:
             pass
         elif (c & 0xC0) == 0x80:
             c &= ~0xC0
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
         elif (c & 0xE0) == 0xC0:
             c &= ~0xE0
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
         elif (c & 0xF0) == 0xE0:
             c &= ~0xF0
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
         elif (c & 0xF8) == 0xF0:
-            c = ord(self.readStr(1))
+            c = self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
             c <<= 8
-            c += ord(self.readStr(1))
+            c += self.readBytes(1)[0]
         return c
 
-    def writeStr(self, text):
-        n = 0
-        while n < len(text):
-            r = self.sk.send(text[n:])
-            if r == 0: raise RuntimeError, "connection closed by remote end"
+    def writeBytes(self, str):
+        n = 0;
+        while n < len(str):
+            r = self.sk.send(str[n:])
+            if r == 0: raise RuntimeError("connection closed by remote end")
             n += r
 
-    def readStr(self, length):
-        ret = ''
+    def readBytes(self, length):
+        ret = b''
         while len(ret) < length:
             s = self.sk.recv(length - len(ret))
-            if s == '': raise RuntimeError, "connection closed by remote end"
+            if len(s) == 0: raise RuntimeError("connection closed by remote end")
             ret += s
         return ret
 
@@ -145,7 +135,7 @@ class MikrotikTransmitter(BaseTransmitter):
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or settings.NAS_IP
         if not ping(ip):
-            raise NasNetworkError(u'NAS %s не пингуется' % ip)
+            raise NasNetworkError('NAS %s не пингуется' % ip)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip, port or settings.NAS_PORT))
         self.ar = ApiRos(s)
@@ -165,7 +155,7 @@ class MikrotikTransmitter(BaseTransmitter):
         return ret[0][1]
 
     def add_user_range(self, user_list):
-        return map(self.add_user, user_list)
+        return list(map(self.add_user, user_list))
 
     def remove_user_range(self, user_list):
         names = ['uid%d' % usr.uid for usr in user_list]

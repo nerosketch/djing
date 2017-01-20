@@ -29,9 +29,9 @@ class IpPoolItemManager(models.Manager):
         end_ip = ip2int(end_ip)
 
         if (end_ip - start_ip) > 5000:
-            raise Exception(u'Not add over 5000 ip\'s')
+            raise Exception('Not add over 5000 ip\'s')
 
-        sql_strs = map(lambda tip: r"(%d)" % tip, range(start_ip, end_ip + 1))
+        sql_strs = [r"(%d)" % tip for tip in range(start_ip, end_ip + 1)]
         sql = r'INSERT INTO ip_pool_ippoolitem (ip) VALUES %s' % r",".join(sql_strs)
 
         cursor = connection.cursor()
@@ -55,5 +55,5 @@ class IpPoolItem(models.Model):
     def int_ip(self):
         return ip2int(self.ip)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.ip

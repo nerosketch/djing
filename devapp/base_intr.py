@@ -3,9 +3,7 @@ from abc import ABCMeta, abstractmethod
 from netsnmp import Session, VarList, Varbind
 
 
-class DevBase(object):
-    __metaclass__ = ABCMeta
-
+class DevBase(object, metaclass=ABCMeta):
     @staticmethod
     def description():
         """Возвращает текстовое описание"""
@@ -27,9 +25,7 @@ class DevBase(object):
         pass
 
 
-class BasePort(object):
-    __metaclass__ = ABCMeta
-
+class BasePort(object, metaclass=ABCMeta):
     def __init__(self, num, name, status, mac, speed):
         self.num = int(num)
         self.nm = name
@@ -50,8 +46,7 @@ class BasePort(object):
         return "%x:%x:%x:%x:%x:%x" % (ord(m[0]), ord(m[1]), ord(m[2]), ord(m[3]), ord(m[4]), ord(m[5]))
 
 
-class SNMPBaseWorker(object):
-    __metaclass__ = ABCMeta
+class SNMPBaseWorker(object, metaclass=ABCMeta):
     ses = None
 
     def __init__(self, ip, community='public', ver=2):

@@ -3,41 +3,41 @@ from django.db import models
 from gmap.utils import geolocate
 
 
-CATEGORY_LOOKUP = {u'1': 'Cirrus Authorized Service Center (ASC)', u'2': 'Cirrus Sales Representative or Center',
-                   u'3': 'Cirrus Training Center (CTC)', u'4': 'Cirrus Standardized Instructor Pilot (CSIP)'}
+CATEGORY_LOOKUP = {'1': 'Cirrus Authorized Service Center (ASC)', '2': 'Cirrus Sales Representative or Center',
+                   '3': 'Cirrus Training Center (CTC)', '4': 'Cirrus Standardized Instructor Pilot (CSIP)'}
 
-INVERSE_CATEGORY = dict((v, k) for k, v in CATEGORY_LOOKUP.iteritems())
+INVERSE_CATEGORY = dict((v, k) for k, v in CATEGORY_LOOKUP.items())
 
 SUBCATEGORY_LOOKUP = {
 
-    u'1': 'Composite & Paint Repair',
-    u'2': 'Pickup & Delivery Service',
-    u'3': 'Parts Distributor',
-    u'4': 'Air Conditioning Service',
-    u'5': 'Garmin Service',
-    u'6': 'Avidyne Service',
-    u'7': 'Full Avionics Facility',
-    u'8': 'Oxygen Service',
-    u'9': 'Wi-Fi Equipped',
-    u'10': 'CAPS Overhaul',
-    u'11': 'Cirrus Platinum Service Partner',
-    u'12': 'Ice Protection System Maintenance',
-    u'13': 'SR20 Rental',
-    u'14': 'SR22 Rental',
-    u'15': 'SR22T Rental',
-    u'16': 'Cirrus Perspective Avionics Available',
-    u'17': 'Avidyne Entegra Avionics Available',
-    u'18': 'Cirrus Platinum Training Partner',
-    u'19': 'Simulator Available',
-    u'20': 'Cirrus Perspective Qualified',
-    u'21': 'Avidyne Entegra Qualified',
-    u'22': 'New Cirrus Sales',
-    u'23': 'Used Cirrus Sales',
-    u'24': 'n/a'
+    '1': 'Composite & Paint Repair',
+    '2': 'Pickup & Delivery Service',
+    '3': 'Parts Distributor',
+    '4': 'Air Conditioning Service',
+    '5': 'Garmin Service',
+    '6': 'Avidyne Service',
+    '7': 'Full Avionics Facility',
+    '8': 'Oxygen Service',
+    '9': 'Wi-Fi Equipped',
+    '10': 'CAPS Overhaul',
+    '11': 'Cirrus Platinum Service Partner',
+    '12': 'Ice Protection System Maintenance',
+    '13': 'SR20 Rental',
+    '14': 'SR22 Rental',
+    '15': 'SR22T Rental',
+    '16': 'Cirrus Perspective Avionics Available',
+    '17': 'Avidyne Entegra Avionics Available',
+    '18': 'Cirrus Platinum Training Partner',
+    '19': 'Simulator Available',
+    '20': 'Cirrus Perspective Qualified',
+    '21': 'Avidyne Entegra Qualified',
+    '22': 'New Cirrus Sales',
+    '23': 'Used Cirrus Sales',
+    '24': 'n/a'
 
 }
 
-INVERSE_SUBCATEGORY = dict((v, k) for k, v in SUBCATEGORY_LOOKUP.iteritems())
+INVERSE_SUBCATEGORY = dict((v, k) for k, v in SUBCATEGORY_LOOKUP.items())
 
 # name, category, platinum partner, contacT_name, contact_title, airport_name, airport_code, address, phone, fax, email, url, sub_category1, ..., sub_categoryN
 
@@ -60,7 +60,7 @@ class SalesBoundary(models.Model):
     class Meta:
         unique_together = ("boundary_code", "owner")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.boundary_code
 
 
@@ -146,7 +146,7 @@ class SalesDirector(models.Model):
         # Ask django really, really nicely not to insert our object twice
         self.save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -166,7 +166,7 @@ class MarkerCategory(models.Model):
     def natural_key(self):
         return self.name
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -177,7 +177,7 @@ class MarkerSubCategory(models.Model):
     def natural_key(self):
         return self.name
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -198,7 +198,7 @@ class CountryISOCode(models.Model):
     def natural_key(self):
         return self.long_name
 
-    def __unicode__(self):
+    def __str__(self):
         return self.long_name
 
 
@@ -237,9 +237,9 @@ class MapMarker(models.Model):
             else:
                 raise GeolocateFailure("Failed to geolocate address for %s" % self.name, full_address)
 
-        super(MapMarker, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def from_csv(self, row, row_id, errors):

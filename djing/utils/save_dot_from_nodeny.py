@@ -26,4 +26,4 @@ if __name__ == "__main__":
             )
         dev.comment=dt['loc']
         dev.save()
-        print(dt['descr'], dt['loc'], dev)
+        print((dt['descr'], dt['loc'], dev))

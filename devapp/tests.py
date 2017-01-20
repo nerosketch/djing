@@ -1,5 +1,5 @@
 from django.test import TestCase
-import dev_types
+from . import dev_types
 
 
 class DevTest(TestCase):
@@ -10,13 +10,13 @@ class DevTest(TestCase):
     def snmp(self):
         dev = dev_types.DLinkDevice('10.115.1.105', '<community>', 2)
 
-        print('DevName:', dev.get_device_name())
+        print(('DevName:', dev.get_device_name()))
         ports = dev.get_ports()
-        print 'gports'
+        print('gports')
         for port in ports:
             assert issubclass(port.__class__, dev_types.BasePort)
-            print('\tPort:', port.nm, port.st, port.mac(), port.sp)
+            print(('\tPort:', port.nm, port.st, port.mac(), port.sp))
         # Disable 2 port
-        print ports[1].disable()
+        print((ports[1].disable()))
         # Enable 2 port
-        print ports[1].enable()
+        print((ports[1].enable()))

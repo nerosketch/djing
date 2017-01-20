@@ -1,64 +1,58 @@
 # coding=utf-8
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
-#import os
-#from subprocess import call
 from django.db import models
 from django.conf import settings
 from abonapp.models import Abon
-
-#from devapp.models import Device
-#from djing.settings import BASE_DIR
-from handle import handle as task_handle
+from .handle import handle as task_handle
 
 
 TASK_PRIORITIES = (
-    (b'A', u'Высший'),
-    (b'C', u'Средний'),
-    (b'E', u'Низкий')
+    ('A', 'Высший'),
+    ('C', 'Средний'),
+    ('E', 'Низкий')
 )
 
 TASK_STATES = (
-    (b'S', u'Новая'),
-    (b'C', u'На выполнении'),
-    (b'F', u'Выполнена')
+    ('S', 'Новая'),
+    ('C', 'На выполнении'),
+    ('F', 'Выполнена')
 )
 
 TASK_TYPES = (
-    (b'na', u'не выбрано'),
-    (b'yt', u'жёлтый треугольник'),
-    (b'rc', u'красный крестик'),
-    (b'ls', u'слабая скорость'),
-    (b'cf', u'обрыв кабеля'),
-    (b'cn', u'подключение'),
-    (b'pf', u'переодическое пропадание'),
-    (b'cr', u'настройка роутера'),
-    (b'co', u'настроить onu'),
-    (b'fc', u'обжать кабель'),
-    (b'ot', u'другое')
+    ('na', 'не выбрано'),
+    ('yt', 'жёлтый треугольник'),
+    ('rc', 'красный крестик'),
+    ('ls', 'слабая скорость'),
+    ('cf', 'обрыв кабеля'),
+    ('cn', 'подключение'),
+    ('pf', 'переодическое пропадание'),
+    ('cr', 'настройка роутера'),
+    ('co', 'настроить onu'),
+    ('fc', 'обжать кабель'),
+    ('ot', 'другое')
 )
 
 
 class ChangeLog(models.Model):
     task = models.ForeignKey('Task')
     ACT_CHOICES = (
-        (b'e', u'Изменение задачи'),
-        (b'c', u'Создание задачи'),
-        (b'd', u'Удаление задачи'),
-        (b'f', u'Завершение задачи'),
-        (b'b', u'Задача начата')
+        ('e', 'Изменение задачи'),
+        ('c', 'Создание задачи'),
+        ('d', 'Удаление задачи'),
+        ('f', 'Завершение задачи'),
+        ('b', 'Задача начата')
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
     who = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_act_type_display()
 
 
 def _delta_add_days():
     return datetime.now() + timedelta(days=3)
+
 
 class Task(models.Model):
     descr = models.CharField(max_length=128, null=True, blank=True)
@@ -82,40 +76,39 @@ class Task(models.Model):
         )
 
     def finish(self, current_user):
-        self.state = b'F'  # Выполнена
+        self.state = 'F'  # Выполнена
         self.out_date = datetime.now()  # Время завершения
         ChangeLog.objects.create(
             task=self,
-            act_type=b'f',
+            act_type='f',
             who=current_user
         )
         self.save(update_fields=['state', 'out_date'])
 
     def begin(self, current_user):
-        self.state = b'C'  # Начата
+        self.state = 'C'  # Начата
         ChangeLog.objects.create(
             task=self,
-            act_type=b'b',
+            act_type='b',
             who=current_user
         )
         self.save(update_fields=['state'])
 
 
 def task_handler(sender, instance, **kwargs):
-    #cur_dir = os.path.join(BASE_DIR, "taskapp")
     group = ''
     if instance.abon:
         group = instance.abon.group
     if kwargs['created']:
         ChangeLog.objects.create(
             task=instance,
-            act_type=b'c',
+            act_type='c',
             who=instance.author
         )
     else:
         ChangeLog.objects.create(
             task=instance,
-            act_type=b'e',
+            act_type='e',
             who=instance.author
         )
     for recipient in instance.recipients.all():
@@ -123,27 +116,12 @@ def task_handler(sender, instance, **kwargs):
             instance, instance.author,
             recipient, group
         )
-        '''
-        call(['%s/handle.sh' % cur_dir,
-            first_param,                    # start or change
-            instance.get_mode_display(),    # mode - Характер поломки
-              'N',                          # (ip устройства) Зарезервировано
-              instance.state,               # Состояние задачи (новая|выполнена)
-              instance.author.telephone,    # Телефон автора задачи
-              recipient.telephone,          # Телефон ответственного монтажника
-              instance.descr,               # Описание задачи
-              # Если указан абонент то инфа о нём
-              instance.abon.fio if instance.abon else '<нет фио>',
-              instance.abon.address if instance.abon else '<нет адреса>',
-              instance.abon.telephone if instance.abon else '<нет телефона>',
-              group_name])                  # Имя группы абонента
-              '''
 
 
 def task_delete(sender, instance, **kwargs):
     ChangeLog.objects.create(
         task=instance,
-        act_type=b'd',
+        act_type='d',
         who=instance.author
     )
 

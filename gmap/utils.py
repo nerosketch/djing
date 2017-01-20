@@ -1,15 +1,15 @@
 import json
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import csv
 import codecs
-import cStringIO
+import io
 
 
 def csvByLine(csvFile, lineHandler):
     errors = ''
     for row_id, line in enumerate(UnicodeReader(csvFile)):
-        print "Calling Line handler for %s" % line
+        print(("Calling Line handler for %s" % line))
         errors = ''.join([errors, lineHandler(line)])
     return errors
 
@@ -28,8 +28,8 @@ def geolocate(location, sensor=False):
     """
     sensor = str(sensor).lower()
     url = "http://maps.googleapis.com/maps/api/geocode/json?"
-    url += urllib.urlencode({'address': location, 'sensor': sensor})
-    data = urllib2.urlopen(url).read()
+    url += urllib.parse.urlencode({'address': location, 'sensor': sensor})
+    data = urllib.request.urlopen(url).read()
     data = json.loads(data)
     if data and data['status'] == 'OK':
         return ({
@@ -43,10 +43,10 @@ def geolocate(location, sensor=False):
 def georeverse(lat, lon):
     # construct url for reverse geocoding with google-maps
     url = "http://maps.googleapis.com/maps/api/geocode/json?"
-    url += urllib.urlencode({'latlng': lat + ',' + lon, 'sensor': 'false'})
+    url += urllib.parse.urlencode({'latlng': lat + ',' + lon, 'sensor': 'false'})
 
     # retrieve and load google-map data
-    data = urllib2.urlopen(url).read()
+    data = urllib.request.urlopen(url).read()
     data = json.loads(data)
 
     # if request goes through, return the state and country of the location
@@ -89,7 +89,7 @@ class UTF8Recoder:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         # return self.reader.next().decode("cp1252").encode("utf-8")
         return self.reader.next().encode("utf-8")
 
@@ -105,9 +105,9 @@ class UnicodeReader:
         f = UTF8Recoder(f, encoding)
         self.reader = csv.reader(f, dialect=dialect, **kwds)
 
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
+    def __next__(self):
+        row = next(self.reader)
+        return [str(s, "utf-8") for s in row]
 
     def __iter__(self):
         return self
@@ -121,7 +121,7 @@ class UnicodeWriter:
 
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
+        self.queue = io.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder(encoding)()

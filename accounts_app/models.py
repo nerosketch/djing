@@ -50,7 +50,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         max_length=16,
         verbose_name='Telephone number',
         #unique=True,
-        validators=[RegexValidator(r'^\+[7,8,9,3]\d{10,11}$')]
+        validators=[RegexValidator('^\+[7,8,9,3]\d{10,11}$')]
     )
     avatar = models.ForeignKey(Photo, null=True, blank=True)
     email = models.EmailField()
@@ -86,5 +86,5 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         else:
             return DEFAULT_PICTURE
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_full_name()
