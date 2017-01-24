@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
-from netsnmp import Session, VarList, Varbind
+from easysnmp import Session
 
 
 class DevBase(object, metaclass=ABCMeta):
@@ -50,20 +50,14 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
     ses = None
 
     def __init__(self, ip, community='public', ver=2):
-        self.ses = Session(DestHost=ip, Version=ver, Community=community)
+        self.ses = Session(hostname=ip, community=community, version=ver)
 
     def set_int_value(self, oid, value):
-        vs = VarList(Varbind(
-            tag=oid,
-            val=int(value),
-            type='INTEGER'
-        ))
-        return self.ses.set(vs)
+        return self.ses.set(oid, value)
 
     def get_list(self, oid):
-        vs = VarList(Varbind(oid))
-        return self.ses.walk(vs)
+        l = self.ses.walk(oid)
+        return [e.value for e in l]
 
     def get_item(self, oid):
-        var = VarList(Varbind(oid))
-        return self.ses.get(var)[0]
+        return self.ses.get(oid).value
