@@ -1,5 +1,5 @@
 Django==1.9
 Pillow
-MySQL-python
+mysqlclient
 telepot
-python3-netsnmp
+easysnmp
