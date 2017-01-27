@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
     url(r'^search/', include('searchapp.urls', namespace='searchapp')),
     url(r'^dev/', include('devapp.urls', namespace='devapp')),
-    url(r'^gmap/', include('gmap.urls')),
+    url(r'^map/', include('mapapp.urls', namespace='mapapp')),
     url(r'^statistic/', include('statistics.urls', namespace='statistics')),
     url(r'^tasks/', include('taskapp.urls', namespace='taskapp')),
     url(r'^client/', include('clientsideapp.urls', namespace='client_side')),
