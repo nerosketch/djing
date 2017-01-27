@@ -85,11 +85,11 @@
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     {{ form.out_date }}{{ form.out_date.errors }}
                 </div>
+                <script type="text/javascript" src="/static/js/datetime_with_moment.min.js"></script>
                 <script type="text/javascript">
                     $(function () {
                         $('#id_out_date').datetimepicker({
-                            format: 'YYYY-MM-DD',
-                            locale: 'ru'
+                            format: 'YYYY-MM-DD'
                         });
                     });
                 </script>
