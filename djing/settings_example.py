@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'ip_pool',
     'searchapp',
     'devapp',
-    'gmap',
+    'mapapp',
     'statistics',
     'taskapp',
     'clientsideapp',
