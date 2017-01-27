@@ -1,0 +1,14 @@
+{% extends 'all_base.html' %}
+{% block base_content %}
+
+    <!-- Main content -->
+    <div class="col-sm-12 main">
+        <p class="pull-left visible-xs">
+            <button type="button" data-toggle="offcanvas"></button>
+        </p>
+
+        {% block main %}{% endblock %}
+
+    </div>
+    <!-- END Main content -->
+{% endblock %}
