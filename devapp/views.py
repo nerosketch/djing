@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from easysnmp import EasySNMPTimeoutError
 
 from .models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins, ping
@@ -64,15 +65,18 @@ def devview(request, did):
     ports = None
     uptime = 0
     dev = get_object_or_404(Device, id=did)
-    if ping(dev.ip_address):
-        if dev.man_passw:
-            manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
-            uptime = manager.uptime()
-            ports = manager.get_ports()
+    try:
+        if ping(dev.ip_address):
+            if dev.man_passw:
+                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+                uptime = manager.uptime()
+                ports = manager.get_ports()
+            else:
+                messages.warning(request, 'Не указан snmp пароль для устройства')
         else:
-            messages.warning(request, 'Не указан snmp пароль для устройства')
-    else:
-        messages.error(request, 'Эта точка не пингуется')
+            messages.error(request, 'Эта точка не пингуется')
+    except EasySNMPTimeoutError:
+        messages.error(request, 'Время ожидания ответа от SNMP истекло')
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,
