@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InternetService - Админка</title>
+    <meta charset="UTF-8">
+    <!--[if lt IE 9]><meta http-equiv="refresh" content="0;URL=/static/bad_ie.html" /><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <script src="/static/js/all.min.js"></script>
+    <script src="/static/js/my.js"></script>
+    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+</head>
+<body>
+
+<!-- Modal -->
+<div class="modal fade" id="modFrm" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modContent"></div>
+    </div>
+</div>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'acc_app:other_profile' request.user.id %}">InternetService</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+
+                {% url 'acc_app:other_profile' request.user.id as home_url %}
+                <li{% if home_url == request.path %} class="active"{% endif %}><a href="{{ home_url }}">Главная</a></li>
+
+                {% url 'mapapp:home' as map_url %}
+                <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">Карта</a></li>
+
+                <!--<li><a href="{ % url 'statistics:home' %}" target="_blank">График траффика</a></li>--->
+
+                {% url 'client_side:home' as client_url %}
+                <li{% if client_url == request.home %} class="active"{% endif %}><a href="{{ client_url }}" target="_blank">Кабинет клиента</a></li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'acc_app:setup_info' %}">Настройки</a></li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Действия аккаунта</li>
+                        <li><a href="{% url 'acc_app:logout' %}">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-right" action="{% url 'searchapp:home' %}" method="get">
+                <div class="input-group stylish-input-group">
+                    <input type="text" class="form-control" placeholder="Search..." name="s">
+                  <span class="input-group-addon">
+                    <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                  </span>
+                </div>
+            </form>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+<!-- END Fixed navbar -->
+
+
+<div class="container-fluid">
+    <div class="row row-offcanvas row-offcanvas-left">
+
+        {% block base_content %}{% endblock %}
+
+    </div>
+</div>
+
+</body>
+</html>
