@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base_no_lmenu.html' %}
 {% block main %}
-    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <script>
 
         var markers = {
@@ -32,9 +32,9 @@
             m.setMap(this);
         };
 
-        function myISGmap(elId) {
-
-            this.map = new google.maps.Map(document.getElementById(elId), {
+        function MyISGmap(elId) {
+            var contain_block = document.getElementById(elId);
+            this.map = new google.maps.Map(contain_block, {
                 center: new google.maps.LatLng(45.4489018, 34.7880390),
                 zoom: 11,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -42,13 +42,12 @@
             this.map.set("disableDoubleClickZoom", true);
 
             google.maps.event.addListener(this.map, 'dblclick', this.map.onMapDblClick);
-
         }
 
         function initialize() {
-            var mm = new myISGmap("maincontent");
+            var mm = new MyISGmap("main");
 
-            $.getJSON("{% url 'maps_get_dots' %}", function (r) {
+            $.getJSON("#{ % url 'maps_get_dots' %}", function (r) {
                 for (var n in r.dots) {
                     var el = r.dots[n];
                     mm.map.SetStaticMarker("/", markers.disabled, el[1], el[2]);
@@ -56,11 +55,8 @@
             });
         }
 
-
         google.maps.event.addDomListener(window, 'load', initialize);
     </script>
-
-
 
 
 {% endblock %}
