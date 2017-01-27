@@ -1,0 +1,54 @@
+{% extends 'base_no_lmenu.html' %}
+{% block main %}
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+    <script type="text/javascript">
+    ymaps.ready(init);
+    var myMap;
+
+    function load_dots(r){
+        for(var n=0; n< r.length; n++){
+            //console.debug([r[n].fields.latitude, r[n].fields.longitude, r[n].fields.title]);
+            var dot = new ymaps.Placemark([r[n].fields.latitude, r[n].fields.longitude],{
+                hintContent: r[n].fields.title, balloonContent: r[n].fields.title});
+            myMap.geoObjects.add(dot);
+        }
+    }
+
+    function add_dot(e){
+        var coords = e.get('coords');
+        $.get('{% url 'mapapp:modal_add_dot' %}', {'coords': coords.join(',')}, function(r){
+            show_Modal('Добавить точку', r, 'primary');
+        });
+        e.preventDefault();
+    }
+
+    function init(){
+
+        var win = $(window);
+        $('#yamap')
+                .css('width', win.width()-5+'px')
+                .css('height', win.height()+'px');
+
+
+        myMap = new ymaps.Map("yamap", {
+            center: [45.449160, 34.735454],
+            zoom: 12
+        });
+
+        $.getJSON("{% url 'mapapp:get_dots' %}", load_dots);
+
+        myMap.events.add('dblclick', add_dot);
+
+    }
+    </script>
+
+
+    <div id="yamap"></div>
+    <style>
+    #yamap{
+        margin-left: -15px;
+        margin-top: -9px;
+    }
+    </style>
+{% endblock %}

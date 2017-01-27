@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block main %}
+
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">Настройки карты</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <h3>Точки топологии</h3>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Longitude</th>
+                <th>latitude</th>
+                <th width="50">Ред.</th>
+                <th width="50">Уд.</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                {% for dot in dots %}
+                    <td>{{ dot.title }}</td>
+                    <td>{{ dot.longitude }}</td>
+                    <td>{{ dot.latitude }}</td>
+                    <td colspan="2" class="btn-group-xs">
+
+                        {% if perms.mapapp.change_dot %}
+                        <a href="{% url 'mapapp:edit_dot' dot.id %}"
+                           class="btn btn-primary">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                        {% endif %}
+
+                        {% if perms.mapapp.delete_dot %}
+                        <a href="{% url 'mapapp:remove_dot' dot.id %}"
+                           class="btn btn-danger">
+                            <span class="glyphicon glyphicon-remove-circle"></span>
+                        </a>
+                        {% endif %}
+
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">Вы ещё не создавали точки топологии. <a href="{% url 'mapapp:add_dot' %}">Создать</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    <a href="{% url 'mapapp:add_dot' %}" class="btn btn-sm btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=dots %}
+{% endblock %}

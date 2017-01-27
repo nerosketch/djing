@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block main %}
+
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'mapapp:options' %}">Настройки карты</a></li>
+        <li class="active">{{ dot.title }}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Точка топологии</h3>
+        </div>
+        <div class="panel-body">
+
+            {% if dot.id %}
+                <form role="form" action="{% url 'mapapp:edit_dot' dot.id %}" method="post">
+            {% else %}
+                <form role="form" action="{% url 'mapapp:add_dot' %}" method="post">
+            {% endif %}
+            {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_title">Название точки топологии</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-edit"></span></span>
+                        {{ form.title }}{{ form.title.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_longitude">Longitude</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+                        {{ form.longitude }}{{ form.longitude.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_latitude">Latitude</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+                        {{ form.latitude }}{{ form.latitude.errors }}
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                    </button>
+                    <button type="reset" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

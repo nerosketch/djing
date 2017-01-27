@@ -1,0 +1,16 @@
+<form action="{% url 'mapapp:modal_add_dot' %}" method="post">{% csrf_token %}
+    <div class="modal-body">
+        <h4>Координаты: {{ coords }}</h4>
+        <div class="form-group">
+            <label for="id_title">Название точки</label>
+            <input type="text" class="form-control" autofocus name="title" id="id_title">
+        </div>
+        <input type="hidden" name="coords" value="{{ coords }}">
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-sm btn-primary">
+            <span class="glyphicon glyphicon-save"></span> Сохранить
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+    </div>
+</form>
