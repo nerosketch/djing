@@ -1,0 +1,40 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% block content %}
+
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Автор</th>
+            <th>Исполнители</th>
+            <th>Комментарий</th>
+            <th>Состояние</th>
+            <th>Тип</th>
+            <th>Дата создания</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for task in tasks %}
+            <tr>
+                <td><a href="{% url 'acc_app:other_profile' task.author.id %}">{{ task.author.get_short_name }}</a></td>
+                <td>
+                    {% for rec in task.recipients.all %}
+                        <a href="{% url 'acc_app:other_profile' rec.id %}">{{ rec.get_short_name }}</a>
+                    {% empty %}
+                        Нет исполнителей
+                    {% endfor %}
+                </td>
+                <td>{{ task.descr|default:'&mdash;' }}</td>
+                <td>{{ task.get_state_display }}</td>
+                <td>{{ task.get_mode_display }}</td>
+                <td>{{ task.time_of_create|date:"D d E Y H:i:s" }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6">Нет задач</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+    {% include 'toolbar_page.html' with pag=tasks %}
+{% endblock %}
