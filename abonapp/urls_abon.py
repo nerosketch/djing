@@ -20,5 +20,7 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='activate_service'),
 
     url(r'^(?P<uid>\d+)/unsubscribe_service(?P<srvid>\d+)$', views.unsubscribe_service,
-        name='unsubscribe_service')
+        name='unsubscribe_service'),
+
+    url(r'^(?P<uid>\d+)/task_log$', views.task_log, name='task_log')
 ]

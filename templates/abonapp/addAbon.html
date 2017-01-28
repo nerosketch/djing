@@ -33,14 +33,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="ip">IP Адрес</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-ice-lolly"></span></span>
-                        {{ form.ip_address }}{{ form.ip_address.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="telephone">Телефон</label>
 
                     <div class="input-group">
@@ -57,13 +49,28 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="address">Адрес проживания</label>
+                    <label for="id_description">Комментарий</label>
+
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
+                    {{ form.description }}{{ form.description.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="id_street">Улица</label>
 
                     <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-map-marker"></span></span>
-                        {{ form.address }}
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-road"></span></span>
+                        {{ form.street }}{{ form.street.errors }}
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="id_house">Дом/Квартира</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-home"></span></span>
+                        {{ form.house }}{{ form.house.errors }}
+                    </div>
+                </div>
+
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> Сохранить

@@ -150,12 +150,20 @@ class AbonTariff(models.Model):
         )
 
 
+class AbonStreets(models.Model):
+    name = models.CharField(max_length=64)
+    group = models.ForeignKey(AbonGroup)
+
+
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
     ballance = models.FloatField(default=0.0, validators=[DecimalValidator])
     ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.CharField(max_length=256)
+    #TODO: надо ж пароль для абонента создавать
+    description = models.TextField(null=True, blank=True)
+    street = models.ForeignKey(AbonStreets, on_delete=models.SET_NULL, null=True, blank=True)
+    house = models.CharField(max_length=12, null=True, blank=True)
 
     _act_tar_cache = None
 
@@ -172,23 +180,6 @@ class Abon(UserProfile):
         else:
             self._act_tar_cache = None
             return
-
-    def save_form(self, abonform_instance):
-        try:
-            cd = abonform_instance.cleaned_data
-            tel = cd['telephone']
-            self.username = cd['username'] or tel[1:]
-            self.fio = cd['fio']
-            self.telephone = tel
-            self.is_admin = False
-            self.ip_address = get_object_or_404(IpPoolItem, ip=cd['ip_address'])
-            self.is_active = True
-            self.group = cd['group']
-            self.address = cd['address']
-        except Http404:
-            raise LogicError('Введённый IP адрес не добавлен в ip pool')
-        except MultipleObjectsReturned:
-            raise LogicError('Введённый IP адрес не определён')
 
     class Meta:
         db_table = 'abonent'
@@ -359,6 +350,8 @@ def abontariff_post_save(sender, instance, **kwargs):
     # Тут или подключение абону услуги, или изменение приоритета
     if not kwargs['created']:
         # если изменение приоритета то не говорим об этом NAS'у
+        return
+    if instance.abon.ip_address is None:
         return
     agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
     agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)

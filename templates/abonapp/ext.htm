@@ -13,26 +13,46 @@
     <div class="page-header">
         <h2>{{ abon.fio|default:"Имя абонента" }}
             <small>Балланс <i class="glyphicon glyphicon-ruble"></i>
-                <b>{{ ballance }}</b> руб
+                <b>{{ abon.ballance }}</b> руб
             </small>
         </h2>
     </div>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#livetab_content" data-tab-remote="{% url 'abonapp:abon_home' abon_group.id abon.id %}"
-                              role="tab" data-toggle="tab">Информация абонента</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abonapp:abon_services' abon_group.id abon.id %}" role="tab"
-               data-toggle="tab">Услуги</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abonapp:abon_amount' abon_group.id abon.id %}" role="tab"
-               data-toggle="tab">Пополнить счёт</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abonapp:abon_debts' abon_group.id abon.id %}" role="tab"
-               data-toggle="tab">Долги</a></li>
-        <li><a href="#livetab_content" data-tab-remote="{% url 'abonapp:abon_phistory' abon_group.id abon.id %}" role="tab"
-               data-toggle="tab">История платежей</a></li>
+
+        {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
+        <li{% if abon_home == request.path %} class="active"{% endif %}>
+            <a href="{{ abon_home }}">Информация абонента</a>
+        </li>
+
+        {% url 'abonapp:abon_services' abon_group.id abon.id as abserv %}
+        <li{% if abserv == request.path %} class="active"{% endif %}>
+            <a href="{{ abserv }}">Услуги</a>
+        </li>
+
+        {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
+        <li{% if abamount == request.path %} class="active"{% endif %}>
+            <a href="{{ abamount }}">Пополнить счёт</a>
+        </li>
+
+        {% url 'abonapp:abon_debts' abon_group.id abon.id as abondebts %}
+        <li{% if abondebts == request.path %} class="active"{% endif %}>
+            <a href="{{ abondebts }}">Долги</a>
+        </li>
+
+        {% url 'abonapp:abon_phistory' abon_group.id abon.id as abphist %}
+        <li{% if abphist == request.path %} class="active"{% endif %}>
+            <a href="{{ abphist }}">История платежей</a>
+        </li>
+
+        {% url 'abonapp:task_log' abon_group.id abon.id as abtasklog %}
+        <li{% if abtasklog == request.path %} class="active"{% endif %}>
+            <a href="{{ abtasklog }}">История задач</a>
+        </li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane active" id="livetab_content">
+        <div class="tab-pane active">
             {% block content %}{% endblock %}
         </div>
     </div>

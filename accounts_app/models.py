@@ -53,7 +53,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         validators=[RegexValidator('^\+[7,8,9,3]\d{10,11}$')]
     )
     avatar = models.ForeignKey(Photo, null=True, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(default='admin@example.ru')
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['telephone']

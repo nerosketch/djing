@@ -11,7 +11,6 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 
-from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from agent import NasFailedResult, AbonStruct, Transmitter, TariffStruct, NasNetworkError
 from . import forms
@@ -102,12 +101,9 @@ def addabon(request, gid):
     try:
         group = get_object_or_404(models.AbonGroup, id=gid)
         if request.method == 'POST':
-            frm = forms.AbonForm(request.POST)
+            frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
-                prf = models.Abon()
-                prf.group = group
-                prf.save_form(frm)
-                prf.save()
+                frm.save()
                 return redirect('abonapp:people_list', group.id)
             else:
                 messages.error(request, 'Некоторые поля заполнены не правильно, проверте ещё раз')
@@ -123,8 +119,9 @@ def addabon(request, gid):
 
     if not frm:
         frm = forms.AbonForm(initial={
-            'ip_address': IpPoolItem.objects.get_free_ip(),
-            'group': group
+            'group': group,
+            'address': 'Адрес',
+            'is_active': False
         })
 
     return render(request, 'abonapp/addAbon.html', {
@@ -231,44 +228,27 @@ def abon_services(request, gid, uid):
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
-    ballance = abon.ballance
     frm = None
-    init_frm_dat = {
-        'username': abon.username,
-        'fio': abon.fio,
-        'ip_address': abon.ip_address or 'Не назначен',
-        'telephone': abon.telephone,
-        'group': abon.group,
-        'address': abon.address,
-        'is_active': abon.is_active
-    }
 
     try:
         if request.method == 'POST':
-            frm = forms.AbonForm(request.POST)
+            frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                cd = frm.cleaned_data
-                abon.username = cd['username']
-                abon.fio = cd['fio']
-                abon.ip_address = get_object_or_404(IpPoolItem, ip=cd['ip_address'])
-                abon.telephone = cd['telephone']
-                abon.group = cd['group']
-                abon.address = cd['address']
-                abon.is_active = 1 if cd['is_active'] else 0
                 abon.save()
+                messages.success(request, 'Абонент успешно сохранён')
 
                 # return redirect('abonapp:abon_home', gid, uid)
             else:
                 messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
         else:
-            frm = forms.AbonForm(initial=init_frm_dat)
+            frm = forms.AbonForm(instance=abon)
     except IntegrityError as e:
         messages.error(request, 'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e)
-        frm = forms.AbonForm(initial=init_frm_dat)
+        frm = forms.AbonForm(instance=abon)
 
     except Http404:
         messages.error(request, 'Ip адрес не найден в списке IP адресов')
-        frm = forms.AbonForm(initial=init_frm_dat)
+        frm = forms.AbonForm(instance=abon)
 
     except NasFailedResult as e:
         messages.error(request, e)
@@ -276,9 +256,8 @@ def abonhome(request, gid, uid):
         messages.error(request, e)
 
     return render(request, 'abonapp/editAbon.html', {
-        'form': frm or forms.AbonForm(initial=init_frm_dat),
+        'form': frm or forms.AbonForm(instance=abon),
         'abon': abon,
-        'ballance': ballance,
         'abon_group': abon_group
     })
 
@@ -518,6 +497,20 @@ def update_nas(request, group_id):
     return redirect('abonapp:people_list', gid=group_id)
 
 
+@login_required
+@mydefs.only_admins
+def task_log(request, gid, uid):
+    from taskapp.models import Task
+    abon = get_object_or_404(models.Abon, id=uid)
+    tasks = Task.objects.filter(abon=abon)
+    return render(request, 'abonapp/task_log.html', {
+        'tasks': tasks,
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon': abon
+    })
+
+
+
 # API's
 
 def abons(request):
@@ -544,6 +537,7 @@ def abons(request):
 
 def search_abon(request):
     word = request.GET.get('s')
+    #FIXME: всё равно чувствительный к регистру, надо не чувствительный
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id':usr.id, 'name':usr.username, 'fio':usr.fio} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))

@@ -89,9 +89,16 @@ td.btn-group {
     vertical-align: middle;
 }
 
-.modal-header.warning {
-    background-color: #d2322d;
+
+.modal-header{
     border-radius: 4px 4px 0 0;
+}
+.modal-header.warning {background-color: #d2322d;}
+.modal-header.success {background-color: #6ad245;}
+.modal-header.primary {background-color: #789cbb;}
+
+.page-header {
+    margin-top: 19px;
 }
 
 .tab-pane {
@@ -119,15 +126,6 @@ td.btn-group {
 }
 
 /*---------Switch----------*/
-.switch_ports {
-    border: 2px solid #636363;
-    border-radius: 7px;
-    box-shadow: 3px 3px 8px #2B2B2B;
-}
-
-.switch_ports h4 {
-    margin: 10px 0 3px 10px;
-}
 
 .port {
     display: inline-block;
@@ -187,7 +185,7 @@ a.port-img{
 
 
 /*
- * Off Canvas
+ * Off Canvas. На маленьком экране появляется кнопка чтоб сдвинуть экран
  * --------------------------------------------------
  */
 @media screen and (max-width: 767px) {
