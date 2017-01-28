@@ -1,20 +1,13 @@
-function errShow(errContent) {
-	//window.history.back();
-
-	$('#modContent').html('<div class="modal-header warning">\
-	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\
-	<h4 class="modal-title" id="myModalLabel"><span class="glyphicon glyphicon-warning-sign"></span>\
-		Ошибка\
-</h4>\
-</div>\
-<div class="modal-body">' +
-		errContent
-		+ '</div>\
-<div class="modal-footer">\
-	<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>\
-</div>');
+function show_Modal(title, content, type_class){
+    $('#modContent').html('<div class="modal-header '+type_class+'">\
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\
+<h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>'+title+'</h4>\
+</div>'+content);
 	$('#modFrm').modal();
+}
 
+function errShow(errContent) {
+    show_Modal('Ошибка', '<div class="modal-body">'+errContent+'</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button></div>', 'warning');
 }
 
 $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
