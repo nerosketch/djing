@@ -1,0 +1,11 @@
+<h4>{{ dot.title }}</h4>
+<div class="list-group">
+    {% for dev in devs %}
+        <a class="list-group-item" href="{% url 'devapp:view' dev.id %}" target="_blank">
+            {{ dev.comment }}
+            <span class="badge">14</span>
+        </a>
+    {% empty %}
+        <li class="list-group-item">нет привязанных устройств</li>
+    {% endfor %}
+</div>
