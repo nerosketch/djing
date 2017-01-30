@@ -151,6 +151,9 @@ class AbonStreets(models.Model):
     name = models.CharField(max_length=64)
     group = models.ForeignKey(AbonGroup)
 
+    def __str__(self):
+        return self.name
+
 
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
