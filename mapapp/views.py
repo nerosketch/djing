@@ -8,6 +8,7 @@ from django.core.serializers import serialize
 from .models import Dot
 from .forms import DotForm
 from mydefs import pag_mn
+from devapp.models import Device
 
 
 @login_required
@@ -96,3 +97,18 @@ def modal_add_dot(request):
     return render_to_text('maps/modal_add_dot.html', {
         'coords': coords
     }, request=request)
+
+
+@login_required
+def dot_tooltip(request):
+    d = request.GET.get('d')
+    devs, dot = None, None
+    try:
+        dot = Dot.objects.get(id=d)
+        devs = Device.objects.filter(map_dot=dot)
+    except Dot.DoesNotExist:
+        pass
+    return render_to_text('maps/map_tooltip.html', {
+        'devs': devs,
+        'dot': dot
+    })
