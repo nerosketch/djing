@@ -46,7 +46,7 @@ def dev(request, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
-            return redirect('devapp:view', did=devid)
+            messages.success(request, 'Инфа о точке сохранена')
         else:
             messages.error(request, 'Ошибка в данных, проверте их ещё раз')
     else:
