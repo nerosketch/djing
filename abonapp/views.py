@@ -240,9 +240,11 @@ def abonhome(request, gid, uid):
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
                 ip_str = request.POST.get('ip')
-                ip = IpPoolItem.objects.get(ip=ip_str)
-                print('Ip:', ip)
-                abon.ip_address = ip
+                if ip_str:
+                    ip = IpPoolItem.objects.get(ip=ip_str)
+                    abon.ip_address = ip
+                else:
+                    abon.ip_address = None
                 frm.save()
                 messages.success(request, 'Абонент успешно сохранён')
             else:
