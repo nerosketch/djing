@@ -15,6 +15,7 @@ from tariff_app.models import Tariff
 from agent import NasFailedResult, AbonStruct, Transmitter, TariffStruct, NasNetworkError
 from . import forms
 from . import models
+from ip_pool.models import IpPoolItem
 import mydefs
 
 
@@ -85,6 +86,7 @@ def delgroup(request):
     try:
         agd = mydefs.safe_int(request.GET.get('id'))
         get_object_or_404(models.AbonGroup, id=agd).delete()
+        messages.success(request, 'Группа успешно удалена')
         return mydefs.res_success(request, 'abonapp:group_list')
     except NasFailedResult as e:
         messages.error(request, e)
@@ -104,6 +106,7 @@ def addabon(request, gid):
             frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
                 frm.save()
+                messages.success(request, 'Абонент создан')
                 return redirect('abonapp:people_list', group.id)
             else:
                 messages.error(request, 'Некоторые поля заполнены не правильно, проверте ещё раз')
@@ -135,7 +138,6 @@ def addabon(request, gid):
 def delentity(request):
     typ = request.GET.get('t')
     uid = request.GET.get('id')
-
     try:
         if typ == 'a':
             if not request.user.has_perm('abonapp.delete_abon'):
@@ -233,15 +235,16 @@ def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
     frm = None
-
     try:
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                abon.save()
+                ip_str = request.POST.get('ip')
+                ip = IpPoolItem.objects.get(ip=ip_str)
+                print('Ip:', ip)
+                abon.ip_address = ip
+                frm.save()
                 messages.success(request, 'Абонент успешно сохранён')
-
-                # return redirect('abonapp:abon_home', gid, uid)
             else:
                 messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
         else:
@@ -258,11 +261,14 @@ def abonhome(request, gid, uid):
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
+    except IpPoolItem.DoesNotExist:
+        messages.error(request, 'Указанный вами ip отсутствует в ip pool')
 
     return render(request, 'abonapp/editAbon.html', {
         'form': frm or forms.AbonForm(instance=abon),
         'abon': abon,
-        'abon_group': abon_group
+        'abon_group': abon_group,
+        'ip': abon.ip_address
     })
 
 
@@ -301,6 +307,7 @@ def add_invoice(request, gid, uid):
 
             newinv.author = request.user
             newinv.save()
+            messages.success(request, 'Необходимый платёж создан')
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
     except NasNetworkError as e:
@@ -327,6 +334,7 @@ def buy_tariff(request, gid, uid):
                 cd = frm.cleaned_data
                 abon.buy_tariff(cd['tariff'], request.user)
                 abon.save()
+                messages.success(request, 'Тариф успешно выбран')
                 return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
             else:
                 messages.error(request, 'Что-то не так при покупке услуги, проверьте и попробуйте ещё')
@@ -415,9 +423,10 @@ def activate_service(request, gid, uid, srvid):
     try:
         if request.method == 'POST':
             if request.POST.get('finish_confirm') != 'yes':
-                return HttpResponse('<h1>Request not confirmed</h1>')
+                return HttpResponse('<h1>Запрос не подтверждён</h1>')
 
             abtar.activate(request.user)
+            messages.success(request, 'Услуга активирована')
             return redirect('abonapp:abon_home', gid, uid)
 
     except NasFailedResult as e:
@@ -440,6 +449,7 @@ def activate_service(request, gid, uid, srvid):
 def unsubscribe_service(request, gid, uid, srvid):
     try:
         get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
+        messages.success(request, 'Абонент отвязан от услуги')
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:
