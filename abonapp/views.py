@@ -143,16 +143,20 @@ def delentity(request):
             abon = get_object_or_404(models.Abon, id=uid)
             gid = abon.group.id
             abon.delete()
-            return mydefs.res_success(request, resolve_url('abonapp:people_list', gid))
+            messages.success(request, 'Абонент успешно удалён')
+            return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
         elif typ == 'g':
             if not request.user.has_perm('abonapp.delete_abongroup'):
                 raise PermissionDenied
             get_object_or_404(models.AbonGroup, id=uid).delete()
-        return mydefs.res_success(request, 'abonapp:group_list')
+            messages.success(request, 'Группа успешно удалёна')
+            return mydefs.res_success(request, 'abonapp:group_list')
+        else:
+            messages.warning(request, 'Не понятно что удалять')
     except NasNetworkError as e:
         messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, e)
+        messages.error(request, "NAS сказал: '%s'" % e)
     return redirect('abonapp:group_list')
 
 

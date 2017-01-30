@@ -317,33 +317,39 @@ def abon_post_save(sender, instance, **kwargs):
     else:
         return
     inst_tariff = instance.active_tariff()
-    if inst_tariff:
-        agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
-    else:
-        agent_trf = TariffStruct()
-    agent_abon = AbonStruct(instance.id, user_ip, agent_trf)
-    tm = Transmitter()
-    if kwargs['created']:
-        # создаём абонента
-        tm.add_user(agent_abon)
-    else:
-        # обновляем абонента на NAS
-        try:
-            tm.update_user(agent_abon)
-        except NasFailedResult:
-            tm.add_user(agent_abon)
-        # если не активен то приостановим услугу
-        if instance.is_active:
-            tm.start_user(agent_abon)
+    try:
+        if inst_tariff:
+            agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
         else:
-            tm.pause_user(agent_abon)
+            agent_trf = TariffStruct()
+        agent_abon = AbonStruct(instance.id, user_ip, agent_trf)
+        tm = Transmitter()
+        if kwargs['created']:
+            # создаём абонента
+            tm.add_user(agent_abon)
+        else:
+            # обновляем абонента на NAS
+            try:
+                tm.update_user(agent_abon)
+            except NasFailedResult:
+                tm.add_user(agent_abon)
+            # если не активен то приостановим услугу
+            if instance.is_active:
+                tm.start_user(agent_abon)
+            else:
+                tm.pause_user(agent_abon)
+    except NasFailedResult:
+        return True
 
 
 def abon_del_signal(sender, instance, **kwargs):
-    # подключаемся к NAS'у
-    tm = Transmitter()
-    # удаляем абонента на NAS
-    tm.remove_user(instance.id)
+    try:
+        # подключаемся к NAS'у
+        tm = Transmitter()
+        # удаляем абонента на NAS
+        tm.remove_user(instance.id)
+    except NasFailedResult:
+        return True
 
 
 def abontariff_post_save(sender, instance, **kwargs):
@@ -353,21 +359,30 @@ def abontariff_post_save(sender, instance, **kwargs):
         return
     if instance.abon.ip_address is None:
         return
-    agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
-    agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
-    tm = Transmitter()
-    tm.update_user(agent_abon)
-    tm.start_user(agent_abon)
+    try:
+        agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
+        agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
+        tm = Transmitter()
+        tm.update_user(agent_abon)
+        tm.start_user(agent_abon)
+    except NasFailedResult:
+        return True
 
 
 def abontariff_del_signal(sender, instance, **kwargs):
     if not instance.is_started():
         # если удаляем не активную услугу то говорить об этом NAS'у не обязательно
         return
-    agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
-    agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
-    tm = Transmitter()
-    tm.pause_user(agent_abon)
+    if instance.abon.ip_address is None:
+        # если у абонента нет ip то и создавать правило не на кого
+        return
+    try:
+        agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
+        agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
+        tm = Transmitter()
+        tm.pause_user(agent_abon)
+    except NasFailedResult:
+        return True
 
 
 models.signals.post_save.connect(abon_post_save, sender=Abon)
