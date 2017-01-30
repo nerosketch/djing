@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/bin/env python2
 # coding=utf-8
 
 import os
@@ -9,13 +9,13 @@ from json import dumps
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 
-    db = MySQLdb.connect(host="localhost", user="root", passwd="ps", db="nodeny", charset='utf8')
+    db = MySQLdb.connect(host="localhost", user="root", passwd="5jf3k48", db="nodeny", charset='utf8')
     cursor = db.cursor()
 
     result = dict()
 
     # выбираем абонентов
-    sql = r"SELECT users.name, users.fio, data0._adr_telefon, dictionary.v, data0._adr_house, data0._birthday, users.grp FROM users LEFT JOIN data0 ON (data0.uid=users.id) LEFT JOIN dictionary ON (dictionary.k=data0._adr_street AND dictionary.type='street')"
+    sql = r"SELECT users.name, users.fio, data0._adr_telefon, dictionary.v, data0._adr_house, data0._birthday, users.grp FROM users LEFT JOIN data0 ON (data0.uid=users.id) LEFT JOIN dictionary ON (dictionary.k=data0._adr_street AND dictionary.type='street') WHERE users.grp=23"
     cursor.execute(sql)
     result['users'] = list()
     res = cursor.fetchone()
@@ -24,7 +24,7 @@ if __name__ == "__main__":
             'name': res[0],
             'fio': res[1],
             'tel': res[2],
-            'addr': "ул. %s д. %s" % (res[3], res[4]),
+            'addr': u"ул. %s д. %s" % (res[3], res[4]),
             'birth': int(res[5]),
             'grp': int(res[6])
         })
@@ -43,6 +43,6 @@ if __name__ == "__main__":
         res = cursor.fetchone()
 
     db.close()
-    f = open('../../dump.json', 'w')
+    f = open('dump_chkal.json', 'w')
     f.write(dumps(result, ensure_ascii=False).encode('utf8'))
     f.close()
