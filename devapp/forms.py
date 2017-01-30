@@ -14,20 +14,19 @@ class DeviceForm(forms.ModelForm):
                 'pattern': ip_addr_regex,
                 'placeholder': '192.168.0.100',
                 'required': True,
-                'class': 'form-control',
-                'id': 'ip_address'
+                'class': 'form-control'
             }),
             'comment': forms.Textarea(attrs={
                 'required': True,
-                'class': 'form-control',
-                'id': 'comment'
+                'class': 'form-control'
             }),
             'devtype': forms.Select(attrs={
-                'class': 'form-control',
-                'id': 'devtype'
+                'class': 'form-control'
             }),
             'man_passw': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'id': 'man_passw'
+                'class': 'form-control'
+            }),
+            'map_dot': forms.Select(attrs={
+                'class': 'form-control'
             })
         }
