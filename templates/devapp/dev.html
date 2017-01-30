@@ -15,7 +15,7 @@
             {% endif %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
-                    <label for="ip_address">Ip адрес</label>
+                    <label for="id_ip_address">Ip адрес</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="comment">Комментарий</label>
+                    <label for="id_comment">Комментарий</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="devtype">Тип устройства</label>
+                    <label for="id_devtype">Тип устройства</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
@@ -42,11 +42,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="man_passw">Пароль SNMP</label>
+                    <label for="id_man_passw">Пароль SNMP</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                         {{ form.man_passw }}{{ form.man_passw.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_map_dot">Точка топологии</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-map-marker"></span></span>
+                        {{ form.map_dot }}{{ form.devtype.errors }}
                     </div>
                 </div>
 
