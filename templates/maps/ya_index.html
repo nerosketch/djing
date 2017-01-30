@@ -6,11 +6,27 @@
     ymaps.ready(init);
     var myMap;
 
+    function placemark_click(e){
+        var plcmrk = e.get('target');
+        plcmrk.properties.set('balloonContent', "Получаю инфу..");
+        var html = $.ajax({
+          url: "{% url 'mapapp:dot_tooltip' %}",
+          data: {'d': plcmrk.properties._data.dot_id},
+          async: false
+        }).responseText;
+        plcmrk.properties.set('balloonContent', html);
+    }
+
     function load_dots(r){
         for(var n=0; n< r.length; n++){
-            //console.debug([r[n].fields.latitude, r[n].fields.longitude, r[n].fields.title]);
-            var dot = new ymaps.Placemark([r[n].fields.latitude, r[n].fields.longitude],{
-                hintContent: r[n].fields.title, balloonContent: r[n].fields.title});
+            var dot = new ymaps.Placemark(
+                    [r[n].fields.latitude, r[n].fields.longitude],
+                    {
+                        hintContent: r[n].fields.title,
+                        dot_id: r[n].pk
+                    }
+            );
+            dot.events.add('click', placemark_click);
             myMap.geoObjects.add(dot);
         }
     }
