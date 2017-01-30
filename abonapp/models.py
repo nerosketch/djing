@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.core.exceptions import MultipleObjectsReturned
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
 from django.db import models
