@@ -4,6 +4,7 @@ from django.db import models
 from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
 from .dev_types import DEVICE_TYPES
+from mapapp.models import Dot
 
 
 class _DeviceChoicesAdapter(MyChoicesAdapter):
@@ -16,7 +17,7 @@ class Device(models.Model):
     comment = models.CharField(max_length=256)
     devtype = models.CharField(max_length=2, default=DEVICE_TYPES[0][0], choices=_DeviceChoicesAdapter())
     man_passw = models.CharField(max_length=16, null=True, blank=True)
-    # map_dot = models.ForeignKey()
+    map_dot = models.ForeignKey(Dot, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'dev'
