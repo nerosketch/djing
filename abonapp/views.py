@@ -275,16 +275,9 @@ def abonhome(request, gid, uid):
 
 
 def terminal_pay(request):
-    username = request.GET.get('username')
-    amount = mydefs.safe_float(request.GET.get('amount'))
-
-    kernel_user = get_object_or_404(get_user_model(), username='kernel')
-    abon = get_object_or_404(models.Abon, username=username)
-
-    abon.add_ballance(kernel_user, amount)
-
-    abon.save(update_fields=['ballance'])
-    return HttpResponse('ok')
+    from .pay_systems import allpay
+    ret_text = allpay(request)
+    return HttpResponse(ret_text)
 
 
 @login_required
