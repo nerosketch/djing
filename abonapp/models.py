@@ -147,7 +147,7 @@ class AbonTariff(models.Model):
         )
 
 
-class AbonStreets(models.Model):
+class AbonStreet(models.Model):
     name = models.CharField(max_length=64)
     group = models.ForeignKey(AbonGroup)
 
@@ -162,7 +162,7 @@ class Abon(UserProfile):
     ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
     #TODO: надо ж пароль для абонента создавать
     description = models.TextField(null=True, blank=True)
-    street = models.ForeignKey(AbonStreets, on_delete=models.SET_NULL, null=True, blank=True)
+    street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
 
     _act_tar_cache = None
@@ -309,6 +309,35 @@ class InvoiceForPayment(models.Model):
     class Meta:
         ordering = ('date_create',)
         db_table = 'abonent_inv_pay'
+
+
+# Log for pay system "AllTime"
+class AllTimePayLog(models.Model):
+    pay_id = models.CharField(max_length=36, unique=True, primary_key=True)
+    date_add = models.DateTimeField(auto_now_add=True)
+    summ = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return self.pay_id
+
+    class Meta:
+        db_table = 'all_time_pay_log'
+        ordering = ('date_add',)
+
+
+# log for all terminals
+class AllPayLog(models.Model):
+    pay_id = models.CharField(max_length=64, primary_key=True)
+    date_action = models.DateTimeField(auto_now_add=True)
+    summ = models.FloatField(default=0.0)
+    pay_system_name = models.CharField(max_length=16)
+
+    def __str__(self):
+        return self.pay_system_name
+
+    class Meta:
+        db_table = 'all_pay_log'
+        ordering = ('date_action',)
 
 
 def abon_post_save(sender, instance, **kwargs):
