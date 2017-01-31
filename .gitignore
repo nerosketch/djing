@@ -1,6 +1,6 @@
 *.pyc
 *.db
-*/*/*.txt
+*.txt
 media/*
 media/min/*
 ~*/migrations/00*.py
