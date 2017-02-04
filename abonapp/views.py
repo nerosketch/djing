@@ -545,7 +545,6 @@ def abons(request):
 
 def search_abon(request):
     word = request.GET.get('s')
-    #FIXME: всё равно чувствительный к регистру, надо не чувствительный
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id':usr.id, 'name':usr.username, 'fio':usr.fio} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))
