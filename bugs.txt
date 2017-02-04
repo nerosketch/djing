@@ -1,3 +1,4 @@
 - (GUI) Иконки возле кнопок не настроены, натыканы случайно
 - В abonapp.complete_service нельзя досрочно завершить услугу пока нет связи с NAS'ом
 - Не меняет приоритеты заказанных услуг (UNIQUE constraint failed)
+- Надо указывать в /usr/lib/python3.5/site-packages/django/contrib/auth/decorators.py raise_exception=True
