@@ -16,14 +16,7 @@ from .handle import TaskException
 @only_admins
 def home(request):
     tasks = Task.objects.filter(recipients=request.user, state='S')  # Новые задачи
-
-    # filter
-    # dir, field = order_helper(request)
-    #if field:
-    #    tasks = tasks.order_by(field)
-
     tasks = pag_mn(request, tasks)
-
     return render(request, 'taskapp/tasklist.html', {
         'tasks': tasks
     })
