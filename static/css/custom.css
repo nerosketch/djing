@@ -88,6 +88,10 @@ td.btn-group {
 .table > tbody > tr > td {
     vertical-align: middle;
 }
+.borderbot>tbody>tr>td {
+    border-top: 0;
+    border-bottom: 1px solid #ddd;
+}
 
 
 .modal-header{
