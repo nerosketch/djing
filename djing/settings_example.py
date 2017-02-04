@@ -65,7 +65,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'global_context_processors.context_processor_client_ipaddress',
                 'taskapp.context_proc.get_active_tasks_count',
                 'global_context_processors.context_processor_additional_profile'
             ],
