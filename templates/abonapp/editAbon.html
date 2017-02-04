@@ -1,113 +1,131 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
 {% block content %}
 
-
     <div class="row">
-        <div class="col-sm-4">
-            <form role="form" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.id abon.id %}" method="post"> {% csrf_token %}
-
-                <div class="form-group-sm">
-                    <label for="id_group" class="col-sm-2 control-label">Группа</label>
-                    <div class="col-sm-10">
-                        {{ form.group }}{{ form.group.errors }}
-                    </div>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Изменение абонента</h3>
                 </div>
+                <div class="panel-body">
+                    <form role="form" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.id abon.id %}" method="post"> {% csrf_token %}
 
-                <div class="form-group-sm">
-                    <label for="id_is_active" class="col-sm-2 control-label">Активен</label>
-                    <div class="col-sm-10">
-                        {{ form.is_active }}
-                    </div>
+                        <div class="form-group-sm">
+                            <label for="id_group" class="col-sm-2 control-label">Группа</label>
+                            <div class="col-sm-10">
+                                {{ form.group }}{{ form.group.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_is_active" class="col-sm-2 control-label">Активен</label>
+                            <div class="col-sm-10">
+                                {{ form.is_active }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_username" class="col-sm-2 control-label">Логин</label>
+                            <div class="col-sm-10">
+                                {{ form.username }}{{ form.username.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_fio" class="col-sm-2 control-label">ФИО</label>
+                            <div class="col-sm-10">
+                                {{ form.fio }}{{ form.fio.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_telephone" class="col-sm-2 control-label">Телефон</label>
+                            <div class="col-sm-10">
+                                {{ form.telephone }}{{ form.telephone.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_street" class="col-sm-2 control-label">Улица</label>
+
+                            <div class="col-sm-10">
+                                {{ form.street }}{{ form.street.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_house" class="col-sm-2 control-label">Дом</label>
+
+                            <div class="col-sm-10">
+                                {{ form.house }}{{ form.house.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_ip" class="col-sm-2 control-label">IP Адрес</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_description" class="col-sm-2 control-label">Комментарий</label>
+                            <div class="col-sm-10">
+                                {{ form.description }}{{ form.description.errors }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
-
-                <div class="form-group-sm">
-                    <label for="id_username" class="col-sm-2 control-label">Логин</label>
-                    <div class="col-sm-10">
-                        {{ form.username }}{{ form.username.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_fio" class="col-sm-2 control-label">ФИО</label>
-                    <div class="col-sm-10">
-                        {{ form.fio }}{{ form.fio.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_telephone" class="col-sm-2 control-label">Телефон</label>
-                    <div class="col-sm-10">
-                        {{ form.telephone }}{{ form.telephone.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_street" class="col-sm-2 control-label">Улица</label>
-
-                    <div class="col-sm-10">
-                        {{ form.street }}{{ form.street.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_house" class="col-sm-2 control-label">Дом</label>
-
-                    <div class="col-sm-10">
-                        {{ form.house }}{{ form.house.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_ip" class="col-sm-2 control-label">IP Адрес</label>
-                    <div class="col-sm-10">
-                        <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
-                    </div>
-                </div>
-
-                <div class="form-group-sm">
-                    <label for="id_description">Комментарий</label>
-                    <div class="input-group">
-                        {{ form.description }}{{ form.description.errors }}
-                    </div>
-                </div>
-
-                <br>
-                <button type="submit" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-save"></span> Сохранить
-                </button>
-            </form>
+            </div>
 
         </div>
-        <div class="col-sm-4">
-            <form role="form" class="form-horizontal" action="" method="get">
-
-                <div class="form-group-sm">
-                    <label for="pasp_num" class="col-sm-4 control-label">Серия пас.</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
-                    </div>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Паспортные данные</h3>
                 </div>
-                <div class="form-group-sm">
-                    <label for="pasp_sr" class="col-sm-4 control-label">Номер пас.</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
-                    </div>
-                </div>
-                <div class="form-group-sm">
-                    <label for="wr" class="col-sm-4 control-label">Кем выдан</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="wr" class="form-control" id="wr"/>
-                    </div>
-                </div>
+                <div class="panel-body">
+                    <form role="form" class="form-horizontal" action="" method="get">
 
-                <br>
-                <button type="submit" class="btn btn-default btn-sm">
-                    <span class="glyphicon glyphicon-save"></span> Сохранить
-                </button>
-            </form>
-        </div>
-        <div class="col-sm-4">
+                        <div class="form-group-sm">
+                            <label for="pasp_num" class="col-sm-3 control-label">Серия пас.</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
+                            </div>
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="pasp_sr" class="col-sm-3 control-label">Номер пас.</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
+                            </div>
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="wr" class="col-sm-3 control-label">Кем выдан</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="wr" class="form-control" id="wr"/>
+                            </div>
+                        </div>
 
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
