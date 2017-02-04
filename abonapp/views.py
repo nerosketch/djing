@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import dumps
 from django.core.exceptions import PermissionDenied
-
 from django.db import IntegrityError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -229,13 +228,15 @@ def abon_services(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.change_abon')
+@mydefs.only_admins
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
     frm = None
     try:
         if request.method == 'POST':
+            if not request.user.has_perm('abonapp.change_abon'):
+                raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
                 ip_str = request.POST.get('ip')
@@ -265,12 +266,19 @@ def abonhome(request, gid, uid):
     except IpPoolItem.DoesNotExist:
         messages.error(request, 'Указанный вами ip отсутствует в ip pool')
 
-    return render(request, 'abonapp/editAbon.html', {
-        'form': frm or forms.AbonForm(instance=abon),
-        'abon': abon,
-        'abon_group': abon_group,
-        'ip': abon.ip_address
-    })
+    if request.user.has_perm('abonapp.change_abon'):
+        return render(request, 'abonapp/editAbon.html', {
+            'form': frm or forms.AbonForm(instance=abon),
+            'abon': abon,
+            'abon_group': abon_group,
+            'ip': abon.ip_address
+        })
+    else:
+        return render(request, 'abonapp/viewAbon.html', {
+            'abon': abon,
+            'abon_group': abon_group,
+            'ip': abon.ip_address
+        })
 
 
 def terminal_pay(request):
