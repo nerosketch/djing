@@ -136,10 +136,13 @@ class MikrotikTransmitter(BaseTransmitter):
         ip = ip or settings.NAS_IP
         if not ping(ip):
             raise NasNetworkError('NAS %s не пингуется' % ip)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((ip, port or settings.NAS_PORT))
-        self.ar = ApiRos(s)
-        self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((ip, port or settings.NAS_PORT))
+            self.ar = ApiRos(s)
+            self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
+        except ConnectionRefusedError:
+            raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
 
     def _exec_cmd(self, cmd):
         assert isinstance(cmd, list)
