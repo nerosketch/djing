@@ -20,12 +20,10 @@
 
     <ul class="nav nav-tabs">
 
-        {% if perms.abonapp.change_abon %}
-            {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
-            <li{% if abon_home == request.path %} class="active"{% endif %}>
-                <a href="{{ abon_home }}">Информация абонента</a>
-            </li>
-        {% endif %}
+        {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
+        <li{% if abon_home == request.path %} class="active"{% endif %}>
+            <a href="{{ abon_home }}">Информация абонента</a>
+        </li>
 
         {% url 'abonapp:abon_services' abon_group.id abon.id as abserv %}
         <li{% if abserv == request.path %} class="active"{% endif %}>
