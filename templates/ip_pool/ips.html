@@ -34,7 +34,7 @@
                             <button class="btn btn-sm btn-danger disabled">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </button>
-                        {% else %}
+                        {% elif perms.ip_pool.delete_ippoolitem %}
                             <a href="{% url 'ip_pool:del_ip' %}?id={{ pi.id }}" class="btn btn-sm btn-danger">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </a>
@@ -43,8 +43,11 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="4">Нет ни одного пула зарезервированных ip адресов. <a
-                            href="{% url 'ip_pool:add' %}">Создать</a></td>
+                    <td colspan="4">Нет ни одного пула зарезервированных ip адресов.
+                        {% if perms.ip_pool.add_ippoolitem %}
+                            <a href="{% url 'ip_pool:add' %}">Создать</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

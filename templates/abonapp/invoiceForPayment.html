@@ -40,15 +40,17 @@
             </tr>
         {% endfor %}
         </tbody>
-        <tfoot>
-        <tr>
-            <th colspan="7">
-                <a href="{% url 'abonapp:add_invoice' abon_group.id abon.id %}" class="btn btn-success btn-sm">
-                    <span class="glyphicon glyphicon-plus"></span> Добавить
-                </a>
-            </th>
-        </tr>
-        </tfoot>
+        {% if perms.abonapp.add_invoiceforpayment %}
+            <tfoot>
+            <tr>
+                <th colspan="7">
+                    <a href="{% url 'abonapp:add_invoice' abon_group.id abon.id %}" class="btn btn-success btn-sm">
+                        <span class="glyphicon glyphicon-plus"></span> Добавить
+                    </a>
+                </th>
+            </tr>
+            </tfoot>
+        {% endif %}
     </table>
 
 {% endblock %}

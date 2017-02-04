@@ -27,24 +27,33 @@
                     <td>{{ pl.0 }}</td>
                     <td>{{ pl.1 }}</td>
                     <td>{{ pl.2 }}</td>
-                    <td colspan="2" class="btn-group">
+                    <td colspan="2" class="btn-group btn-group-sm btn-group-justified">
+
                         <a href="{% url 'ip_pool:ips' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
-                           class="btn btn-sm btn-primary">
+                           class="btn btn-primary">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
-                        <a href="{% url 'ip_pool:ips_del' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}"
-                           class="btn btn-sm btn-danger">
-                            <span class="glyphicon glyphicon-remove-circle"></span>
-                        </a>
+
+                        {% if perms.ip_pool.delete_ippoolitem %}
+                            <a href="{% url 'ip_pool:ips_del' %}?ips={{ pl.0 }}&ipe={{ pl.1 }}" class="btn btn-danger">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </a>
+                        {% endif %}
+
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">Нет ни одного пула зарезервированных ip адресов. <a
-                            href="{% url 'ip_pool:add' %}">Создать</a></td>
+                    <td colspan="5">Нет ни одного пула зарезервированных ip адресов.
+                        {% if perms.ip_pool.add_ippoolitem %}
+                            <a href="{% url 'ip_pool:add' %}">Создать</a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
+
+            {% if perms.ip_pool.add_ippoolitem %}
             <tfoot>
             <tr>
                 <td colspan="5">
@@ -54,6 +63,8 @@
                 </td>
             </tr>
             </tfoot>
+            {% endif %}
+
         </table>
     </div>
 

@@ -35,12 +35,14 @@
                     <td><a href="{% url 'abonapp:people_list' gr.id %}">{{ gr.title }}</a></td>
                     <td>{{ gr.usercount }}</td>
                     <td>
-                        {% if gr.usercount > 0 %}
-                            <a href="#" class="btn btn-sm btn-default disabled">
-                        {% else %}
-                            <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
+                        {% if perms.abonapp.delete_abongroup %}
+                            {% if gr.usercount > 0 %}
+                                <a href="#" class="btn btn-sm btn-default disabled">
+                            {% else %}
+                                <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
+                            {% endif %}
+                            <span class="glyphicon glyphicon-remove-circle"></span></a>
                         {% endif %}
-                        <span class="glyphicon glyphicon-remove-circle"></span></a>
                     </td>
                 </tr>
             {% empty %}
@@ -52,9 +54,11 @@
             <tfoot>
             <tr>
                 <td colspan="4" class="btn-group">
+                    {% if perms.abonapp.add_abongroup %}
                     <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> Создать группу
                     </a>
+                    {% endif %}
                     <a href="{% url 'abonapp:log' %}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-record"></span> Действия абонентов
                     </a>

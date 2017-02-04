@@ -71,19 +71,30 @@
                 <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                 <td>
                     {% if human.active_tariff %}
-                        <a href="{% url 'tarifs:edit' human.active_tariff.id %}">{{ human.active_tariff.title }}</a>
-                        {% else %}&mdash;&mdash;&mdash;
+                        {% if perms.tariff_app.change_tariff %}
+                            <a href="{% url 'tarifs:edit' human.active_tariff.id %}">{{ human.active_tariff.title }}</a>
+                        {% else %}
+                            {{ human.active_tariff.title }}
+                        {% endif %}
+                    {% else %}&mdash;&mdash;&mdash;
                     {% endif %}
                 </td>
                 <td>{{ human.ballance }}</td>
-                <td><a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.id }}" class="btn btn-danger btn-sm">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </a></td>
+                <td>
+                    {% if perms.abonapp.delete_abon %}
+                        <a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.id }}" class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    {% endif %}
+                </td>
                 </tr>
             {% empty %}
                 <tr>
                     <td colspan="9">
-                        Ещё нет абонентов, <a href="{% url 'abonapp:add_abon' abon_group.id %}">добавить</a>
+                        Ещё нет абонентов.
+                        {% if perms.abonapp.add_abon %}
+                            <a href="{% url 'abonapp:add_abon' abon_group.id %}">Добавить</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

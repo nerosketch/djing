@@ -51,24 +51,38 @@
             <tbody>
             {% for tar in tariflist %}
                 <tr>
-                    <td><a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a></td>
+                    <td>
+                        {% if perms.tariff_app.change_tariff %}
+                            <a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a>
+                        {% else %}
+                            {{ tar.title }}
+                        {% endif %}
+                    </td>
                     <td>{{ tar.speedIn }}</td>
                     <td>{{ tar.speedOut }}</td>
                     <td>{{ tar.amount }} руб</td>
                     <td>{{ tar.time_of_action }} дней</td>
                     <td>{{ tar.calc_type }}</td>
-                    <td><a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger">
-                        <span class="glyphicon glyphicon-remove-circle"></span>
-                    </a></td>
+                    <td>
+                        {% if perms.tariff_app.delete_tariff %}
+                            <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="7">Ещё нет созданных тарифов, <a href="{% url 'tarifs:add' %}" class="lgtbx">создать</a>
+                    <td colspan="7">Ещё нет созданных тарифов.
+                        {% if perms.tariff_app.add_tariff %}
+                            <a href="{% url 'tarifs:add' %}" class="lgtbx">Создать</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
 
+            {% if perms.tariff_app.add_tariff %}
             <tfoot>
             <tr>
                 <td colspan="7">
@@ -78,6 +92,7 @@
                 </td>
             </tr>
             </tfoot>
+            {% endif %}
 
         </table>
     </div>

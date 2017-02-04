@@ -19,19 +19,31 @@
         {% for trf in abon_tarifs %}
             <tr{% if trf.id == active_abontariff_id %} class="active"{% endif %}>
                 <td>{{ trf.tariff_priority }}</td>
-                <td><a href="{% url 'tarifs:edit' trf.tariff.id %}"
-                       title="{{ trf.time_start|default:'' }}">{{ trf.tariff.title }}</a></td>
+                <td>
+
+                    {% if perms.tariff_app.change_tariff %}
+                        <a href="{% url 'tarifs:edit' trf.tariff.id %}" title="{{ trf.time_start|default:'' }}">
+                            {{ trf.tariff.title }}
+                        </a>
+                    {% else %}
+                        {{ trf.tariff.title }}
+                    {% endif %}
+
+                </td>
                 <td>{{ trf.tariff.amount }}</td>
                 <td>{{ trf.tariff.speedIn }}</td>
                 <td>{{ trf.tariff.speedOut }}</td>
                 <td>{{ trf.tariff.time_of_action }}</td>
                 {% if trf.id != active_abontariff_id %}
                     <td class="btn-group">
-                        {% if not active_abontariff_id %}
-                            <a href="{% url 'abonapp:activate_service' abon_group.id abon.id trf.id %}"
-                               class="btn btn-success btn-sm" title="Активировать услугу">
-                                <i class="glyphicon glyphicon-shopping-cart"></i>
-                            </a>
+
+                        {% if perms.abonapp.can_activate_service %}
+                            {% if not active_abontariff_id %}
+                                <a href="{% url 'abonapp:activate_service' abon_group.id abon.id trf.id %}"
+                                   class="btn btn-success btn-sm" title="Активировать услугу">
+                                    <i class="glyphicon glyphicon-shopping-cart"></i>
+                                </a>
+                            {% endif %}
                         {% endif %}
 
                         <!-- "{ % url 'abonapp:chpriority_tariff' abon_group.id abon.id % }?t={ { trf.id } }&a=up" -->
@@ -46,10 +58,12 @@
                             <i class="glyphicon glyphicon-hand-down"></i>
                         </a>
 
-                        <a href="{% url 'abonapp:unsubscribe_service' abon_group.id abon.id trf.id %}"
-                           class="btn btn-danger btn-sm" title="Удалить услугу">
-                            <i class="glyphicon glyphicon-remove"></i>
-                        </a>
+                        {% if perms.abonapp.delete_abontariff %}
+                            <a href="{% url 'abonapp:unsubscribe_service' abon_group.id abon.id trf.id %}"
+                               class="btn btn-danger btn-sm" title="Удалить услугу">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a>
+                        {% endif %}
                     </td>
                 {% else %}
                     <td>        <!--{ % url 'abonapp:compl_srv' abon_group.id abon.id trf.id % }-->
@@ -61,22 +75,25 @@
             </tr>
         {% empty %}
             <tr>
-                <td colspan="7">Нет подключённых абоненту услуг, <a
-                        href="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}" class="lgtbx">купить</a></td>
+                <td colspan="7">Нет подключённых абоненту услуг.
+                    {% if perms.abonapp.can_buy_tariff %}
+                        <a href="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}" class="lgtbx">Купить</a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
-
-        <tfoot>
-        <tr>
-            <th colspan="7">
-                <a href="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}" class="btn btn-sm btn-success">
-                    <span class="glyphicon glyphicon-plus"></span> Купить услугу
-                </a>
-            </th>
-        </tr>
-        </tfoot>
-
+        {% if perms.abonapp.can_buy_tariff %}
+            <tfoot>
+            <tr>
+                <th colspan="7">
+                    <a href="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}" class="btn btn-sm btn-success">
+                        <span class="glyphicon glyphicon-plus"></span> Купить услугу
+                    </a>
+                </th>
+            </tr>
+            </tfoot>
+        {% endif %}
     </table>
 
 

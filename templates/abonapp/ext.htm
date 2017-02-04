@@ -20,20 +20,24 @@
 
     <ul class="nav nav-tabs">
 
-        {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
-        <li{% if abon_home == request.path %} class="active"{% endif %}>
-            <a href="{{ abon_home }}">Информация абонента</a>
-        </li>
+        {% if perms.abonapp.change_abon %}
+            {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
+            <li{% if abon_home == request.path %} class="active"{% endif %}>
+                <a href="{{ abon_home }}">Информация абонента</a>
+            </li>
+        {% endif %}
 
         {% url 'abonapp:abon_services' abon_group.id abon.id as abserv %}
         <li{% if abserv == request.path %} class="active"{% endif %}>
             <a href="{{ abserv }}">Услуги</a>
         </li>
 
-        {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
-        <li{% if abamount == request.path %} class="active"{% endif %}>
-            <a href="{{ abamount }}">Пополнить счёт</a>
-        </li>
+        {% if perms.abonapp.can_add_ballance %}
+            {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
+            <li{% if abamount == request.path %} class="active"{% endif %}>
+                <a href="{{ abamount }}">Пополнить счёт</a>
+            </li>
+        {% endif %}
 
         {% url 'abonapp:abon_debts' abon_group.id abon.id as abondebts %}
         <li{% if abondebts == request.path %} class="active"{% endif %}>

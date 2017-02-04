@@ -27,9 +27,13 @@
                     <td><a href="{% url 'devapp:view' dev.id %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
-                    <td><a href="{% url 'devapp:del' dev.id %}" class="btn btn-danger btn-sm">
-                        <span class="glyphicon glyphicon-remove"></span>
-                    </a></td>
+                    <td>
+                        {% if perms.devapp.delete_device %}
+                            <a href="{% url 'devapp:del' dev.id %}" class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% empty %}
                 <tr>

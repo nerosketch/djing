@@ -26,8 +26,13 @@
                     Для продолжения пользования ресурсами надо подключить нужную услугу</p>
 
                 <p>Подробнее:<br/>
-                    Вы завершаете тариф <a href="{% url 'tarifs:edit' abtar.tariff.id %}"
-                                           target="_blank">{{ abtar.tariff.title }}</a>.<br/>
+                    Вы завершаете тариф
+
+                    {% if perms.tariff_app.change_tariff %}
+                        <a href="{% url 'tarifs:edit' abtar.tariff.id %}" target="_blank">{{ abtar.tariff.title }}</a>.<br/>
+                    {% else %}
+                        {{ abtar.tariff.title }}.<br/>
+                    {% endif %}
 
                     Услуга была подключена: {{ abtar.time_start|date:'d F Y, H:i:s' }}<br/>
                     Сегодня: {% now "d F Y, H:i:s" %}<br/>

@@ -43,9 +43,17 @@
                            title="Отправить сообщение">
                             <span class="glyphicon glyphicon-envelope"></span>
                         </a>
-                        <a href="#" class="btn btn-sm btn-danger disabled">
-                            <span class="glyphicon glyphicon-remove"></span>
-                        </a>
+
+                        {% if usr.id == request.user.id or perms.acc_app.delete_userprofile %}
+                            <a href="{% url 'acc_app:delete_profile' usr.id %}" class="btn btn-sm btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        {% else %}
+                            <a href="#" class="btn btn-sm btn-danger disabled" title="Не прав на удаление">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        {% endif %}
+
                     </td>
                 </tr>
             {% empty %}
