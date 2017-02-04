@@ -81,6 +81,7 @@ def get_dots(request):
 @login_required
 @permission_required('mapapp.add_dot')
 def modal_add_dot(request):
+    #FIXME: тут надо удостовериться что при отсутствии прав, сообщение об этом корректно отобразится
     if request.method == 'POST':
         coords = request.POST.get('coords')
         title = request.POST.get('title')
