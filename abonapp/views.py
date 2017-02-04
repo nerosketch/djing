@@ -8,7 +8,6 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.http import HttpResponse, Http404
-from django.contrib.auth import get_user_model
 from django.contrib import messages
 
 from tariff_app.models import Tariff
