@@ -41,7 +41,7 @@ class AbonForm(forms.ModelForm):
                 'class': 'form-control'
             }),
             'group': forms.Select(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows':'3', 'cols':'65'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': '4'}),
             'street': forms.Select(attrs={'class': 'form-control'}),
             'house': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.NullBooleanSelect(attrs={'class': 'form-control'})
