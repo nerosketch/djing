@@ -244,10 +244,6 @@ def group(request, uid):
     grp_rights = grp.permissions.all()
     all_rights = Permission.objects.exclude(group=grp)
 
-    #prms = Permission.objects.all()
-    #for pr in prms:
-    #    print u"%s   |   %s" % (pr.name, pr.codename)
-
     return render(request, 'accounts/group.html', {
         'group': grp,
         'all_rights': all_rights,
