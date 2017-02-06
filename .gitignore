@@ -6,6 +6,7 @@ media/min/*
 ~*/migrations/00*.py
 .idea/
 djing/settings.py
+djing/agent/settings.py
 gmap/fixtures
 *.sqlite3
 *.json
