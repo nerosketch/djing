@@ -172,7 +172,8 @@ class MikrotikTransmitter(BaseTransmitter):
         return self._exec_cmd(['/queue/simple/add',
             '=name=uid%d' % user.uid,
             '=target-addresses=%s/32' % user.ip.get_str(),
-            '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn)
+            '=limit-at=%fM/%fM' % (user.tariff.speedIn, user.tariff.speedOut),
+            '=max-limit=%fM/%fM' % (user.tariff.speedIn + 1, user.tariff.speedOut + 1)
         ])
 
     # удаляем правило шейпера по имени правила
@@ -185,7 +186,8 @@ class MikrotikTransmitter(BaseTransmitter):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
         self._exec_cmd(['/queue/simple/set', '=.id=uid%d' % user.uid,
-            '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn),
+            '=limit-at=%fM/%fM' % (user.tariff.speedIn, user.tariff.speedOut),
+            '=max-limit=%fM/%fM' % (user.tariff.speedIn + 1, user.tariff.speedOut + 1),
             '=target-addresses=%s/32' % user.ip.get_str()
         ])
 
