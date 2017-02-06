@@ -114,10 +114,10 @@ class ApiRos:
             c += self.readBytes(1)[0]
         return c
 
-    def writeBytes(self, str):
-        n = 0;
-        while n < len(str):
-            r = self.sk.send(str[n:])
+    def writeBytes(self, s):
+        n = 0
+        while n < len(s):
+            r = self.sk.send(s[n:])
             if r == 0: raise RuntimeError("connection closed by remote end")
             n += r
 
@@ -171,7 +171,7 @@ class MikrotikTransmitter(BaseTransmitter):
         assert isinstance(user.ip, IpStruct)
         return self._exec_cmd(['/queue/simple/add',
             '=name=uid%d' % user.uid,
-            '=target=%s/32' % user.ip.get_str(),
+            '=target-addresses=%s/32' % user.ip.get_str(),
             '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn)
         ])
 
@@ -186,7 +186,7 @@ class MikrotikTransmitter(BaseTransmitter):
         assert isinstance(user.ip, IpStruct)
         self._exec_cmd(['/queue/simple/set', '=.id=uid%d' % user.uid,
             '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn),
-            '=target=%s/32' % user.ip.get_str()
+            '=target-addresses=%s/32' % user.ip.get_str()
         ])
 
     # приостановливаем обслуживание абонента
