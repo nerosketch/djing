@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django import forms
+from django.utils import timezone
 from .models import Task
 
 
@@ -24,5 +25,5 @@ class TaskFrm(forms.ModelForm):
             'abon': forms.Select(attrs={'class': 'form-control'})
         }
         initials = {
-            'out_date': datetime.now()+timedelta(days=3)
+            'out_date': timezone.now()+timedelta(days=3)
         }

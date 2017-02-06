@@ -1,7 +1,8 @@
 # coding=utf-8
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from abonapp.models import Abon
 from .handle import handle as task_handle
 
@@ -51,7 +52,7 @@ class ChangeLog(models.Model):
 
 
 def _delta_add_days():
-    return datetime.now() + timedelta(days=3)
+    return timezone.now() + timedelta(days=3)
 
 
 class Task(models.Model):
@@ -77,7 +78,7 @@ class Task(models.Model):
 
     def finish(self, current_user):
         self.state = 'F'  # Выполнена
-        self.out_date = datetime.now()  # Время завершения
+        self.out_date = timezone.now()  # Время завершения
         ChangeLog.objects.create(
             task=self,
             act_type='f',

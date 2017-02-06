@@ -301,7 +301,7 @@ class InvoiceForPayment(models.Model):
 
     def set_ok(self):
         self.status = True
-        self.date_pay = datetime.now()
+        self.date_pay = timezone.now()
 
     def get_prev_invoice(self):
         return self.objects.order

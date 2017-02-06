@@ -3,7 +3,7 @@ import sys
 import socket
 import struct
 from re import sub
-from datetime import datetime
+from django.utils import timezone
 
 
 def ip2int(strip):
@@ -32,7 +32,7 @@ def convert(query):
 
 if __name__ == '__main__':
     f = sys.stdin
-    table_name = "flowstat_%s" % datetime.now().strftime("%d%m%Y")
+    table_name = "flowstat_%s" % timezone.now().strftime("%d%m%Y")
     print(("CREATE TABLE IF NOT EXISTS %s (" % table_name))
     print("`id` int(10) AUTO_INCREMENT NOT NULL,")
     print("`src_ip` INT(10) UNSIGNED NOT NULL,")
