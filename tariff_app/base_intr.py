@@ -8,6 +8,10 @@ class TariffBase(metaclass=ABCMeta):
     def calc_amount(self, abon_tariff):
         """Считает итоговую сумму платежа"""
 
+    @abstractmethod
+    def get_avail_time(self):
+        """Возвращает оставшееся время услуги в секундах"""
+
     @staticmethod
     def description():
         """Возвращает текстовое описание"""
