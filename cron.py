@@ -29,14 +29,14 @@ if __name__ == "__main__":
         )
         # обновляем абонента на NAS
         mikroid = tm._find_queue('uid%d' % user.id)
-        mikroid = mikroid['=.id'].replace('*', '')
-        try:
+        if mikroid:
+            mikroid = mikroid['=.id'].replace('*', '')
             tm.update_user(ab)
-        except NasFailedResult:
-            tm.add_user(ab)
-        # если не активен то приостановим услугу
-        if user.is_active:
-            tm.start_user(mikroid)
+            # если не активен то приостановим услугу
+            if user.is_active:
+                tm.start_user(mikroid)
+            else:
+                tm.pause_user(mikroid)
         else:
-            tm.pause_user(mikroid)
-        tm.update_user(ab)
+            tm.add_user(ab)
+
