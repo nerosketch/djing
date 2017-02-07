@@ -37,8 +37,8 @@ class BaseTransmitter(metaclass=ABCMeta):
         """добавляем список абонентов в NAS"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def remove_user_range(self, user_list):
+    @check_input_type(int)
+    def remove_user_range(self, user_ids):
         """удаляем список абонентов"""
 
     @abstractmethod
