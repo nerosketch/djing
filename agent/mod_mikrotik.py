@@ -4,7 +4,7 @@ import binascii
 from hashlib import md5
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
-from .structs import TariffStruct, AbonStruct, IpStruct
+from .structs import TariffStruct, AbonStruct, IpStruct, ShapeItem
 from . import settings
 from djing.settings import DEBUG
 
@@ -163,42 +163,60 @@ class MikrotikTransmitter(BaseTransmitter):
             res.append(rt[1])
         return res
 
+    # Строим объект ShapeItem из инфы, присланной из mikrotik'a
+    def _build_shape_obj(self, info):
+        speeds = info['=max-limit'].split('/')
+        speeds = [sp.replace('M','') for sp in speeds]
+        t = TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
+        a = AbonStruct(
+            uid=int(info['=name'][3:]),
+            ip=info['=target-addresses'][:-3],
+            tariff=t
+        )
+        return ShapeItem(abon=a, sid=info['=.id'].replace('*', ''))
+
     # ищем правило по имени, и возвращаем всю инфу о найденном правиле
-    def _find_queue(self, name):
+    def find_queue(self, name):
         ret = self._exec_cmd(['/queue/simple/print', '?name=%s' % name])
-        return ret[0]
+        if ret:
+            return self._build_shape_obj(ret[0])
 
     def add_user_range(self, user_list):
         for usr in user_list:
             self.add_user(usr)
 
+    # В @user_ids передаём номера правил из mikrotik
     def remove_user_range(self, user_ids):
         names = ['%d' % usr for usr in user_ids]
         return self._exec_cmd(['/queue/simple/remove', *names])
 
     # добавляем правило шейпинга для указанного ip и со скоростью max-limit=Upload/Download
-    # Мы уверены что user это инстанс класса agent.structs.AbonStruct
+    # Мы уверены что @user это инстанс класса agent.structs.AbonStruct
     def add_user(self, user):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
         return self._exec_cmd(['/queue/simple/add',
             '=name=uid%d' % user.uid,
-            '=target-addresses=%s/32' % user.ip.get_str(),
-            '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn)
+            '=target-addresses=%s' % user.ip.get_str(),
+            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn)
         ])
 
     # удаляем правило шейпера по имени правила
+    # В @user передаём номер правила в mikrotik для абонента
     def remove_user(self, user):
-        uid = user if type(user) is int else user.uid
-        return self._exec_cmd(['/queue/simple/remove', '=name=uid%d' % uid])
+        assert type(user) is int
+        return self._exec_cmd(['/queue/simple/remove', '=.id=*'+str(user)])
 
     # обновляем основную инфу абонента
-    def update_user(self, user):
+    # @mk_id это номер в mikrotik
+    def update_user(self, user, mk_id=None):
+        assert mk_id is not None
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
-        return self._exec_cmd(['/queue/simple/set', '=name=uid%d' % user.uid,
-            '=max-limit=%fM/%fM' % (user.tariff.speedOut, user.tariff.speedIn),
-            '=target-addresses=%s/32' % user.ip.get_str()
+        return self._exec_cmd(['/queue/simple/set', '=.id=*'+mk_id,
+            '=name=uid%d' % user.uid,
+            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
+            '=target-addresses=%s' % user.ip.get_str()
         ])
 
     # читаем абонентов, возващаем абнента и номер в микротике
@@ -206,16 +224,9 @@ class MikrotikTransmitter(BaseTransmitter):
         ret_it = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
         for re in ret_it:
             if re[0] == '!done': return
-            speeds = re[1]['=limit-at'].split('/')
-            speeds = [sp.replace('M','') for sp in speeds]
-            abon = AbonStruct(
-                uid=int(re[1]['=name'][3:]),
-                ip=IpStruct(re[1]['=target-addresses'][:-3]),
-                tariff=TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
-            )
-            yield abon
+            yield self._build_shape_obj(re[1])
 
-    # то же что и выше, только получаем номера в микротике
+    # то же что и выше, только получаем только номера в микротике
     def read_users_mikroids_iter(self):
         ret_it = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
         for re in ret_it:
@@ -225,12 +236,12 @@ class MikrotikTransmitter(BaseTransmitter):
     # приостановливаем обслуживание абонента
     # в @user передаём номер в микротике
     def pause_user(self, user):
-        self._exec_cmd(['/queue/simple/disable', user])
+        self._exec_cmd(['/queue/simple/disable', '=.id=*'+user])
 
     # продолжаем обслуживание абонента
     # в @user передаём номер в микротике
     def start_user(self, user):
-        self._exec_cmd(['/queue/simple/enable', user])
+        self._exec_cmd(['/queue/simple/enable', '=.id=*'+user])
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
     def add_tariff_range(self, tariff_list):
