@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404
 from django.contrib import messages
 
 from tariff_app.models import Tariff
-from agent import NasFailedResult, AbonStruct, Transmitter, TariffStruct, NasNetworkError
+from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
 from ip_pool.models import IpPoolItem
@@ -383,8 +383,9 @@ def chpriority(request, gid, uid):
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
 
-    if abtar.abon.id != int(uid):
-        return HttpResponse('<h1>uid not equal uid from service</h1>')
+    if int(abtar.abon.pk) != int(uid) or int(abtar.abon.group.pk) != int(gid):
+        # если что-то написали в урле вручную, то вернём на путь истинный
+        return redirect('abonapp:compl_srv', gid=abtar.abon.group.pk, uid=abtar.abon.pk, srvid=srvid)
     time_use = None
     try:
         if request.method == 'POST':
@@ -394,7 +395,7 @@ def complete_service(request, gid, uid, srvid):
                 # удаляем запись о текущей услуге.
                 abtar.delete()
                 messages.success(request, 'Услуга успешно завершена')
-                return redirect('abonapp:abon_home', gid, uid)
+                return redirect('abonapp:abon_services', gid, uid)
             else:
                 raise models.LogicError('Действие не подтверждено')
 
