@@ -34,6 +34,7 @@ if __name__ == "__main__":
             continue
 
         # ищем абонента в списке инфы из nas
+        abons = [queue for queue in queues if queue is not None]
         abons = [{'abon': queue.abon, 'mikro_id': queue.sid} for queue in queues if queue.abon.uid == user.pk]
         abons_len = len(abons)
         if abons_len < 1:
@@ -51,7 +52,6 @@ if __name__ == "__main__":
             # если всё совпадает, то менять нечего
             continue
         else:
-            print('Change abon:', user.get_full_name())
             # иначе обновляем абонента
             tm.update_user(ab, abons[0]['mikro_id'])
             # если не активен то приостановим услугу
