@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.utils.datetime_safe import datetime
 from django.db import models
 from django.core.validators import DecimalValidator
-
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
@@ -286,6 +285,19 @@ class Abon(UserProfile):
         else:
             return False
 
+    # создаём абонента из структуры агента
+    def build_agent_struct(self):
+        if self.ip_address:
+            user_ip = self.ip_address.int_ip()
+        else:
+            return
+        inst_tariff = self.active_tariff()
+        if inst_tariff:
+            agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
+        else:
+            agent_trf = TariffStruct()
+        return AbonStruct(self.pk, user_ip, agent_trf)
+
 
 class InvoiceForPayment(models.Model):
     abon = models.ForeignKey(Abon)
@@ -341,32 +353,31 @@ class AllPayLog(models.Model):
 
 
 def abon_post_save(sender, instance, **kwargs):
-    if instance.ip_address:
-        user_ip = instance.ip_address.int_ip()
-    else:
-        return
-    inst_tariff = instance.active_tariff()
+    print('abon_post_save', instance.username)
+    print('Instance:', instance.pk, sender)
     try:
-        if inst_tariff:
-            agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
-        else:
-            agent_trf = TariffStruct()
-        agent_abon = AbonStruct(instance.id, user_ip, agent_trf)
         tm = Transmitter()
+        agent_abon =  instance.build_agent_struct()
         if kwargs['created']:
             # создаём абонента
             tm.add_user(agent_abon)
         else:
             # обновляем абонента на NAS
-            try:
-                tm.update_user(agent_abon)
-            except NasFailedResult:
-                tm.add_user(agent_abon)
-            # если не активен то приостановим услугу
-            if instance.is_active:
-                tm.start_user(agent_abon)
+            # найдём абонента на NAS
+            queue = tm.find_queue('uid%d' % instance.pk)
+            if queue:
+                # если нашли абонента на NAS
+                mikrotik_id = queue.sid
+                tm.update_user(agent_abon, mikrotik_id)
+
+                # если не активен то приостановим услугу
+                if instance.is_active:
+                    tm.start_user(mikrotik_id)
+                else:
+                    tm.pause_user(mikrotik_id)
             else:
-                tm.pause_user(agent_abon)
+                # если не нашли абонента на NAS то добавим
+                tm.add_user(agent_abon)
     except NasFailedResult:
         return True
 
@@ -375,13 +386,17 @@ def abon_del_signal(sender, instance, **kwargs):
     try:
         # подключаемся к NAS'у
         tm = Transmitter()
-        # удаляем абонента на NAS
-        tm.remove_user(instance.id)
+        # найдём правило удаляемого абонента
+        queue = tm.find_queue('uid%d' % instance.pk)
+        if queue:
+            # нашли абонента, и удаляем его на NAS
+            tm.remove_user(queue.sid)
     except NasFailedResult:
         return True
 
 
 def abontariff_post_save(sender, instance, **kwargs):
+    print('abontariff_post_save')
     # Тут или подключение абону услуги, или изменение приоритета
     if not kwargs['created']:
         # если изменение приоритета то не говорим об этом NAS'у
@@ -389,11 +404,20 @@ def abontariff_post_save(sender, instance, **kwargs):
     if instance.abon.ip_address is None:
         return
     try:
-        agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
-        agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
+        agent_abon = instance.abon.build_agent_struct()
         tm = Transmitter()
-        tm.update_user(agent_abon)
-        tm.start_user(agent_abon)
+        # найдём абонента на NAS
+        queue = tm.find_queue('uid%d' % instance.abon.pk)
+        if queue:
+            mikrotik_id = queue.sid
+            # нашли абонента, обновляем его на NAS
+            tm.update_user(agent_abon, mikrotik_id)
+            if instance.abon.is_active:
+                tm.start_user(mikrotik_id)
+            else:
+                tm.pause_user(mikrotik_id)
+        else:
+            tm.add_user(agent_abon)
     except NasFailedResult:
         return True
 
@@ -406,10 +430,10 @@ def abontariff_del_signal(sender, instance, **kwargs):
         # если у абонента нет ip то и создавать правило не на кого
         return
     try:
-        agent_trf = TariffStruct(instance.tariff.id, instance.tariff.speedIn, instance.tariff.speedOut)
-        agent_abon = AbonStruct(instance.abon.id, instance.abon.ip_address.int_ip(), agent_trf)
         tm = Transmitter()
-        tm.pause_user(agent_abon)
+        queue = tm.find_queue('uid%d' % instance.abon.pk)
+        if queue:
+            tm.pause_user(queue.sid)
     except NasFailedResult:
         return True
 
