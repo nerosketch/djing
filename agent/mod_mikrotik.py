@@ -140,10 +140,14 @@ class MikrotikTransmitter(BaseTransmitter):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((ip, port or settings.NAS_PORT))
+            self.s = s
             self.ar = ApiRos(s)
             self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
         except ConnectionRefusedError:
             raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
+
+    def __del__(self):
+        self.s.close()
 
     def _exec_cmd_iter(self, cmd):
         assert isinstance(cmd, list)
@@ -165,15 +169,18 @@ class MikrotikTransmitter(BaseTransmitter):
 
     # Строим объект ShapeItem из инфы, присланной из mikrotik'a
     def _build_shape_obj(self, info):
-        speeds = info['=max-limit'].split('/')
-        speeds = [sp.replace('M','') for sp in speeds]
-        t = TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
-        a = AbonStruct(
-            uid=int(info['=name'][3:]),
-            ip=info['=target-addresses'][:-3],
-            tariff=t
-        )
-        return ShapeItem(abon=a, sid=info['=.id'].replace('*', ''))
+        try:
+            speeds = info['=max-limit'].split('/')
+            speeds = [sp.replace('M','') for sp in speeds]
+            t = TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
+            a = AbonStruct(
+                uid=int(info['=name'][3:]),
+                ip=info['=target-addresses'][:-3],
+                tariff=t
+            )
+            return ShapeItem(abon=a, sid=info['=.id'].replace('*', ''))
+        except KeyError:
+            return
 
     # ищем правило по имени, и возвращаем всю инфу о найденном правиле
     def find_queue(self, name):
