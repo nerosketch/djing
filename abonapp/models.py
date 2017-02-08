@@ -153,13 +153,15 @@ class AbonStreet(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = 'abon_street'
+
 
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
     ballance = models.FloatField(default=0.0, validators=[DecimalValidator])
     ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
-    #TODO: надо ж пароль для абонента создавать
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
@@ -352,12 +354,23 @@ class AllPayLog(models.Model):
         ordering = ('date_action',)
 
 
+class AbonRawPassword(models.Model):
+    account = models.OneToOneField(Abon, primary_key=True)
+    passw_text = models.CharField(max_length=64)
+
+    def __str__(self):
+        return "%s - %s" % (self.account, self.passw_text)
+
+    class Meta:
+        db_table = 'abon_raw_password'
+
+
 def abon_post_save(sender, instance, **kwargs):
-    print('abon_post_save', instance.username)
-    print('Instance:', instance.pk, sender)
     try:
         tm = Transmitter()
-        agent_abon =  instance.build_agent_struct()
+        agent_abon = instance.build_agent_struct()
+        if agent_abon is None:
+            return True
         if kwargs['created']:
             # создаём абонента
             tm.add_user(agent_abon)
@@ -396,7 +409,6 @@ def abon_del_signal(sender, instance, **kwargs):
 
 
 def abontariff_post_save(sender, instance, **kwargs):
-    print('abontariff_post_save')
     # Тут или подключение абону услуги, или изменение приоритета
     if not kwargs['created']:
         # если изменение приоритета то не говорим об этом NAS'у
@@ -405,6 +417,8 @@ def abontariff_post_save(sender, instance, **kwargs):
         return
     try:
         agent_abon = instance.abon.build_agent_struct()
+        if agent_abon is None:
+            return True
         tm = Transmitter()
         # найдём абонента на NAS
         queue = tm.find_queue('uid%d' % instance.abon.pk)
