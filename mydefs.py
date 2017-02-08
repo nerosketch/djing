@@ -155,6 +155,15 @@ def ping(hostname):
 # Русифицированный вывод timedelta
 class RuTimedelta(timedelta):
 
+    def __new__(cls, tm):
+        if isinstance(tm, timedelta):
+            return timedelta.__new__(
+                cls,
+                days=tm.days,
+                seconds=tm.seconds,
+                microseconds=tm.microseconds
+            )
+
     def __str__(self):
         hours, remainder = divmod(self.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
