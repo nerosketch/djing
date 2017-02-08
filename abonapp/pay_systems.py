@@ -36,7 +36,6 @@ def allpay(request):
         s = '_'.join((str(act), str(pay_account), serv_id or '', pay_id, SECRET))
         md.update(bytes(s, 'utf-8'))
         our_sign = md.hexdigest()
-        print('Signs:', our_sign, sign, s)
         if our_sign != sign:
             return bad_ret(-101)
 
