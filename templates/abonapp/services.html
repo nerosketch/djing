@@ -66,8 +66,9 @@
                         {% endif %}
                     </td>
                 {% else %}
-                    <td>        <!--{ % url 'abonapp:compl_srv' abon_group.id abon.id trf.id % }-->
-                        <a href="#" title="Завершить услугу досрочно" class="btn btn-danger btn-sm disabled">
+                    <td>
+                        <a href="{% url 'abonapp:compl_srv' abon_group.id abon.id trf.id %}"
+                           title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
                             <i class="glyphicon glyphicon-remove"></i> Завершить
                         </a>
                     </td>
