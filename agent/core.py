@@ -53,7 +53,7 @@ class BaseTransmitter(metaclass=ABCMeta):
 
     @abstractmethod
     @check_input_type(AbonStruct)
-    def update_user(self, user):
+    def update_user(self, user, *args):
         """чтоб обновить абонента надо изменить всё кроме его uid, по uid абонент будет найден"""
 
     @abstractmethod
