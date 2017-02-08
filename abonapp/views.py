@@ -103,9 +103,9 @@ def addabon(request, gid):
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
-                frm.save()
+                abon = frm.save()
                 messages.success(request, 'Абонент создан')
-                return redirect('abonapp:people_list', group.id)
+                return redirect('abonapp:abon_home', group.id, abon.pk)
             else:
                 messages.error(request, 'Некоторые поля заполнены не правильно, проверте ещё раз')
 
@@ -232,8 +232,9 @@ def abon_services(request, gid, uid):
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, id=uid)
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
-    frm = None
+    frm, passw = None, None
     try:
+        passw = models.AbonRawPassword.objects.get(account=abon).passw_text
         if request.method == 'POST':
             if not request.user.has_perm('abonapp.change_abon'):
                 raise PermissionDenied
@@ -250,14 +251,14 @@ def abonhome(request, gid, uid):
             else:
                 messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
         else:
-            frm = forms.AbonForm(instance=abon)
+            frm = forms.AbonForm(instance=abon, initial={'password': passw})
     except IntegrityError as e:
         messages.error(request, 'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e)
-        frm = forms.AbonForm(instance=abon)
+        frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
     except Http404:
         messages.error(request, 'Ip адрес не найден в списке IP адресов')
-        frm = forms.AbonForm(instance=abon)
+        frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
     except NasFailedResult as e:
         messages.error(request, e)
@@ -265,10 +266,12 @@ def abonhome(request, gid, uid):
         messages.error(request, e)
     except IpPoolItem.DoesNotExist:
         messages.error(request, 'Указанный вами ip отсутствует в ip pool')
+    except models.AbonRawPassword.DoesNotExist:
+        messages.warning(request, 'Для абонента не задан пароль, он не сможет войти в учётку')
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
-            'form': frm or forms.AbonForm(instance=abon),
+            'form': frm or forms.AbonForm(instance=abon, initial={'password': passw}),
             'abon': abon,
             'abon_group': abon_group,
             'ip': abon.ip_address
@@ -277,7 +280,8 @@ def abonhome(request, gid, uid):
         return render(request, 'abonapp/viewAbon.html', {
             'abon': abon,
             'abon_group': abon_group,
-            'ip': abon.ip_address
+            'ip': abon.ip_address,
+            'passw': passw
         })
 
 
@@ -496,11 +500,12 @@ def update_nas(request, group_id):
             if not usr.ip_address:
                 continue
             agent_abon = usr.build_agent_struct()
-            queue = tm.find_queue('uid%d' % usr.pk)
-            if queue:
-                tm.update_user(agent_abon, queue.sid)
-            else:
-                tm.add_user(agent_abon)
+            if agent_abon is not None:
+                queue = tm.find_queue('uid%d' % usr.pk)
+                if queue:
+                    tm.update_user(agent_abon, queue.sid)
+                else:
+                    tm.add_user(agent_abon)
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:
