@@ -492,19 +492,13 @@ def update_nas(request, group_id):
     try:
         tm = Transmitter()
         for usr in users:
-            if usr.ip_address:
-                user_ip = usr.ip_address.int_ip()
-            else:
+            if not usr.ip_address:
                 continue
-            tariff = usr.active_tariff()
-            if tariff:
-                agent_trf = TariffStruct(tariff.id, tariff.speedIn, tariff.speedOut)
+            agent_abon = usr.build_agent_struct()
+            queue = tm.find_queue('uid%d' % usr.pk)
+            if queue:
+                tm.update_user(agent_abon, queue.sid)
             else:
-                agent_trf = TariffStruct()
-            agent_abon = AbonStruct(usr.id, user_ip, agent_trf)
-            try:
-                tm.update_user(agent_abon)
-            except NasFailedResult:
                 tm.add_user(agent_abon)
     except NasFailedResult as e:
         messages.error(request, e)
