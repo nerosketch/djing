@@ -339,7 +339,7 @@ def buy_tariff(request, gid, uid):
             if frm.is_valid():
                 cd = frm.cleaned_data
                 abon.buy_tariff(cd['tariff'], request.user)
-                abon.save()
+                #abon.save()
                 messages.success(request, 'Тариф успешно выбран')
                 return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
             else:
@@ -394,8 +394,7 @@ def complete_service(request, gid, uid, srvid):
     try:
         if request.method == 'POST':
             # досрочно завершаем услугу
-            finish_confirm = request.POST.get('finish_confirm')
-            if finish_confirm == 'yes':
+            if request.POST.get('finish_confirm') == 'yes':
                 # удаляем запись о текущей услуге.
                 abtar.delete()
                 messages.success(request, 'Услуга успешно завершена')
