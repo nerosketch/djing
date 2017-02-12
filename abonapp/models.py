@@ -209,7 +209,7 @@ class Abon(UserProfile):
         self.ballance += amount
 
     # покупаем тариф
-    def buy_tariff(self, tariff, author):
+    def buy_tariff(self, tariff, author, comment=None):
         assert isinstance(tariff, Tariff)
 
         # выбераем связь ТарифАбонент с самым низким приоритетом
@@ -234,7 +234,7 @@ class Abon(UserProfile):
         AbonLog.objects.create(
             abon=self, amount=-tariff.amount,
             author=author,
-            comment='Покупка тарифного плана через админку, тариф "%s"' % tariff.title
+            comment=comment or 'Покупка тарифного плана через админку, тариф "%s"' % tariff
         )
 
     # Пробует подключить новую услугу если пришло время
