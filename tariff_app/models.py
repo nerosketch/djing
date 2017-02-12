@@ -31,4 +31,4 @@ class Tariff(models.Model):
             return res_type()
 
     def __str__(self):
-        return "%s (%f)" % (self.title, self.amount)
+        return "%s (%.2f)" % (self.title, self.amount)
