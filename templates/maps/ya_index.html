@@ -34,7 +34,7 @@
     function add_dot(e){
         var coords = e.get('coords');
         $.get('{% url 'mapapp:modal_add_dot' %}', {'coords': coords.join(',')}, function(r){
-            show_Modal('Добавить точку', r, 'primary');
+            show_ModalMyContent(r);
         });
         e.preventDefault();
     }
