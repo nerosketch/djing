@@ -12,3 +12,8 @@ body > .container {
 .table thead {
     background-color: #ddd;
 }
+
+.modal-header{border-radius: 4px 4px 0 0;}
+.modal-header.warning {background-color: #d2322d;}
+.modal-header.success {background-color: #6ad245;}
+.modal-header.primary {background-color: #789cbb;}
