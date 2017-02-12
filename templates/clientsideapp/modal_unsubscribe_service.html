@@ -1,0 +1,26 @@
+<form action="{% url 'client_side:unsubscribe_service' abtar.pk %}" method="post">{% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-question-sign"></span>Отписаться от услуги</h4>
+    </div>
+    <div class="modal-body">
+        <h3>Вы уверены что хотите отписаться от услуги?</h3>
+        <input type="hidden" name="finish_confirm" value="yes">
+        <h3>{{ service.title }}</h3>
+
+        <p>{{ service.descr }}</p>
+
+        <p>Входящая скорость: {{ service.speedIn }} MBit/s<br>
+            Исходящая скорость: {{ service.speedOut }} MBit/s</p>
+
+        <p>Когда вы отпишитесь от услуги, это просто уберёт её из очереди включений ваших услуг.<br>
+           Ваши средства не буду затронуты, деньги не уйдут.</p>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-sm btn-primary">
+            <span class="glyphicon glyphicon-alert"></span> Отписаться
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+    </div>
+</form>

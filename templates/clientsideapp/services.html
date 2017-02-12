@@ -20,17 +20,31 @@
                     {% for abon_tariff in own_abon_tariffs %}
                         <li class="list-group-item">
                             <div class="btn-group">
-                                <a href="#sdf" class="btn btn-xs btn-success disabled" title="Активировать">
-                                    <span class="glyphicon glyphicon-fire"></span>
-                                </a>
-                                <a href="#del" class="btn btn-xs btn-danger disabled" title="Удалить услугу из списка">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                </a>
+                                {% if abon_tariff == current_service %}
+                                    <a href="{% url 'client_side:complete_service' abon_tariff.pk %}"
+                                       class="btn btn-xs btn-danger btn-modal" title="Завершить услугу досрочно">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                {% else %}
+                                    {% if not current_service %}
+                                        <a href="{% url 'client_side:activate_service' abon_tariff.pk %}"
+                                           class="btn btn-xs btn-success btn-modal" title="Активировать">
+                                            <span class="glyphicon glyphicon-fire"></span>
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'client_side:unsubscribe_service' abon_tariff.pk %}"
+                                       class="btn btn-xs btn-danger btn-modal" title="Удалить услугу из списка">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                {% endif %}
                             </div>
                             <span class="badge">{{ abon_tariff.tariff.amount }}</span>
                             <a href="#sdv">
-                                {% if abon_tariff.is_started %}<b>{{ abon_tariff.tariff.title }}</b>
-                                {% else %}{{ abon_tariff.tariff.title }}{% endif %}
+                                {% if abon_tariff.is_started %}
+                                    <b>{{ abon_tariff.tariff.title }}</b>
+                                {% else %}
+                                    {{ abon_tariff.tariff.title }}
+                                {% endif %}
                             </a>
                         </li>
                     {% empty %}
@@ -53,8 +67,11 @@
                                     Исходящая скорость: {{ tarif.speedOut }} MBit/s<br>
                                     Стоимость: {{ tarif.amount }} руб.</p>
 
-                                <!-- { % url 'client_side:buy_service' tarif.id % } -->
-                                <a href="#" class="btn btn-primary disabled">
+                                {% if request.user.is_staff %}
+                                    <a href="#" class="btn btn-primary disabled">
+                                {% else %}
+                                    <a href="{% url 'client_side:buy_service' tarif.id %}" class="btn btn-primary btn-modal">
+                                {% endif %}
                                     <span class="glyphicon glyphicon-shopping-cart"></span> Заказать
                                 </a>
                             </div>
@@ -66,8 +83,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
