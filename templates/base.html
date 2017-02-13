@@ -57,7 +57,7 @@
                     <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
                 </a></li>
 
-            {% url 'privmsg:home' as privmsg_home %}
+            {% url 'django_messages:messages_inbox' as privmsg_home %}
             <li{% if privmsg_home in request.path %} class="active"{% endif %}>
                 <a href="{{ privmsg_home }}">
                     <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
