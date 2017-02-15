@@ -9,9 +9,9 @@ SERV_ID = 'y832r92y8f9e'
 SECRET = '302u8u3280'
 
 
+#?ACT=1&PAY_ACCOUNT=960849&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=377&SIGN=32e533a72389fe4e93746509f9d672f8
+#?ACT=4&PAY_ACCOUNT=960849&PAY_AMOUNT=1.00&RECEIPT_NUM=29096&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=496&SIGN=c42161214099dba01e6ab008552bbd3d
 
-#payin.php?ACT=1&PAY_AMOUNT=2&PAY_ACCOUNT=13&PAY_ID=2&RECEIPT_NUM=24&TRADE_POINT=tr2&SIGN=c069de1e5469ff7078f00d1acd4c413d
-#?ACT=1&PAY_ACCOUNT=7120&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=377&SIGN=C90A5138C3B54010FE711BBFC947327C
 
 def allpay(request):
 
@@ -67,8 +67,8 @@ def allpay(request):
                 pay_id=pay_id,
                 summ=pay_amount
             )
-            #TODO: тут в author надо передавать учётку автора платежа
-            abon.add_ballance(abon, pay_amount)
+            # тут в author передаём учётку абонента, т.к. это он сам через терминал пополняет
+            abon.add_ballance(abon, pay_amount, comment='Пополнение на %.2f через AllPay' % pay_amount)
             abon.save(update_fields=['ballance'])
             current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
             return "<?xml version='1.0' encoding='UTF-8'?>" \
