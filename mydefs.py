@@ -5,11 +5,12 @@ import socket
 import struct
 from collections import Iterator
 import os
-from django.http import HttpResponse, Http404
+from functools import wraps
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import models
-from djing.settings import PAGINATION_ITEMS_PER_PAGE
+from djing.settings import PAGINATION_ITEMS_PER_PAGE, DEBUG
 
 
 ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
@@ -138,6 +139,7 @@ def order_helper(request):
 
 # Декоратор проверяет аккаунт, чтоб не пускать клиентов в страницы администрации
 def only_admins(fn):
+    @wraps(fn)
     def wrapped(request, *args, **kwargs):
         if request.user.is_admin:
             return fn(request, *args, **kwargs)
@@ -180,3 +182,18 @@ class RuTimedelta(timedelta):
                 ru_days = 'день'
             text_date = '%d %s %s' % (self.days, ru_days, text_date)
         return text_date
+
+
+def require_ssl(view):
+    """
+    Decorator that requires an SSL connection. If the current connection is not SSL, we redirect to the SSL version of
+    the page.
+    from: https://gist.github.com/ckinsey/9709984
+    """
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not DEBUG and not request.is_secure():
+            target_url = "https://" + request.META['HTTP_HOST'] + request.path_info
+            return HttpResponseRedirect(target_url)
+        return view(request, *args, **kwargs)
+    return wrapper
