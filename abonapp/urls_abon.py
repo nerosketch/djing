@@ -1,5 +1,4 @@
 from django.conf.urls import url
-
 from . import views
 
 
@@ -14,7 +13,7 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/pay_history', views.pay_history, name='abon_phistory'),
 
     url(r'^(?P<uid>\d+)/addinvoice$', views.add_invoice, name='add_invoice'),
-    url(r'^(?P<uid>\d+)/buy$', views.buy_tariff, name='buy_tariff'),
+    url(r'^(?P<uid>\d+)/pick$', views.pick_tariff, name='pick_tariff'),
     url(r'^(?P<uid>\d+)/chpriority$', views.chpriority, name='chpriority_tariff'),
     url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='compl_srv'),
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='activate_service'),
