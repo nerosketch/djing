@@ -19,7 +19,7 @@
             </h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'abonapp:buy_tariff' abon_group.id abon.id %}"
+            <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="id_tariff">Выбирите тарифф</label>
