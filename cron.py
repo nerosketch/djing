@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 import os
 import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
+django.setup()
+from abonapp.models import Abon, LogicError
+from agent import Transmitter, NasNetworkError, NasFailedResult
 
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
-    django.setup()
-    from abonapp.models import Abon
-    from agent import Transmitter
-
+def main():
     tm = Transmitter()
 
     # получим инфу о записях в NAS
@@ -17,45 +16,63 @@ if __name__ == "__main__":
 
     users = Abon.objects.all()
     for user in users:
+        try:
+            # бдим за услугами абонента: просроченные отключить, заказанные подключить
+            user.activate_next_tariff(user)
 
-        # если нет ip то и нет смысла лезть в NAS
-        if user.ip_address is None:
-            continue
+            # если нет ip то и нет смысла лезть в NAS
+            if user.ip_address is None:
+                continue
 
-        # а есть-ли у абонента доступ к услуге
-        if not user.is_access():
-            continue
+            # а есть-ли у абонента доступ к услуге
+            if not user.is_access():
+                continue
 
-        # строим структуру агента
-        ab = user.build_agent_struct()
-        if ab is None:
-            # если не построилась структура агента, значит нет ip
-            # а если нет ip то и синхронизировать абонента без ip нельзя
-            continue
+            # строим структуру агента
+            ab = user.build_agent_struct()
+            if ab is None:
+                # если не построилась структура агента, значит нет ip
+                # а если нет ip то и синхронизировать абонента без ip нельзя
+                continue
 
-        # ищем абонента в списке инфы из nas
-        abons = [queue for queue in queues if queue is not None]
-        abons = [{'abon': queue.abon, 'mikro_id': queue.sid} for queue in queues if queue.abon.uid == user.pk]
-        abons_len = len(abons)
-        if abons_len < 1:
-            # абонент не найден в nas, добавим
-            tm.add_user(ab)
-            continue
-        elif abons_len > 1:
-            # удаляем срез из nas, всё кроме 1й записи
-            tm.remove_user_range(
-                [mkid['mikro_id'] for mkid in abons[1:]]
-            )
-        # один абонент
-        # сравним совпадает-ли инфа об абоненте в базе и в nas
-        if ab == abons[0]['abon']:
-            # если всё совпадает, то менять нечего
-            continue
-        else:
-            # иначе обновляем абонента
-            tm.update_user(ab, abons[0]['mikro_id'])
-            # если не активен то приостановим услугу
-            if user.is_active:
-                tm.start_user(abons[0]['mikro_id'])
+            # ищем абонента в списке инфы из nas
+            abons = [queue for queue in queues if queue is not None]
+            abons = [{'abon': queue.abon, 'mikro_id': queue.sid} for queue in abons if queue.abon.uid == user.pk]
+            abons_len = len(abons)
+            if abons_len < 1:
+                # абонент не найден в nas, добавим
+                tm.add_user(ab)
+                continue
+            elif abons_len > 1:
+                # удаляем срез из nas, всё кроме 1й записи
+                tm.remove_user_range(
+                    [mkid['mikro_id'] for mkid in abons[1:]]
+                )
+            # один абонент
+            # сравним совпадает-ли инфа об абоненте в базе и в nas
+            if ab == abons[0]['abon']:
+                # если всё совпадает, то менять нечего
+                continue
             else:
-                tm.pause_user(abons[0]['mikro_id'])
+                # иначе обновляем абонента
+                tm.update_user(ab, abons[0]['mikro_id'])
+                # если не активен то приостановим услугу
+                if user.is_active:
+                    tm.start_user(abons[0]['mikro_id'])
+                else:
+                    tm.pause_user(abons[0]['mikro_id'])
+        except NasNetworkError as er:
+            print("Error:", er)
+        except NasFailedResult as er:
+            print("Error:", er)
+        except LogicError as er:
+            print("Notice:", er)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except NasNetworkError as e:
+        print(e)
+    except NasFailedResult as e:
+        print(e)
