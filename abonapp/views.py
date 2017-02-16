@@ -285,6 +285,7 @@ def abonhome(request, gid, uid):
         })
 
 
+@mydefs.require_ssl
 def terminal_pay(request):
     from .pay_systems import allpay
     ret_text = allpay(request)
@@ -329,7 +330,7 @@ def add_invoice(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.can_buy_tariff')
-def buy_tariff(request, gid, uid):
+def pick_tariff(request, gid, uid):
     frm = None
     grp = get_object_or_404(models.AbonGroup, id=gid)
     abon = get_object_or_404(models.Abon, id=uid)
@@ -338,7 +339,7 @@ def buy_tariff(request, gid, uid):
             frm = forms.BuyTariff(request.POST)
             if frm.is_valid():
                 cd = frm.cleaned_data
-                abon.buy_tariff(cd['tariff'], request.user)
+                abon.pick_tariff(cd['tariff'], request.user)
                 #abon.save()
                 messages.success(request, 'Тариф успешно выбран')
                 return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
@@ -433,7 +434,7 @@ def activate_service(request, gid, uid, srvid):
 
             abtar.activate(request.user)
             messages.success(request, 'Услуга активирована')
-            return redirect('abonapp:abon_home', gid, uid)
+            return redirect('abonapp:abon_services', gid, uid)
 
     except NasFailedResult as e:
         messages.error(request, e)
@@ -441,12 +442,14 @@ def activate_service(request, gid, uid, srvid):
         messages.warning(request, e)
     except models.LogicError as e:
         messages.error(request, e)
+    calc_obj = abtar.tariff.get_calc_type()(abtar)
     return render(request, 'abonapp/activate_service.html', {
         'abon': abtar.abon,
         'abon_group': abtar.abon.group,
         'abtar': abtar,
         'amount': amount,
-        'diff': abtar.abon.ballance - amount
+        'diff': abtar.abon.ballance - amount,
+        'deadline': calc_obj.calc_deadline()
     })
 
 

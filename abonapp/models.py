@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.utils import timezone
-from django.utils.datetime_safe import datetime
 from django.db import models
 from django.core.validators import DecimalValidator
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
@@ -10,14 +9,7 @@ from accounts_app.models import UserProfile
 
 
 class LogicError(Exception):
-    def __init__(self, value):
-        self.message = value
-
-    def __str__(self):
-        return repr(self.message)
-
-    def __str__(self):
-        return repr(self.message)
+    pass
 
 
 class AbonGroup(models.Model):
@@ -55,6 +47,9 @@ class AbonTariff(models.Model):
 
     # время начала действия, остальные что не начали действие - NULL
     time_start = models.DateTimeField(null=True, blank=True, default=None)
+
+    # время завершения услуги
+    deadline = models.DateTimeField(null=True, blank=True, default=None)
 
     def priority_up(self):
         # ищем услугу с большим приоритетом(число приоритета меньше)
@@ -108,21 +103,24 @@ class AbonTariff(models.Model):
 
     # Считает текущую стоимость услуг согласно выбранной для тарифа логики оплаты (см. в документации)
     def calc_amount_service(self):
-        calc_obj = self.tariff.get_calc_type()
+        calc_obj = self.tariff.get_calc_type()(self)
         # calc_obj - instance of tariff_app.custom_tariffs.TariffBase
-        amount = calc_obj.calc_amount(self)
+        amount = calc_obj.calc_amount()
         return round(amount, 2)
 
     # Активируем тариф
     def activate(self, current_user):
+        calc_obj = self.tariff.get_calc_type()(self)
         amnt = self.calc_amount_service()
         # если не хватает денег
         if self.abon.ballance < amnt:
             raise LogicError('Не хватает денег на счету')
-        # дата активации услуги
+        # считаем дату активации услуги
         self.time_start = timezone.now()
+        # считаем дату завершения услуги
+        self.deadline = calc_obj.calc_deadline()
         # снимаем деньги за услугу
-        self.abon.make_pay(current_user, amnt)
+        self.abon.make_pay(current_user, amnt, u_comment='Завершение и оплата услуги по истечению срока действия')
         self.save()
 
     # Используется-ли услуга сейчас, если время старта есть то он активирован
@@ -209,7 +207,7 @@ class Abon(UserProfile):
         self.ballance += amount
 
     # покупаем тариф
-    def buy_tariff(self, tariff, author, comment=None):
+    def pick_tariff(self, tariff, author, comment=None):
         assert isinstance(tariff, Tariff)
 
         # выбераем связь ТарифАбонент с самым низким приоритетом
@@ -241,47 +239,29 @@ class Abon(UserProfile):
     def activate_next_tariff(self, author):
         ats = AbonTariff.objects.filter(abon=self).order_by('tariff_priority')
 
-        nw = datetime.now(tz=timezone.get_current_timezone())
+        nw = timezone.datetime.now()
 
         for at in ats:
-            # Если активированный тариф
-            if not at.is_started():
-                return
-
-            # время к началу месяца
-            to_start_month = datetime(nw.year, nw.month, 1, tzinfo=timezone.get_current_timezone())
-
-            # проверяем расстояние от Сегодня до начала этого месяца.
-            # И от заказа тарифа до начала этого месяца
-            if (nw - at.time_start) > (nw - to_start_month):
-                # Заказ из прошлого месяца, срок действия закончен
-                print('Заказ из прошлого месяца, срок действия закончен')
-
+            # если услуга просрочена
+            if nw > at.deadline:
+                print("Услуга просрочена, отключаем, и подключаем новую")
                 # выберем следующую по приоритету
                 # next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)
-                next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
+                next_tarifs = [tr for tr in ats if tr.tariff_priority > at.tariff_priority][:2]
+                #next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
 
-                # и если что-нибудь вернулось то активируем, давая время начала действия
+                # и если что-нибудь из списка следующих услуг вернулось - то активируем
                 if len(next_tarifs) > 0:
-                    next_tarifs[0].time_start = nw
-                    next_tarifs[0].save(update_fields=['time_start'])
+                    next_tarifs[0].activate(author)
 
-                # завершаем текущую услугу.
+                # удаляем запись о текущей услугу.
                 at.delete()
-
-                # Создаём лог о завершении услуги
-                AbonLog.objects.create(
-                    abon=self,
-                    amount=0,
-                    author=author,
-                    comment='Завершение услуги по истечению срока действия'
-                )
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
         trf = self.active_tariff()
         if not trf: return False
-        ct = trf.get_calc_type()
+        ct = trf.get_calc_type()()
         if ct.manage_access(self):
             return True
         else:
@@ -311,7 +291,7 @@ class InvoiceForPayment(models.Model):
     author = models.ForeignKey(UserProfile, related_name='+')
 
     def __str__(self):
-        return "%s -> %d $" % (self.abon.username, self.amount)
+        return "%s -> %.2f" % (self.abon.username, self.amount)
 
     def set_ok(self):
         self.status = True
