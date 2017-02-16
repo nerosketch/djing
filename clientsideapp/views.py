@@ -45,7 +45,7 @@ def buy_service(request, srv_id):
     service = get_object_or_404(Tariff, id=srv_id)
     current_service = abon.active_tariff()
     if request.method == 'POST':
-        abon.buy_tariff(service, request.user, 'Покупка тарифного плана через личный кабинет, тариф "%s"'
+        abon.pick_tariff(service, request.user, 'Покупка тарифного плана через личный кабинет, тариф "%s"'
                                    % service)
         messages.success(request, 'Вы подписались на новую услугу. Она встала на очередь подключений. '
                                   'Когда закончится ваша текущая услуга, то включится эта')
