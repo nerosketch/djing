@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'statistics',
     'taskapp',
     'clientsideapp',
-    'chatbot'
+    'chatbot',
+    'django_messages'
 ]
 
 MIDDLEWARE_CLASSES = [
