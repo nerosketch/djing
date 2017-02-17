@@ -28,7 +28,7 @@ class Tariff(models.Model):
         if len(ob) > 0:
             res_type = ob[0][1]
             assert issubclass(res_type, TariffBase)
-            return res_type()
+            return res_type
 
     def __str__(self):
         return "%s (%.2f)" % (self.title, self.amount)

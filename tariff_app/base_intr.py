@@ -5,12 +5,12 @@ from abc import ABCMeta, abstractmethod
 
 class TariffBase(metaclass=ABCMeta):
     @abstractmethod
-    def calc_amount(self, abon_tariff):
+    def calc_amount(self):
         """Считает итоговую сумму платежа"""
 
     @abstractmethod
-    def get_avail_time(self):
-        """Возвращает оставшееся время услуги в секундах"""
+    def calc_deadline(self):
+        """Считаем дату, до которой действкет тариф"""
 
     @staticmethod
     def description():
