@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 import telnetlib
 from mydefs import ping
 from socket import error

@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 from struct import pack, unpack, calcsize
 from .utils import int2ip, ip2int

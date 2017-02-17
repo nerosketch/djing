@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 from .mod_mikrotik import MikrotikTransmitter
 from .core import NasFailedResult, NasNetworkError
 from .structs import TariffStruct, AbonStruct
