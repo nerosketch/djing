@@ -1,8 +1,9 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
 
-    <legend>Начисление средств на счёт</legend>
+    <legend>{% trans 'Additional sum' %}</legend>
 
 
     <div class="row">
@@ -11,7 +12,7 @@
                   method="post"> {% csrf_token %}
 
                 <div class="form-group-sm">
-                    <label for="amount">Количество денег</label>
+                    <label for="amount">{% trans 'Amount of money' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon">&#8399;</span>
@@ -23,10 +24,10 @@
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Пополнить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Refill' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
 

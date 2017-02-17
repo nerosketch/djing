@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
-        <li class="active">Должники</li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
+        <li class="active">{% trans 'Debtors' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>Народ, у которого есть неоплаченные услуги</h3>
+    <h3>{% trans 'People with debts' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
                 <th width="15">#</th>
-                <th>Абонент</th>
-                <th>Цена</th>
-                <th>Комментарий</th>
-                <th>Дата создания</th>
-                <th>Автор</th>
+                <th>{% trans 'Sub' %}</th>
+                <th>{% trans 'Sum of pay' %}</th>
+                <th>{% trans 'Comment' %}</th>
+                <th>{% trans 'Date of make' %}</th>
+                <th>{% trans 'Author' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -38,7 +39,7 @@
             {% empty %}
                 <tr>
                     <td colspan="7">
-                        Нет должников
+                        {% trans 'Debts not found' %}
                     </td>
                 </tr>
             {% endfor %}

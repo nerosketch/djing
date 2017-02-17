@@ -1,4 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="row">
@@ -6,51 +7,51 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Просмотр абонента</h3>
+                    <h3 class="panel-title">{% trans 'View the subscriber' %}</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table borderbot">
                     <tbody>
                         <tr>
-                            <td>Группа</td>
+                            <td>{% trans 'User group' %}</td>
                             <td>
-                                <i>{{ abon.group|default:'&lt;нет&gt;' }}</i>
+                                <i>{{ abon.group|default:_('Not assigned') }}</i>
                             </td>
                         </tr>
                         <tr>
-                            <td>Активен</td>
+                            <td>{% trans 'Is active' %}</td>
                             <td>
-                                <i>{{ abon.is_active|yesno:'Да,Нет' }}</i>
+                                <i>{{ abon.is_active|yesno:_('yes,no') }}</i>
                             </td>
                         </tr>
                         <tr>
-                            <td>Логин</td>
-                            <td><i>{{ abon.username|default:'&lt;нет&gt;' }}</i></td>
+                            <td>{% trans 'login' %}</td>
+                            <td><i>{{ abon.username|default:_('Not assigned') }}</i></td>
                         </tr>
                         <tr>
-                            <td>ФИО</td>
-                            <td><i>{{ abon.fio|default:'&lt;нет&gt;' }}</i></td>
+                            <td>{% trans 'fio' %}</td>
+                            <td><i>{{ abon.fio|default:_('Not assigned') }}</i></td>
                         </tr>
                         <tr>
-                            <td>Телефон</td>
-                            <td><i>{{ abon.telephone|default:'&lt;нет&gt;' }}</i></td>
+                            <td>{% trans 'Telephone' %}</td>
+                            <td><i>{{ abon.telephone|default:_('Not assigned') }}</i></td>
                         </tr>
                         <tr>
-                            <td>Улица</td>
+                            <td>{% trans 'Street' %}</td>
                             <td>
-                                <i>{{ abon.street|default:'&lt;нет&gt;' }}</i>
+                                <i>{{ abon.street|default:_('Not assigned') }}</i>
                             </td>
                         </tr>
                         <tr>
-                            <td>Дом</td>
-                            <td><i>{{ abon.house|default:'&lt;не указан&gt;' }}</i></td>
+                            <td>{% trans 'House' %}</td>
+                            <td><i>{{ abon.house|default:_('Not assigned') }}</i></td>
                         </tr>
                         <tr>
-                            <td>IP Адрес</td>
-                            <td><i>{{ abon.ip_address|default:'&lt;не назначен&gt;' }}</i></td>
+                            <td>{% trans 'Ip Address' %}</td>
+                            <td><i>{{ abon.ip_address|default:_('Not assigned') }}</i></td>
                         </tr>
                         <tr>
-                            <td>Пароль</td>
+                            <td>{% trans 'Password' %}</td>
                             <td><i>{{ passw }}</i></td>
                         </tr>
                     </tbody>
@@ -63,17 +64,17 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Паспортные данные (статичная)</h3>
+                    <h3 class="panel-title">{% trans 'Passport information' %}</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table borderbot">
                     <tbody>
                     <tr>
-                        <td>Серия пас.</td>
+                        <td>{% trans 'Pasport serial' %}</td>
                         <td><i>67 54 937238746</i></td>
                     </tr>
                     <tr>
-                        <td>Кем выдан</td>
+                        <td>{% trans 'Distributor' %}</td>
                         <td><i>ОСУО Всякое название</i></td>
                     </tr>
                     <tr>

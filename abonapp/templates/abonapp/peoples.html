@@ -1,59 +1,60 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li class="active">{{ abon_group.title }}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>Народ в выбранной группе</h3>
+    <h3>{% trans 'The people in the selected group' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
                 <th>
                     <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=username&dir={{ dir|default:"down" }}">
-                        Абонент
+                        {% trans 'Sub' %}
                     </a>
                     {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ip_address&dir={{ dir|default:"down" }}">
-                        IP Адрес
+                        {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=fio&dir={{ dir|default:"down" }}">
-                        ФИО
+                        {% trans 'fio' %}
                     </a>
                     {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a herf="{% url 'abonapp:people_list' abon_group.id %}?order_by=street&dir={{ dir|default:"down" }}">
-                        Улица
+                        {% trans 'Street' %}
                     </a>
                     {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="100">
                     <a herf="{% url 'abonapp:people_list' abon_group.id %}?order_by=house&dir={{ dir|default:"down" }}">
-                        дом/кв
+                        {% trans 'House' %}/{% trans 'Apartment' %}
                     </a>
                     {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="150">Телефон</th>
-                <th width="150">Тариф</th>
+                <th width="150">{% trans 'Telephone' %}</th>
+                <th width="150">{% trans 'Service' %}</th>
                 <th width="50">
                     <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ballance&dir={{ dir|default:"down" }}">
-                        Балланс
+                        {% trans 'Ballance' %}
                     </a>
                     {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="100">Do</th>
+                <th width="100">#</th>
             </tr>
             </thead>
             <tbody>
@@ -64,10 +65,10 @@
                     <tr class="danger">
                 {% endif %}
                 <td><a href="{% url 'abonapp:abon_home' human.group.id human.id %}">{{ human.username }}</a></td>
-                <td>{{ human.ip_address|default:'Не назначен' }}</td>
+                <td>{{ human.ip_address|default:_('Not assigned') }}</td>
                 <td>{{ human.fio }}</td>
-                <td>{{ human.street|default:'Не указан' }}</td>
-                <td>{{ human.house|default:'Не указан' }}</td>
+                <td>{{ human.street|default:_('Not assigned') }}</td>
+                <td>{{ human.house|default:_('Not assigned') }}</td>
                 <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                 <td>
                     {% if human.active_tariff %}
@@ -91,9 +92,9 @@
             {% empty %}
                 <tr>
                     <td colspan="9">
-                        Ещё нет абонентов.
+                        {% trans 'Subscribers not found' %}.
                         {% if perms.abonapp.add_abon %}
-                            <a href="{% url 'abonapp:add_abon' abon_group.id %}">Добавить</a>
+                            <a href="{% url 'abonapp:add_abon' abon_group.id %}">{% trans 'Add abon' %}</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -104,11 +105,11 @@
                 <td colspan="9" class="btn-group">
                     {% if perms.abonapp.add_abon %}
                         <a href="{% url 'abonapp:add_abon' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
-                            <span class="glyphicon glyphicon-plus"></span> Добавить абонента
+                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
                         </a>
                     {% endif %}
                     <a href="{% url 'abonapp:update_nas' abon_group.id %}" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-refresh"></span> Обновить абонентов в NAS
+                        <span class="glyphicon glyphicon-refresh"></span> {% trans 'Refresh subscribers on NAS' %}
                     </a>
                 </td>
             </tr>

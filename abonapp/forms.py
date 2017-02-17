@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils.translation import ugettext as _
 from django import forms
 from django.contrib.auth.hashers import make_password
 from random import choice
@@ -25,9 +26,9 @@ def generate_random_password():
 
 class AbonForm(forms.ModelForm):
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username, widget=forms.TextInput(attrs={
-        'placeholder': 'Логин',
+        'placeholder': _('login'),
         'class': "form-control",
-        'required':''
+        'required': ''
     }))
 
     password = forms.CharField(max_length=64, initial=generate_random_password,
@@ -38,12 +39,12 @@ class AbonForm(forms.ModelForm):
         fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active']
         widgets = {
             'fio': forms.TextInput(attrs={
-                'placeholder': 'ФИО',
+                'placeholder': _('fio'),
                 'class': "form-control",
                 'required': ''
             }),
             'telephone': forms.TextInput(attrs={
-                'placeholder': '+[7,8,9,3] и 10,11 цифр',
+                'placeholder': _('telephone placeholder'),
                 'pattern': r'^\+[7,8,9,3]\d{10,11}$',
                 'required': '',
                 'class': 'form-control'

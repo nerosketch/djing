@@ -1,17 +1,18 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
-    <legend>Купленные абонентом услуги (назначенные тарифные планы)</legend>
+    <legend>{% trans 'Services of subscriber' %}</legend>
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
-            <th width="50">Приоритет</th>
-            <th>Тариф</th>
-            <th>Стоимость</th>
-            <th>Входящая скорость</th>
-            <th>Исходящая скорость</th>
-            <th>Время действия</th>
-            <th>Ред.</th>
+            <th width="50">{% trans 'Priority' %}</th>
+            <th>{% trans 'Service' %}</th>
+            <th>{% trans 'Sum' %}</th>
+            <th>{% trans 'Input speed' %}</th>
+            <th>{% trans 'Output speed' %}</th>
+            <th>{% trans 'Time of action' %}</th>
+            <th>{% trans 'Edit' %}</th>
         </tr>
         </thead>
 
@@ -40,7 +41,7 @@
                         {% if perms.abonapp.can_activate_service %}
                             {% if not active_abontariff_id %}
                                 <a href="{% url 'abonapp:activate_service' abon_group.id abon.id trf.id %}"
-                                   class="btn btn-success btn-sm" title="Активировать услугу">
+                                   class="btn btn-success btn-sm" title="{% trans 'Activate service' %}">
                                     <i class="glyphicon glyphicon-shopping-cart"></i>
                                 </a>
                             {% endif %}
@@ -48,37 +49,36 @@
 
                         <!-- "{ % url 'abonapp:chpriority_tariff' abon_group.id abon.id % }?t={ { trf.id } }&a=up" -->
                         <a href="#"
-                           class="btn btn-default btn-sm disabled" title="Повысить приоритет">
+                           class="btn btn-default btn-sm disabled" title="{% trans 'Priority up' %}">
                             <i class="glyphicon glyphicon-hand-up"></i>
                         </a>
 
                         <!-- "{ % url 'abonapp:chpriority_tariff' abon_group.id abon.id % }?t={ { trf.id } }&a=down" -->
                         <a href="#"
-                           class="btn btn-default btn-sm disabled" title="Понизить приоритет">
+                           class="btn btn-default btn-sm disabled" title="{% trans 'Priority down' %}">
                             <i class="glyphicon glyphicon-hand-down"></i>
                         </a>
 
                         {% if perms.abonapp.delete_abontariff %}
                             <a href="{% url 'abonapp:unsubscribe_service' abon_group.id abon.id trf.id %}"
-                               class="btn btn-danger btn-sm" title="Удалить услугу">
+                               class="btn btn-danger btn-sm" title="{% trans 'Delete service' %}">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </a>
                         {% endif %}
                     </td>
                 {% else %}
                     <td>
-                        <a href="{% url 'abonapp:compl_srv' abon_group.id abon.id trf.id %}"
-                           title="Завершить услугу досрочно" class="btn btn-danger btn-sm">
-                            <i class="glyphicon glyphicon-remove"></i> Завершить
+                        <a href="{% url 'abonapp:compl_srv' abon_group.id abon.id trf.id %}" class="btn btn-danger btn-sm">
+                            <i class="glyphicon glyphicon-remove"></i> {% trans 'Finish service' %}
                         </a>
                     </td>
                 {% endif %}
             </tr>
         {% empty %}
             <tr>
-                <td colspan="7">Нет подключённых абоненту услуг.
+                <td colspan="7">{% trans 'Services of subscribers not found' %}.
                     {% if perms.abonapp.can_buy_tariff %}
-                        <a href="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}" class="lgtbx">Купить</a>
+                        <a href="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}" class="lgtbx">{% trans 'Buy' %}</a>
                     {% endif %}
                 </td>
             </tr>
@@ -89,7 +89,7 @@
             <tr>
                 <th colspan="7">
                     <a href="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}" class="btn btn-sm btn-success">
-                        <span class="glyphicon glyphicon-plus"></span> Купить услугу
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Buy service' %}
                     </a>
                 </th>
             </tr>

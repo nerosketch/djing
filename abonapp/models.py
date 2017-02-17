@@ -2,6 +2,7 @@
 from django.utils import timezone
 from django.db import models
 from django.core.validators import DecimalValidator
+from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
@@ -19,7 +20,7 @@ class AbonGroup(models.Model):
     class Meta:
         db_table = 'abonent_groups'
         permissions = (
-            ('can_add_ballance', 'Пополнение счёта'),
+            ('can_add_ballance', _('fill account')),
         )
 
     def __str__(self):
@@ -114,13 +115,13 @@ class AbonTariff(models.Model):
         amnt = self.calc_amount_service()
         # если не хватает денег
         if self.abon.ballance < amnt:
-            raise LogicError('Не хватает денег на счету')
+            raise LogicError(_('not enough money'))
         # считаем дату активации услуги
         self.time_start = timezone.now()
         # считаем дату завершения услуги
         self.deadline = calc_obj.calc_deadline()
         # снимаем деньги за услугу
-        self.abon.make_pay(current_user, amnt, u_comment='Завершение и оплата услуги по истечению срока действия')
+        self.abon.make_pay(current_user, amnt, u_comment=_('service finish log'))
         self.save()
 
     # Используется-ли услуга сейчас, если время старта есть то он активирован
@@ -139,8 +140,8 @@ class AbonTariff(models.Model):
         db_table = 'abonent_tariff'
         unique_together = (('abon', 'tariff', 'tariff_priority'),)
         permissions = (
-            ('can_complete_service', 'Досрочное завершение услуги абонента'),
-            ('can_activate_service', 'Активация услуги абонента')
+            ('can_complete_service', _('finish service perm')),
+            ('can_activate_service', _('activate service perm'))
         )
 
 
@@ -183,11 +184,11 @@ class Abon(UserProfile):
     class Meta:
         db_table = 'abonent'
         permissions = (
-            ('can_buy_tariff', 'Покупка тарифа абоненту'),
+            ('can_buy_tariff', _('Buy service perm')),
         )
 
     # Платим за что-то
-    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment='Снятие со счёта средств'):
+    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=_('pay log')):
         AbonLog.objects.create(
             abon=self,
             amount=-how_match_to_pay,
@@ -232,7 +233,7 @@ class Abon(UserProfile):
         AbonLog.objects.create(
             abon=self, amount=-tariff.amount,
             author=author,
-            comment=comment or 'Покупка тарифного плана через админку, тариф "%s"' % tariff
+            comment=comment or _('Buy service default log')
         )
 
     # Пробует подключить новую услугу если пришло время
@@ -244,7 +245,7 @@ class Abon(UserProfile):
         for at in ats:
             # если услуга просрочена
             if nw > at.deadline:
-                print("Услуга просрочена, отключаем, и подключаем новую")
+                print(_('service overdue log'))
                 # выберем следующую по приоритету
                 # next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)
                 next_tarifs = [tr for tr in ats if tr.tariff_priority > at.tariff_priority][:2]

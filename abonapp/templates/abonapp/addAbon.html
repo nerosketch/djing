@@ -1,23 +1,24 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
-        <li class="active">Добавить абонента</li>
+        <li class="active">{% trans 'Add abon' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Добавьте аккаунт абонента</h3>
+            <h3 class="panel-title">{% trans 'Add abon' %}</h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'abonapp:add_abon' abon_group.id %}" method="post">{% csrf_token %}
                 <div class="form-group">
-                    <label for="login">Логин абонента</label>
+                    <label for="login">{% trans 'login' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -25,7 +26,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="fio">Фамилия Имя</label>
+                    <label for="fio">{% trans 'Long name' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bookmark"></span></span>
@@ -33,7 +34,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="telephone">Телефон</label>
+                    <label for="telephone">{% trans 'Telephone' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
@@ -41,7 +42,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="grp">Группа абонентов</label>
+                    <label for="grp">{% trans 'User group' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
@@ -49,13 +50,13 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="id_description">Комментарий</label>
+                    <label for="id_description">{% trans 'Comment' %}</label>
 
                     <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
                     {{ form.description }}{{ form.description.errors }}
                 </div>
                 <div class="form-group">
-                    <label for="id_street">Улица</label>
+                    <label for="id_street">{% trans 'Street' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-road"></span></span>
@@ -63,7 +64,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="id_house">Дом/Квартира</label>
+                    <label for="id_house">{% trans 'Apartment' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-home"></span></span>
@@ -72,7 +73,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_password">Пароль</label>
+                    <label for="id_password">{% trans 'Password' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
@@ -82,10 +83,10 @@
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
             </form>

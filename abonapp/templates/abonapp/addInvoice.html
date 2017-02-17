@@ -1,20 +1,20 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
         <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
-        <li class="active">Добавить долг</li>
+        <li class="active">{% trans 'Add debt' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Добавьте платёж на оплату для
+            <h3 class="panel-title">{% trans 'Add receipt for' %}
                 <u><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></u>
             </h3>
         </div>
@@ -22,7 +22,7 @@
             <form role="form" action="{% url 'abonapp:add_invoice' abon_group.id abon.id %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
-                    <label for="pamount">Сумма для платежа</label>
+                    <label for="pamount">{% trans 'Sum of pay' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon">&#8381;</span>
@@ -33,20 +33,20 @@
                 <div class="checkbox">
                     <label>
                         <input id="paystat" type="checkbox" name="status"{% if invcount == 0 %} checked{% endif %}>
-                        Статус оплаты
+                        {% trans 'Pay status' %}
                     </label>
                 </div>
                 <div class="form-group">
-                    <label for="comm">Комментарий</label>
+                    <label for="comm">{% trans 'Comment' %}</label>
                     <textarea id="comm" name="comment" required maxlength="128" rows="3"
                               class="form-control"></textarea>
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
             </form>

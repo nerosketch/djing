@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li class="active">Группы абонентов</li>
+        <li class="active">{% trans 'User groups' %}</li>
     </ol>
 
-    <h3>Группы абонентов</h3>
+    <h3>{% trans 'User groups' %}</h3>
 
     {% include 'message_block.html' %}
 
@@ -18,14 +19,14 @@
                 <th width="50">#</th>
                 <th>
                     <a href="{% url 'abonapp:group_list' %}?order_by=title&dir={{ dir|default:"down" }}">
-                        Название группы
+                        {% trans 'Group title' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="100">
-                    Количество абонентов
+                    {% trans 'Number of subscribers' %}
                 </th>
-                <th width="100">Do</th>
+                <th width="100">#</th>
             </tr>
             </thead>
             <tbody>
@@ -47,7 +48,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="4"><a href="#">Ещё нет групп</a></td>
+                    <td colspan="4"><a href="#">{% trans 'Groups was not found' %}</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -56,14 +57,14 @@
                 <td colspan="4" class="btn-group">
                     {% if perms.abonapp.add_abongroup %}
                     <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
-                        <span class="glyphicon glyphicon-plus"></span> Создать группу
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add group' %}
                     </a>
                     {% endif %}
                     <a href="{% url 'abonapp:log' %}" class="btn btn-default btn-sm">
-                        <span class="glyphicon glyphicon-record"></span> Действия абонентов
+                        <span class="glyphicon glyphicon-record"></span> {% trans 'Subscribers actions' %}
                     </a>
                     <a href="{% url 'abonapp:debtors' %}" class="btn btn-default btn-sm">
-                        <span class="glyphicon glyphicon-exclamation-sign"></span> Список должников
+                        <span class="glyphicon glyphicon-exclamation-sign"></span> {% trans 'List of debtors' %}
                     </a>
                 </td>
             </tr>

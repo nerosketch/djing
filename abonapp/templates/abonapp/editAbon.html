@@ -1,52 +1,53 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="row">
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Изменение абонента</h3>
+                    <h3 class="panel-title">{% trans 'Change subscriber' %}</h3>
                 </div>
                 <div class="panel-body">
                     <form role="form" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.id abon.id %}" method="post"> {% csrf_token %}
 
                         <div class="form-group-sm">
-                            <label for="id_group" class="col-sm-2 control-label">Группа</label>
+                            <label for="id_group" class="col-sm-2 control-label">{% trans 'User group' %}</label>
                             <div class="col-sm-10">
                                 {{ form.group }}{{ form.group.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_is_active" class="col-sm-2 control-label">Активен</label>
+                            <label for="id_is_active" class="col-sm-2 control-label">{% trans 'Is active' %}</label>
                             <div class="col-sm-10">
                                 {{ form.is_active }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_username" class="col-sm-2 control-label">Логин</label>
+                            <label for="id_username" class="col-sm-2 control-label">{% trans 'login' %}</label>
                             <div class="col-sm-10">
                                 {{ form.username }}{{ form.username.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_fio" class="col-sm-2 control-label">ФИО</label>
+                            <label for="id_fio" class="col-sm-2 control-label">{% trans 'fio' %}</label>
                             <div class="col-sm-10">
                                 {{ form.fio }}{{ form.fio.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_telephone" class="col-sm-2 control-label">Телефон</label>
+                            <label for="id_telephone" class="col-sm-2 control-label">{% trans 'Telephone' %}</label>
                             <div class="col-sm-10">
                                 {{ form.telephone }}{{ form.telephone.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_street" class="col-sm-2 control-label">Улица</label>
+                            <label for="id_street" class="col-sm-2 control-label">{% trans 'Street' %}</label>
 
                             <div class="col-sm-10">
                                 {{ form.street }}{{ form.street.errors }}
@@ -54,7 +55,7 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_house" class="col-sm-2 control-label">Дом</label>
+                            <label for="id_house" class="col-sm-2 control-label">{% trans 'House' %}</label>
 
                             <div class="col-sm-10">
                                 {{ form.house }}{{ form.house.errors }}
@@ -62,21 +63,21 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_ip" class="col-sm-2 control-label">IP Адрес</label>
+                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Ip Address' %}</label>
                             <div class="col-sm-10">
                                 <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_password" class="col-sm-2 control-label">Пароль</label>
+                            <label for="id_password" class="col-sm-2 control-label">{% trans 'Password' %}</label>
                             <div class="col-sm-10">
                                 {{ form.password }}{{ form.password.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_description" class="col-sm-2 control-label">Комментарий</label>
+                            <label for="id_description" class="col-sm-2 control-label">{% trans 'Comment' %}</label>
                             <div class="col-sm-10">
                                 {{ form.description }}{{ form.description.errors }}
                             </div>
@@ -85,7 +86,7 @@
                         <div class="form-group-sm">
                             <div class="col-sm-offset-2 col-sm-10">
                                 <button type="submit" class="btn btn-primary btn-sm">
-                                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                                 </button>
                             </div>
                         </div>
@@ -98,25 +99,25 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Паспортные данные</h3>
+                    <h3 class="panel-title">{% trans 'Passport information' %}</h3>
                 </div>
                 <div class="panel-body">
                     <form role="form" class="form-horizontal" action="" method="get">
 
                         <div class="form-group-sm">
-                            <label for="pasp_num" class="col-sm-3 control-label">Серия пас.</label>
+                            <label for="pasp_num" class="col-sm-3 control-label">{% trans 'Pasport serial' %}</label>
                             <div class="col-sm-9">
                                 <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <label for="pasp_sr" class="col-sm-3 control-label">Номер пас.</label>
+                            <label for="pasp_sr" class="col-sm-3 control-label">{% trans 'Pasport number' %}</label>
                             <div class="col-sm-9">
                                 <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <label for="wr" class="col-sm-3 control-label">Кем выдан</label>
+                            <label for="wr" class="col-sm-3 control-label">{% trans 'Distributor' %}</label>
                             <div class="col-sm-9">
                                 <input type="text" name="wr" class="form-control" id="wr"/>
                             </div>
@@ -125,7 +126,7 @@
                         <div class="form-group-sm">
                             <div class="col-sm-offset-3 col-sm-9">
                                 <button type="submit" class="btn btn-primary btn-sm">
-                                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                                 </button>
                             </div>
                         </div>

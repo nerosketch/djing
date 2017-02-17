@@ -1,9 +1,10 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
         <li class="active">{{ abon.fio }}</li>
     </ol>
@@ -11,9 +12,9 @@
     {% include 'message_block.html' %}
 
     <div class="page-header">
-        <h2>{{ abon.fio|default:"Имя абонента" }}
-            <small>Балланс <i class="glyphicon glyphicon-ruble"></i>
-                <b>{{ abon.ballance }}</b> руб
+        <h2>{{ abon.fio|default:_("Long name") }}
+            <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
+                <b>{{ abon.ballance }}</b>
             </small>
         </h2>
     </div>
@@ -22,34 +23,34 @@
 
         {% url 'abonapp:abon_home' abon_group.id abon.id as abon_home %}
         <li{% if abon_home == request.path %} class="active"{% endif %}>
-            <a href="{{ abon_home }}">Информация абонента</a>
+            <a href="{{ abon_home }}">{% trans 'Sub information' %}</a>
         </li>
 
         {% url 'abonapp:abon_services' abon_group.id abon.id as abserv %}
         <li{% if abserv == request.path %} class="active"{% endif %}>
-            <a href="{{ abserv }}">Услуги</a>
+            <a href="{{ abserv }}">{% trans 'Services' %}</a>
         </li>
 
         {% if perms.abonapp.can_add_ballance %}
             {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
             <li{% if abamount == request.path %} class="active"{% endif %}>
-                <a href="{{ abamount }}">Пополнить счёт</a>
+                <a href="{{ abamount }}">{% trans 'Fill account' %}</a>
             </li>
         {% endif %}
 
         {% url 'abonapp:abon_debts' abon_group.id abon.id as abondebts %}
         <li{% if abondebts == request.path %} class="active"{% endif %}>
-            <a href="{{ abondebts }}">Долги</a>
+            <a href="{{ abondebts }}">{% trans 'Debts' %}</a>
         </li>
 
         {% url 'abonapp:abon_phistory' abon_group.id abon.id as abphist %}
         <li{% if abphist == request.path %} class="active"{% endif %}>
-            <a href="{{ abphist }}">История платежей</a>
+            <a href="{{ abphist }}">{% trans 'Payment history' %}</a>
         </li>
 
         {% url 'abonapp:task_log' abon_group.id abon.id as abtasklog %}
         <li{% if abtasklog == request.path %} class="active"{% endif %}>
-            <a href="{{ abtasklog }}">История задач</a>
+            <a href="{{ abtasklog }}">{% trans 'History of tasks' %}</a>
         </li>
     </ul>
 

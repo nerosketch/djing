@@ -1,0 +1,559 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE"S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-17 17:28+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: abonapp/forms.py:29 abonapp/templates/abonapp/addAbon.html.py:21
+msgid "login"
+msgstr "Логин"
+
+#: abonapp/forms.py:42
+msgid "fio"
+msgstr "ФИО"
+
+#: abonapp/forms.py:47
+msgid "telephone placeholder"
+msgstr "+[7,8,9,3] и 10,11 цифр"
+
+#: abonapp/models.py:23
+msgid "fill account"
+msgstr "Пополнение счёта"
+
+#: abonapp/models.py:118
+msgid "not enough money"
+msgstr "Не хватает денег на счету"
+
+#: abonapp/models.py:124
+msgid "service finish log"
+msgstr "Завершение и оплата услуги по истечению срока действия"
+
+#: abonapp/models.py:143
+msgid "finish service perm"
+msgstr "Снятие со счёта средств"
+
+#: abonapp/models.py:144
+msgid "activate service perm"
+msgstr "Активация услуги абонента"
+
+#: abonapp/models.py:187
+msgid "Buy service perm"
+msgstr "Покупка тарифа абоненту"
+
+#: abonapp/models.py:191
+msgid "pay log"
+msgstr "Снятие со счёта средств"
+
+#: abonapp/models.py:236
+msgid "Buy service default log"
+msgstr "Покупка тарифного плана через админку"
+
+#: abonapp/models.py:248
+msgid "service overdue log"
+msgstr "Услуга просрочена, отключаем, и подключаем новую"
+
+#: abonapp/templates/abonapp/abonamount.html:6
+msgid "Additional sum"
+msgstr "Начисление средств на счёт"
+
+#: abonapp/templates/abonapp/abonamount.html:15
+msgid "Amount of money"
+msgstr "Количество денег"
+
+#: abonapp/templates/abonapp/abonamount.html:27
+msgid "Refill"
+msgstr "Пополнить"
+
+#: abonapp/templates/abonapp/abonamount.html:30
+#: abonapp/templates/abonapp/addAbon.html:89
+#: abonapp/templates/abonapp/addGroup.html:32
+#: abonapp/templates/abonapp/addInvoice.html:49
+#: abonapp/templates/abonapp/buy_tariff.html:37
+#: abonapp/templates/abonapp/complete_service.html:63
+msgid "Reset"
+msgstr "Сбросить"
+
+#: abonapp/templates/abonapp/activate_service.html:8
+#: abonapp/templates/abonapp/addAbon.html:7
+#: abonapp/templates/abonapp/addGroup.html:7
+#: abonapp/templates/abonapp/addInvoice.html:7
+#: abonapp/templates/abonapp/buy_tariff.html:7
+#: abonapp/templates/abonapp/complete_service.html:7
+msgid "User groups"
+msgstr "Группы абонентов"
+
+#: abonapp/templates/abonapp/activate_service.html:11
+#: abonapp/templates/abonapp/activate_service.html:18
+msgid "Activate service"
+msgstr "Активировать услугу"
+
+#: abonapp/templates/abonapp/activate_service.html:26
+#, python-format
+msgid ""
+"\n"
+"Are you sure that you want activate service for the user?<br>\n"
+"Note that the account will be removed from his money and open access to the "
+"resources of the paid services.<br>\n"
+"Maintenance cost is %(amount)s. On account of %(ballance)s, will be "
+"%(diff)s<br>\n"
+"It will work until %(deadline)s"
+msgstr ""
+"\n"
+"Вы уверены что хотите активировать абоненту эту услугу?<br>Обратите внимание "
+"что с его счёта <b>снимутся деньги</b> и откроется доступ к ресурсам "
+"оплаченной услуги.<br>Стоимость услуги: %(amount)sруб. На счету %(ballance)s "
+"руб, останется %(diff)s руб.<br>Услуга будет действовать до %(deadline)s"
+
+#: abonapp/templates/abonapp/activate_service.html:34
+#: abonapp/templates/abonapp/addAbon.html:86
+#: abonapp/templates/abonapp/addGroup.html:29
+#: abonapp/templates/abonapp/addInvoice.html:46
+#: abonapp/templates/abonapp/buy_tariff.html:34
+#: abonapp/templates/abonapp/complete_service.html:60
+msgid "Save"
+msgstr "Сохранить"
+
+#: abonapp/templates/abonapp/addAbon.html:9
+#: abonapp/templates/abonapp/addAbon.html:16
+msgid "Add abon"
+msgstr "Добавить абонента"
+
+#: abonapp/templates/abonapp/addAbon.html:29
+msgid "Long name"
+msgstr "Фамилия и Имя"
+
+#: abonapp/templates/abonapp/addAbon.html:37
+msgid "Telephone"
+msgstr "Телефон"
+
+#: abonapp/templates/abonapp/addAbon.html:45
+msgid "User group"
+msgstr "Группа"
+
+#: abonapp/templates/abonapp/addAbon.html:53
+#: abonapp/templates/abonapp/addInvoice.html:40
+msgid "Comment"
+msgstr "Комментарий"
+
+#: abonapp/templates/abonapp/addAbon.html:59
+msgid "Street"
+msgstr "Улица"
+
+#: abonapp/templates/abonapp/addAbon.html:67
+msgid "Apartment"
+msgstr "Квартира"
+
+#: abonapp/templates/abonapp/addAbon.html:76
+msgid "Password"
+msgstr "Пароль"
+
+#: abonapp/templates/abonapp/addGroup.html:8
+#: abonapp/templates/abonapp/addGroup.html:15
+msgid "Add group"
+msgstr "Добавьте группу абонентов"
+
+#: abonapp/templates/abonapp/addGroup.html:20
+msgid "Group title"
+msgstr "Название группы"
+
+#: abonapp/templates/abonapp/addInvoice.html:10
+msgid "Add debt"
+msgstr "Добавить квитанцию"
+
+#: abonapp/templates/abonapp/addInvoice.html:17
+msgid "Add receipt for"
+msgstr "Добавьте платёж на оплату для"
+
+#: abonapp/templates/abonapp/addInvoice.html:25
+msgid "Sum of pay"
+msgstr "Сумма для платежа"
+
+#: abonapp/templates/abonapp/addInvoice.html:36
+msgid "Pay status"
+msgstr "Статус оплаты"
+
+#: abonapp/templates/abonapp/buy_tariff.html:10
+#: abonapp/templates/abonapp/buy_tariff.html:25
+msgid "Pick a service"
+msgstr "Заказать услугу"
+
+#: abonapp/templates/abonapp/buy_tariff.html:17
+msgid "Pick a service for"
+msgstr "Купить новую услугу (заказать тариф) для"
+
+#: abonapp/templates/abonapp/buy_tariff.html:18
+msgid "Sub"
+msgstr "Абонент"
+
+#: abonapp/templates/abonapp/complete_service.html:10
+#: abonapp/templates/abonapp/complete_service.html:17
+msgid "Finish service"
+msgstr "Завершить услугу"
+
+#: abonapp/templates/abonapp/complete_service.html:25
+msgid ""
+"Early completion of the current service will cause that user will be denied "
+"access to services Resources (Net closes)\n"
+"To continue to use the resources necessary to connect the required service"
+msgstr ""
+"Досрочное завершение текущей услуги приведёт к тому что пользователю будет запрещён доступ к ресурсам "
+"услуги (закроется инет)<br/>"
+"Для продолжения пользования ресурсами надо подключить нужную услугу"
+
+#: abonapp/templates/abonapp/complete_service.html:32
+msgid ""
+"Details: <br/>\n"
+"You complete tariff"
+msgstr ""
+"Подробнее:<br/>"
+"Вы завершаете тариф"
+
+#: abonapp/templates/abonapp/complete_service.html:44
+#, python-format
+msgid ""
+"The service has been connected: %(time_start)s<br/>\n"
+"Today: %(today)s <br/>\n"
+"Time of use: %(time_use)s <br/>\n"
+"The total cost of the service: %(amount)s <br/>\n"
+"Total cost: %(tcost)s"
+msgstr ""
+"Услуга была подключена: %(time_start)s<br/>"
+"Сегодня: %(today)s<br/>"
+"Время использования: %(time_use)s<br/>"
+"Полная стоимость услуги: %(amount)s<br/>"
+"Итоговая стоимость: %(tcost)s"
+
+#: abonapp/views.py:50
+msgid "create group success msg"
+msgstr "Группа успешно создана"
+
+#: abonapp/views.py:53 abonapp/views.py:111 abonapp/views.py:252
+#: abonapp/views.py:344
+msgid "fix form errors"
+msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
+
+#: abonapp/views.py:88 abonapp/views.py:153
+msgid "delete group success msg"
+msgstr "Группа успешно удалена"
+
+#: abonapp/views.py:108
+msgid "create abon success msg"
+msgstr "Абонент успешно создан"
+
+#: abonapp/views.py:125
+msgid "Address"
+msgstr "Адрес"
+
+#: abonapp/views.py:147
+msgid "delete abon success msg"
+msgstr "Абонент успешно удалён"
+
+#: abonapp/views.py:156
+msgid "I not know what to delete"
+msgstr "Не понятно что удалять"
+
+#: abonapp/views.py:160
+#, python-format
+msgid "NAS says: '%s'"
+msgstr "NAS сказал: '%s'"
+
+#: abonapp/views.py:173
+msgid "fill account through admin side"
+msgstr "Пополнение счёта через админку"
+
+#: abonapp/views.py:175
+#, python-format
+msgid "Account filled successfully on %.2f"
+msgstr ""
+
+#: abonapp/views.py:178
+msgid "I not know the account id"
+msgstr "Счёт успешно пополнен на %.2f"
+
+#: abonapp/views.py:250
+msgid "edit abon success msg"
+msgstr "Абонент успешно изменён"
+
+#: abonapp/views.py:257
+#, python-format
+msgid "Ip address already exist. %s"
+msgstr ""
+"Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. "
+"А вообще: %s"
+
+#: abonapp/views.py:265
+msgid "Ip address not found"
+msgstr "Указанный вами ip отсутствует в ip pool"
+
+#: abonapp/views.py:267
+msgid "User has not have password, and cannot login"
+msgstr "Для абонента не задан пароль, он не сможет войти в учётку"
+
+#: abonapp/views.py:314
+msgid "Receipt has been created"
+msgstr "Квитанция на оплату была создана"
+
+#: abonapp/views.py:341
+msgid "Tariff has been picked"
+msgstr "Тариф успешно выбран"
+
+#: abonapp/views.py:398
+msgid "Service has been finished successfully"
+msgstr "Услуга успешно завершена"
+
+#: abonapp/views.py:401 abonapp/views.py:430
+msgid "Not confirmed"
+msgstr "Действие не подтверждено"
+
+#: abonapp/views.py:433
+msgid "Service has been activated successfully"
+msgstr "Услуга успешно активирована"
+
+#: abonapp/views.py:458
+msgid "User has been detached from service"
+msgstr "Абонент отвязан от услуги"
+
+msgid "House"
+msgstr "Дом"
+
+msgid "Debtors"
+msgstr "Должники"
+
+msgid "People with debts"
+msgstr "Народ, у которого есть неоплаченные услуги"
+
+msgid "Date of make"
+msgstr "Дата создания"
+
+msgid "Author"
+msgstr "Автор"
+
+msgid "Debts not found"
+msgstr "Нет должников"
+
+msgid "Change subscriber"
+msgstr "Изменение абонента"
+
+msgid "Is active"
+msgstr "Активен"
+
+msgid "Ip Address"
+msgstr "IP Адрес"
+
+msgid "Passport information"
+msgstr "Паспортные данные"
+
+msgid "Pasport serial"
+msgstr "Серия пас."
+
+msgid "Pasport number"
+msgstr "Номер пас."
+
+msgid "Distributor"
+msgstr "Кем выдан"
+
+msgid "Ballance"
+msgstr "Балланс"
+
+
+msgid "Sub information"
+msgstr "Информация абонента"
+
+msgid "Services"
+msgstr "Услуги"
+msgid "Service"
+msgstr "Услуга"
+
+msgid "Fill account"
+msgstr "Пополнить счёт"
+
+msgid "Debts"
+msgstr "Долги"
+
+msgid "Payment history"
+msgstr "История платежей"
+
+msgid "History of tasks"
+msgstr "История задач"
+
+msgid "Number of subscribers"
+msgstr "Количество абонентов"
+
+msgid "Groups was not found"
+msgstr "Ещё нет групп"
+
+msgid "Subscribers actions"
+msgstr "История действий абонентов"
+
+msgid "List of debtors"
+msgstr "Список должников"
+
+msgid "History of subscriber"
+msgstr "История абонента"
+
+msgid "Sum"
+msgstr "Сумма"
+
+msgid "Date"
+msgstr "Время"
+
+msgid "Actions not found"
+msgstr "Нет событий"
+
+msgid "Month"
+msgstr "Месяц"
+
+msgid "Date of payment"
+msgstr "Дата оплаты"
+
+msgid "Author of payment"
+msgstr "Назначил"
+
+msgid "Created paid,Not yet paid"
+msgstr "Создан оплаченным,Ещё не оплачено"
+
+msgid "Receipts not found"
+msgstr "Назначенные платежи отсутствуют"
+
+msgid "Payment history is empty"
+msgstr "История платежей пуста"
+
+msgid "The people in the selected group"
+msgstr "Народ в выбранной группе"
+
+msgid "Not assigned"
+msgstr "&lt;Не назначен&gt;"
+
+msgid "Subscribers not found"
+msgstr "Абоненты не найдены"
+
+msgid "Refresh subscribers on NAS"
+msgstr "Обновить абонентов в NAS"
+
+msgid "Services of subscriber"
+msgstr "Купленные абонентом услуги (назначенные тарифные планы)"
+
+msgid "Priority"
+msgstr "Приоритет"
+
+msgid "Input speed"
+msgstr "Входящая скорость"
+
+msgid "Output speed"
+msgstr "Исходящая скорость"
+
+msgid "Time of action"
+msgstr "Время действия"
+
+msgid "Edit"
+msgstr "Ред."
+
+msgid "Priority up"
+msgstr "Повысить приоритет"
+
+msgid "Priority down"
+msgstr "Понизить приоритет"
+
+msgid "Delete service"
+msgstr "Удалить услугу"
+
+msgid "Services of subscribers not found"
+msgstr "Нет подключённых абоненту услуг"
+
+msgid "Buy"
+msgstr "Купить"
+
+msgid "Buy service"
+msgstr "Купить услугу"
+
+msgid "Recipients"
+msgstr "Исполнители"
+
+msgid "State"
+msgstr "Состояние"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Recipients not found"
+msgstr "Нет исполнителей"
+
+msgid "Tasks not found"
+msgstr "Нет задач"
+
+msgid "View the subscriber"
+msgstr "Просмотр абонента"
+
+msgid "yes,no"
+msgstr "Да,Нет"
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+

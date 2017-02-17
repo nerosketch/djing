@@ -1,24 +1,25 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
-        <li class="active">История действий абонентов</li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
+        <li class="active">{% trans 'Subscribers actions' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>История абонента</h3>
+    <h3>{% trans 'History of subscriber' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>Сумма</th>
-                <th>Абонент</th>
-                <th>Комментарий</th>
-                <th width="250">Время</th>
-                <th width="150">Автор</th>
+                <th>{% trans 'Sum' %}</th>
+                <th>{% trans 'Sub' %}</th>
+                <th>{% trans 'Comment' %}</th>
+                <th width="250">{% trans 'Date' %}</th>
+                <th width="150">{% trans 'Author' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -36,17 +37,14 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">Нет событий</td>
+                    <td colspan="5">{% trans 'Actions not found' %}</td>
                 </tr>
             {% endfor %}
             </tbody>
-
 
         </table>
     </div>
 
     {% include 'toolbar_page.html' with pag=logs %}
-
-
 
 {% endblock %}

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.http import HttpResponse, Http404
 from django.contrib import messages
+from django.utils.translation import ugettext as _
 
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
@@ -46,10 +47,10 @@ def addgroup(request):
             frm = forms.AbonGroupForm(request.POST)
             if frm.is_valid():
                 frm.save()
-                messages.success(request, 'Группа успешно создана')
+                messages.success(request, _('create group success msg'))
                 return redirect('abonapp:group_list')
             else:
-                messages.error(request, 'Исправьте ошибки')
+                messages.error(request, _('fix form errors'))
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:
@@ -84,7 +85,7 @@ def delgroup(request):
     try:
         agd = mydefs.safe_int(request.GET.get('id'))
         get_object_or_404(models.AbonGroup, id=agd).delete()
-        messages.success(request, 'Группа успешно удалена')
+        messages.success(request, _('delete group success msg'))
         return mydefs.res_success(request, 'abonapp:group_list')
     except NasFailedResult as e:
         messages.error(request, e)
@@ -104,10 +105,10 @@ def addabon(request, gid):
             frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
                 abon = frm.save()
-                messages.success(request, 'Абонент создан')
+                messages.success(request, _('create abon success msg'))
                 return redirect('abonapp:abon_home', group.id, abon.pk)
             else:
-                messages.error(request, 'Некоторые поля заполнены не правильно, проверте ещё раз')
+                messages.error(request, _('fix form errors'))
 
     except IntegrityError as e:
         messages.error(request, e)
@@ -121,7 +122,7 @@ def addabon(request, gid):
     if not frm:
         frm = forms.AbonForm(initial={
             'group': group,
-            'address': 'Адрес',
+            'address': _('Address'),
             'is_active': False
         })
 
@@ -143,20 +144,20 @@ def delentity(request):
             abon = get_object_or_404(models.Abon, id=uid)
             gid = abon.group.id
             abon.delete()
-            messages.success(request, 'Абонент успешно удалён')
+            messages.success(request, _('delete abon success msg'))
             return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
         elif typ == 'g':
             if not request.user.has_perm('abonapp.delete_abongroup'):
                 raise PermissionDenied
             get_object_or_404(models.AbonGroup, id=uid).delete()
-            messages.success(request, 'Группа успешно удалёна')
+            messages.success(request, _('delete group success msg'))
             return mydefs.res_success(request, 'abonapp:group_list')
         else:
-            messages.warning(request, 'Не понятно что удалять')
+            messages.warning(request, _('I not know what to delete'))
     except NasNetworkError as e:
         messages.error(request, e)
     except NasFailedResult as e:
-        messages.error(request, "NAS сказал: '%s'" % e)
+        messages.error(request, _("NAS says: '%s'") % e)
     return redirect('abonapp:group_list')
 
 
@@ -169,12 +170,12 @@ def abonamount(request, gid, uid):
             abonid = mydefs.safe_int(request.POST.get('abonid'))
             if abonid == int(uid):
                 amnt = mydefs.safe_float(request.POST.get('amount'))
-                abon.add_ballance(request.user, amnt, comment='Пополнение счёта через админку')
+                abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
                 abon.save(update_fields=['ballance'])
-                messages.success(request, 'Счёт успешно пополнен на %d' % amnt)
+                messages.success(request, _('Account filled successfully on %.2f') % amnt)
                 return redirect('abonapp:abon_home', gid=gid, uid=uid)
             else:
-                messages.error(request, 'Не могу разобрать id абонента')
+                messages.error(request, _('I not know the account id'))
     except NasNetworkError as e:
         messages.error(request, e)
     except NasFailedResult as e:
@@ -246,18 +247,14 @@ def abonhome(request, gid, uid):
                 else:
                     abon.ip_address = None
                 frm.save()
-                messages.success(request, 'Абонент успешно сохранён')
+                messages.success(request, _('edit abon success msg'))
             else:
-                messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
+                messages.warning(request, _('fix form errors'))
         else:
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
     except IntegrityError as e:
-        messages.error(request, 'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e)
-        frm = forms.AbonForm(instance=abon, initial={'password': passw})
-
-    except Http404:
-        messages.error(request, 'Ip адрес не найден в списке IP адресов')
+        messages.error(request, _('Ip address already exist. %s') % e)
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
     except NasFailedResult as e:
@@ -265,9 +262,9 @@ def abonhome(request, gid, uid):
     except NasNetworkError as e:
         messages.error(request, e)
     except IpPoolItem.DoesNotExist:
-        messages.error(request, 'Указанный вами ip отсутствует в ip pool')
+        messages.error(request, _('Ip address not found'))
     except models.AbonRawPassword.DoesNotExist:
-        messages.warning(request, 'Для абонента не задан пароль, он не сможет войти в учётку')
+        messages.warning(request, _('User has not have password, and cannot login'))
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
@@ -314,7 +311,7 @@ def add_invoice(request, gid, uid):
 
             newinv.author = request.user
             newinv.save()
-            messages.success(request, 'Необходимый платёж создан')
+            messages.success(request, _('Receipt has been created'))
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
     except NasNetworkError as e:
@@ -341,10 +338,10 @@ def pick_tariff(request, gid, uid):
                 cd = frm.cleaned_data
                 abon.pick_tariff(cd['tariff'], request.user)
                 #abon.save()
-                messages.success(request, 'Тариф успешно выбран')
+                messages.success(request, _('Tariff has been picked'))
                 return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
             else:
-                messages.error(request, 'Что-то не так при покупке услуги, проверьте и попробуйте ещё')
+                messages.error(request, _('fix form errors'))
         else:
             frm = forms.BuyTariff()
     except models.LogicError as e:
@@ -398,10 +395,10 @@ def complete_service(request, gid, uid, srvid):
             if request.POST.get('finish_confirm') == 'yes':
                 # удаляем запись о текущей услуге.
                 abtar.delete()
-                messages.success(request, 'Услуга успешно завершена')
+                messages.success(request, _('Service has been finished successfully'))
                 return redirect('abonapp:abon_services', gid, uid)
             else:
-                raise models.LogicError('Действие не подтверждено')
+                raise models.LogicError(_('Not confirmed'))
 
         time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
@@ -430,10 +427,10 @@ def activate_service(request, gid, uid, srvid):
     try:
         if request.method == 'POST':
             if request.POST.get('finish_confirm') != 'yes':
-                return HttpResponse('<h1>Запрос не подтверждён</h1>')
+                return HttpResponse(_('Not confirmed'))
 
             abtar.activate(request.user)
-            messages.success(request, 'Услуга активирована')
+            messages.success(request, _('Service has been activated successfully'))
             return redirect('abonapp:abon_services', gid, uid)
 
     except NasFailedResult as e:
@@ -458,7 +455,7 @@ def activate_service(request, gid, uid, srvid):
 def unsubscribe_service(request, gid, uid, srvid):
     try:
         get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
-        messages.success(request, 'Абонент отвязан от услуги')
+        messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:

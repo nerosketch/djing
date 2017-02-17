@@ -1,28 +1,28 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'abonapp:group_list' %}">Группы абонентов</a></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
         <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
-        <li class="active">Заказать услугу</li>
+        <li class="active">{% trans 'Pick a service' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Купить новую услугу (заказать тариф) для
-                <a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}" title="На страницу абонента"><u>абонента</u></a>
+            <h3 class="panel-title">{% trans 'Pick a service for' %}
+                <a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}"><u>{% trans 'Sub' %}</u></a>
             </h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
-                    <label for="id_tariff">Выбирите тарифф</label>
+                    <label for="id_tariff">{% trans 'Pick a service' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
@@ -31,10 +31,10 @@
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
             </form>
