@@ -199,12 +199,12 @@ class Abon(UserProfile):
         self.ballance -= how_match_to_pay
 
     # Пополняем счёт
-    def add_ballance(self, current_user, amount):
+    def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
             abon=self,
             amount=amount,
             author=current_user,
-            comment='Пополнение счёта через админку'
+            comment=comment
         )
         self.ballance += amount
 
