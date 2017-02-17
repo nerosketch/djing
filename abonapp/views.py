@@ -169,7 +169,7 @@ def abonamount(request, gid, uid):
             abonid = mydefs.safe_int(request.POST.get('abonid'))
             if abonid == int(uid):
                 amnt = mydefs.safe_float(request.POST.get('amount'))
-                abon.add_ballance(request.user, amnt)
+                abon.add_ballance(request.user, amnt, comment='Пополнение счёта через админку')
                 abon.save(update_fields=['ballance'])
                 messages.success(request, 'Счёт успешно пополнен на %d' % amnt)
                 return redirect('abonapp:abon_home', gid=gid, uid=uid)
@@ -234,7 +234,6 @@ def abonhome(request, gid, uid):
     abon_group = get_object_or_404(models.AbonGroup, id=gid)
     frm, passw = None, None
     try:
-        passw = models.AbonRawPassword.objects.get(account=abon).passw_text
         if request.method == 'POST':
             if not request.user.has_perm('abonapp.change_abon'):
                 raise PermissionDenied
@@ -251,6 +250,7 @@ def abonhome(request, gid, uid):
             else:
                 messages.warning(request, 'Не правильные значения, проверте поля и попробуйте ещё')
         else:
+            passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
     except IntegrityError as e:
         messages.error(request, 'Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. А вообще: %s' % e)
