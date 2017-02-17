@@ -31,7 +31,7 @@ class AbonForm(forms.ModelForm):
     }))
 
     password = forms.CharField(max_length=64, initial=generate_random_password,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'required':''}))
+        widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = models.Abon
@@ -56,6 +56,7 @@ class AbonForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
+        print('SavePassw')
         raw_password = self.cleaned_data['password']
         acc = super().save(commit=False)
         acc.password = make_password(raw_password)
@@ -66,7 +67,7 @@ class AbonForm(forms.ModelForm):
             abon_raw_passw.passw_text = raw_password
             abon_raw_passw.save(update_fields=['passw_text'])
         except models.AbonRawPassword.DoesNotExist:
-            models.AbonRawPassword.create(
+            models.AbonRawPassword.objects.create(
                 account=acc,
                 passw_text=raw_password
             )

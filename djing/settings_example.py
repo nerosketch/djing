@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts_app',
     'photo_app',
-    'privatemessage',
     'abonapp',
     'tariff_app',
     'ip_pool',

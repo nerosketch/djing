@@ -1,0 +1,43 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">Сообщения</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <ul class="nav nav-tabs">
+
+        {% url 'django_messages:messages_inbox' as inp_msg %}
+        <li{% if inp_msg == request.path %} class="active"{% endif %}>
+            <a href="{{ inp_msg }}">{% trans "Inbox" %}</a>
+        </li>
+
+        {% url 'django_messages:messages_outbox' as out_msg %}
+        <li{% if out_msg == request.path %} class="active"{% endif %}>
+            <a href="{{ out_msg }}">{% trans "Sent Messages" %}</a>
+        </li>
+
+        {% url 'django_messages:messages_compose' as cmp_msg %}
+        <li{% if cmp_msg == request.path %} class="active"{% endif %}>
+            <a href="{{ cmp_msg }}">{% trans "New Message" %}</a>
+        </li>
+
+        {% url 'django_messages:messages_trash' as trh_msg %}
+        <li{% if trh_msg == request.path %} class="active"{% endif %}>
+            <a href="{{ trh_msg }}">{% trans "Trash" %}</a>
+        </li>
+
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}

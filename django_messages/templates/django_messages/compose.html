@@ -1,0 +1,53 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,django_messages/ext.htm' %}
+{% load i18n %}
+
+{% block content %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans "Compose Message"%}</h3>
+        </div>
+        <div class="panel-body">
+            <form action="" method="post">{% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_recipient">{% trans "Recipient" %}</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                        {{ form.recipient }}{{ form.recipient.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_subject">{% trans "Subject" %}</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-blackboard"></span></span>
+                        {{ form.subject }}{{ form.subject.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_body">{% trans "Body" %}</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-text-background"></span></span>
+                        {{ form.body }}{{ form.body.errors }}
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> {% trans "Send" %}
+                    </button>
+                    <button type="reset" class="btn btn-sm btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> Reset
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

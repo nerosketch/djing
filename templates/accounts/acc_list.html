@@ -39,7 +39,7 @@
                            title="Дать задание">
                             <span class="glyphicon glyphicon-tasks"></span>
                         </a>
-                        <a href="{% url 'privmsg:send_message' %}?a={{ usr.id }}" class="btn btn-sm btn-info disabled"
+                        <a href="{% url 'django_messages:messages_compose' %}?a={{ usr.id }}" class="btn btn-sm btn-info"
                            title="Отправить сообщение">
                             <span class="glyphicon glyphicon-envelope"></span>
                         </a>
