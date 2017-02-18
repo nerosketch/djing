@@ -9,7 +9,7 @@ import django
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
     django.setup()
-    from abonapp.models import Abon, AbonGroup, AbonTariff
+    from abonapp.models import Abon, AbonGroup, AbonTariff, AbonRawPassword
     from ip_pool.models import IpPoolItem
     from tariff_app.models import Tariff
     from accounts_app.models import UserProfile
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     #    dt['obj'] = grp
 
     grp = AbonGroup.objects.get(id=43)
-    pshn_trf = Tariff.objects.get(id=3)
-    print(pshn_trf)
+    pshen_trf = Tariff.objects.get(id=3)
+    print(pshen_trf)
     iam = UserProfile.objects.get(id=1)
     for dt in dat['users']:
         #grp = [gr for gr in dat['groups'] if dt['grp']==gr['gid']]
@@ -46,7 +46,17 @@ if __name__ == "__main__":
         abon.group=grp
         abon.ballance=dt['balance']
         abon.ip_address=ip_addr
+        abon.set_password(dt['passw'])
         abon.save()
+        try:
+            abon_raw_passw = AbonRawPassword.objects.get(account=abon)
+            abon_raw_passw.passw_text = dt['passw']
+            abon_raw_passw.save(update_fields=['passw_text'])
+        except AbonRawPassword.DoesNotExist:
+            AbonRawPassword.objects.create(
+                account=abon,
+                passw_text=dt['passw']
+            )
 
         abtrfs =  AbonTariff.objects.filter(abon=abon)
         if abtrfs.count() > 0:
@@ -54,8 +64,7 @@ if __name__ == "__main__":
         else:
             abtrf = AbonTariff()
         abtrf.abon = abon
-        abtrf.tariff = pshn_trf
+        abtrf.tariff = pshen_trf
         abtrf.save()
         abtrf.activate(iam)
         print(abon.username, abon.fio, abon.group, ip_addr)
-
