@@ -3,45 +3,46 @@ from datetime import timedelta
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 from abonapp.models import Abon
 from .handle import handle as task_handle
 
 
 TASK_PRIORITIES = (
-    ('A', 'Высший'),
-    ('C', 'Средний'),
-    ('E', 'Низкий')
+    ('A', _('Higher')),
+    ('C', _('Average')),
+    ('E', _('Low'))
 )
 
 TASK_STATES = (
-    ('S', 'Новая'),
-    ('C', 'На выполнении'),
-    ('F', 'Выполнена')
+    ('S', _('New')),
+    ('C', _('In fulfilling')),
+    ('F', _('Completed'))
 )
 
 TASK_TYPES = (
-    ('na', 'не выбрано'),
-    ('yt', 'жёлтый треугольник'),
-    ('rc', 'красный крестик'),
-    ('ls', 'слабая скорость'),
-    ('cf', 'обрыв кабеля'),
-    ('cn', 'подключение'),
-    ('pf', 'переодическое пропадание'),
-    ('cr', 'настройка роутера'),
-    ('co', 'настроить onu'),
-    ('fc', 'обжать кабель'),
-    ('ot', 'другое')
+    ('na', _('not chosen')),
+    ('yt', _('yellow triangle')),
+    ('rc', _('red cross')),
+    ('ls', _('weak speed')),
+    ('cf', _('cable break')),
+    ('cn', _('connection')),
+    ('pf', _('periodic disappearance')),
+    ('cr', _('router setup')),
+    ('co', _('configure onu')),
+    ('fc', _('crimp cable')),
+    ('ot', _('other'))
 )
 
 
 class ChangeLog(models.Model):
     task = models.ForeignKey('Task')
     ACT_CHOICES = (
-        ('e', 'Изменение задачи'),
-        ('c', 'Создание задачи'),
-        ('d', 'Удаление задачи'),
-        ('f', 'Завершение задачи'),
-        ('b', 'Задача начата')
+        ('e', _('Change task')),
+        ('c', _('Create task')),
+        ('d', _('Delete task')),
+        ('f', _('Completing tasks')),
+        ('b', _('The task started'))
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
@@ -72,8 +73,8 @@ class Task(models.Model):
         db_table = 'task'
         ordering = ('-id',)
         permissions = (
-            ('can_viewall', 'Доступ ко всем задачам'),
-            ('can_remind', 'Напоминания о задачах')
+            ('can_viewall', _('Access to all tasks')),
+            ('can_remind', _('Reminders of tasks'))
         )
 
     def finish(self, current_user):

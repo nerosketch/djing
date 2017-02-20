@@ -1,4 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="table-responsive">
@@ -6,13 +7,13 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-sm-6">Пару слов..</th>
-                <th class="col-sm-1">Характер поломки</th>
-                <th class="col-sm-1">Состояние</th>
-                <th class="col-sm-1">Приоритет</th>
-                <th class="col-sm-1">Дата создания</th>
-                <th class="col-sm-1">Приложение</th>
-                <th class="col-sm-1">Действия</th>
+                <th class="col-sm-4">{% trans 'Description' %}</th>
+                <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
+                <th class="col-sm-1">{% trans 'Condition' %}</th>
+                <th class="col-sm-1">{% trans 'A priority' %}</th>
+                <th class="col-sm-1">{% trans 'Date of create' %}</th>
+                <th class="col-sm-1">{% trans 'Attachment' %}</th>
+                <th class="col-sm-1">{% trans 'Actions' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -32,21 +33,21 @@
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
-                <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
+                <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td class="btn-group btn-group-justified">
                     {% if perms.taskapp.change_task %}
-                    <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="Редактировать">
+                    <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
                     {% endif %}
                     {% if perms.taskapp.can_remind %}
-                        <a href="{% url 'taskapp:remind' task.id %}" class="btn btn-default btn-sm" title="Напомнить">
+                        <a href="{% url 'taskapp:remind' task.id %}" class="btn btn-default btn-sm" title="{% trans 'Remind' %}">
                             <span class="glyphicon glyphicon-bell"></span>
                         </a>
                     {% endif %}
                     {% if perms.taskapp.delete_task %}
-                        <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-sm btn-danger" title="Удалить">
+                        <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-sm btn-danger" title="{% trans 'Delete' %}">
                             <span class="glyphicon glyphicon-remove-circle"></span>
                         </a>
                     {% endif %}
@@ -54,7 +55,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="8">Все ваши задачи выполнены</td>
+                    <td colspan="8">{% trans 'All your tasks has been performed' %}</td>
                 </tr>
             {% endfor %}
             </tbody>

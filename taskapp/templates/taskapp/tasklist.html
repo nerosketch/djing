@@ -1,4 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="table-responsive">
@@ -6,14 +7,14 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-sm-4">Пару слов..</th>
-                <th class="col-sm-1">Кто назначил</th>
-                <th class="col-sm-1">Характер поломки</th>
-                <th class="col-sm-1">Состояние</th>
-                <th class="col-sm-1">Приоритет</th>
-                <th class="col-sm-1">Дата создания</th>
-                <th class="col-sm-1">Приложение</th>
-                <th class="col-sm-2" colspan="3">Действия</th>
+                <th class="col-sm-4">{% trans 'Description' %}</th>
+                <th class="col-sm-1">{% trans 'Task author' %}</th>
+                <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
+                <th class="col-sm-1">{% trans 'Condition' %}</th>
+                <th class="col-sm-1">{% trans 'A priority' %}</th>
+                <th class="col-sm-1">{% trans 'Date of create' %}</th>
+                <th class="col-sm-1">{% trans 'Attachment' %}</th>
+                <th class="col-sm-2" colspan="3">{% trans 'Actions' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -34,17 +35,17 @@
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
-                <td>{{ task.time_of_create|date:'d N yг H:i:s' }}</td>
+                <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
                 <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
                 <td colspan="3" class="btn-group btn-group-justified">
-                    <a href="{% url 'taskapp:begin' task.id %}" class="btn btn-primary btn-xs" title="Начать">
+                    <a href="{% url 'taskapp:begin' task.id %}" class="btn btn-primary btn-xs" title="{% trans 'Begin' %}">
                         <span class="glyphicon glyphicon-cog"></span>
                     </a>
-                    <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success btn-xs" title="Завершить">
+                    <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success btn-xs" title="{% trans 'Complete' %}">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
                     {% if perms.taskapp.change_task %}
-                    <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-default btn-xs" title="Редактировать">
+                    <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-default btn-xs" title="{% trans 'Edit' %}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
                     {% endif %}
@@ -52,7 +53,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="11">Список пуст</td>
+                    <td colspan="11">{% trans 'The list is empty' %}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -1,17 +1,18 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'taskapp:home' %}">Задачи</a></li>
-        <li class="active">{% if task_id %}Редактировать{% else %}Создать{% endif %}</li>
+	<li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
+	<li class="active">{% if task_id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Добавьте новую задачу</h3>
+		<h3 class="panel-title">{% trans 'Add new task' %}</h3>
         </div>
         <div class="panel-body">
 
@@ -23,7 +24,7 @@
             {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="409600"/>
 
             <div class="form-group">
-                <label for="id_descr">Пару слов...</label>
+		    <label for="id_descr">{% trans 'Description' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
@@ -31,7 +32,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_mode">Характер поломки</label>
+		<label for="id_mode">{% trans 'The nature of the damage' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-pawn"></span></span>
@@ -39,7 +40,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_priority">Приоритет</label>
+		<label for="id_priority">{% trans 'A priority' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
@@ -47,7 +48,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_state">Состояние</label>
+		    <label for="id_state">{% trans 'Condition' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-retweet"></span></span>
@@ -55,7 +56,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_abon">Абонент</label>
+		<label for="id_abon">{% trans 'Subscriber' %}</label>
 
                 <div class="input-group selectajax">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -71,7 +72,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="id_out_date">Актуальность (дата, до которой нужно завершить задачу)</label>
+		<label for="id_out_date">{% trans 'Reality (the date by which you must complete the task)' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -87,7 +88,7 @@
                 </script>
             </div>
             <div class="form-group">
-                <label for="id_attachment">Прикреплённое изображение</label>
+                <label for="id_attachment">{% trans 'Attached image' %}</label>
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-picture"></span></span>
                     {{ form.attachment }}{{ form.attachment.errors }}
@@ -95,10 +96,10 @@
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-sm btn-primary">
-                    <span class="glyphicon glyphicon-save"></span> Сохранить
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
                 <button type="reset" class="btn btn-sm btn-default">
-                    <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                 </button>
             </div>
             </form>

@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
+from django.utils.translation import ugettext as _
 from datetime import date
 from chatbot.models import TelegramBot
 from .models import Task
@@ -142,13 +143,13 @@ def task_add_edit(request, task_id=0):
                         task_instance.save()
                         return redirect('taskapp:home')
                     else:
-                        messages.error(request, 'Нет ответственных за группу, в которой находится выбранный абонент')
+                        messages.error(request, _('No responsible employee for the users group'))
                 else:
-                    messages.error(request, 'Нужно выбрать абонента')
+                    messages.error(request, _('You must select the subscriber'))
             else:
-                messages.error(request, 'Ошибка в полях формы в задаче')
+                messages.error(request, _('Error in the form fields'))
         except TelegramBot.DoesNotExist:
-            messages.error(request, 'Исполнитель ещё не подписался на оповещения')
+            messages.error(request, _('Employee has not yet signed up for notifications'))
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
