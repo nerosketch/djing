@@ -31,6 +31,13 @@
             <a href="{{ abserv }}">{% trans 'Services' %}</a>
         </li>
 
+        {% if perms.abonapp.can_view_passport %}
+            {% url 'abonapp:passport_view' abon_group.id abon.id as passport_view_url %}
+            <li{% if passport_view_url == request.path %} class="active"{% endif %}>
+                <a href="{{ passport_view_url }}">{% trans 'Passport information' %}</a>
+            </li>
+        {% endif %}
+
         {% if perms.abonapp.can_add_ballance %}
             {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
             <li{% if abamount == request.path %} class="active"{% endif %}>

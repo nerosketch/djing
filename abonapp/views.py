@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
@@ -524,6 +524,15 @@ def task_log(request, gid, uid):
         'abon': abon
     })
 
+
+@login_required
+@mydefs.only_admins
+def passport_view(request, gid, uid):
+    abon = get_object_or_404(models.Abon, id=uid)
+    return render(request, 'abonapp/passport_view.html', {
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon': abon
+    })
 
 
 # API's

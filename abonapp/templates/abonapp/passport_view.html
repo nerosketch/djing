@@ -1,0 +1,52 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'Passport information' %}</h3>
+                </div>
+                <div class="panel-body">
+                    <form role="form" class="form-horizontal" action="" method="get">
+
+                        <div class="form-group-sm">
+                            <label for="pasp_num" class="col-sm-3 control-label">{% trans 'Pasport serial' %}</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
+                            </div>
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="pasp_sr" class="col-sm-3 control-label">{% trans 'Pasport number' %}</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
+                            </div>
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="wr" class="col-sm-3 control-label">{% trans 'Distributor' %}</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="wr" class="form-control" id="wr"/>
+                            </div>
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="birthday" class="col-sm-3 control-label">{% trans 'Birthday' %}</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="birthday" class="form-control" id="birthday"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
