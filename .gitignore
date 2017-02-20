@@ -11,3 +11,4 @@ gmap/fixtures
 *.sqlite3
 *.json
 *.bak
+*.mo
