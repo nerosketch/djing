@@ -32,7 +32,7 @@ class AbonForm(forms.ModelForm):
     }))
 
     password = forms.CharField(max_length=64, initial=generate_random_password,
-        widget=forms.TextInput(attrs={'class': 'form-control'}))
+        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'password'}))
 
     class Meta:
         model = models.Abon
