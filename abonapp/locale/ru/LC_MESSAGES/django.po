@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-20 16:36+0300\n"
+"POT-Creation-Date: 2017-02-20 17:32+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -149,7 +149,7 @@ msgstr ""
 #: abonapp/templates/abonapp/addInvoice.html:46
 #: abonapp/templates/abonapp/buy_tariff.html:34
 #: abonapp/templates/abonapp/complete_service.html:48
-#: abonapp/templates/abonapp/editAbon.html:98
+#: abonapp/templates/abonapp/editAbon.html:89
 #: abonapp/templates/abonapp/passport_view.html:42
 msgid "Save"
 msgstr "Сохранить"
@@ -181,7 +181,7 @@ msgstr "Группа"
 #: abonapp/templates/abonapp/addAbon.html:53
 #: abonapp/templates/abonapp/addInvoice.html:40
 #: abonapp/templates/abonapp/debtors.html:22
-#: abonapp/templates/abonapp/editAbon.html:89
+#: abonapp/templates/abonapp/editAbon.html:80
 #: abonapp/templates/abonapp/invoiceForPayment.html:11
 #: abonapp/templates/abonapp/log.html:20
 #: abonapp/templates/abonapp/payHistory.html:12
@@ -328,7 +328,15 @@ msgstr "Дом"
 msgid "Is active"
 msgstr "Активен"
 
-#: abonapp/templates/abonapp/editAbon.html:80
+#: abonapp/templates/abonapp/editAbon.html:92
+msgid "Send account info to user"
+msgstr "Отправить учётные данные абоненту"
+
+#: abonapp/templates/abonapp/editAbon.html:104
+msgid "Technical information"
+msgstr "Техническая информация"
+
+#: abonapp/templates/abonapp/editAbon.html:110
 #: abonapp/templates/abonapp/viewAbon.html:50
 msgid "Ip Address"
 msgstr "IP Адрес"
@@ -644,9 +652,3 @@ msgstr "История задач"
 
 msgid "Dynamic Field"
 msgstr "Динамическое поле"
-
-msgid "Send account info to user"
-msgstr "Отправить учётные данные абоненту"
-
-msgid "Technical information"
-msgstr "Техническая информация"
