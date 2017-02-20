@@ -9,7 +9,7 @@ from json import dumps
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 
-    db = MySQLdb.connect(host="localhost", user="root", passwd="5jf3k48", db="nodeny", charset='utf8')
+    db = MySQLdb.connect(host="localhost", user="root", passwd="PASSWORD", db="nodeny", charset='utf8')
     cursor = db.cursor()
 
     result = dict()
