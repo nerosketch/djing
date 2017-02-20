@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/addinvoice$', views.add_invoice, name='add_invoice'),
     url(r'^(?P<uid>\d+)/pick$', views.pick_tariff, name='pick_tariff'),
     url(r'^(?P<uid>\d+)/chpriority$', views.chpriority, name='chpriority_tariff'),
+    url(r'^(?P<uid>\d+)/passport_view$', views.passport_view, name='passport_view'),
     url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='compl_srv'),
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='activate_service'),
 
