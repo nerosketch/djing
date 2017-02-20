@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils import timezone
 from django.db import models
-from django.core.validators import DecimalValidator
+from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
 from ip_pool.models import IpPoolItem
@@ -159,7 +159,7 @@ class AbonStreet(models.Model):
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
-    ballance = models.FloatField(default=0.0, validators=[DecimalValidator])
+    ballance = models.FloatField(default=0.0)
     ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
@@ -185,6 +185,7 @@ class Abon(UserProfile):
         db_table = 'abonent'
         permissions = (
             ('can_buy_tariff', _('Buy service perm')),
+            ('can_view_passport', _('Can view passport'))
         )
 
     # Платим за что-то
@@ -344,6 +345,30 @@ class AbonRawPassword(models.Model):
 
     class Meta:
         db_table = 'abon_raw_password'
+
+
+class ExtraFieldsModel(models.Model):
+    DYNAMIC_FIELD_TYPES = (
+        ('int', _('Digital field')),
+        ('str', _('Text field')),
+        ('dbl', _('Floating field'))
+    )
+
+    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES)
+    account = models.ForeignKey(Abon, on_delete=models.DO_NOTHING)
+    data = models.CharField(max_length=64, null=True, blank=True)
+
+    def clean(self):
+        val = None
+        if self.field_type == 'int':
+            val = validators.integer_validator
+        elif self.field_type == 'dbl':
+            val = validators.DecimalValidator(9, 6)
+        if val:
+            self.validators.append(val)
+
+    class Meta:
+        db_table = 'abon_extra_fields'
 
 
 def abon_post_save(sender, instance, **kwargs):
