@@ -12,20 +12,6 @@
                     <form role="form" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.id abon.id %}" method="post"> {% csrf_token %}
 
                         <div class="form-group-sm">
-                            <label for="id_group" class="col-sm-2 control-label">{% trans 'User group' %}</label>
-                            <div class="col-sm-10">
-                                {{ form.group }}{{ form.group.errors }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <label for="id_is_active" class="col-sm-2 control-label">{% trans 'Is active' %}</label>
-                            <div class="col-sm-10">
-                                {{ form.is_active }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
                             <label for="id_username" class="col-sm-2 control-label">{% trans 'login' %}</label>
                             <div class="col-sm-10">
                                 {{ form.username }}{{ form.username.errors }}
@@ -63,16 +49,30 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Ip Address' %}</label>
+                            <label for="id_is_active" class="col-sm-2 control-label">{% trans 'Is active' %}</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
+                                {{ form.is_active }}
+                            </div>
+                        </div>
+
+                        <div class="form-group-sm">
+                            <label for="id_group" class="col-sm-2 control-label">{% trans 'User group' %}</label>
+                            <div class="col-sm-10">
+                                {{ form.group }}{{ form.group.errors }}
                             </div>
                         </div>
 
                         <div class="form-group-sm">
                             <label for="id_password" class="col-sm-2 control-label">{% trans 'Password' %}</label>
                             <div class="col-sm-10">
-                                {{ form.password }}{{ form.password.errors }}
+                                <div class="input-group input-group-sm">
+                                    {{ form.password }}{{ form.password.errors }}
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" onmousedown="document.getElementById('id_password').type='text'" onmouseup="document.getElementById('id_password').type='password'">
+                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -84,50 +84,32 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <div class="col-sm-offset-2 col-sm-10">
+                            <div class="col-sm-offset-2 col-sm-10 btn-group">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                                 </button>
+                                <a href="#" class="btn btn-default btn-sm" onclick="showPrimary('<h3>Надо ещё придумать чем будем абонентам отправлять оповещения</h3> Ну кроме смс');">
+                                    <span class="glyphicon glyphicon-bullhorn"></span> {% trans 'Send account info to user' %}
+                                </a>
                             </div>
                         </div>
 
                     </form>
                 </div>
             </div>
-
         </div>
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'Passport information' %}</h3>
+                    <h3 class="panel-title">{% trans 'Technical information' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="" method="get">
+                    <form role="form" class="form-horizontal" action="#" method="post"> {% csrf_token %}
 
                         <div class="form-group-sm">
-                            <label for="pasp_num" class="col-sm-3 control-label">{% trans 'Pasport serial' %}</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
-                            </div>
-                        </div>
-                        <div class="form-group-sm">
-                            <label for="pasp_sr" class="col-sm-3 control-label">{% trans 'Pasport number' %}</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
-                            </div>
-                        </div>
-                        <div class="form-group-sm">
-                            <label for="wr" class="col-sm-3 control-label">{% trans 'Distributor' %}</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="wr" class="form-control" id="wr"/>
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
-                                </button>
+                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Ip Address' %}</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
                             </div>
                         </div>
 
