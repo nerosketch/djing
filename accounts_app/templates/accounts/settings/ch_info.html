@@ -1,29 +1,30 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/settings/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <form role="form" action="{% url 'acc_app:setup_info' %}" method="post">{% csrf_token %}
 
         <div class="form-group">
-            <label for="login">Логин</label>
+            <label for="login">{% trans 'User name' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                <input id="login" type="text" value="{{ user.username }}" name="username" placeholder="Имя пользователя"
+                <input id="login" type="text" value="{{ user.username }}" name="username" placeholder="{% trans 'User name' %}"
                        required class="form-control">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="fio">Фамилия Имя</label>
+            <label for="fio">{% trans 'Name and surname' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                <input id="fio" type="text" value="{{ user.fio }}" name="fio" placeholder="ФИО" class="form-control">
+                <input id="fio" type="text" value="{{ user.fio }}" name="fio" class="form-control">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="mail">Мыло</label>
+            <label for="mail">{% trans 'Email' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -33,17 +34,17 @@
         </div>
 
         <div class="form-group">
-            <label for="tel">Телефон</label>
+            <label for="tel">{% trans 'Telephone' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                 <input id="tel" type="text" value="{{ user.telephone }}" pattern="\+[7,8,9,3]\d{10,11}" name="telephone"
-                       placeholder="+[7,8,9,3] и 10,11 цифр" class="form-control">
+                       placeholder="{% trans '+[7,8,9,3] and 10,11 digits' %}" class="form-control">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="oldpassw">Старый пароль</label>
+            <label for="oldpassw">{% trans 'Old password' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -52,7 +53,7 @@
         </div>
 
         <div class="form-group">
-            <label for="npassw">Новый пароль</label>
+            <label for="npassw">{% trans 'New password' %}</label>
 
             <div class="input-group">
                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -62,10 +63,10 @@
 
         <div class="btn-group">
             <button type="submit" class="btn btn-primary">
-                <span class="glyphicon glyphicon-save"></span> Сохранить
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
             </button>
             <button type="reset" class="btn btn-default">
-                <span class="glyphicon glyphicon-remove"></span> Сбросить
+                <span class="glyphicon glyphicon-remove"></span> {% trans 'Reset' %}
             </button>
         </div>
 

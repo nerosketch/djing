@@ -1,0 +1,87 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-20 17:32+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: accounts_app/templates/accounts/login.html:5
+msgid "Auth"
+msgstr "Авторизация"
+
+#: accounts_app/templates/accounts/login.html:24
+#: accounts_app/templates/accounts/login.html:53
+msgid "Login"
+msgstr "Войти"
+
+#: accounts_app/templates/accounts/login.html:36
+#: accounts_app/templates/accounts/settings/ch_info.html:8
+#: accounts_app/templates/accounts/settings/ch_info.html:12
+msgid "User name"
+msgstr "Логин"
+
+#: accounts_app/templates/accounts/login.html:56
+#: accounts_app/templates/accounts/settings/ch_info.html:69
+msgid "Reset"
+msgstr "Сбросить"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:18
+msgid "Name and surname"
+msgstr "Фамилия и Имя"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:27
+msgid "Email"
+msgstr "Адрес электронной почты"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:37
+msgid "Telephone"
+msgstr "Номр телефона"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:42
+msgid "+[7,8,9,3] and 10,11 digits"
+msgstr "+[7,8,9,3] и 10,11 цифр"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:47
+msgid "Old password"
+msgstr "Старый пароль"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:56
+msgid "New password"
+msgstr "Новый пароль"
+
+msgid "Password"
+msgstr "Пароль"
+
+#: accounts_app/templates/accounts/settings/ch_info.html:66
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Administrators"
+msgstr "Администраторы"
+
+msgid "Options"
+msgstr "Настройки"
+
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+msgid "Change self onfo"
+msgstr "Изменить инфу о себе"
+
+msgid "Permission options"
+msgstr "Настройка прав"
