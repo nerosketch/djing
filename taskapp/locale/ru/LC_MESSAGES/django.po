@@ -353,3 +353,6 @@ msgstr "Назначенные мной задачи"
 
 msgid "All my tasks"
 msgstr "Все мои задачи"
+
+msgid "You cannot delete task that assigned to you"
+msgstr "Вы не можете удалять назначенные на вас задачи"
