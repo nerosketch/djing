@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.utils.translation import ugettext as _
 from easysnmp import EasySNMPTimeoutError
 
 from .models import Device
@@ -25,10 +26,10 @@ def devices(request):
 @permission_required('devapp.delete_device')
 def devdel(request, did):
     try:
-        get_object_or_404(Device, id=did).delete()
+        Device.objects.get(pk=did).delete()
         return res_success(request, 'devapp:devs')
-    except:
-        return res_error(request, 'Неизвестная ошибка при удалении :(')
+    except Device.DoesNotExist:
+        return res_error(request, _('Delete failed'))
 
 
 @login_required
@@ -46,9 +47,9 @@ def dev(request, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
-            messages.success(request, 'Инфа о точке сохранена')
+            messages.success(request, _('Device info has been saved'))
         else:
-            messages.error(request, 'Ошибка в данных, проверте их ещё раз')
+            messages.error(request, _('Form is invalid, check fields and try again'))
     else:
         frm = DeviceForm(instance=devinst)
 
@@ -72,11 +73,11 @@ def devview(request, did):
                 uptime = manager.uptime()
                 ports = manager.get_ports()
             else:
-                messages.warning(request, 'Не указан snmp пароль для устройства')
+                messages.warning(request, _('Not Set snmp device password'))
         else:
-            messages.error(request, 'Эта точка не пингуется')
+            messages.error(request, _('Dot was not pinged'))
     except EasySNMPTimeoutError:
-        messages.error(request, 'Время ожидания ответа от SNMP истекло')
+        messages.error(request, _('wait for a reply from the SNMP Timeout'))
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,
@@ -100,7 +101,7 @@ def toggle_port(request, did, portid, status=0):
             else:
                 ports[portid-1].disable()
         else:
-            messages.warning(request, 'Не указан snmp пароль для устройства')
+            messages.warning(request, _('Not Set snmp device password'))
     else:
-        messages.error(request, 'Эта точка не пингуется')
+        messages.error(request, _('Dot was not pinged'))
     return redirect('devapp:view', did=did)

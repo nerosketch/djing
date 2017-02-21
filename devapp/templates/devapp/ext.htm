@@ -1,16 +1,17 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'devapp:devs' %}">Устройства</a></li>
+        <li><a href="{% url 'devapp:devs' %}">{% trans 'Devices' %}</a></li>
         <li class="active">{{ dev.ip_address }}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="page-header">
-        <h2>{{ dev.comment|default:'Без названия' }}</h2>
+        <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
     </div>
 
     <ul class="nav nav-tabs">
@@ -18,13 +19,13 @@
         {% url 'devapp:view' dev.id as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>
             <a href="{{ devapp_view }}">
-                Порты {{ dev.ip_address }}
+                {% trans 'Ports' %} {{ dev.ip_address }}
             </a>
         </li>
 
         {% url 'devapp:edit' dev.id as devapp_edit %}
         <li{% if devapp_edit == request.path %} class="active"{% endif %}>
-            <a href="{{ devapp_edit }}">Редактировать</a>
+            <a href="{{ devapp_edit }}">{% trans 'Edit' %}</a>
         </li>
     </ul>
 

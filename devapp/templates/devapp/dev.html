@@ -1,9 +1,10 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Инфа о железке</h3>
+            <h3 class="panel-title">{% trans 'Device info' %}</h3>
         </div>
         <div class="panel-body">
 
@@ -15,7 +16,7 @@
             {% endif %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
-                    <label for="id_ip_address">Ip адрес</label>
+                    <label for="id_ip_address">{% trans 'Ip address' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
@@ -24,7 +25,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_comment">Комментарий</label>
+                    <label for="id_comment">{% trans 'Comment' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
@@ -33,7 +34,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_devtype">Тип устройства</label>
+                    <label for="id_devtype">{% trans 'Device type' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
@@ -42,7 +43,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_man_passw">Пароль SNMP</label>
+                    <label for="id_man_passw">{% trans 'SNMP password' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
@@ -51,7 +52,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_map_dot">Точка топологии</label>
+                    <label for="id_map_dot">{% trans 'Map point' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-map-marker"></span></span>
@@ -61,10 +62,10 @@
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Отменить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
 

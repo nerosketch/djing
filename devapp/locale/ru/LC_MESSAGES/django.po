@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE"S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-22 01:50+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "Device info"
+msgstr "Инфа о железке"
+
+msgid "Ip address"
+msgstr "Ip адрес"
+
+msgid "Comment"
+msgstr "Комментарий"
+
+msgid "Device type"
+msgstr "Тип устройства"
+
+msgid "SNMP password"
+msgstr "Пароль SNMP"
+
+msgid "Map point"
+msgstr "Точка топологии"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Devices"
+msgstr 'Устройства'
+
+msgid "Devices does not found"
+msgstr "Нет созданных устройств"
+
+msgid "Create"
+msgstr "Cоздать"
+
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+msgid "Ports"
+msgstr "Порты"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Title of the type of switch"
+msgstr "Название типа свича"
+
+msgid "Uptime"
+msgstr "Без перезагрузки"
+
+msgid "We have not received info, please check options :("
+msgstr "Инфа не получена, проверьте настройки :("
+
+msgid "Device log"
+msgstr "Лог устройства"
+
+msgid "Level"
+msgstr "Уровень"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Ports comment"
+msgstr "Комментарии портов"
+
+msgid "Title"
+msgstr "Название"
+
+msgid "We have not received info for ports"
+msgstr "Инфа о портах не получена"
+
+msgid "Delete failed"
+msgstr "Неизвестная ошибка при удалении :("
+
+msgid "Device info has been saved"
+msgstr "Инфа о точке сохранена"
+
+msgid "Form is invalid, check fields and try again"
+msgstr "Ошибка в данных, проверте их ещё раз"
+
+msgid "Not Set snmp device password"
+msgstr "Не указан snmp пароль для устройства"
+
+msgid "Dot was not pinged"
+msgstr "Эта точка не пингуется"
+
+msgid "wait for a reply from the SNMP Timeout"
+msgstr "Время ожидания ответа от SNMP истекло"

@@ -1,12 +1,13 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <div class="panel-title">{{ dev.get_devtype_display|default:'Название типа свича' }}, без
-                        перезагрузки {{ uptime }}</div>
+                    <div class="panel-title">{{ dev.get_devtype_display|default:_('Title of the type of switch') }}.
+                        {% trans 'Uptime' %} {{ uptime }}</div>
                 </div>
                 <div class="panel-body">
 
@@ -38,7 +39,7 @@
                             </div>
                         </div>
                     {% empty %}
-                        <h3>Инфа не получена, проверьте настройки :(</h3>
+                        <h3>{% trans 'We have not received info, please check options :(' %}</h3>
                     {% endfor %}
 
                 </div>
@@ -50,16 +51,16 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Лог устройства</h3>
+                    <h3 class="panel-title">{% trans 'Device log' %}</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table table-responsive">
                         <thead>
                         <tr>
                             <td>ID</td>
-                            <td>уровень</td>
-                            <td>описание</td>
-                            <td>дата</td>
+                            <td>{% trans 'Level' %}</td>
+                            <td>{% trans 'Description' %}</td>
+                            <td>{% trans 'Date' %}</td>
                         </tr>
                         </thead>
                         <tbody>
@@ -125,25 +126,25 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Комментарии портов</h3>
+                    <h3 class="panel-title">{% trans 'Ports comment' %}</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table table-responsive">
                         <thead>
                         <tr>
-                            <th width="50">Порт</th>
-                            <th>Название</th>
+                            <th width="50">{% trans 'Port' %}</th>
+                            <th>{% trans 'Title' %}</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for port in ports %}
                             <tr>
                                 <td>{{ port.num }}</td>
-                                <td>{{ port.nm|default:"&lt;не назначен&gt;" }}</td>
+                                <td>{{ port.nm|default:_('Not assigned') }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                            <td colspan="2">инфа о портах не получена</td>
+                            <td colspan="2">{% trans 'We have not received info for ports' %}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
