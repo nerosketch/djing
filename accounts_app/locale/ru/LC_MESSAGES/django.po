@@ -73,6 +73,9 @@ msgstr "Сохранить"
 msgid "Administrators"
 msgstr "Администраторы"
 
+msgid "Administrator"
+msgstr "Администратор"
+
 msgid "Options"
 msgstr "Настройки"
 
@@ -84,3 +87,69 @@ msgstr "Изменить инфу о себе"
 
 msgid "Permission options"
 msgstr "Настройка прав"
+
+msgid "Users must have an telephone number"
+msgstr "У пользователей должен быть номер телефона"
+
+msgid "Telephone number"
+msgstr "Номер телефона"
+
+msgid "Wrong login or password, please try again"
+msgstr "Неправильный логин или пароль, попробуйте ещё раз"
+
+msgid "Wrong password"
+msgstr "Неправильный пароль"
+
+msgid "You forget specify a password for the new account"
+msgstr "Забыли указать пароль для нового аккаунта"
+
+msgid "You forget to repeat a password for the new account"
+msgstr "Забыли повторить пароль для нового аккаунта"
+
+msgid "Subscriber with this name already exist"
+msgstr "Пользователь с таким именем уже есть"
+
+msgid "Passwords does not match, try again"
+msgstr "Пароли не совпадают, попробуйте ещё раз"
+
+msgid "The responsibility of the administrator of the group of subscribers"
+msgstr "Ответственность администратора за группы абонентов"
+
+msgid "Is enable"
+msgstr "Включён-ли"
+
+msgid "Last login"
+msgstr "Последняя авторизация"
+
+msgid "All permissions"
+msgstr "Административный доступ (все права)"
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "Admin groups list"
+msgstr "Список групп администраторов"
+
+msgid "Groups does not found"
+msgstr "Нет групп"
+
+msgid "Add group"
+msgstr "Добавить группу"
+
+msgid "The current distribution of rights for groups"
+msgstr "Действующее распределение прав для группы"
+
+msgid "Available rights"
+msgstr "Доступные права"
+
+msgid "Rights for the group"
+msgstr "Права группы"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Set a task"
+msgstr "Дать задачу"

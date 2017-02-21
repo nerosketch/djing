@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
+from django.utils.translation import ugettext as _
 
 from djing.settings import DEFAULT_PICTURE
 from photo_app.models import Photo
@@ -14,7 +15,7 @@ class MyUserManager(BaseUserManager):
         birth and password.
         """
         if not telephone:
-            raise ValueError('Users must have an telephone number')
+            raise ValueError(_('Users must have an telephone number'))
 
         user = self.model(
             telephone=telephone,
@@ -48,7 +49,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     telephone = models.CharField(
         max_length=16,
-        verbose_name='Telephone number',
+        verbose_name=_('Telephone number'),
         #unique=True,
         validators=[RegexValidator('^\+[7,8,9,3]\d{10,11}$')]
     )
