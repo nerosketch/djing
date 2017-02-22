@@ -68,6 +68,17 @@
                 </tr>
             {% endfor %}
             </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="12">
+                    {% if perms.taskapp.add_task %}
+                    <a href="{% url 'taskapp:add' %}" class="btn btn-sm btn-success" title="{% trans 'Add new task' %}">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add new task' %}
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            </tfoot>
         </table>
     </div>
 
