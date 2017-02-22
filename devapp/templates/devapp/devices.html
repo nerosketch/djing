@@ -14,9 +14,24 @@
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>{% trans 'Ip address' %}</th>
-                <th>{% trans 'Comment' %}</th>
-                <th width="250">{% trans 'Device type' %}</th>
+                <th>
+                    <a href="{% url 'devapp:devs' %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                        {% trans 'Ip address' %}
+                    </a>
+                    {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+                </th>
+                <th>
+                    <a href="{% url 'devapp:devs' %}?order_by=comment&dir={{ dir|default:"down" }}">
+                        {% trans 'Comment' %}
+                    </a>
+                    {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+                </th>
+                <th width="250">
+                    <a href="{% url 'devapp:devs' %}?order_by=devtype&dir={{ dir|default:"down" }}">
+                        {% trans 'Device type' %}
+                    </a>
+                    {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
+                </th>
                 <th width="100">Do</th>
             </tr>
             </thead>

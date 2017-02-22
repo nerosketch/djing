@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from easysnmp import EasySNMPTimeoutError
 
 from .models import Device
-from mydefs import pag_mn, res_success, res_error, only_admins, ping
+from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm
 
 
@@ -15,10 +15,20 @@ from .forms import DeviceForm
 @only_admins
 def devices(request):
     devs = Device.objects.all()
+
+    # фильтр
+    dr, field = order_helper(request)
+    if field:
+        devs = devs.order_by(field)
+    print(type(request.GET), request.GET)
+    import django.http.request
+
     devs = pag_mn(request, devs)
 
     return render(request, 'devapp/devices.html', {
-        'devices': devs
+        'devices': devs,
+        'dir': dr,
+        'order_by': request.GET.get('order_by')
     })
 
 
