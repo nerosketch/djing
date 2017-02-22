@@ -35,6 +35,13 @@
             </tr>
         {% endfor %}
         </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="6">
+                {% include 'taskapp/footer_btns.html' %}
+            </td>
+        </tr>
+        </tfoot>
 
     </table>
     {% include 'toolbar_page.html' with pag=tasks %}
