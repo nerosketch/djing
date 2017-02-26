@@ -241,7 +241,7 @@ class Abon(UserProfile):
     def activate_next_tariff(self, author):
         ats = AbonTariff.objects.filter(abon=self).order_by('tariff_priority')
 
-        nw = timezone.datetime.now()
+        nw = timezone.make_aware(timezone.datetime.now())
 
         for at in ats:
             # усдуга не активна, продолжаем
