@@ -49,7 +49,7 @@ msgstr "Адрес электронной почты"
 
 #: accounts_app/templates/accounts/settings/ch_info.html:37
 msgid "Telephone"
-msgstr "Номр телефона"
+msgstr "Номер телефона"
 
 #: accounts_app/templates/accounts/settings/ch_info.html:42
 msgid "+[7,8,9,3] and 10,11 digits"

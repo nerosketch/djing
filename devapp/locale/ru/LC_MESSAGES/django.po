@@ -44,7 +44,7 @@ msgid "Reset"
 msgstr "Сбросить"
 
 msgid "Devices"
-msgstr 'Устройства'
+msgstr "Устройства"
 
 msgid "Devices does not found"
 msgstr "Нет созданных устройств"
@@ -111,3 +111,6 @@ msgstr "Эта точка не пингуется"
 
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
+
+msgid "Devices without group"
+msgstr "Устройства без группы"
