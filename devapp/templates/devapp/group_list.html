@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Groups' %}</li>
+    </ol>
+
+    <h3>{% trans 'Groups' %}</h3>
+
+    {% include 'message_block.html' %}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>{% trans 'Group title' %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for gr in groups %}
+                <tr>
+                    <td><a href="{% url 'devapp:devs' gr.id %}">{{ gr.title }}</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td><a href="#">{% trans 'Groups was not found' %}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td class="btn-group">
+                    {% if perms.abonapp.add_abongroup %}
+                    <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add group' %}
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'devapp:devices_null_group' %}" class="btn btn-primary btn-sm">
+                        <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Devices without group' %}
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=groups %}
+
+{% endblock %}

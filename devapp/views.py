@@ -1,31 +1,50 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from easysnmp import EasySNMPTimeoutError
 
 from .models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm
+from abonapp.models import AbonGroup
 
 
 @login_required
 @only_admins
-def devices(request):
-    devs = Device.objects.all()
+def devices(request, grp):
+    group = get_object_or_404(AbonGroup, pk=grp)
+    devs = Device.objects.filter(user_group=grp)
 
     # фильтр
     dr, field = order_helper(request)
     if field:
         devs = devs.order_by(field)
-    print(type(request.GET), request.GET)
-    import django.http.request
 
     devs = pag_mn(request, devs)
 
     return render(request, 'devapp/devices.html', {
+        'devices': devs,
+        'dir': dr,
+        'order_by': request.GET.get('order_by'),
+        'group': group
+    })
+
+
+@login_required
+@only_admins
+def devices_null_group(request):
+    devs = Device.objects.all()
+    # фильтр
+    dr, field = order_helper(request)
+    if field:
+        devs = devs.order_by(field)
+
+    devs = pag_mn(request, devs)
+
+    return render(request, 'devapp/devices_null_group.html', {
         'devices': devs,
         'dir': dr,
         'order_by': request.GET.get('order_by')
@@ -36,8 +55,10 @@ def devices(request):
 @permission_required('devapp.delete_device')
 def devdel(request, did):
     try:
-        Device.objects.get(pk=did).delete()
-        return res_success(request, 'devapp:devs')
+        dev = Device.objects.get(pk=did)
+        back_url = resolve_url('devapp:devs', grp=dev.user_group.pk if dev.user_group else 0)
+        dev.delete()
+        return res_success(request, back_url)
     except Device.DoesNotExist:
         return res_error(request, _('Delete failed'))
 
@@ -63,10 +84,15 @@ def dev(request, devid=0):
     else:
         frm = DeviceForm(instance=devinst)
 
-    return render(request, 'devapp/dev.html', {
-        'form': frm,
-        'dev': devinst
-    })
+    if devinst is None:
+        return render(request, 'devapp/add_dev.html', {
+            'form': frm
+        })
+    else:
+        return render(request, 'devapp/dev.html', {
+            'form': frm,
+            'dev': devinst
+        })
 
 
 @login_required
@@ -114,4 +140,13 @@ def toggle_port(request, did, portid, status=0):
             messages.warning(request, _('Not Set snmp device password'))
     else:
         messages.error(request, _('Dot was not pinged'))
-    return redirect('devapp:view', did=did)
+    return redirect('devapp:view', dev.user_group or 0, did)
+
+
+@login_required
+@only_admins
+def group_list(request):
+    groups = AbonGroup.objects.all()
+    return render(request, 'devapp/group_list.html', {
+        'groups': groups
+    })

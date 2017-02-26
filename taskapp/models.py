@@ -1,5 +1,6 @@
 # coding=utf-8
 from datetime import timedelta
+import os
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -95,6 +96,9 @@ class Task(models.Model):
             who=current_user
         )
         self.save(update_fields=['state'])
+
+    def get_attachment_fname(self):
+        return os.path.basename(self.attachment.name)
 
 
 def task_handler(sender, instance, **kwargs):

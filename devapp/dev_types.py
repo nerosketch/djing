@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from mydefs import RuTimedelta, safe_int
+from datetime import timedelta
 from .base_intr import DevBase, SNMPBaseWorker, BasePort
 
 
@@ -77,7 +78,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
     def uptime(self):
         uptimestamp = safe_int(self.get_item(oids['uptime']))
-        tm = RuTimedelta(seconds=uptimestamp/100) or RuTimedelta()
+        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta()
         return tm
 
 
