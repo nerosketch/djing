@@ -244,6 +244,9 @@ class Abon(UserProfile):
         nw = timezone.datetime.now()
 
         for at in ats:
+            # усдуга не активна, продолжаем
+            if at.deadline is None:
+                continue
             # если услуга просрочена
             if nw > at.deadline:
                 print(_('service overdue log'))
@@ -261,9 +264,10 @@ class Abon(UserProfile):
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
-        trf = self.active_tariff()
-        if not trf: return False
-        ct = trf.get_calc_type()()
+        ats = AbonTariff.objects.filter(abon=self).exclude(time_start=None)
+        if not ats or ats.count() < 1: return False
+        trf = ats[0].tariff
+        ct = trf.get_calc_type()(ats[0])
         if ct.manage_access(self):
             return True
         else:
