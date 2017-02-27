@@ -1,31 +1,39 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'devapp:devs' %}">Устройства</a></li>
-        <li class="active">{{ dev.ip_address }}</li>
+        <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
+        {% if dev.user_group %}
+            <li><a href="{% url 'devapp:devs' dev.user_group.pk %}">{{ dev.user_group.title }}</a></li>
+        {% else %}
+            <li>{% trans 'Not assigned' %}</li>
+        {% endif %}
+        <li class="active">{{ dev.comment }}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="page-header">
-        <h2>{{ dev.comment|default:'Без названия' }}</h2>
+        <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
     </div>
 
     <ul class="nav nav-tabs">
 
-        {% url 'devapp:view' dev.id as devapp_view %}
+        {% url 'devapp:view' dev.user_group.pk|default:0 dev.id as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>
             <a href="{{ devapp_view }}">
-                Порты {{ dev.ip_address }}
+                {% trans 'Ports' %} {{ dev.ip_address }}
             </a>
         </li>
 
-        {% url 'devapp:edit' dev.id as devapp_edit %}
-        <li{% if devapp_edit == request.path %} class="active"{% endif %}>
-            <a href="{{ devapp_edit }}">Редактировать</a>
-        </li>
+        {% if perms.devapp.change_device %}
+            {% url 'devapp:edit' dev.user_group.pk|default:0 dev.id as devapp_edit %}
+            <li{% if devapp_edit == request.path %} class="active"{% endif %}>
+                <a href="{{ devapp_edit }}">{% trans 'Edit' %}</a>
+            </li>
+        {% endif %}
     </ul>
 
     <div class="tab-content">

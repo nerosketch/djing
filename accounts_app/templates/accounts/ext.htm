@@ -1,9 +1,10 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
         <li class="active">{{ userprofile.username }}</li>
     </ol>
 
@@ -22,27 +23,27 @@
                 <div class="caption btn-group btn-group-sm">
                     {% if userprofile == request.user %}
                     <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary btn-sm" role="button">
-                        <span class="glyphicon glyphicon-edit"></span> Редактировать</a>
+                        <span class="glyphicon glyphicon-edit"></span> {% trans 'Edit' %}</a>
                     {% endif %}
                     <a href="#" class="btn btn-default btn-sm disabled" role="button">
-                        <span class="glyphicon glyphicon-star-empty"></span> Дать задачу</a>
+                        <span class="glyphicon glyphicon-star-empty"></span> {% trans 'Set a task' %}</a>
                 </div>
             </div>
         </div>
 
         <div class="col-sm-9">
-            <h3>{{ userprofile.username|default:"&lt;Нет ника&gt;" }}</h3>
+            <h3>{{ userprofile.username|default:_('Not assigned') }}</h3>
             <ul class="nav nav-tabs">
                 {% url 'acc_app:other_profile' uid as profile_url %}
                 <li{% if profile_url == request.path %} class="active"{% endif %}>
                     <a href="{{ profile_url }}">
-                        Администратор
+                        {% trans 'Administrator' %}
                     </a>
                 </li>
                 {% url 'acc_app:profile_setup_group' uid as profilegroups_url %}
                 <li{% if profilegroups_url == request.path %} class="active"{% endif %}>
                     <a href="{{ profilegroups_url }}">
-                        Группы
+                        {% trans 'Groups' %}
                     </a>
                 </li>
             </ul>

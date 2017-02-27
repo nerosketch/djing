@@ -80,6 +80,8 @@ def task_delete(request, task_id):
     # нельзя удалить назначенную мне задачу
     if request.user not in task.recipients.all():
         task.delete()
+    else:
+        messages.warning(request, _('You cannot delete task that assigned to you'))
     return redirect('taskapp:home')
 
 

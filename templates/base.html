@@ -70,9 +70,9 @@
                     <span class="glyphicon glyphicon-compressed"></span> ip пул
                 </a></li>
 
-            {% url 'devapp:devs' as devapp_devs %}
-            <li{% if devapp_devs in request.path %} class="active"{% endif %}>
-                <a href="{{ devapp_devs }}">
+            {% url 'devapp:group_list' as devapp_groups %}
+            <li{% if devapp_groups in request.path %} class="active"{% endif %}>
+                <a href="{{ devapp_groups }}">
                     <span class="glyphicon glyphicon-hdd"></span> железки
                 </a></li>
 

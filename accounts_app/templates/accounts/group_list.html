@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
-        <li class="active">Группы</li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li class="active">{% trans 'Groups' %}</li>
     </ol>
 
-    <h3>Список групп администраторов</h3>
+    <h3>{% trans 'Admin groups list' %}</h3>
 
     {% include 'message_block.html' %}
 
@@ -17,7 +17,7 @@
             <thead>
             <tr>
                 <th width="50">#</th>
-                <th>Группа</th>
+                <th>{% trans 'Group' %}</th>
                 <th class="col-sm-1">&mdash;</th>
             </tr>
             </thead>
@@ -37,14 +37,16 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="3"><a href="#">Нет групп</a></td>
+                    <td colspan="3"><a href="#">{% trans 'Groups does not found' %}</a></td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
                 <td colspan="3">
-                    <a href="#" class="btn btn-primary btn-sm" title="Добавить группу"><i class="icon-plus"></i></a>
+                    <a href="#" class="btn btn-primary btn-sm disabled" title="{% trans 'Add group' %}">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
                 </td>
             </tr>
             </tfoot>

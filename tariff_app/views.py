@@ -35,22 +35,20 @@ def edit_tarif(request, tarif_id=0):
     if tarif_id == 0:
         if not request.user.has_perm('tariff_app.add_tariff'):
             raise PermissionDenied
+        tarif = None
     else:
         if not request.user.has_perm('tariff_app.change_tariff'):
             raise PermissionDenied
+        tarif = get_object_or_404(Tariff, pk=tarif_id)
 
     if request.method == 'POST':
-        frm = forms.TariffForm(request.POST)
+        frm = forms.TariffForm(request.POST, instance=tarif)
         if frm.is_valid():
             frm.save()
             return redirect('tarifs:home')
         else:
             messages.warning(request, 'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
     else:
-        if tarif_id == 0:
-            tarif = Tariff()
-        else:
-            tarif = get_object_or_404(Tariff, id=tarif_id)
         frm = forms.TariffForm(instance=tarif)
 
     return render(request, 'tariff_app/editTarif.html', {

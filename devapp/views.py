@@ -1,23 +1,53 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 from easysnmp import EasySNMPTimeoutError
 
 from .models import Device
-from mydefs import pag_mn, res_success, res_error, only_admins, ping
+from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm
+from abonapp.models import AbonGroup
 
 
 @login_required
 @only_admins
-def devices(request):
-    devs = Device.objects.all()
+def devices(request, grp):
+    group = get_object_or_404(AbonGroup, pk=grp)
+    devs = Device.objects.filter(user_group=grp)
+
+    # фильтр
+    dr, field = order_helper(request)
+    if field:
+        devs = devs.order_by(field)
+
     devs = pag_mn(request, devs)
 
     return render(request, 'devapp/devices.html', {
-        'devices': devs
+        'devices': devs,
+        'dir': dr,
+        'order_by': request.GET.get('order_by'),
+        'group': group
+    })
+
+
+@login_required
+@only_admins
+def devices_null_group(request):
+    devs = Device.objects.all()
+    # фильтр
+    dr, field = order_helper(request)
+    if field:
+        devs = devs.order_by(field)
+
+    devs = pag_mn(request, devs)
+
+    return render(request, 'devapp/devices_null_group.html', {
+        'devices': devs,
+        'dir': dr,
+        'order_by': request.GET.get('order_by')
     })
 
 
@@ -25,10 +55,12 @@ def devices(request):
 @permission_required('devapp.delete_device')
 def devdel(request, did):
     try:
-        get_object_or_404(Device, id=did).delete()
-        return res_success(request, 'devapp:devs')
-    except:
-        return res_error(request, 'Неизвестная ошибка при удалении :(')
+        dev = Device.objects.get(pk=did)
+        back_url = resolve_url('devapp:devs', grp=dev.user_group.pk if dev.user_group else 0)
+        dev.delete()
+        return res_success(request, back_url)
+    except Device.DoesNotExist:
+        return res_error(request, _('Delete failed'))
 
 
 @login_required
@@ -46,16 +78,21 @@ def dev(request, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             frm.save()
-            messages.success(request, 'Инфа о точке сохранена')
+            messages.success(request, _('Device info has been saved'))
         else:
-            messages.error(request, 'Ошибка в данных, проверте их ещё раз')
+            messages.error(request, _('Form is invalid, check fields and try again'))
     else:
         frm = DeviceForm(instance=devinst)
 
-    return render(request, 'devapp/dev.html', {
-        'form': frm,
-        'dev': devinst
-    })
+    if devinst is None:
+        return render(request, 'devapp/add_dev.html', {
+            'form': frm
+        })
+    else:
+        return render(request, 'devapp/dev.html', {
+            'form': frm,
+            'dev': devinst
+        })
 
 
 @login_required
@@ -72,11 +109,11 @@ def devview(request, did):
                 uptime = manager.uptime()
                 ports = manager.get_ports()
             else:
-                messages.warning(request, 'Не указан snmp пароль для устройства')
+                messages.warning(request, _('Not Set snmp device password'))
         else:
-            messages.error(request, 'Эта точка не пингуется')
+            messages.error(request, _('Dot was not pinged'))
     except EasySNMPTimeoutError:
-        messages.error(request, 'Время ожидания ответа от SNMP истекло')
+        messages.error(request, _('wait for a reply from the SNMP Timeout'))
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,
@@ -100,7 +137,16 @@ def toggle_port(request, did, portid, status=0):
             else:
                 ports[portid-1].disable()
         else:
-            messages.warning(request, 'Не указан snmp пароль для устройства')
+            messages.warning(request, _('Not Set snmp device password'))
     else:
-        messages.error(request, 'Эта точка не пингуется')
-    return redirect('devapp:view', did=did)
+        messages.error(request, _('Dot was not pinged'))
+    return redirect('devapp:view', dev.user_group or 0, did)
+
+
+@login_required
+@only_admins
+def group_list(request):
+    groups = AbonGroup.objects.all()
+    return render(request, 'devapp/group_list.html', {
+        'groups': groups
+    })

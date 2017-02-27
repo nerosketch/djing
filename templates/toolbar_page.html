@@ -1,3 +1,5 @@
+{% with request.GET.urlencode|yesno:'&,' as start_divide %}
+{% with request.GET.urlencode as url %}
 {% if pag.paginator.num_pages > 1 %}
     <div class="row">
         <div class="col-sm-4 col-sm-offset-4">
@@ -5,21 +7,23 @@
                 {% if pag.number == 1 %}
                     <li class="disabled"><a href="#">&laquo;</a></li>
                 {% else %}
-                    <li><a href="?p=1">&laquo;</a></li>
+                    <li><a href="?{{ url }}{{ start_divide }}p=1">&laquo;</a></li>
                 {% endif %}
                 {% if pag.has_previous %}
-                    <li><a href="?p={{ pag.previous_page_number }}">{{ pag.previous_page_number }}</a></li>
+                    <li><a href="?{{ url }}{{ start_divide }}p={{ pag.previous_page_number }}">{{ pag.previous_page_number }}</a></li>
                 {% endif %}
                 <li class="disabled"><a href="#">{{ pag.number }}</a></li>
                 {% if pag.has_next %}
-                    <li><a href="?p={{ pag.next_page_number }}">{{ pag.next_page_number }}</a></li>
+                    <li><a href="?{{ url }}{{ start_divide }}p={{ pag.next_page_number }}">{{ pag.next_page_number }}</a></li>
                 {% endif %}
                 {% if pag.number == pag.paginator.num_pages %}
                     <li class="disabled"><a href="#">&raquo;</a></li>
                 {% else %}
-                    <li><a href="?p={{ pag.paginator.num_pages }}">&raquo;</a></li>
+                    <li><a href="?{{ url }}{{ start_divide }}p={{ pag.paginator.num_pages }}">&raquo;</a></li>
                 {% endif %}
             </ul>
         </div>
     </div>
 {% endif %}
+{% endwith %}
+{% endwith %}

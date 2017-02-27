@@ -28,5 +28,8 @@ class DeviceForm(forms.ModelForm):
             }),
             'map_dot': forms.Select(attrs={
                 'class': 'form-control'
+            }),
+            'user_group': forms.Select(attrs={
+                'class': 'form-control'
             })
         }

@@ -1,0 +1,12 @@
+[Unit]
+Description=Run every 30 minutes a job for djing
+
+[Timer]
+OnCalendar=*-*-* *:30:00
+Persistent=true
+RandomizedDelaySec=300
+Unit=djing.service
+
+[Install]
+WantedBy=timers.target
+

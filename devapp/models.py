@@ -18,6 +18,7 @@ class Device(models.Model):
     devtype = models.CharField(max_length=2, default=DEVICE_TYPES[0][0], choices=_DeviceChoicesAdapter())
     man_passw = models.CharField(max_length=16, null=True, blank=True)
     map_dot = models.ForeignKey(Dot, on_delete=models.SET_NULL, null=True, blank=True)
+    user_group = models.ForeignKey('abonapp.AbonGroup', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'dev'

@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.http import Http404
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
+from django.utils.translation import ugettext as _
 from abonapp.models import AbonGroup
 
 from photo_app.models import Photo
@@ -39,13 +40,13 @@ def to_signin(request):
 
             return render(request, 'accounts/login.html', {
                 'next': nextl,
-                'errmsg': 'Неправильный логин или пароль, попробуйте ещё раз'
+                'errmsg': _('Wrong login or password, please try again')
             })
         return render(request, 'accounts/login.html', {
             'next': nextl
         })
     except NoReverseMatch:
-        raise Http404("Destination page does not exist")
+        return redirect('acc_app:profile')
 
 
 def sign_out(request):
@@ -133,7 +134,7 @@ def ch_info(request):
                 newpasswd = request.POST.get('newpasswd')
                 user.set_password(newpasswd)
             else:
-                messages.error(request, 'Неправильный пароль')
+                messages.error(request, _('Wrong password'))
         user.save()
         request.user = user
 
@@ -158,10 +159,10 @@ def create_profile(request):
         passwd = request.POST.get('passwd')
         conpasswd = request.POST.get('conpasswd')
         if not passwd:
-            messages.error(request, 'Забыли указать пароль для нового аккаунта')
+            messages.error(request, _('You forget specify a password for the new account'))
 
         if not conpasswd:
-            messages.error(request, 'Забыли повторить пароль для нового аккаунта')
+            messages.error(request, _('You forget to repeat a password for the new account'))
 
         if passwd == conpasswd:
             user_qs = UserProfile.objects.filter(username=username)[:1]
@@ -170,9 +171,9 @@ def create_profile(request):
                 user.save()
                 return redirect('acc_app:accounts_list')
             else:
-                messages.error(request, 'Пользователь с таким именем уже есть')
+                messages.error(request, _('Subscriber with this name already exist'))
         else:
-            messages.error(request, 'Пароли не совпадают, попробуйте ещё раз')
+            messages.error(request, _('Passwords does not match, try again'))
         return render(request, 'accounts/create_acc.html', {
             'newuser': user
         })
@@ -194,9 +195,7 @@ def delete_profile(request, uid):
 @mydefs.only_admins
 def acc_list(request):
     users = UserProfile.objects.filter(is_admin=True)
-
     users = mydefs.pag_mn(request, users)
-
     return render(request, 'accounts/acc_list.html', {
         'users': users
     })
@@ -207,7 +206,6 @@ def acc_list(request):
 def perms(request, uid):
     profile = get_object_or_404(UserProfile, id=uid)
     own_permissions = UserProfile.get_all_permissions(profile)
-
     return render(request, 'accounts/settings/permissions.html', {
         'uid': uid,
         'own_permissions': own_permissions
@@ -218,9 +216,7 @@ def perms(request, uid):
 @mydefs.only_admins
 def groups(request):
     grps = Group.objects.all()
-
     grps = mydefs.pag_mn(request, grps)
-
     return render(request, 'accounts/group_list.html', {
         'groups': grps
     })

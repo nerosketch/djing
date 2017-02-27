@@ -37,7 +37,7 @@
                 <td>{{ task.get_state_display }}</td>
                 <td>{{ task.get_priority_display }}</td>
                 <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
-                <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.attachment.name }}</a>{% else %}&horbar;{% endif %}</td>
+                <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.get_attachment_fname|truncatechars:32 }}</a>{% else %}&horbar;{% endif %}</td>
                 <td colspan="3" class="btn-group">
                     {% if perms.taskapp.change_task %}
                     <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">

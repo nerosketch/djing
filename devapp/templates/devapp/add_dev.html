@@ -1,6 +1,18 @@
-{% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block content %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
+        <li class="active">{% trans 'Add new device' %}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <div class="page-header">
+        <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
+    </div>
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -8,7 +20,7 @@
         </div>
         <div class="panel-body">
 
-            <form role="form" action="{% url 'devapp:edit' dev.user_group.pk|default:0 dev.pk %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'devapp:add' %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
                     <label for="id_ip_address">{% trans 'Ip address' %}</label>

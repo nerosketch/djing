@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
-        <li><a href="{% url 'acc_app:groups_list' %}">Группы</a></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:groups_list' %}">{% trans 'Groups' %}</a></li>
         <li class="active">{{ group.name }}</li>
     </ol>
 
@@ -13,13 +13,13 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Действующее распределение прав для группы <b>{{ group.name }}</b></h3>
+            <h3 class="panel-title">{% trans 'The current distribution of rights for groups' %} <b>{{ group.name }}</b></h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'acc_app:group_link' group.id %}" method="post">{% csrf_token %}
 
                 <div class="choice_wrapper">
-                    <label for="sel_left">Доступные права</label>
+                    <label for="sel_left">{% trans 'Available rights' %}</label>
                     <select name="allrights" multiple id="sel_left">
                         {% for rgt in all_rights %}
                             <option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
@@ -33,7 +33,7 @@
                             class="black icon-arrow-left"></i></a></li>
                 </ul>
                 <div class="choice_wrapper">
-                    <label for="sel_right">Права группы</label>
+                    <label for="sel_right">{% trans 'Rights for the group' %}</label>
                     <select name="group_rights" multiple id="sel_right">
                         {% for rgt in grp_rights %}
                             <option value="{{ rgt.id }}">{{ rgt.content_type }} &lt;{{ rgt.name }}&gt;</option>
@@ -41,7 +41,7 @@
                     </select>
                 </div>
                 <br/>
-                <input type="submit" value="Сохранить"> <input type="reset" value="Сбросить">
+                <input type="submit" value="{% trans 'Save' %}"> <input type="reset" value="{% trans 'Reset' %}">
 
             </form>
         </div>

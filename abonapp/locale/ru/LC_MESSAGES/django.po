@@ -332,7 +332,7 @@ msgstr "Активен"
 
 #: abonapp/templates/abonapp/editAbon.html:92
 msgid "Send account info to user"
-msgstr "Отправить учётные данные абоненту"
+msgstr "Отправить данные абоненту"
 
 #: abonapp/templates/abonapp/editAbon.html:104
 msgid "Technical information"
