@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-20 17:32+0300\n"
+"POT-Creation-Date: 2017-02-27 14:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -19,37 +19,114 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: accounts_app/templates/accounts/login.html:5
-msgid "Auth"
-msgstr "Авторизация"
+#: accounts_app/models.py:18
+msgid "Users must have an telephone number"
+msgstr "У пользователей должен быть номер телефона"
 
-#: accounts_app/templates/accounts/login.html:24
-#: accounts_app/templates/accounts/login.html:53
-msgid "Login"
-msgstr "Войти"
+#: accounts_app/models.py:52
+msgid "Telephone number"
+msgstr "Номер телефона"
 
-#: accounts_app/templates/accounts/login.html:36
+#: accounts_app/templates/accounts/group.html:7
+#: accounts_app/templates/accounts/group_list.html:7
+msgid "Administrators"
+msgstr "Администраторы"
+
+#: accounts_app/templates/accounts/group.html:8
+#: accounts_app/templates/accounts/group_list.html:8
+msgid "Groups"
+msgstr "Группы"
+
+#: accounts_app/templates/accounts/group.html:16
+msgid "The current distribution of rights for groups"
+msgstr "Действующее распределение прав для группы"
+
+#: accounts_app/templates/accounts/group.html:22
+msgid "Available rights"
+msgstr "Доступные права"
+
+#: accounts_app/templates/accounts/group.html:36
+msgid "Rights for the group"
+msgstr "Права группы"
+
+#: accounts_app/templates/accounts/group.html:44
+#: accounts_app/templates/accounts/profile_chgroup.html:20
+#: accounts_app/templates/accounts/settings/ch_info.html:66
+msgid "Save"
+msgstr "Сохранить"
+
+#: accounts_app/templates/accounts/group.html:44
+#: accounts_app/templates/accounts/login.html:55
+#: accounts_app/templates/accounts/profile_chgroup.html:20
+#: accounts_app/templates/accounts/settings/ch_info.html:69
+msgid "Reset"
+msgstr "Сбросить"
+
+#: accounts_app/templates/accounts/group_list.html:11
+msgid "Admin groups list"
+msgstr "Список групп администраторов"
+
+#: accounts_app/templates/accounts/group_list.html:20
+msgid "Group"
+msgstr "Группа"
+
+#: accounts_app/templates/accounts/group_list.html:40
+msgid "Groups does not found"
+msgstr "Нет групп"
+
+#: accounts_app/templates/accounts/group_list.html:47
+msgid "Add group"
+msgstr "Добавить группу"
+
+#: accounts_app/templates/accounts/index.html:8
+#: accounts_app/templates/accounts/settings/ch_info.html:37
+msgid "Telephone"
+msgstr "Номер телефона"
+
+#: accounts_app/templates/accounts/index.html:12
+#: accounts_app/templates/accounts/login.html:35
 #: accounts_app/templates/accounts/settings/ch_info.html:8
 #: accounts_app/templates/accounts/settings/ch_info.html:12
 msgid "User name"
 msgstr "Логин"
 
-#: accounts_app/templates/accounts/login.html:56
-#: accounts_app/templates/accounts/settings/ch_info.html:69
-msgid "Reset"
-msgstr "Сбросить"
-
+#: accounts_app/templates/accounts/index.html:16
 #: accounts_app/templates/accounts/settings/ch_info.html:18
 msgid "Name and surname"
 msgstr "Фамилия и Имя"
 
+#: accounts_app/templates/accounts/index.html:20
+msgid "Is enable"
+msgstr "Включён-ли"
+
+#: accounts_app/templates/accounts/index.html:24
+msgid "Last login"
+msgstr "Последняя авторизация"
+
+#: accounts_app/templates/accounts/index.html:29
+msgid "All permissions"
+msgstr "Административный доступ (все права)"
+
+#: accounts_app/templates/accounts/login.html:5
+msgid "Auth"
+msgstr "Авторизация"
+
+#: accounts_app/templates/accounts/login.html:23
+#: accounts_app/templates/accounts/login.html:52
+msgid "Login"
+msgstr "Войти"
+
+#: accounts_app/templates/accounts/login.html:43
+msgid "Password"
+msgstr "Пароль"
+
+#: accounts_app/templates/accounts/profile_chgroup.html:5
+msgid "The responsibility of the administrator of the group of subscribers"
+msgstr "Ответственность администратора за группы абонентов"
+
 #: accounts_app/templates/accounts/settings/ch_info.html:27
 msgid "Email"
 msgstr "Адрес электронной почты"
-
-#: accounts_app/templates/accounts/settings/ch_info.html:37
-msgid "Telephone"
-msgstr "Номер телефона"
 
 #: accounts_app/templates/accounts/settings/ch_info.html:42
 msgid "+[7,8,9,3] and 10,11 digits"
@@ -63,15 +140,29 @@ msgstr "Старый пароль"
 msgid "New password"
 msgstr "Новый пароль"
 
-msgid "Password"
-msgstr "Пароль"
+#: accounts_app/views.py:43
+msgid "Wrong login or password, please try again"
+msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
-#: accounts_app/templates/accounts/settings/ch_info.html:66
-msgid "Save"
-msgstr "Сохранить"
+#: accounts_app/views.py:137
+msgid "Wrong password"
+msgstr "Неправильный пароль"
 
-msgid "Administrators"
-msgstr "Администраторы"
+#: accounts_app/views.py:162
+msgid "You forget specify a password for the new account"
+msgstr "Забыли указать пароль для нового аккаунта"
+
+#: accounts_app/views.py:165
+msgid "You forget to repeat a password for the new account"
+msgstr "Забыли повторить пароль для нового аккаунта"
+
+#: accounts_app/views.py:174
+msgid "Subscriber with this name already exist"
+msgstr "Пользователь с таким именем уже есть"
+
+#: accounts_app/views.py:176
+msgid "Passwords does not match, try again"
+msgstr "Пароли не совпадают, попробуйте ещё раз"
 
 msgid "Administrator"
 msgstr "Администратор"
@@ -87,66 +178,6 @@ msgstr "Изменить инфу о себе"
 
 msgid "Permission options"
 msgstr "Настройка прав"
-
-msgid "Users must have an telephone number"
-msgstr "У пользователей должен быть номер телефона"
-
-msgid "Telephone number"
-msgstr "Номер телефона"
-
-msgid "Wrong login or password, please try again"
-msgstr "Неправильный логин или пароль, попробуйте ещё раз"
-
-msgid "Wrong password"
-msgstr "Неправильный пароль"
-
-msgid "You forget specify a password for the new account"
-msgstr "Забыли указать пароль для нового аккаунта"
-
-msgid "You forget to repeat a password for the new account"
-msgstr "Забыли повторить пароль для нового аккаунта"
-
-msgid "Subscriber with this name already exist"
-msgstr "Пользователь с таким именем уже есть"
-
-msgid "Passwords does not match, try again"
-msgstr "Пароли не совпадают, попробуйте ещё раз"
-
-msgid "The responsibility of the administrator of the group of subscribers"
-msgstr "Ответственность администратора за группы абонентов"
-
-msgid "Is enable"
-msgstr "Включён-ли"
-
-msgid "Last login"
-msgstr "Последняя авторизация"
-
-msgid "All permissions"
-msgstr "Административный доступ (все права)"
-
-msgid "Groups"
-msgstr "Группы"
-
-msgid "Group"
-msgstr "Группа"
-
-msgid "Admin groups list"
-msgstr "Список групп администраторов"
-
-msgid "Groups does not found"
-msgstr "Нет групп"
-
-msgid "Add group"
-msgstr "Добавить группу"
-
-msgid "The current distribution of rights for groups"
-msgstr "Действующее распределение прав для группы"
-
-msgid "Available rights"
-msgstr "Доступные права"
-
-msgid "Rights for the group"
-msgstr "Права группы"
 
 msgid "Edit"
 msgstr "Редактировать"
