@@ -45,6 +45,7 @@ def edit_tarif(request, tarif_id=0):
         frm = forms.TariffForm(request.POST, instance=tarif)
         if frm.is_valid():
             frm.save()
+            messages.success(request, 'Тариф успешно сохранён')
             return redirect('tarifs:home')
         else:
             messages.warning(request, 'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
