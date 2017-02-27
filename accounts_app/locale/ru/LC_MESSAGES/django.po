@@ -84,3 +84,15 @@ msgstr "Изменить инфу о себе"
 
 msgid "Permission options"
 msgstr "Настройка прав"
+
+msgid "The responsibility of the administrator of the group of subscribers"
+msgstr "Ответственность администратора за группы абонентов"
+
+msgid "Is enable"
+msgstr "Включён-ли"
+
+msgid "Last login"
+msgstr "Последняя авторизация"
+
+msgid "Administrative access (all rights)"
+msgstr "Административный доступ (все права)"

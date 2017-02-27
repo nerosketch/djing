@@ -1,35 +1,32 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
+{% load i18n %}
 {% block content %}
 
     <table class="table table-striped table-bordered">
         <tbody>
         <tr>
-            <td class="col-sm-4">Телефон</td>
+            <td class="col-sm-4">{% trans 'Telephone' %}</td>
             <td><a href="tel:{{ userprofile.telephone }}">{{ userprofile.telephone }}</a></td>
         </tr>
         <tr>
-            <td>Логин</td>
+            <td>{% trans 'User name' %}</td>
             <td>{{ userprofile.username }}</td>
         </tr>
         <tr>
-            <td>ФИО</td>
+            <td>{% trans 'Name and surname' %}</td>
             <td>{{ userprofile.fio }}</td>
         </tr>
         <tr>
-            <td>Включён-ли</td>
+            <td>{% trans 'Is enable' %}</td>
             <td><input type="checkbox" {{ userprofile.is_active|yesno:' checked,' }}></td>
         </tr>
         <tr>
-            <td>Последняя авторизация</td>
+            <td>{% trans 'Last login' %}</td>
             <td>{{ userprofile.last_login|date:"l d E Y H:i" }}</td>
-        </tr>
-        <tr>
-            <td>Выделенный ip</td>
-            <td>&lt;10.155.13.43&gt;</td>
         </tr>
         {% if request.user.is_superuser %}
             <tr>
-                <td>Административный доступ (все права)</td>
+                <td>{% trans 'Administrative access (all rights)' %}</td>
                 <td><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
             </tr>
         {% endif %}
