@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<form role="form" action="{% url 'abonapp:abon_amount' abon_group.id abon.id %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-shopping-cart"></span>{% trans 'Additional sum' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group-sm">
+            <label for="amount">{% trans 'Amount of money' %}</label>
+
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-ruble"></span></span>
+                <input id="amount" type="text" name="amount" placeholder="0.0" class="form-control" required
+                       pattern="\d+">
+            </div>
+        </div>
+        <input type="hidden" name="abonid" value="{{ abon.id }}"><br>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-primary">
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Refill' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

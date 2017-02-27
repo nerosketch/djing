@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import dumps
+from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Count
@@ -180,10 +181,10 @@ def abonamount(request, gid, uid):
         messages.error(request, e)
     except NasFailedResult as e:
         messages.error(request, e)
-    return render(request, 'abonapp/abonamount.html', {
+    return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
         'abon_group': get_object_or_404(models.AbonGroup, id=gid)
-    })
+    }, request=request)
 
 
 @login_required
