@@ -121,4 +121,12 @@ $(document).ready(function () {
 	$('[data-toggle=offcanvas]').click(function () {
 		$('.row-offcanvas').toggleClass('active');
 	});
+
+    $('.btn-modal').on('click', function(){
+        $.get(this.href, function(r){
+            show_ModalMyContent(r);
+        });
+        return false;
+    });
+
 });
