@@ -197,6 +197,7 @@ class Abon(UserProfile):
             comment=u_comment
         )
         self.ballance -= how_match_to_pay
+        self.save(update_fields=['ballance'])
 
     # Пополняем счёт
     def add_ballance(self, current_user, amount, comment):
