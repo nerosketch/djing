@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-22 01:50+0300\n"
+"POT-Creation-Date: 2017-02-27 12:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -19,98 +19,171 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+#: devapp/templates/devapp/add_dev.html:7
+#: devapp/templates/devapp/devices.html:7
+#: devapp/templates/devapp/devices_null_group.html:7
+#: devapp/templates/devapp/group_list.html:7
+#: devapp/templates/devapp/group_list.html:10
+msgid "Groups"
+msgstr ""
+
+#: devapp/templates/devapp/add_dev.html:8
+msgid "Add new device"
+msgstr ""
+
+#: devapp/templates/devapp/add_dev.html:14
+#: devapp/templates/devapp/ports.html:143
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+#: devapp/templates/devapp/add_dev.html:19 devapp/templates/devapp/dev.html:7
 msgid "Device info"
 msgstr "Инфа о железке"
 
+#: devapp/templates/devapp/add_dev.html:26 devapp/templates/devapp/dev.html:14
+#: devapp/templates/devapp/devices.html:20
+#: devapp/templates/devapp/devices_null_group.html:20
 msgid "Ip address"
 msgstr "Ip адрес"
 
+#: devapp/templates/devapp/add_dev.html:35 devapp/templates/devapp/dev.html:23
+#: devapp/templates/devapp/devices.html:26
+#: devapp/templates/devapp/devices_null_group.html:26
 msgid "Comment"
 msgstr "Комментарий"
 
+#: devapp/templates/devapp/add_dev.html:44 devapp/templates/devapp/dev.html:32
+#: devapp/templates/devapp/devices.html:32
+#: devapp/templates/devapp/devices_null_group.html:32
 msgid "Device type"
 msgstr "Тип устройства"
 
+#: devapp/templates/devapp/add_dev.html:53 devapp/templates/devapp/dev.html:41
 msgid "SNMP password"
 msgstr "Пароль SNMP"
 
+#: devapp/templates/devapp/add_dev.html:62 devapp/templates/devapp/dev.html:50
 msgid "Map point"
 msgstr "Точка топологии"
 
+#: devapp/templates/devapp/add_dev.html:71 devapp/templates/devapp/dev.html:59
+msgid "User group"
+msgstr ""
+
+#: devapp/templates/devapp/add_dev.html:81 devapp/templates/devapp/dev.html:69
 msgid "Save"
 msgstr "Сохранить"
 
+#: devapp/templates/devapp/add_dev.html:84 devapp/templates/devapp/dev.html:72
 msgid "Reset"
 msgstr "Сбросить"
 
+#: devapp/templates/devapp/devices.html:13
+#: devapp/templates/devapp/devices_null_group.html:8
 msgid "Devices"
 msgstr "Устройства"
 
+#: devapp/templates/devapp/devices.html:61
+#: devapp/templates/devapp/devices_null_group.html:61
 msgid "Devices does not found"
 msgstr "Нет созданных устройств"
 
+#: devapp/templates/devapp/devices.html:61
+#: devapp/templates/devapp/devices.html:70
+#: devapp/templates/devapp/devices_null_group.html:61
+#: devapp/templates/devapp/devices_null_group.html:70
 msgid "Create"
 msgstr "Cоздать"
 
-msgid "Not assigned"
-msgstr "&lt;Не назначено&gt;"
+#: devapp/templates/devapp/devices_null_group.html:13
+#: devapp/templates/devapp/group_list.html:41
+msgid "Devices without group"
+msgstr "Устройства без группы"
+
+#: devapp/templates/devapp/group_list.html:18
+msgid "Group title"
+msgstr ""
+
+#: devapp/templates/devapp/group_list.html:28
+#, fuzzy
+#| msgid "Dot was not pinged"
+msgid "Groups was not found"
+msgstr "Эта точка не пингуется"
+
+#: devapp/templates/devapp/group_list.html:37
+msgid "Add group"
+msgstr ""
+
+#: devapp/templates/devapp/ports.html:9
+msgid "Title of the type of switch"
+msgstr "Название типа свича"
+
+#: devapp/templates/devapp/ports.html:10
+msgid "Uptime"
+msgstr "Без перезагрузки"
+
+#: devapp/templates/devapp/ports.html:42
+msgid "We have not received info, please check options :("
+msgstr "Инфа не получена, проверьте настройки :("
+
+#: devapp/templates/devapp/ports.html:54
+msgid "Device log"
+msgstr "Лог устройства"
+
+#: devapp/templates/devapp/ports.html:61
+msgid "Level"
+msgstr "Уровень"
+
+#: devapp/templates/devapp/ports.html:62
+msgid "Description"
+msgstr "Описание"
+
+#: devapp/templates/devapp/ports.html:63
+msgid "Date"
+msgstr "Дата"
+
+#: devapp/templates/devapp/ports.html:129
+msgid "Ports comment"
+msgstr "Комментарии портов"
+
+#: devapp/templates/devapp/ports.html:135
+msgid "Port"
+msgstr "Порт"
+
+#: devapp/templates/devapp/ports.html:136
+msgid "Title"
+msgstr "Название"
+
+#: devapp/templates/devapp/ports.html:147
+msgid "We have not received info for ports"
+msgstr "Инфа о портах не получена"
+
+#: devapp/views.py:63
+msgid "Delete failed"
+msgstr "Неизвестная ошибка при удалении :("
+
+#: devapp/views.py:81
+msgid "Device info has been saved"
+msgstr "Инфа о точке сохранена"
+
+#: devapp/views.py:83
+msgid "Form is invalid, check fields and try again"
+msgstr "Ошибка в данных, проверте их ещё раз"
+
+#: devapp/views.py:112 devapp/views.py:140
+msgid "Not Set snmp device password"
+msgstr "Не указан snmp пароль для устройства"
+
+#: devapp/views.py:114 devapp/views.py:142
+msgid "Dot was not pinged"
+msgstr "Эта точка не пингуется"
+
+#: devapp/views.py:116
+msgid "wait for a reply from the SNMP Timeout"
+msgstr "Время ожидания ответа от SNMP истекло"
 
 msgid "Ports"
 msgstr "Порты"
 
-msgid "Port"
-msgstr "Порт"
-
 msgid "Edit"
 msgstr "Редактировать"
-
-msgid "Title of the type of switch"
-msgstr "Название типа свича"
-
-msgid "Uptime"
-msgstr "Без перезагрузки"
-
-msgid "We have not received info, please check options :("
-msgstr "Инфа не получена, проверьте настройки :("
-
-msgid "Device log"
-msgstr "Лог устройства"
-
-msgid "Level"
-msgstr "Уровень"
-
-msgid "Description"
-msgstr "Описание"
-
-msgid "Date"
-msgstr "Дата"
-
-msgid "Ports comment"
-msgstr "Комментарии портов"
-
-msgid "Title"
-msgstr "Название"
-
-msgid "We have not received info for ports"
-msgstr "Инфа о портах не получена"
-
-msgid "Delete failed"
-msgstr "Неизвестная ошибка при удалении :("
-
-msgid "Device info has been saved"
-msgstr "Инфа о точке сохранена"
-
-msgid "Form is invalid, check fields and try again"
-msgstr "Ошибка в данных, проверте их ещё раз"
-
-msgid "Not Set snmp device password"
-msgstr "Не указан snmp пароль для устройства"
-
-msgid "Dot was not pinged"
-msgstr "Эта точка не пингуется"
-
-msgid "wait for a reply from the SNMP Timeout"
-msgstr "Время ожидания ответа от SNMP истекло"
-
-msgid "Devices without group"
-msgstr "Устройства без группы"
