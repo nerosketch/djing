@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-21 01:59+0300\n"
+"POT-Creation-Date: 2017-02-27 12:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -45,99 +45,99 @@ msgstr "с. %s. Тип задачи - %s. "
 msgid "Not assigned"
 msgstr "&lt;Не назначено&gt;"
 
-#: taskapp/models.py:12
+#: taskapp/models.py:13
 msgid "Higher"
 msgstr "Высший"
 
-#: taskapp/models.py:13
+#: taskapp/models.py:14
 msgid "Average"
 msgstr "Средний"
 
-#: taskapp/models.py:14
+#: taskapp/models.py:15
 msgid "Low"
 msgstr "Низкий"
 
-#: taskapp/models.py:18
+#: taskapp/models.py:19
 msgid "New"
 msgstr "Новая"
 
-#: taskapp/models.py:19
+#: taskapp/models.py:20
 msgid "In fulfilling"
 msgstr "На выполнении"
 
-#: taskapp/models.py:20
+#: taskapp/models.py:21
 msgid "Completed"
 msgstr "Выполнена"
 
-#: taskapp/models.py:24
+#: taskapp/models.py:25
 msgid "not chosen"
 msgstr "не выбрано"
 
-#: taskapp/models.py:25
+#: taskapp/models.py:26
 msgid "yellow triangle"
 msgstr "жёлтый треугольник"
 
-#: taskapp/models.py:26
+#: taskapp/models.py:27
 msgid "red cross"
 msgstr "красный крестик"
 
-#: taskapp/models.py:27
+#: taskapp/models.py:28
 msgid "weak speed"
 msgstr "слабая скорость"
 
-#: taskapp/models.py:28
+#: taskapp/models.py:29
 msgid "cable break"
 msgstr "обрыв кабеля"
 
-#: taskapp/models.py:29
+#: taskapp/models.py:30
 msgid "connection"
 msgstr "подключение"
 
-#: taskapp/models.py:30
+#: taskapp/models.py:31
 msgid "periodic disappearance"
 msgstr "переодическое пропадание"
 
-#: taskapp/models.py:31
+#: taskapp/models.py:32
 msgid "router setup"
 msgstr "настройка роутера"
 
-#: taskapp/models.py:32
+#: taskapp/models.py:33
 msgid "configure onu"
 msgstr "настроить onu"
 
-#: taskapp/models.py:33
+#: taskapp/models.py:34
 msgid "crimp cable"
 msgstr "обжать кабель"
 
-#: taskapp/models.py:34
+#: taskapp/models.py:35
 msgid "other"
 msgstr "другое"
 
-#: taskapp/models.py:41
+#: taskapp/models.py:42
 msgid "Change task"
 msgstr "Изменение задачи"
 
-#: taskapp/models.py:42
+#: taskapp/models.py:43
 msgid "Create task"
 msgstr "Создание задачи"
 
-#: taskapp/models.py:43
+#: taskapp/models.py:44
 msgid "Delete task"
 msgstr "Удаление задачи"
 
-#: taskapp/models.py:44
+#: taskapp/models.py:45
 msgid "Completing tasks"
 msgstr "Завершение задачи"
 
-#: taskapp/models.py:45
+#: taskapp/models.py:46
 msgid "The task started"
 msgstr "Задача начата"
 
-#: taskapp/models.py:76
+#: taskapp/models.py:77
 msgid "Access to all tasks"
 msgstr "Доступ ко всем задачам"
 
-#: taskapp/models.py:77
+#: taskapp/models.py:78
 msgid "Reminders of tasks"
 msgstr "Напоминания о задачах"
 
@@ -161,7 +161,10 @@ msgid "Create"
 msgstr "Создать"
 
 #: taskapp/templates/taskapp/add_edit_task.html:15
+#: taskapp/templates/taskapp/footer_btns.html:3
 #: taskapp/templates/taskapp/footer_btns.html:4
+#: taskapp/templates/taskapp/tasklist_all.html:75
+#: taskapp/templates/taskapp/tasklist_all.html:76
 msgid "Add new task"
 msgstr "Добавьте новую задачу"
 
@@ -320,19 +323,23 @@ msgstr "Времени осталось"
 msgid "Task type"
 msgstr "Тип задачи"
 
-#: taskapp/views.py:146
+#: taskapp/views.py:84
+msgid "You cannot delete task that assigned to you"
+msgstr "Вы не можете удалять назначенные на вас задачи"
+
+#: taskapp/views.py:148
 msgid "No responsible employee for the users group"
 msgstr "Нет ответственных за группу, в которой находится выбранный абонент"
 
-#: taskapp/views.py:148
+#: taskapp/views.py:150
 msgid "You must select the subscriber"
 msgstr "Нужно выбрать абонента"
 
-#: taskapp/views.py:150
+#: taskapp/views.py:152
 msgid "Error in the form fields"
 msgstr "Ошибка в полях формы"
 
-#: taskapp/views.py:152
+#: taskapp/views.py:154
 msgid "Employee has not yet signed up for notifications"
 msgstr "Исполнитель ещё не подписался на оповещения"
 
@@ -353,6 +360,3 @@ msgstr "Назначенные мной задачи"
 
 msgid "All my tasks"
 msgstr "Все мои задачи"
-
-msgid "You cannot delete task that assigned to you"
-msgstr "Вы не можете удалять назначенные на вас задачи"
