@@ -295,6 +295,9 @@ msgstr ""
 msgid "Debtors"
 msgstr "Должники"
 
+msgid "Debtor"
+msgstr "Должник"
+
 #: abonapp/templates/abonapp/debtors.html:14
 msgid "People with debts"
 msgstr "Народ, у которого есть неоплаченные услуги"
@@ -648,6 +651,9 @@ msgstr "Долги"
 
 msgid "Payment history"
 msgstr "История платежей"
+
+msgid "Payments"
+msgstr "Финансы"
 
 msgid "History of tasks"
 msgstr "История задач"
