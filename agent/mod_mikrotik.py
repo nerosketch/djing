@@ -147,7 +147,8 @@ class MikrotikTransmitter(BaseTransmitter):
             raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
 
     def __del__(self):
-        self.s.close()
+        if hasattr(self, 's'):
+            self.s.close()
 
     def _exec_cmd_iter(self, cmd):
         assert isinstance(cmd, list)
