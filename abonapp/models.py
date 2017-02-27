@@ -225,10 +225,10 @@ class Abon(UserProfile):
 
         # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
         if not abtrf:
-            # значит она сразу стаёт активной
-            new_abtar.time_start = timezone.now()
-
-        new_abtar.save()
+            # значит пробуем её активировать
+            new_abtar.activate(author)
+        else:
+            new_abtar.save()
 
         # Запись об этом в лог
         AbonLog.objects.create(
