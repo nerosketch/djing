@@ -36,19 +36,17 @@ You complete tariff{% endblocktrans %}
                     {% endif %}
 
                     {% now "d F Y, H: i: s" as today %}
-                    {% blocktrans with time_start=abtar.time_start|date:'d F Y, H: i: s' amount=abtar.tariff.amount tcost=abtar.calc_amount_service %}The service has been connected: {{ time_start }}<br/>
-Today: {{ today }} <br/>
-Time of use: {{ time_use }} <br/>
-The total cost of the service: {{ amount }} <br/>
-Total cost: {{ tcost }}{% endblocktrans %}
+                    {% blocktrans with time_start=abtar.time_start|date:'d F Y, H: i: s' amount=abtar.tariff.amount %}The service has been connected: {{ time_start }}<br/>
+Today: {{ today }}<br/>
+Time of use: {{ time_use }}<br/>
+The total cost of the service: {{ amount }}<br/>
+Total cost: {{ tcost }}<br/>
+Cashback: {{ cashback }}{% endblocktrans %}
                 </p>
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
-                    </button>
-                    <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
 

@@ -385,6 +385,12 @@ def chpriority(request, gid, uid):
 @permission_required('abonapp.can_complete_service')
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, id=srvid)
+    abon = abtar.abon
+    # считаем не использованные ресурсы
+    calc_obj = abtar.tariff.get_calc_type()(abtar)
+    # получаем сколько использовано
+    res_amount = calc_obj.calc_amount()
+    cashback = abtar.tariff.amount - res_amount
 
     if int(abtar.abon.pk) != int(uid) or int(abtar.abon.group.pk) != int(gid):
         # если что-то написали в урле вручную, то вернём на путь истинный
@@ -394,6 +400,15 @@ def complete_service(request, gid, uid, srvid):
         if request.method == 'POST':
             # досрочно завершаем услугу
             if request.POST.get('finish_confirm') == 'yes':
+                if cashback > 0.5:
+                    # возвращаем деньги, которые абонент не использовал
+                    abon.add_ballance(
+                        request.user,
+                        cashback,
+                        _('Refunds for unused resources')
+                    )
+                    abon.save(update_fields=['ballance'])
+
                 # удаляем запись о текущей услуге.
                 abtar.delete()
                 messages.success(request, _('Service has been finished successfully'))
@@ -413,9 +428,11 @@ def complete_service(request, gid, uid, srvid):
 
     return render(request, 'abonapp/complete_service.html', {
         'abtar': abtar,
-        'abon': abtar.abon,
+        'abon': abon,
         'time_use': time_use,
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid)
+        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'tcost': round(res_amount, 4),
+        'cashback': round(cashback, 4)
     })
 
 

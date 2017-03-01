@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 from django.core import validators
@@ -104,15 +105,13 @@ class AbonTariff(models.Model):
 
     # Считает текущую стоимость услуг согласно выбранной для тарифа логики оплаты (см. в документации)
     def calc_amount_service(self):
-        calc_obj = self.tariff.get_calc_type()(self)
-        # calc_obj - instance of tariff_app.custom_tariffs.TariffBase
-        amount = calc_obj.calc_amount()
+        amount = self.tariff.amount
         return round(amount, 2)
 
     # Активируем тариф
     def activate(self, current_user):
         calc_obj = self.tariff.get_calc_type()(self)
-        amnt = self.calc_amount_service()
+        amnt = self.tariff.amount
         # если не хватает денег
         if self.abon.ballance < amnt:
             raise LogicError(_('not enough money'))
@@ -156,6 +155,36 @@ class AbonStreet(models.Model):
         db_table = 'abon_street'
 
 
+class ExtraFieldsModel(models.Model):
+    DYNAMIC_FIELD_TYPES = (
+        ('int', _('Digital field')),
+        ('str', _('Text field')),
+        ('dbl', _('Floating field'))
+    )
+
+    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES)
+    data = models.CharField(max_length=64, null=True, blank=True)
+
+    def clean(self):
+        d = self.data
+        if self.field_type == 'int':
+            validators.validate_integer(d)
+        elif self.field_type == 'dbl':
+            try:
+                float(d)
+            except ValueError:
+                raise ValidationError(_('Double invalid value'), code='invalid')
+        elif self.field_type == 'str':
+            str_validator = validators.MaxLengthValidator(64)
+            str_validator(d)
+
+    def __str__(self):
+        return "%s: %s" % (self.get_field_type_display(), self.data)
+
+    class Meta:
+        db_table = 'abon_extra_fields'
+
+
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
@@ -164,6 +193,7 @@ class Abon(UserProfile):
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
+    extra_fields = models.ManyToManyField(ExtraFieldsModel)
 
     _act_tar_cache = None
 
@@ -350,30 +380,6 @@ class AbonRawPassword(models.Model):
 
     class Meta:
         db_table = 'abon_raw_password'
-
-
-class ExtraFieldsModel(models.Model):
-    DYNAMIC_FIELD_TYPES = (
-        ('int', _('Digital field')),
-        ('str', _('Text field')),
-        ('dbl', _('Floating field'))
-    )
-
-    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES)
-    account = models.ForeignKey(Abon, on_delete=models.DO_NOTHING)
-    data = models.CharField(max_length=64, null=True, blank=True)
-
-    def clean(self):
-        val = None
-        if self.field_type == 'int':
-            val = validators.integer_validator
-        elif self.field_type == 'dbl':
-            val = validators.DecimalValidator(9, 6)
-        if val:
-            self.validators.append(val)
-
-    class Meta:
-        db_table = 'abon_extra_fields'
 
 
 def abon_post_save(sender, instance, **kwargs):
