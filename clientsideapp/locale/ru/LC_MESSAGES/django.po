@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-27 14:20+0300\n"
+"POT-Creation-Date: 2017-02-28 12:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -104,7 +104,7 @@ msgid "Pick"
 msgstr "Заказать"
 
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:29
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:27
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:24
 msgid "Close"
 msgstr "Закрыть"
 
@@ -116,7 +116,7 @@ msgstr "Отписаться от услуги"
 msgid "Are you sure you want to unsubscribe from the service?"
 msgstr "Вы уверены что хотите отписаться от услуги?"
 
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:15
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:14
 #, fuzzy, python-format
 #| msgid ""
 #| "Inbound speed: %(service.speedIn)s MBit/s<br>\n"
@@ -129,16 +129,17 @@ msgstr ""
 "Входящая скорость: %(service.speedIn)s MBit/s<br>\n"
 "Исходящая скорость: %(service.speedOut)s MBit/s"
 
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:19
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:16
 msgid ""
 "When you unsubscribe from the service, it just will remove it from the queue "
 "inclusions your services.<br>\n"
 "Your funds will not be affected, the money will not go away."
 msgstr ""
-"Когда вы отпишитесь от услуги, это просто уберёт её из очереди включений ваших услуг.<br>\n"
+"Когда вы отпишитесь от услуги, это просто уберёт её из очереди включений "
+"ваших услуг.<br>\n"
 "Ваши средства не буду затронуты, деньги не уйдут."
 
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:25
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:22
 msgid "Unsubscribe"
 msgstr "Отписаться"
 
@@ -146,14 +147,18 @@ msgstr "Отписаться"
 msgid "conducted payments"
 msgstr "Проведённые платежи"
 
+#: clientsideapp/templates/clientsideapp/pays.html:11
 msgid "Transaction Amount (rubles)"
 msgstr "Сумма транзакции (руб)"
 
+#: clientsideapp/templates/clientsideapp/pays.html:12
 msgid "Date of transaction"
 msgstr "Дата транзакции"
 
+#: clientsideapp/templates/clientsideapp/pays.html:13
 msgid "Comment"
 msgstr "Комментарий"
 
+#: clientsideapp/templates/clientsideapp/pays.html:25
 msgid "You have not spent payments"
 msgstr "У вас нет проведённых платежей"
