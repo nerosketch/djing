@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from agent import NasNetworkError
-from .models import AbonTariff, Abon
+from .models import AbonTariff, Abon, AbonGroup, LogicError
 from tariff_app.models import Tariff
 
 
@@ -15,17 +15,22 @@ class AbonTestCase(TestCase):
                 speedOut=3.0,
                 amount=3
             )
-            Abon.objects.create(
-                username='mainuser',
-                telephone='+79788328884'
-            )
+            abon = Abon()
+            abon.username = '1234567'
+            abon.fio = 'mainuser'
+            abon.telephone = '+79788328884'
+            abon.set_password('ps')
+            abon.is_superuser = True
+            abon.save()
+            abon_group = AbonGroup.objects.create(title='abon_group')
+            abon_group.profiles.add(abon)
         except NasNetworkError:
             pass
 
     # проверка на пополнение счёта
     def test_add_ballance(self):
         try:
-            abon = Abon.objects.get(username='mainuser')
+            abon = Abon.objects.get(username='1234567')
             ballance = abon.ballance
             abon.add_ballance(abon, 13, 'test pay')
             abon.save(update_fields=['ballance'])
@@ -41,10 +46,14 @@ class AbonTestCase(TestCase):
     def test_pick_tariff(self):
         try:
             tariff = Tariff.objects.get(title='test_tariff')
-            abon = Abon.objects.get(username='mainuser')
-            abon.pick_tariff(tariff, abon)
+            abon = Abon.objects.get(username='1234567')
+            try:
+                abon.pick_tariff(tariff, abon)
+                # нет денег, должно всплыть исключение и сюда дойти мы не должны
+                self.assertFalse(True)
+            except LogicError:
+                pass
             act_tar = abon.active_tariff()
-
             # если недостаточно денег на счету
             assert abon.ballance <= tariff.amount
             # У абонента на счету 0, не должна быть куплена услуга
@@ -55,6 +64,7 @@ class AbonTestCase(TestCase):
             # с деньгами
             abon.add_ballance(abon, 7.34, 'add pay for test pick tariff')
             abon.pick_tariff(tariff, abon)
+            act_tar = abon.active_tariff()
             # должны получить указанную услугу
             self.assertEqual(act_tar, tariff)
             # и получить доступ
@@ -62,12 +72,93 @@ class AbonTestCase(TestCase):
         except NasNetworkError:
             pass
 
+    # тестим очередь услуг
+    def test_services_queue(self):
+        abon = Abon.objects.get(username='1234567')
+        tariff = Tariff.objects.get(title='test_tariff')
+        abon.add_ballance(abon, 9, 'add pay for test services queue')
+        abon.save()
+        abon.pick_tariff(tariff, abon)
+        abon.pick_tariff(tariff, abon)
+        abon.pick_tariff(tariff, abon)
+        # снять деньги должно было только за первый выбор, остальные стают в очередь услуг
+        self.assertEqual(abon.ballance, 6)
+
+        c = Client()
+        # login
+        c.post('/accounts/login/', {'login': '1234567', 'password': 'ps'})
+        resp = c.get('/abons/1/1/complete_service1')
+        print('RESP:', resp)
+        self.assertEqual(resp.status_code, 200)
+        resp = c.post('/abons/1/1/complete_service1', data={
+            'finish_confirm': 'yes'
+        })
+        print('RESP:', resp)
+        # при успешной остановке услуги идёт редирект на др страницу
+        self.assertEqual(resp.status_code, 302)
+        # текущей услуги быть не должно
+        act_tar = abon.active_tariff()
+        self.assertIsNone(act_tar)
+        # не активных услуг останется 2
+        noact_count = AbonTariff.objects.filter(abon=abon).filter(time_start=None).count()
+        self.assertEqual(noact_count, 2)
+
+    # проверяем платёжку alltime
+    def test_allpay(self):
+        from hashlib import md5
+        from djing.settings import pay_SECRET, pay_SERV_ID
+        import xmltodict
+        def sig(act, pay_account, pay_id):
+            md = md5()
+            s = '_'.join((str(act), str(pay_account), pay_SERV_ID, str(pay_id), pay_SECRET))
+            md.update(bytes(s, 'utf-8'))
+            return md.hexdigest()
+        c = Client()
+        r = c.get('/abons/pay', {
+            'ACT': 1, 'PAY_ACCOUNT': '1234567',
+            'SERVICE_ID': pay_SERV_ID,
+            'PAY_ID': 3561234,
+            'TRADE_POINT': 377,
+            'SIGN': sig(1, 1234567, 3561234)
+        })
+        xobj = xmltodict.parse(r.content)
+        self.assertEqual(int(xobj['pay-response']['status_code']), 21)
+        r = c.get('/abons/pay', {
+            'ACT': 4, 'PAY_ACCOUNT': '1234567',
+            'SERVICE_ID': pay_SERV_ID,
+            'PAY_ID': 3561234,
+            'PAY_AMOUNT': 1.0,
+            'TRADE_POINT': 377,
+            'SIGN': sig(4, 1234567, 3561234)
+        })
+        xobj = xmltodict.parse(r.content)
+        self.assertEqual(int(xobj['pay-response']['status_code']), 22)
+        r = c.get('/abons/pay', {
+            'ACT': 4, 'PAY_ACCOUNT': '1234567',
+            'SERVICE_ID': pay_SERV_ID,
+            'PAY_ID': 3561234,
+            'PAY_AMOUNT': 1.0,
+            'TRADE_POINT': 377,
+            'SIGN': sig(4, 1234567, 3561234)
+        })
+        xobj = xmltodict.parse(r.content)
+        self.assertEqual(int(xobj['pay-response']['status_code']), -100)
+        r = c.get('/abons/pay', {
+            'ACT': 7, 'PAY_ACCOUNT': '1234567',
+            'SERVICE_ID': pay_SERV_ID,
+            'PAY_ID': 3561234,
+            'PAY_AMOUNT': 1.0,
+            'TRADE_POINT': 377,
+            'SIGN': sig(7, 1234567, 3561234)
+        })
+        xobj = xmltodict.parse(r.content)
+        self.assertEqual(int(xobj['pay-response']['status_code']), 11)
 
 
 class AbonTariffTestCase(TestCase):
     def setUp(self):
         abon = Abon.objects.create(
-            username='mainuser',
+            username='1234567',
             telephone='+79788328884'
         )
         tariff = Tariff.objects.create(
