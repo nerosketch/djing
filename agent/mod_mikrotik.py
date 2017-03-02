@@ -7,6 +7,7 @@ from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct, ShapeItem
 from . import settings
 from djing.settings import DEBUG
+import re
 
 
 class ApiRos:
@@ -171,7 +172,8 @@ class MikrotikTransmitter(BaseTransmitter):
     def _build_shape_obj(self, info):
         try:
             speeds = info['=max-limit'].split('/')
-            speeds = [sp.replace('M','') for sp in speeds]
+            speeds = [re.sub(r'[a-zA-Z]', '', sp) for sp in speeds]
+            #FIXBUG: не может распознать входные данные на скорость 62k, надо фильтровать буквы в скоростях
             t = TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
             a = AbonStruct(
                 uid=int(info['=name'][3:]),
