@@ -3,3 +3,5 @@ Pillow
 mysqlclient
 telepot
 easysnmp
+# for testing required xmltodict
+xmltodict
