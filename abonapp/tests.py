@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from agent import NasNetworkError
-from .models import AbonTariff, Abon, AbonGroup, LogicError
+from .models import AbonTariff, Abon, AbonGroup, LogicError, AbonRawPassword
 from tariff_app.models import Tariff
 
 
@@ -153,6 +153,43 @@ class AbonTestCase(TestCase):
         })
         xobj = xmltodict.parse(r.content)
         self.assertEqual(int(xobj['pay-response']['status_code']), 11)
+        abon = Abon.objects.get(username='1234567')
+        self.assertEqual(abon.ballance, 1)
+
+    # пробуем добавить группу абонентов
+    def test_add_abongroup(self):
+        abon = Abon.objects.get(username='1234567')
+        ag = AbonGroup.objects.create(title='%&34%$&*(')
+        ag.profiles.add(abon)
+
+    # пробуем добавить абонента
+    def test_add_abon(self):
+        c = Client()
+        c.login(username='1234567', password='ps')
+        r = c.get('/abons/1/addabon')
+        # поглядим на страницу добавления абонента
+        self.assertEqual(r.status_code, 200)
+        r = c.post('/abons/1/addabon', {
+            'username': '123',
+            'password': 'ps',
+            'fio': 'Abon Fio',
+            'telephone': '+79783753914',
+            'is_active': True
+        })
+        self.assertEqual(r.status_code, 302)
+        r = c.get('/abons/324/addabon')
+        self.assertEqual(r.status_code, 404)
+        try:
+            abn = Abon.objects.get(username='123')
+            self.assertIsNotNone(abn)
+            psw = AbonRawPassword.objects.get(account=abn, passw_text='ps')
+            self.assertIsNotNone(psw)
+        except Abon.DoesNotExist:
+            # абонент должен был создаться
+            self.assertTrue(False)
+        except AbonRawPassword.DoesNotExist:
+            # должен быть пароль абонента простым текстом
+            self.assertTrue(False)
 
 
 class AbonTariffTestCase(TestCase):
