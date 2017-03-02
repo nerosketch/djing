@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/services$', views.abon_services, name='abon_services'),
     url(r'^(?P<uid>\d+)/amount', views.abonamount, name='abon_amount'),
     url(r'^(?P<uid>\d+)/debts', views.invoice_for_payment, name='abon_debts'),
-    url(r'^(?P<uid>\d+)/pay_history', views.pay_history, name='abon_phistory'),
+    url(r'^(?P<uid>\d+)/pay', views.pay_history, name='abon_phistory'),
 
     url(r'^(?P<uid>\d+)/addinvoice$', views.add_invoice, name='add_invoice'),
     url(r'^(?P<uid>\d+)/pick$', views.pick_tariff, name='pick_tariff'),

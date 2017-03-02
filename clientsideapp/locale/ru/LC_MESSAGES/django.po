@@ -1,0 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE"S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-28 12:46+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:6
+msgid "Debts"
+msgstr "Задолженность"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:11
+msgid "repayment of debts"
+msgstr "Оплатить задолженность"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:18
+msgid "Are you sure you want to spend a payment?"
+msgstr "Вы уверены что хотите провести платёж?"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:21
+#, fuzzy, python-format
+#| msgid ""
+#| "From your account, they withdraw funds in <b>%(amount)s</b> rub. <br/>\n"
+#| "As a result, you will remain on your account %(ballance_after)s rubles. "
+#| "<br/>\n"
+#| "The administrator can immediately see that you shut down the debt."
+msgid ""
+"From your account, they withdraw funds in <b>%(amount)s</b> rub.<br/>\n"
+"As a result, you will remain on your account %(ballance_after)s rubles.<br/"
+">\n"
+"The administrator can immediately see that you shut down the debt."
+msgstr ""
+"С вашего счёта снимутся средства в размере <b>%(amount)s</b> руб.<br/>\n"
+"В результате у вас на счету останется %(ballance_after)s руб.<br/>\n"
+"Администратор сразу сможет видеть что у вас закрыта задолженность."
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:24
+msgid "Description of payment"
+msgstr "Описание платежа"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:32
+msgid "Confirm"
+msgstr "Подтвердить"
+
+#: clientsideapp/templates/clientsideapp/debt_buy.html:35
+msgid "Cancel"
+msgstr "Отменить"
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:5
+msgid "Pick service"
+msgstr "Заказать услугу"
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:8
+msgid "Are you sure you want to order the service?"
+msgstr "Вы уверены что хотите заказать услугу?"
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:10
+#, python-format
+msgid ""
+"Your current service <a href=\"#dv\">%(current_service.title)s</a>\n"
+"for the <b>%(current_service.amount)s</b> rub."
+msgstr ""
+"Ваша текущая услуга <a href=\"#dv\">%(current_service.title)s</a>\n"
+"за <b>%(current_service.amount)s</b> руб."
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:13
+msgid ""
+"You do not have an active service for the use of resources required service "
+"purchase from the selection below.<br>\n"
+"And if you have already booked then just activate the service from the list "
+"ordered."
+msgstr ""
+"У вас нет активной услуги, для использования ресурсов приобретите нужную "
+"услугу из представленных ниже.<br>\n"
+"А если уже заказали то просто активируйте услугу из списка заказанных."
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:21
+#, python-format
+msgid ""
+"Inbound speed: %(service.speedIn)s MBit/s<br>\n"
+"Outgoing speed: %(service.speedOut)s MBit/s<br>\n"
+"Cost: %(service.amount)s rubles."
+msgstr ""
+"Входящая скорость: %(service.speedIn)s MBit/s<br>\n"
+"Исходящая скорость: %(service.speedOut)s MBit/s<br>\n"
+"Стоимость: %(service.amount)s руб."
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:27
+msgid "Pick"
+msgstr "Заказать"
+
+#: clientsideapp/templates/clientsideapp/modal_service_buy.html:29
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:24
+msgid "Close"
+msgstr "Закрыть"
+
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:5
+msgid "Unsubscribe from service"
+msgstr "Отписаться от услуги"
+
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:8
+msgid "Are you sure you want to unsubscribe from the service?"
+msgstr "Вы уверены что хотите отписаться от услуги?"
+
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:14
+#, fuzzy, python-format
+#| msgid ""
+#| "Inbound speed: %(service.speedIn)s MBit/s<br>\n"
+#| "Outgoing speed: %(service.speedOut)s MBit/s<br>\n"
+#| "Cost: %(service.amount)s rubles."
+msgid ""
+"Inbound speed: %(service.speedIn)s MBit/s<br>Outgoing speed: "
+"%(service.speedOut)s MBit/s"
+msgstr ""
+"Входящая скорость: %(service.speedIn)s MBit/s<br>\n"
+"Исходящая скорость: %(service.speedOut)s MBit/s"
+
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:16
+msgid ""
+"When you unsubscribe from the service, it just will remove it from the queue "
+"inclusions your services.<br>\n"
+"Your funds will not be affected, the money will not go away."
+msgstr ""
+"Когда вы отпишитесь от услуги, это просто уберёт её из очереди включений "
+"ваших услуг.<br>\n"
+"Ваши средства не буду затронуты, деньги не уйдут."
+
+#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:22
+msgid "Unsubscribe"
+msgstr "Отписаться"
+
+#: clientsideapp/templates/clientsideapp/pays.html:6
+msgid "conducted payments"
+msgstr "Проведённые платежи"
+
+#: clientsideapp/templates/clientsideapp/pays.html:11
+msgid "Transaction Amount (rubles)"
+msgstr "Сумма транзакции (руб)"
+
+#: clientsideapp/templates/clientsideapp/pays.html:12
+msgid "Date of transaction"
+msgstr "Дата транзакции"
+
+#: clientsideapp/templates/clientsideapp/pays.html:13
+msgid "Comment"
+msgstr "Комментарий"
+
+#: clientsideapp/templates/clientsideapp/pays.html:25
+msgid "You have not spent payments"
+msgstr "У вас нет проведённых платежей"

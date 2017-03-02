@@ -1,28 +1,27 @@
 {% extends 'clientsideapp/ext.html' %}
+{% load i18n %}
 {% block client_main %}
 
     <div class="page-header">
-        <h3>Задолженность</h3>
+        <h3>{% trans 'Debts' %}</h3>
     </div>
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Оплатить задолженность</h3>
+            <h3 class="panel-title">{% trans 'repayment of debts' %}</h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'client_side:debt_buy' debt.id %}" method="post">{% csrf_token %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" checked name="sure">
-                        Вы уверены что хотите провести платёж?
+                        {% trans 'Are you sure you want to spend a payment?' %}
                     </label>
                 </div>
-                <p>
-                    С вашего счёта снимутся средства в размере <b>{{ amount }}</b> руб.<br/>
-                    В результате у вас на счету останется {{ ballance_after }} руб.<br/>
-                    Администратор сразу сможет видеть что у вас закрыта задолженность.
-                </p>
-                <h4>Описание платежа</h4>
+                <p>{% blocktrans %}From your account, they withdraw funds in <b>{{ amount }}</b> rub.<br/>
+As a result, you will remain on your account {{ ballance_after }} rubles.<br/>
+The administrator can immediately see that you shut down the debt.{% endblocktrans %}</p>
+                <h4>{% trans 'Description of payment' %}</h4>
 
                 <div class="alert alert-info">
                     {{ debt.comment }}
@@ -30,10 +29,10 @@
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Подтвердить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Confirm' %}
                     </button>
                     <a href="{% url 'client_side:debts' %}" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Отменить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Cancel' %}
                     </a>
                 </div>
             </form>

@@ -26,10 +26,10 @@ def handle(task, author, recipient, abon_group):
             dst_account = author
         fulltext="%s: %s. " % (text, task.abon.get_full_name())
         if task.abon:
-            fulltext += _('address %s. telephone %s. ') % (
+            fulltext += _('address %(task.abon.address)s. telephone %(task.abon.telephone)s. ') % (
                 task.abon.address, task.abon.telephone
             )
-        fulltext += _('locality %s. Task type - %s. ') % (abon_group.title, task.get_mode_display())
+        fulltext += _('locality %(abon_group.title)s. Task type - %(task.get_mode_display)s. ') % (abon_group.title, task.get_mode_display())
         fulltext += task.descr if task.descr else _('Not assigned')
         send_notify(fulltext, dst_account)
     except ChatException as e:

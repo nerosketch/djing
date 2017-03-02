@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-21 01:59+0300\n"
+"POT-Creation-Date: 2017-02-28 12:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -35,78 +35,61 @@ msgstr "ФИО"
 msgid "telephone placeholder"
 msgstr "+[7,8,9,3] и 10,11 цифр"
 
-#: abonapp/models.py:23
+#: abonapp/models.py:24
 msgid "fill account"
 msgstr "Пополнение счёта"
 
-#: abonapp/models.py:118
+#: abonapp/models.py:117
 msgid "not enough money"
 msgstr "Не хватает денег на счету"
 
-#: abonapp/models.py:124
+#: abonapp/models.py:123
 msgid "service finish log"
 msgstr "Завершение и оплата услуги по истечению срока действия"
 
-#: abonapp/models.py:143
+#: abonapp/models.py:142
 msgid "finish service perm"
 msgstr "Снятие со счёта средств"
 
-#: abonapp/models.py:144
+#: abonapp/models.py:143
 msgid "activate service perm"
 msgstr "Активация услуги абонента"
 
-#: abonapp/models.py:187
-msgid "Buy service perm"
-msgstr "Покупка тарифа абоненту"
-
-#: abonapp/models.py:188
-msgid "Can view passport"
-msgstr "Может просматривать паспортные данные"
-
-#: abonapp/models.py:192
-msgid "pay log"
-msgstr "Снятие со счёта средств"
-
-#: abonapp/models.py:237
-msgid "Buy service default log"
-msgstr "Покупка тарифного плана через админку"
-
-#: abonapp/models.py:249
-msgid "service overdue log"
-msgstr "Услуга просрочена, отключаем, и подключаем новую"
-
-#: abonapp/models.py:352
+#: abonapp/models.py:160
 msgid "Digital field"
 msgstr "Цифровое поле"
 
-#: abonapp/models.py:353
+#: abonapp/models.py:161
 msgid "Text field"
 msgstr "Текстовое поле"
 
-#: abonapp/models.py:354
+#: abonapp/models.py:162
 msgid "Floating field"
 msgstr "Дробное с плавающей точкой"
 
-#: abonapp/templates/abonapp/abonamount.html:6
-msgid "Additional sum"
-msgstr "Начисление средств на счёт"
+#: abonapp/models.py:176
+msgid "Double invalid value"
+msgstr "Введите число с плавающей запятой"
 
-#: abonapp/templates/abonapp/abonamount.html:15
-msgid "Amount of money"
-msgstr "Количество денег"
+#: abonapp/models.py:217
+msgid "Buy service perm"
+msgstr "Покупка тарифа абоненту"
 
-#: abonapp/templates/abonapp/abonamount.html:27
-msgid "Refill"
-msgstr "Пополнить"
+#: abonapp/models.py:218
+msgid "Can view passport"
+msgstr "Может просматривать паспортные данные"
 
-#: abonapp/templates/abonapp/abonamount.html:30
-#: abonapp/templates/abonapp/addAbon.html:89
-#: abonapp/templates/abonapp/addGroup.html:32
-#: abonapp/templates/abonapp/addInvoice.html:49
-#: abonapp/templates/abonapp/buy_tariff.html:37
-#: abonapp/templates/abonapp/complete_service.html:51
-msgid "Reset"
-msgstr "Сбросить"
+#: abonapp/models.py:222
+msgid "pay log"
+msgstr "Снятие со счёта средств"
+
+#: abonapp/models.py:268
+msgid "Buy service default log"
+msgstr "Покупка тарифного плана через админку"
+
+#: abonapp/models.py:283
+msgid "service overdue log"
+msgstr "Услуга просрочена, отключаем, и подключаем новую"
 
 #: abonapp/templates/abonapp/activate_service.html:8
 #: abonapp/templates/abonapp/addAbon.html:7
@@ -117,6 +100,7 @@ msgstr "Сбросить"
 #: abonapp/templates/abonapp/debtors.html:8
 #: abonapp/templates/abonapp/group_list.html:8
 #: abonapp/templates/abonapp/group_list.html:11
+#: abonapp/templates/abonapp/invoiceForPayment.html:7
 #: abonapp/templates/abonapp/log.html:7
 #: abonapp/templates/abonapp/peoples.html:8
 msgid "User groups"
@@ -150,7 +134,7 @@ msgstr ""
 #: abonapp/templates/abonapp/addGroup.html:29
 #: abonapp/templates/abonapp/addInvoice.html:46
 #: abonapp/templates/abonapp/buy_tariff.html:34
-#: abonapp/templates/abonapp/complete_service.html:48
+#: abonapp/templates/abonapp/complete_service.html:49
 #: abonapp/templates/abonapp/editAbon.html:89
 #: abonapp/templates/abonapp/passport_view.html:42
 msgid "Save"
@@ -184,7 +168,7 @@ msgstr "Группа"
 #: abonapp/templates/abonapp/addInvoice.html:40
 #: abonapp/templates/abonapp/debtors.html:22
 #: abonapp/templates/abonapp/editAbon.html:80
-#: abonapp/templates/abonapp/invoiceForPayment.html:11
+#: abonapp/templates/abonapp/invoiceForPayment.html:23
 #: abonapp/templates/abonapp/log.html:20
 #: abonapp/templates/abonapp/payHistory.html:12
 #: abonapp/templates/abonapp/task_log.html:10
@@ -209,6 +193,14 @@ msgstr "Квартира"
 msgid "Password"
 msgstr "Пароль"
 
+#: abonapp/templates/abonapp/addAbon.html:89
+#: abonapp/templates/abonapp/addGroup.html:32
+#: abonapp/templates/abonapp/addInvoice.html:49
+#: abonapp/templates/abonapp/buy_tariff.html:37
+#: abonapp/templates/abonapp/modal_abonamount.html:26
+msgid "Reset"
+msgstr "Сбросить"
+
 #: abonapp/templates/abonapp/addGroup.html:8
 #: abonapp/templates/abonapp/addGroup.html:15
 #: abonapp/templates/abonapp/group_list.html:60
@@ -221,7 +213,7 @@ msgid "Group title"
 msgstr "Название группы"
 
 #: abonapp/templates/abonapp/addInvoice.html:10
-#: abonapp/templates/abonapp/invoiceForPayment.html:49
+#: abonapp/templates/abonapp/invoiceForPayment.html:61
 msgid "Add debt"
 msgstr "Добавить квитанцию"
 
@@ -235,7 +227,7 @@ msgid "Sum of pay"
 msgstr "Сумма для платежа"
 
 #: abonapp/templates/abonapp/addInvoice.html:36
-#: abonapp/templates/abonapp/invoiceForPayment.html:8
+#: abonapp/templates/abonapp/invoiceForPayment.html:20
 msgid "Pay status"
 msgstr "Статус оплаты"
 
@@ -279,17 +271,18 @@ msgid ""
 msgstr "Подробнее:<br/>Вы завершаете тариф"
 
 #: abonapp/templates/abonapp/complete_service.html:39
-#, python-format
 msgid ""
 "The service has been connected: %(time_start)s<br/>\n"
-"Today: %(today)s <br/>\n"
-"Time of use: %(time_use)s <br/>\n"
-"The total cost of the service: %(amount)s <br/>\n"
-"Total cost: %(tcost)s"
+"Today: %(today)s<br/>\n"
+"Time of use: %(time_use)s<br/>\n"
+"The total cost of the service: %(amount)s<br/>\n"
+"Total cost: %(tcost)s<br/>\n"
+"Cashback: %(cashback)s"
 msgstr ""
 "Услуга была подключена: %(time_start)s<br/>Сегодня: %(today)s<br/>Время "
-"использования: %(time_use)s<br/>Полная стоимость услуги: %(amount)s<br/"
-">Итоговая стоимость: %(tcost)s"
+"использования: %(time_use)s<br/>Полная стоимость услуги: %(amount)s<br/>"
+"Итоговая стоимость: %(tcost)s<br/>\n"
+"Средства для возврата: %(cashback)s"
 
 #: abonapp/templates/abonapp/debtors.html:9
 msgid "Debtors"
@@ -300,7 +293,7 @@ msgid "People with debts"
 msgstr "Народ, у которого есть неоплаченные услуги"
 
 #: abonapp/templates/abonapp/debtors.html:23
-#: abonapp/templates/abonapp/invoiceForPayment.html:12
+#: abonapp/templates/abonapp/invoiceForPayment.html:24
 #: abonapp/templates/abonapp/task_log.html:13
 msgid "Date of make"
 msgstr "Дата создания"
@@ -339,6 +332,7 @@ msgid "Technical information"
 msgstr "Техническая информация"
 
 #: abonapp/templates/abonapp/editAbon.html:110
+#: abonapp/templates/abonapp/editAbon.html:128
 #: abonapp/templates/abonapp/viewAbon.html:50
 msgid "Ip Address"
 msgstr "IP Адрес"
@@ -360,32 +354,41 @@ msgstr "История действий абонентов"
 msgid "List of debtors"
 msgstr "Список должников"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:9
+#: abonapp/templates/abonapp/invoiceForPayment.html:10
+#: abonapp/templates/abonapp/payHistory.html:39
+msgid "Debts"
+msgstr "Долги"
+
+#: abonapp/templates/abonapp/invoiceForPayment.html:15
+msgid "Debtor"
+msgstr "Должник"
+
+#: abonapp/templates/abonapp/invoiceForPayment.html:21
 msgid "Month"
 msgstr "Месяц"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:10
+#: abonapp/templates/abonapp/invoiceForPayment.html:22
 #: abonapp/templates/abonapp/log.html:18
 #: abonapp/templates/abonapp/payHistory.html:9
 #: abonapp/templates/abonapp/services.html:11
 msgid "Sum"
 msgstr "Сумма"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:13
+#: abonapp/templates/abonapp/invoiceForPayment.html:25
 #: abonapp/templates/abonapp/payHistory.html:10
 msgid "Date of payment"
 msgstr "Дата оплаты"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:14
+#: abonapp/templates/abonapp/invoiceForPayment.html:26
 #: abonapp/templates/abonapp/payHistory.html:11
 msgid "Author of payment"
 msgstr "Назначил"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:33
+#: abonapp/templates/abonapp/invoiceForPayment.html:45
 msgid "Created paid,Not yet paid"
 msgstr "Создан оплаченным,Ещё не оплачено"
 
-#: abonapp/templates/abonapp/invoiceForPayment.html:40
+#: abonapp/templates/abonapp/invoiceForPayment.html:52
 msgid "Receipts not found"
 msgstr "Назначенные платежи отсутствуют"
 
@@ -400,6 +403,18 @@ msgstr "Время"
 #: abonapp/templates/abonapp/log.html:40
 msgid "Actions not found"
 msgstr "Нет событий"
+
+#: abonapp/templates/abonapp/modal_abonamount.html:6
+msgid "Additional sum"
+msgstr "Начисление средств на счёт"
+
+#: abonapp/templates/abonapp/modal_abonamount.html:11
+msgid "Amount of money"
+msgstr "Количество денег"
+
+#: abonapp/templates/abonapp/modal_abonamount.html:23
+msgid "Refill"
+msgstr "Пополнить"
 
 #: abonapp/templates/abonapp/passport_view.html:9
 #: abonapp/templates/abonapp/viewAbon.html:67
@@ -427,6 +442,10 @@ msgstr "Дата рождения"
 #: abonapp/templates/abonapp/payHistory.html:26
 msgid "Payment history is empty"
 msgstr "История платежей пуста"
+
+#: abonapp/templates/abonapp/payHistory.html:35
+msgid "Fill account"
+msgstr "Пополнить счёт"
 
 #: abonapp/templates/abonapp/peoples.html:14
 msgid "The people in the selected group"
@@ -544,93 +563,97 @@ msgstr "Просмотр абонента"
 msgid "yes,no"
 msgstr "Да,Нет"
 
-#: abonapp/views.py:50
+#: abonapp/views.py:51
 msgid "create group success msg"
 msgstr "Группа успешно создана"
 
-#: abonapp/views.py:53 abonapp/views.py:111 abonapp/views.py:252
-#: abonapp/views.py:344
+#: abonapp/views.py:54 abonapp/views.py:112 abonapp/views.py:253
+#: abonapp/views.py:345
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#: abonapp/views.py:88 abonapp/views.py:153
+#: abonapp/views.py:89 abonapp/views.py:154
 msgid "delete group success msg"
 msgstr "Группа успешно удалена"
 
-#: abonapp/views.py:108
+#: abonapp/views.py:109
 msgid "create abon success msg"
 msgstr "Абонент успешно создан"
 
-#: abonapp/views.py:125
+#: abonapp/views.py:126
 msgid "Address"
 msgstr "Адрес"
 
-#: abonapp/views.py:147
+#: abonapp/views.py:148
 msgid "delete abon success msg"
 msgstr "Абонент успешно удалён"
 
-#: abonapp/views.py:156
+#: abonapp/views.py:157
 msgid "I not know what to delete"
 msgstr "Не понятно что удалять"
 
-#: abonapp/views.py:160
+#: abonapp/views.py:161
 #, python-format
 msgid "NAS says: '%s'"
 msgstr "NAS сказал: '%s'"
 
-#: abonapp/views.py:173
+#: abonapp/views.py:174
 msgid "fill account through admin side"
 msgstr "Пополнение счёта через админку"
 
-#: abonapp/views.py:175
+#: abonapp/views.py:176
 #, python-format
 msgid "Account filled successfully on %.2f"
 msgstr ""
 
-#: abonapp/views.py:178
+#: abonapp/views.py:179
 msgid "I not know the account id"
 msgstr "Счёт успешно пополнен на %.2f"
 
-#: abonapp/views.py:250
+#: abonapp/views.py:251
 msgid "edit abon success msg"
 msgstr "Абонент успешно изменён"
 
-#: abonapp/views.py:257
+#: abonapp/views.py:258
 #, python-format
 msgid "Ip address already exist. %s"
 msgstr ""
 "Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. "
 "А вообще: %s"
 
-#: abonapp/views.py:265
+#: abonapp/views.py:266
 msgid "Ip address not found"
 msgstr "Указанный вами ip отсутствует в ip pool"
 
-#: abonapp/views.py:267
+#: abonapp/views.py:268
 msgid "User has not have password, and cannot login"
 msgstr "Для абонента не задан пароль, он не сможет войти в учётку"
 
-#: abonapp/views.py:314
+#: abonapp/views.py:315
 msgid "Receipt has been created"
 msgstr "Квитанция на оплату была создана"
 
-#: abonapp/views.py:341
+#: abonapp/views.py:342
 msgid "Tariff has been picked"
 msgstr "Тариф успешно выбран"
 
-#: abonapp/views.py:398
+#: abonapp/views.py:408
+msgid "Refunds for unused resources"
+msgstr "Возврат средств за неиспользованные ресурсы"
+
+#: abonapp/views.py:414
 msgid "Service has been finished successfully"
 msgstr "Услуга успешно завершена"
 
-#: abonapp/views.py:401 abonapp/views.py:430
+#: abonapp/views.py:417 abonapp/views.py:448
 msgid "Not confirmed"
 msgstr "Действие не подтверждено"
 
-#: abonapp/views.py:433
+#: abonapp/views.py:451
 msgid "Service has been activated successfully"
 msgstr "Услуга успешно активирована"
 
-#: abonapp/views.py:458
+#: abonapp/views.py:476
 msgid "User has been detached from service"
 msgstr "Абонент отвязан от услуги"
 
@@ -640,14 +663,11 @@ msgstr "Информация абонента"
 msgid "Services"
 msgstr "Услуги"
 
-msgid "Fill account"
-msgstr "Пополнить счёт"
-
-msgid "Debts"
-msgstr "Долги"
-
 msgid "Payment history"
 msgstr "История платежей"
+
+msgid "Payments"
+msgstr "Финансы"
 
 msgid "History of tasks"
 msgstr "История задач"

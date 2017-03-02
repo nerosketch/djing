@@ -1,29 +1,31 @@
+{% load i18n %}
 <form action="{% url 'client_side:buy_service' service.pk %}" method="post">{% csrf_token %}
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title"><span class="glyphicon glyphicon-shopping-cart"></span>Заказать услугу</h4>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-shopping-cart"></span>{% trans 'Pick service' %}</h4>
     </div>
     <div class="modal-body">
-        <h3>Вы уверены что хотите заказать услугу?</h3>
+        <h3>{% trans 'Are you sure you want to order the service?' %}</h3>
         {% if current_service %}
-            <p>Ваша текущая услуга <a href="#dv">{{ current_service.title }}</a>
-                за <b>{{ current_service.amount }}</b> руб.</p>
+            <p>{% blocktrans %}Your current service <a href="#dv">{{ current_service.title }}</a>
+for the <b>{{ current_service.amount }}</b> rub.{% endblocktrans %}</p>
         {% else %}
-            <p>У вас нет активной услуги, для использования ресурсов приобретите нужную услугу из представленных ниже.<br>
-                А если уже заказали то просто активируйте услугу из списка заказанных.</p>
+            <p>{% blocktrans %}You do not have an active service for the use of resources required service purchase from the selection below.<br>
+And if you have already booked then just activate the service from the list ordered.{% endblocktrans %}</p>
         {% endif %}
+
         <h3>{{ service.title }}</h3>
 
         <p>{{ service.descr }}</p>
 
-        <p>Входящая скорость: {{ service.speedIn }} MBit/s<br>
-            Исходящая скорость: {{ service.speedOut }} MBit/s<br>
-            Стоимость: {{ service.amount }} руб.</p>
+        <p>{% blocktrans %}Inbound speed: {{ service.speedIn }} MBit/s<br>
+Outgoing speed: {{service.speedOut}} MBit/s<br>
+Cost: {{ service.amount }} rubles.{% endblocktrans %}</p>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-sm btn-primary">
-            <span class="glyphicon glyphicon-save"></span> Сохранить
+            <span class="glyphicon glyphicon-save"></span> {% trans 'Pick' %}
         </button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>
     </div>
 </form>

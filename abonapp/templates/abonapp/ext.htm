@@ -38,21 +38,9 @@
             </li>
         {% endif %}
 
-        {% if perms.abonapp.can_add_ballance %}
-            {% url 'abonapp:abon_amount' abon_group.id abon.id as abamount %}
-            <li{% if abamount == request.path %} class="active"{% endif %}>
-                <a href="{{ abamount }}">{% trans 'Fill account' %}</a>
-            </li>
-        {% endif %}
-
-        {% url 'abonapp:abon_debts' abon_group.id abon.id as abondebts %}
-        <li{% if abondebts == request.path %} class="active"{% endif %}>
-            <a href="{{ abondebts }}">{% trans 'Debts' %}</a>
-        </li>
-
         {% url 'abonapp:abon_phistory' abon_group.id abon.id as abphist %}
         <li{% if abphist == request.path %} class="active"{% endif %}>
-            <a href="{{ abphist }}">{% trans 'Payment history' %}</a>
+            <a href="{{ abphist }}">{% trans 'Payments' %}</a>
         </li>
 
         {% url 'abonapp:task_log' abon_group.id abon.id as abtasklog %}
