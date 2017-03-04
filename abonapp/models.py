@@ -392,10 +392,8 @@ def abon_post_save(sender, instance, **kwargs):
         # создаём абонента
         tm.add_user(agent_abon)
     else:
-        print('Update')
         # обновляем абонента на NAS
         tm.update_user(agent_abon)
-        print('PostUpdate', instance.is_active)
         # если не активен то приостановим услугу
         if instance.is_active:
             tm.start_user(agent_abon)
