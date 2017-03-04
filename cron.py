@@ -11,9 +11,6 @@ from agent import Transmitter, NasNetworkError, NasFailedResult
 def main():
     tm = Transmitter()
 
-    # получим инфу о записях в NAS
-    queues = [queue for queue in tm.read_users_iter()]
-
     users = Abon.objects.all()
     for user in users:
         try:
@@ -36,31 +33,13 @@ def main():
                 continue
 
             # ищем абонента в списке инфы из nas
-            abons = [queue for queue in queues if queue is not None]
-            abons = [{'abon': queue.abon, 'mikro_id': queue.sid} for queue in abons if queue.abon.uid == user.pk]
-            abons_len = len(abons)
-            if abons_len < 1:
-                # абонент не найден в nas, добавим
-                tm.add_user(ab)
-                continue
-            elif abons_len > 1:
-                # удаляем срез из nas, всё кроме 1й записи
-                tm.remove_user_range(
-                    [mkid['mikro_id'] for mkid in abons[1:]]
-                )
-            # один абонент
-            # сравним совпадает-ли инфа об абоненте в базе и в nas
-            if ab == abons[0]['abon']:
-                # если всё совпадает, то менять нечего
-                continue
+            tm.update_user(ab)
+            # если не активен то приостановим услугу
+            if user.is_active:
+                tm.start_user(ab)
             else:
-                # иначе обновляем абонента
-                tm.update_user(ab, abons[0]['mikro_id'])
-                # если не активен то приостановим услугу
-                if user.is_active:
-                    tm.start_user(abons[0]['mikro_id'])
-                else:
-                    tm.pause_user(abons[0]['mikro_id'])
+                tm.pause_user(ab)
+
         except NasNetworkError as er:
             print("Error:", er)
         except NasFailedResult as er:
