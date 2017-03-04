@@ -186,18 +186,18 @@ class TransmitterManager(BaseTransmitter):
             if text_append == 'M':
                 res = text_speed_digit
             elif text_append == 'k':
-                res = text_speed_digit / 0x400  # 1024
+                res = text_speed_digit / 1000
             #elif text_append == 'G':
             #    res = text_speed_digit * 0x400
             else:
-                res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 0x100000  # (1024**2)
+                res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 1000**2
             return res
 
         try:
             speeds = info['=max-limit'].split('/')
             t = TariffStruct(
-                speedIn=parse_speed(speeds[0]),
-                speedOut=parse_speed(speeds[1])
+                speedIn=parse_speed(speeds[1]),
+                speedOut=parse_speed(speeds[0])
             )
             a = AbonStruct(
                 uid=int(info['=name'][3:]),
@@ -386,13 +386,10 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             QueueManager.add(self, user)
             return
         if queue.abon != user:
-            print('Is ip:', queue.abon.ip, user.ip)
-            print('Is tariff:', queue.abon.tariff, user.tariff)
             QueueManager.update(self, user)
 
     # приостановливаем обслуживание абонента
     def pause_user(self, user):
-        print('Pause')
         IpAddressListManager.disable(self, user)
         QueueManager.disable(self, user)
 
