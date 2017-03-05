@@ -10,13 +10,21 @@ from djing.settings import DEBUG
 import re
 
 
+#DEBUG=False
+
+LIST_USERS_ALLOWED = 'DjingUsersAllowed'
+LIST_USERS_BLOCKED = 'DjingUsersBlocked'
+
+
 class ApiRos:
     "Routeros api"
+
     def __init__(self, sk):
         self.sk = sk
         self.currenttag = 0
 
     def login(self, username, pwd):
+        chal = None
         for repl, attrs in self.talk_iter(["/login"]):
             chal = binascii.unhexlify(attrs['=ret'])
         md = md5()
@@ -38,7 +46,7 @@ class ApiRos:
                 if (j == -1):
                     attrs[w] = ''
                 else:
-                    attrs[w[:j]] = w[j+1:]
+                    attrs[w[:j]] = w[j + 1:]
             yield (reply, attrs)
             if reply == '!done': return
 
@@ -133,7 +141,7 @@ class ApiRos:
         return ret
 
 
-class MikrotikTransmitter(BaseTransmitter):
+class TransmitterManager(BaseTransmitter):
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or settings.NAS_IP
         if not ping(ip):
@@ -151,109 +159,246 @@ class MikrotikTransmitter(BaseTransmitter):
         if hasattr(self, 's'):
             self.s.close()
 
-    def _exec_cmd_iter(self, cmd):
-        assert isinstance(cmd, list)
-        result_iter = self.ar.talk_iter(cmd)
-        for rt in result_iter:
-            if rt[0] == '!trap':
-                raise NasFailedResult(rt[1]['=message'])
-            yield rt
-
     def _exec_cmd(self, cmd):
         assert isinstance(cmd, list)
         result_iter = self.ar.talk_iter(cmd)
         res = []
         for rt in result_iter:
-            if len(rt) < 2:
-                continue
             if rt[0] == '!trap':
                 raise NasFailedResult(rt[1]['=message'])
             res.append(rt[1])
         return res
 
+    def _exec_cmd_iter(self, cmd):
+        assert isinstance(cmd, list)
+        result_iter = self.ar.talk_iter(cmd)
+        for rt in result_iter:
+            if len(rt) < 2:
+                continue
+            if rt[0] == '!trap':
+                raise NasFailedResult(rt[1]['=message'])
+            yield rt
+
     # Строим объект ShapeItem из инфы, присланной из mikrotik'a
     def _build_shape_obj(self, info):
+        # Переводим приставку скорости Mikrotik в Mbit/s
+        def parse_speed(text_speed):
+            text_speed_digit = float(text_speed[:-1] or 0.0)
+            text_append = text_speed[-1:]
+            if text_append == 'M':
+                res = text_speed_digit
+            elif text_append == 'k':
+                res = text_speed_digit / 1000
+            #elif text_append == 'G':
+            #    res = text_speed_digit * 0x400
+            else:
+                res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 1000**2
+            return res
+
         try:
             speeds = info['=max-limit'].split('/')
-            speeds = [re.sub(r'[a-zA-Z]', '', sp) for sp in speeds]
-            #FIXBUG: не может распознать входные данные на скорость 62k, надо фильтровать буквы в скоростях
-            t = TariffStruct(speedIn=speeds[0], speedOut=speeds[1])
+            t = TariffStruct(
+                speedIn=parse_speed(speeds[1]),
+                speedOut=parse_speed(speeds[0])
+            )
             a = AbonStruct(
                 uid=int(info['=name'][3:]),
-                ip=info['=target-addresses'][:-3],
+                #FIXME: тут в разных микротиках или =target-addresses или =target
+                ip=info['=target'][:-3],
                 tariff=t
             )
             return ShapeItem(abon=a, sid=info['=.id'].replace('*', ''))
         except KeyError:
             return
 
+
+class QueueManager(TransmitterManager):
     # ищем правило по имени, и возвращаем всю инфу о найденном правиле
-    def find_queue(self, name):
+    def find(self, name):
         ret = self._exec_cmd(['/queue/simple/print', '?name=%s' % name])
-        if ret:
+        if len(ret) > 1:
             return self._build_shape_obj(ret[0])
+
+    def add(self, user):
+        assert isinstance(user, AbonStruct)
+        assert isinstance(user.tariff, TariffStruct)
+        return self._exec_cmd(['/queue/simple/add',
+            '=name=uid%d' % user.uid,
+            #FIXME: тут в разных микротиках или =target-addresses или =target
+            '=target=%s' % user.ip.get_str(),
+            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn)
+        ])
+
+    def remove(self, user):
+        assert isinstance(user, AbonStruct)
+        q = self.find('uid%d' % user.uid)
+        return self._exec_cmd(['/queue/simple/remove', '=.id=*' + str(q.sid)])
+
+    def remove_range(self, q_ids):
+        names = ['%d' % usr for usr in q_ids]
+        return self._exec_cmd(['/queue/simple/remove', *names])
+
+    def update(self, user):
+        assert isinstance(user, AbonStruct)
+        queue = self.find('uid%d' % user.uid)
+        if queue is None:
+            # не нашли запись в шейпере об абоненте, добавим
+            return self.add(user)
+        else:
+            mk_id = queue.sid
+            # обновляем шейпер абонента
+            return self._exec_cmd(['/queue/simple/set', '=.id=*' + mk_id,
+                '=name=uid%d' % user.uid,
+                '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
+                #FIXME: тут в разных микротиках или =target-addresses или =target
+                '=target=%s' % user.ip.get_str()
+            ])
+
+    # читаем шейпер, возващаем записи о шейпере
+    def read_queue_iter(self):
+        queues = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
+        for queue in queues:
+            if queue[0] == '!done': return
+            yield self._build_shape_obj(queue[1])
+
+    # то же что и выше, только получаем только номера в микротике
+    def read_mikroids_iter(self):
+        queues = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
+        for queue in queues:
+            if queue[0] == '!done': return
+            yield int(queue[1]['=.id'].replace('*', ''), base=16)
+
+    def disable(self, user):
+        assert isinstance(user, AbonStruct)
+        q = self.find('uid%d' % user.uid)
+        if q is None:
+            self.add(user)
+        return self._exec_cmd(['/queue/simple/disable', '=.id=*' + q.sid])
+
+    def enable(self, user):
+        assert isinstance(user, AbonStruct)
+        q = self.find('uid%d' % user.uid)
+        if q is None:
+            self.add(user)
+        return self._exec_cmd(['/queue/simple/enable', '=.id=*' + q.sid])
+
+
+class IpAddressListManager(TransmitterManager):
+    def add(self, list_name, ip):
+        assert isinstance(ip, IpStruct)
+        return self._exec_cmd([
+            '/ip/firewall/address-list/add',
+            '=list=%s' % list_name,
+            '=address=%s' % ip.get_str()
+        ])
+
+    def _edit(self, ip, mk_id):
+        assert isinstance(ip, IpStruct)
+        return self._exec_cmd([
+            '/ip/firewall/address-list/set', '=.id=' + str(mk_id),
+            '?address=%s' % ip.get_str()
+        ])
+
+    def remove(self, mk_id):
+        return self._exec_cmd([
+            '/ip/firewall/address-list/remove',
+            '=.id=*' + str(mk_id)
+        ])
+
+    def find(self, ip, list_name):
+        assert isinstance(ip, IpStruct)
+        return self._exec_cmd([
+            '/ip/firewall/address-list/print', 'where',
+            '?list=%s' % list_name,
+            '?address=%s' % ip.get_str()
+        ])
+
+    def disable(self, user):
+        r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
+        if len(r) > 1:
+            mk_id = r[0]['=.id']
+            return self._exec_cmd([
+                '/ip/firewall/address-list/disable',
+                '=.id=' + str(mk_id),
+            ])
+
+    def enable(self, user):
+        r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
+        if len(r) > 1:
+            mk_id = r[0]['=.id']
+            return self._exec_cmd([
+                '/ip/firewall/address-list/enable',
+                '=.id=' + str(mk_id),
+            ])
+
+
+class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def add_user_range(self, user_list):
         for usr in user_list:
             self.add_user(usr)
 
-    # В @user_ids передаём номера правил из mikrotik
-    def remove_user_range(self, user_ids):
-        names = ['%d' % usr for usr in user_ids]
-        return self._exec_cmd(['/queue/simple/remove', *names])
+    def remove_user_range(self, users):
+        queues = [QueueManager.find(self, 'uid%d' % user.uid) for user in users if isinstance(user, AbonStruct)]
+        queue_names = ["uid%d" % queue.sid for queue in queues]
+        QueueManager.remove_range(self, queue_names)
+        ips = [user.ip for user in users if isinstance(user, AbonStruct)]
+        for ip in ips:
+            ip_list_entity = IpAddressListManager.find(self, ip, LIST_USERS_ALLOWED)
+            if len(ip_list_entity) > 1:
+                IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
-    # добавляем правило шейпинга для указанного ip и со скоростью max-limit=Upload/Download
-    # Мы уверены что @user это инстанс класса agent.structs.AbonStruct
     def add_user(self, user):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
-        return self._exec_cmd(['/queue/simple/add',
-            '=name=uid%d' % user.uid,
-            '=target-addresses=%s' % user.ip.get_str(),
-            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn)
-        ])
+        QueueManager.add(self, user)
+        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+        # удаляем из списка заблокированных абонентов
+        firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_BLOCKED)
+        if len(firewall_ip_list_obj) > 1:
+            IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
-    # удаляем правило шейпера по имени правила
-    # В @user передаём номер правила в mikrotik для абонента
     def remove_user(self, user):
-        assert type(user) is int
-        return self._exec_cmd(['/queue/simple/remove', '=.id=*'+str(user)])
+        QueueManager.remove(self, user)
+        firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
+        if len(firewall_ip_list_obj) > 1:
+            IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     # обновляем основную инфу абонента
-    # @mk_id это номер в mikrotik
-    def update_user(self, user, mk_id=None):
-        assert mk_id is not None
+    def update_user(self, user):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
-        return self._exec_cmd(['/queue/simple/set', '=.id=*'+mk_id,
-            '=name=uid%d' % user.uid,
-            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
-            '=target-addresses=%s' % user.ip.get_str()
-        ])
 
-    # читаем абонентов, возващаем абнента и номер в микротике
-    def read_users_iter(self):
-        ret_it = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
-        for re in ret_it:
-            if re[0] == '!done': return
-            yield self._build_shape_obj(re[1])
+        #ищем ip абонента в списке ip
+        find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
 
-    # то же что и выше, только получаем только номера в микротике
-    def read_users_mikroids_iter(self):
-        ret_it = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
-        for re in ret_it:
-            if re[0] == '!done': return
-            yield int(re[1]['=.id'].replace('*', ''), base=16)
+        # если не найден (mikrotik возвращает пустой словарь в списке если ничего нет)
+        if len(find_res) < 2:
+            # добавим запись об абоненте
+            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+        else:
+            # если ip абонента в биллинге не такой как в mikrotik
+            if find_res[0]['=address'] != user.ip.get_str():
+                # то обновляем запись в mikrotik
+                IpAddressListManager._edit(self, user.ip, find_res[0]['=.id'])
+
+        # Проверяем шейпер
+        queue = QueueManager.find(self, 'uid%d' % user.uid)
+        if queue is None:
+            QueueManager.add(self, user)
+            return
+        if queue.abon != user:
+            QueueManager.update(self, user)
 
     # приостановливаем обслуживание абонента
-    # в @user передаём номер в микротике
     def pause_user(self, user):
-        self._exec_cmd(['/queue/simple/disable', '=.id=*'+user])
+        IpAddressListManager.disable(self, user)
+        QueueManager.disable(self, user)
 
     # продолжаем обслуживание абонента
-    # в @user передаём номер в микротике
     def start_user(self, user):
-        self._exec_cmd(['/queue/simple/enable', '=.id=*'+user])
+        QueueManager.enable(self, user)
+        IpAddressListManager.enable(self, user)
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
     def add_tariff_range(self, tariff_list):

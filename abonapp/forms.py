@@ -57,7 +57,6 @@ class AbonForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        print('SavePassw')
         raw_password = self.cleaned_data['password']
         acc = super().save(commit=False)
         acc.password = make_password(raw_password)

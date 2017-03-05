@@ -521,11 +521,7 @@ def update_nas(request, group_id):
                 continue
             agent_abon = usr.build_agent_struct()
             if agent_abon is not None:
-                queue = tm.find_queue('uid%d' % usr.pk)
-                if queue:
-                    tm.update_user(agent_abon, queue.sid)
-                else:
-                    tm.add_user(agent_abon)
+                tm.update_user(agent_abon)
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:

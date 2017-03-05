@@ -37,8 +37,8 @@ class BaseTransmitter(metaclass=ABCMeta):
         """добавляем список абонентов в NAS"""
 
     @abstractmethod
-    @check_input_type(int)
-    def remove_user_range(self, user_ids):
+    @check_input_type(AbonStruct)
+    def remove_user_range(self, users):
         """удаляем список абонентов"""
 
     @abstractmethod
@@ -53,8 +53,8 @@ class BaseTransmitter(metaclass=ABCMeta):
 
     @abstractmethod
     @check_input_type(AbonStruct)
-    def update_user(self, user, *args):
-        """чтоб обновить абонента надо изменить всё кроме его uid, по uid абонент будет найден"""
+    def update_user(self, user):
+        """чтоб обновить абонента можно изменить всё кроме его uid, по uid абонент будет найден"""
 
     @abstractmethod
     @check_input_type(AbonStruct)
