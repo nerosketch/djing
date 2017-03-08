@@ -173,6 +173,8 @@ class TransmitterManager(BaseTransmitter):
         assert isinstance(cmd, list)
         result_iter = self.ar.talk_iter(cmd)
         for rt in result_iter:
+            if len(rt) < 2:
+                continue
             if rt[0] == '!trap':
                 raise NasFailedResult(rt[1]['=message'])
             yield rt

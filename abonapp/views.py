@@ -392,6 +392,9 @@ def complete_service(request, gid, uid, srvid):
     res_amount = calc_obj.calc_amount()
     cashback = abtar.tariff.amount - res_amount
 
+    if abtar.abon.group is None:
+        abon.group = get_object_or_404(models.AbonGroup, pk=gid)
+        abon.save(update_fields=['group'])
     if int(abtar.abon.pk) != int(uid) or int(abtar.abon.group.pk) != int(gid):
         # если что-то написали в урле вручную, то вернём на путь истинный
         return redirect('abonapp:compl_srv', gid=abtar.abon.group.pk, uid=abtar.abon.pk, srvid=srvid)
