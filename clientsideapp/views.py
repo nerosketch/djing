@@ -43,18 +43,23 @@ def services(request):
 def buy_service(request, srv_id):
     abon = get_object_or_404(Abon, id=request.user.pk)
     service = get_object_or_404(Tariff, id=srv_id)
-    current_service = abon.active_tariff()
-    if request.method == 'POST':
-        abon.pick_tariff(service, request.user, 'Покупка тарифного плана через личный кабинет, тариф "%s"'
-                                   % service)
-        messages.success(request, 'Вы подписались на новую услугу. Она встала на очередь подключений. '
-                                  'Когда закончится ваша текущая услуга, то включится эта')
-        return redirect('client_side:services')
-
-    return render_to_text('clientsideapp/modal_service_buy.html', {
-        'service': service,
-        'current_service': current_service
-    }, request=request)
+    try:
+        current_service = abon.active_tariff()
+        if request.method == 'POST':
+            abon.pick_tariff(service, request.user, 'Покупка тарифного плана через личный кабинет, тариф "%s"'
+                                       % service)
+            messages.success(request, 'Вы подписались на новую услугу. Она встала на очередь подключений. '
+                                      'Когда закончится ваша текущая услуга, то включится эта')
+        else:
+            return render_to_text('clientsideapp/modal_service_buy.html', {
+                'service': service,
+                'current_service': current_service
+            }, request=request)
+    except LogicError as e:
+        messages.error(request, e)
+    except NasFailedResult as e:
+        messages.error(request, e)
+    return redirect('client_side:services')
 
 
 @login_required
@@ -62,30 +67,36 @@ def complete_service(request, srv_id):
     abtar = get_object_or_404(AbonTariff, id=srv_id)
     service = abtar.tariff
 
-    if request.method == 'POST':
-        # досрочно завершаем услугу
-        finish_confirm = request.POST.get('finish_confirm')
-        if finish_confirm == 'yes':
-            # удаляем запись о текущей услуге.
-            abtar.delete()
-            messages.success(request, 'Услуга "%s" успешно завершена' % service.title)
-            AbonLog.objects.create(
-                abon=abtar.abon,
-                amount=0.0,
-                author=abtar.abon,
-                comment='Досрочное завершение услуги "%s" из личного кабинета' % service.title
-            )
+    try:
+        if request.method == 'POST':
+            # досрочно завершаем услугу
+            finish_confirm = request.POST.get('finish_confirm')
+            if finish_confirm == 'yes':
+                # удаляем запись о текущей услуге.
+                abtar.delete()
+                messages.success(request, 'Услуга "%s" успешно завершена' % service.title)
+                AbonLog.objects.create(
+                    abon=abtar.abon,
+                    amount=0.0,
+                    author=abtar.abon,
+                    comment='Досрочное завершение услуги "%s" из личного кабинета' % service.title
+                )
+            else:
+                messages.error(request, 'Действие не подтверждено')
         else:
-            messages.error(request, 'Действие не подтверждено')
-        return redirect('client_side:services')
-
-    time_use = RuTimedelta(timezone.now() - abtar.time_start)
-
-    return render_to_text('clientsideapp/modal_complete_service.html', {
-        'service': service,
-        'abtar': abtar,
-        'time_use': time_use
-    }, request=request)
+            time_use = RuTimedelta(timezone.now() - abtar.time_start)
+            return render_to_text('clientsideapp/modal_complete_service.html', {
+                'service': service,
+                'abtar': abtar,
+                'time_use': time_use
+            }, request=request)
+    except LogicError as e:
+        messages.error(request, e)
+    except NasFailedResult as e:
+        messages.error(request, e)
+    except NasNetworkError:
+        messages.error(request, 'Временные неполадки')
+    return redirect('client_side:services')
 
 
 @login_required
@@ -107,6 +118,10 @@ def unsubscribe_service(request, srv_id):
             }, request=request)
     except AbonTariff.DoesNotExist:
         messages.error(request, 'Указанная подписка на услугу не найдена')
+    except NasFailedResult as e:
+        messages.error(request, e)
+    except NasNetworkError:
+        messages.error(request, 'Временные неполадки')
     return redirect('client_side:services')
 
 
