@@ -1,3 +1,4 @@
+from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.test.client import Client
 from agent import NasNetworkError
@@ -86,11 +87,12 @@ class AbonTestCase(TestCase):
 
         c = Client()
         # login
-        c.post('/accounts/login/', {'login': '1234567', 'password': 'ps'})
-        resp = c.get('/abons/1/1/complete_service1')
+        c.post(resolve_url('acc_app:login'), {'login': '1234567', 'password': 'ps'})
+        url = resolve_url('abonapp:compl_srv', gid=1, uid=1, srvid=1)
+        resp = c.get(url)
         print('RESP:', resp)
         self.assertEqual(resp.status_code, 200)
-        resp = c.post('/abons/1/1/complete_service1', data={
+        resp = c.post(url, data={
             'finish_confirm': 'yes'
         })
         print('RESP:', resp)
@@ -114,7 +116,8 @@ class AbonTestCase(TestCase):
             md.update(bytes(s, 'utf-8'))
             return md.hexdigest()
         c = Client()
-        r = c.get('/abons/pay', {
+        url = resolve_url('abonapp:terminal_pay')
+        r = c.get(url, {
             'ACT': 1, 'PAY_ACCOUNT': '1234567',
             'SERVICE_ID': pay_SERV_ID,
             'PAY_ID': 3561234,
@@ -123,7 +126,7 @@ class AbonTestCase(TestCase):
         })
         xobj = xmltodict.parse(r.content)
         self.assertEqual(int(xobj['pay-response']['status_code']), 21)
-        r = c.get('/abons/pay', {
+        r = c.get(url, {
             'ACT': 4, 'PAY_ACCOUNT': '1234567',
             'SERVICE_ID': pay_SERV_ID,
             'PAY_ID': 3561234,
@@ -133,7 +136,7 @@ class AbonTestCase(TestCase):
         })
         xobj = xmltodict.parse(r.content)
         self.assertEqual(int(xobj['pay-response']['status_code']), 22)
-        r = c.get('/abons/pay', {
+        r = c.get(url, {
             'ACT': 4, 'PAY_ACCOUNT': '1234567',
             'SERVICE_ID': pay_SERV_ID,
             'PAY_ID': 3561234,
@@ -143,7 +146,7 @@ class AbonTestCase(TestCase):
         })
         xobj = xmltodict.parse(r.content)
         self.assertEqual(int(xobj['pay-response']['status_code']), -100)
-        r = c.get('/abons/pay', {
+        r = c.get(url, {
             'ACT': 7, 'PAY_ACCOUNT': '1234567',
             'SERVICE_ID': pay_SERV_ID,
             'PAY_ID': 3561234,
@@ -166,10 +169,11 @@ class AbonTestCase(TestCase):
     def test_add_abon(self):
         c = Client()
         c.login(username='1234567', password='ps')
-        r = c.get('/abons/1/addabon')
+        url = resolve_url('abonapp:add_abon', gid=1)
+        r = c.get(url)
         # поглядим на страницу добавления абонента
         self.assertEqual(r.status_code, 200)
-        r = c.post('/abons/1/addabon', {
+        r = c.post(url, {
             'username': '123',
             'password': 'ps',
             'fio': 'Abon Fio',
@@ -177,7 +181,7 @@ class AbonTestCase(TestCase):
             'is_active': True
         })
         self.assertEqual(r.status_code, 302)
-        r = c.get('/abons/324/addabon')
+        r = c.get(resolve_url('abonapp:add_abon', gid=324))
         self.assertEqual(r.status_code, 404)
         try:
             abn = Abon.objects.get(username='123')
@@ -190,6 +194,13 @@ class AbonTestCase(TestCase):
         except AbonRawPassword.DoesNotExist:
             # должен быть пароль абонента простым текстом
             self.assertTrue(False)
+
+    # пробуем удалить абонента
+    def test_view_delentity(self):
+        c = Client()
+        c.login(username='1234567', password='ps')
+        url = resolve_url('abonapp:del_abon') + '?t=a&id=1'
+        r = c.get('/abons/1/addabon')
 
 
 class AbonTariffTestCase(TestCase):
