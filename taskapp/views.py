@@ -153,6 +153,8 @@ def task_add_edit(request, task_id=0):
         messages.error(request, _('Employee has not yet signed up for notifications'))
     except Abon.DoesNotExist:
         messages.warning(request, _("User '%s' does not exist") % str(uid))
+    except TaskException as e:
+        messages.error(request, e)
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
