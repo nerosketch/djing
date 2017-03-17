@@ -360,3 +360,6 @@ msgstr "Назначенные мной задачи"
 
 msgid "All my tasks"
 msgstr "Все мои задачи"
+
+msgid "User '%s' does not exist"
+msgstr "Абонент с логином '%s' не найден"
