@@ -110,11 +110,13 @@ class AbonTestCase(TestCase):
         from hashlib import md5
         from djing.settings import pay_SECRET, pay_SERV_ID
         import xmltodict
+
         def sig(act, pay_account, pay_id):
             md = md5()
             s = '_'.join((str(act), str(pay_account), pay_SERV_ID, str(pay_id), pay_SECRET))
             md.update(bytes(s, 'utf-8'))
             return md.hexdigest()
+
         c = Client()
         url = resolve_url('abonapp:terminal_pay')
         r = c.get(url, {
