@@ -33,13 +33,16 @@ msgstr "Задача завершена"
 
 #: taskapp/handle.py:29
 #, python-format
-msgid "address %s. telephone %s. "
-msgstr "по адресу %s тел. %s. "
+msgid "address %s %s.\ntelephone %s\n"
+msgstr "адрес: %s %s\nтел. %s\n"
 
 #: taskapp/handle.py:32
 #, python-format
-msgid "locality %s. Task type - %s. "
-msgstr "с. %s. Тип задачи - %s. "
+msgid "locality %s.\n"
+msgstr "с. %s.\n"
+
+msgid "Task type - %s.\n"
+msgstr "Тип задачи - %s.\n"
 
 #: taskapp/handle.py:33 taskapp/templates/taskapp/view.html.py:34
 msgid "Not assigned"

@@ -21,16 +21,19 @@ def handle(task, author, recipient, abon_group):
         # Если задача завершена
         elif task.state == 'F':
             text = _('Task completed')
-            # Меняем телефон назначения на телефон автора, т.к. при завершении
+            # Меняем цель назначения на автора, т.к. при завершении
             # идёт оповещение автору о выполнении
             dst_account = author
-        fulltext="%s: %s. " % (text, task.abon.get_full_name())
+        fulltext="%s:\n%s\n" % (text, task.abon.get_full_name())
+        fulltext += _('locality %s.\n') % abon_group.title
         if task.abon:
-            fulltext += _('address %s. telephone %s. ') % (
-                task.abon.street.name if task.abon.street is not None else '', task.abon.telephone
+            fulltext += _('address %s %s.\ntelephone %s\n') % (
+                task.abon.street.name if task.abon.street is not None else '<'+_('not chosen')+'>',
+                task.abon.house,
+                task.abon.telephone
             )
-        fulltext += _('locality %s. Task type - %s.') % (abon_group.title, task.get_mode_display())
-        fulltext += task.descr if task.descr else _('Not assigned')
+        fulltext += _('Task type - %s.\n') % task.get_mode_display()
+        fulltext += task.descr if task.descr else ''
         send_notify(fulltext, dst_account)
     except ChatException as e:
         raise TaskException(e)
