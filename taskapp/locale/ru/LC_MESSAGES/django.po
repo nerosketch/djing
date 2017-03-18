@@ -34,7 +34,7 @@ msgstr "Задача завершена"
 #: taskapp/handle.py:29
 #, python-format
 msgid "address %s %s.\ntelephone %s\n"
-msgstr "%s %s\n%s\n"
+msgstr "адрес: %s %s\nтел. %s\n"
 
 #: taskapp/handle.py:32
 #, python-format
