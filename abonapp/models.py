@@ -18,6 +18,7 @@ class LogicError(Exception):
 class AbonGroup(models.Model):
     title = models.CharField(max_length=127, unique=True)
     profiles = models.ManyToManyField(UserProfile, blank=True, related_name='abon_groups')
+    tariffs = models.ManyToManyField(Tariff, blank=True, related_name='tariff_groups')
 
     class Meta:
         db_table = 'abonent_groups'
@@ -276,7 +277,7 @@ class Abon(UserProfile):
         nw = timezone.make_aware(datetime.now())
 
         for at in ats:
-            # усдуга не активна, продолжаем
+            # услуга не активна, продолжаем
             if at.deadline is None:
                 continue
             # если услуга просрочена
