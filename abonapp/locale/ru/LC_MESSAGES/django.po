@@ -674,3 +674,12 @@ msgstr "История задач"
 
 msgid "Dynamic Field"
 msgstr "Динамическое поле"
+
+msgid "Tariffs in groups"
+msgstr "Тарифы в группах"
+
+msgid "Belonging services for groups"
+msgstr "Принадлежность услуг к группам"
+
+msgid "Tariff your picked does not exist"
+msgstr "Тариф, который вы выбрали, не существует"
