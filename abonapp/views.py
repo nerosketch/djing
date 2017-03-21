@@ -329,22 +329,15 @@ def add_invoice(request, gid, uid):
 @login_required
 @permission_required('abonapp.can_buy_tariff')
 def pick_tariff(request, gid, uid):
-    frm = None
     grp = get_object_or_404(models.AbonGroup, id=gid)
     abon = get_object_or_404(models.Abon, id=uid)
+    tariffs = grp.tariffs.all()
     try:
         if request.method == 'POST':
-            frm = forms.BuyTariff(request.POST)
-            if frm.is_valid():
-                cd = frm.cleaned_data
-                abon.pick_tariff(cd['tariff'], request.user)
-                #abon.save()
-                messages.success(request, _('Tariff has been picked'))
-                return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
-            else:
-                messages.error(request, _('fix form errors'))
-        else:
-            frm = forms.BuyTariff()
+            trf = Tariff.objects.get(pk=request.POST.get('tariff'))
+            abon.pick_tariff(trf, request.user)
+            messages.success(request, _('Tariff has been picked'))
+            return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except models.LogicError as e:
         messages.error(request, e)
     except NasFailedResult as e:
@@ -352,9 +345,11 @@ def pick_tariff(request, gid, uid):
     except NasNetworkError as e:
         messages.error(request, e)
         return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
+    except Tariff.DoesNotExist:
+        messages.error(request, _('Tariff your picked does not exist'))
 
     return render(request, 'abonapp/buy_tariff.html', {
-        'form': frm or forms.BuyTariff(),
+        'tariffs': tariffs,
         'abon': abon,
         'abon_group': grp
     })
@@ -549,6 +544,22 @@ def passport_view(request, gid, uid):
     return render(request, 'abonapp/passport_view.html', {
         'abon_group': get_object_or_404(models.AbonGroup, id=gid),
         'abon': abon
+    })
+
+
+@login_required
+@mydefs.only_admins
+def chgroup_tariff(request, gid):
+    grp = get_object_or_404(models.AbonGroup, pk=gid)
+    if request.method == 'POST':
+        tr = request.POST.getlist('tr')
+        grp.tariffs.clear()
+        grp.tariffs.add(*[int(d) for d in tr])
+        grp.save()
+    tariffs = Tariff.objects.all()
+    return render(request, 'abonapp/group_tariffs.html', {
+        'abon_group': grp,
+        'tariffs': tariffs
     })
 
 
