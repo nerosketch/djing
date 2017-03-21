@@ -32,18 +32,21 @@
             <tbody>
             {% for gr in groups %}
                 <tr>
-                    <td>{{ gr.id }}</td>
-                    <td><a href="{% url 'abonapp:people_list' gr.id %}">{{ gr.title }}</a></td>
+                    <td>{{ gr.pk }}</td>
+                    <td><a href="{% url 'abonapp:people_list' gr.pk %}">{{ gr.title }}</a></td>
                     <td>{{ gr.usercount }}</td>
-                    <td>
+                    <td class="btn-group">
                         {% if perms.abonapp.delete_abongroup %}
-                            {% if gr.usercount > 0 %}
-                                <a href="#" class="btn btn-sm btn-default disabled">
-                            {% else %}
-                                <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.id }}" class="btn btn-sm btn-danger">
+                            {% if gr.usercount == 0 %}
+                                <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.pk }}" class="btn btn-sm btn-danger">
+                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                </a>
                             {% endif %}
-                            <span class="glyphicon glyphicon-remove-circle"></span></a>
                         {% endif %}
+                        <a href="{% url 'abonapp:ch_group_tariff' gr.pk %}" class="btn btn-sm btn-default"
+                           title="{% trans 'User groups' %}">
+                            <span class="glyphicon glyphicon-subscript"></span>
+                        </a>
                     </td>
                 </tr>
             {% empty %}
