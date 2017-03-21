@@ -10,7 +10,7 @@ from djing.settings import DEBUG
 import re
 
 
-#DEBUG=False
+DEBUG=False
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
@@ -234,7 +234,8 @@ class QueueManager(TransmitterManager):
     def remove(self, user):
         assert isinstance(user, AbonStruct)
         q = self.find('uid%d' % user.uid)
-        return self._exec_cmd(['/queue/simple/remove', '=.id=*' + str(q.sid)])
+        if q is not None:
+            return self._exec_cmd(['/queue/simple/remove', '=.id=*' + str(q.sid)])
 
     def remove_range(self, q_ids):
         names = ['%d' % usr for usr in q_ids]
@@ -277,14 +278,18 @@ class QueueManager(TransmitterManager):
         q = self.find('uid%d' % user.uid)
         if q is None:
             self.add(user)
-        return self._exec_cmd(['/queue/simple/disable', '=.id=*' + q.sid])
+            return self.disable(user)
+        else:
+            return self._exec_cmd(['/queue/simple/disable', '=.id=*' + q.sid])
 
     def enable(self, user):
         assert isinstance(user, AbonStruct)
         q = self.find('uid%d' % user.uid)
         if q is None:
             self.add(user)
-        return self._exec_cmd(['/queue/simple/enable', '=.id=*' + q.sid])
+            self.enable(user)
+        else:
+            return self._exec_cmd(['/queue/simple/enable', '=.id=*' + q.sid])
 
 
 class IpAddressListManager(TransmitterManager):
