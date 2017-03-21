@@ -26,7 +26,11 @@
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
-                        {{ form.tariff }}{{ form.tariff.errors }}
+                        <select class="form-control" name="tariff">
+                            {% for trf in tariffs %}
+                                <option value="{{ trf.pk }}">{{ trf.title }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="btn-group">
