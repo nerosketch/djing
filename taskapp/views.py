@@ -101,7 +101,7 @@ def view(request, task_id):
 @only_admins
 def task_add_edit(request, task_id=0):
     task_id = safe_int(task_id)
-    uid = request.GET.get('uid')
+    uid = request.GET.get('uid', 0)
     selected_abon = None
     frm = TaskFrm()
 
@@ -119,11 +119,8 @@ def task_add_edit(request, task_id=0):
         frm = TaskFrm(instance=tsk)
         selected_abon = tsk.abon
 
-    if uid:
-        selected_abon = get_object_or_404(Abon, username=str(uid))
-
-    if request.method == 'POST':
-        try:
+    try:
+        if request.method == 'POST':
             tsk.author = request.user
             frm = TaskFrm(request.POST, request.FILES, instance=tsk)
 
@@ -150,8 +147,14 @@ def task_add_edit(request, task_id=0):
                     messages.error(request, _('You must select the subscriber'))
             else:
                 messages.error(request, _('Error in the form fields'))
-        except TelegramBot.DoesNotExist:
-            messages.error(request, _('Employee has not yet signed up for notifications'))
+        elif uid:
+            selected_abon = Abon.objects.get(username=str(uid))
+    except TelegramBot.DoesNotExist:
+        messages.error(request, _('Employee has not yet signed up for notifications'))
+    except Abon.DoesNotExist:
+        messages.warning(request, _("User '%s' does not exist") % str(uid))
+    except TaskException as e:
+        messages.error(request, e)
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,

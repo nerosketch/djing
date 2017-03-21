@@ -124,13 +124,14 @@ def task_handler(sender, instance, **kwargs):
         )
 
 
-def task_delete(sender, instance, **kwargs):
-    ChangeLog.objects.create(
-        task=instance,
-        act_type='d',
-        who=instance.author
-    )
+#def task_delete(sender, instance, **kwargs):
+#    ChangeLog.objects.create(
+#        task=instance,
+#        act_type='d',
+#        who=instance.author
+#    )
 
 
 models.signals.post_save.connect(task_handler, sender=Task)
-models.signals.post_delete.connect(task_delete, sender=Task)
+#models.signals.post_delete.connect(task_delete, sender=Task)
+

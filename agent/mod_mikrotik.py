@@ -226,7 +226,9 @@ class QueueManager(TransmitterManager):
             '=name=uid%d' % user.uid,
             #FIXME: тут в разных микротиках или =target-addresses или =target
             '=target=%s' % user.ip.get_str(),
-            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn)
+            '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
+            '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
+            '=burst-time=1/1'
         ])
 
     def remove(self, user):
@@ -251,7 +253,9 @@ class QueueManager(TransmitterManager):
                 '=name=uid%d' % user.uid,
                 '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                 #FIXME: тут в разных микротиках или =target-addresses или =target
-                '=target=%s' % user.ip.get_str()
+                '=target=%s' % user.ip.get_str(),
+                '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
+                '=burst-time=1/1'
             ])
 
     # читаем шейпер, возващаем записи о шейпере
