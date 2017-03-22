@@ -24,7 +24,10 @@ def handle(task, author, recipient, abon_group):
             # Меняем цель назначения на автора, т.к. при завершении
             # идёт оповещение автору о выполнении
             dst_account = author
-        fulltext="%s:\n%s\n" % (text, task.abon.get_full_name())
+        if task.abon is not None:
+            fulltext="%s:\n%s\n" % (text, task.abon.get_full_name())
+        else:
+            fulltext="%s\n" % text
         fulltext += _('locality %s.\n') % abon_group.title
         if task.abon:
             fulltext += _('address %s %s.\ntelephone %s\n') % (
