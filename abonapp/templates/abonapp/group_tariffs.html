@@ -1,0 +1,33 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
+        <li class="active">{% trans 'Belonging services for groups' %}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <legend>{% trans 'Belonging services for groups' %}</legend>
+    <form action="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" method="post" role="form">{% csrf_token %}
+        {% for tariff in tariffs %}
+            <div class="checkbox">
+                <label>
+                    {% if tariff in abon_group.tariffs.all %}
+                        <input name="tr" type="checkbox" value="{{ tariff.pk }}" checked/>
+                    {% else %}
+                        <input name="tr" type="checkbox" value="{{ tariff.pk }}"/>
+                    {% endif %}
+                    {{ tariff.title }}
+                </label>
+            </div>
+        {% endfor %}
+        <div class="btn-group">
+            <input type="submit" class="btn btn-primary" value="{% trans 'Save' %}"> <input type="reset" class="btn btn-default" value="{% trans 'Reset' %}">
+        </div>
+    </form>
+
+{% endblock %}

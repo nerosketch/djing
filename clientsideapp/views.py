@@ -27,8 +27,9 @@ def pays(request):
 
 @login_required
 def services(request):
-    all_tarifs = Tariff.objects.all()
-    own_abon_tariffs = AbonTariff.objects.filter(abon_id=request.user.id)
+    abon = Abon.objects.get(pk=request.user.pk)
+    all_tarifs = abon.group.tariffs.all()
+    own_abon_tariffs = AbonTariff.objects.filter(abon=abon)
     current_service = own_abon_tariffs.exclude(time_start=None)
     current_service = current_service[0] if current_service.count() > 0 else None
 
@@ -41,8 +42,8 @@ def services(request):
 
 @login_required
 def buy_service(request, srv_id):
-    abon = get_object_or_404(Abon, id=request.user.pk)
-    service = get_object_or_404(Tariff, id=srv_id)
+    abon = get_object_or_404(Abon, pk=request.user.pk)
+    service = get_object_or_404(Tariff, pk=srv_id)
     try:
         current_service = abon.active_tariff()
         if request.method == 'POST':

@@ -17,31 +17,31 @@
             <thead>
             <tr>
                 <th>
-                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=username&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=username&dir={{ dir|default:"down" }}">
                         {% trans 'Sub' %}
                     </a>
                     {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=fio&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=fio&dir={{ dir|default:"down" }}">
                         {% trans 'fio' %}
                     </a>
                     {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a herf="{% url 'abonapp:people_list' abon_group.id %}?order_by=street&dir={{ dir|default:"down" }}">
+                    <a herf="{% url 'abonapp:people_list' abon_group.pk %}?order_by=street&dir={{ dir|default:"down" }}">
                         {% trans 'Street' %}
                     </a>
                     {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="100">
-                    <a herf="{% url 'abonapp:people_list' abon_group.id %}?order_by=house&dir={{ dir|default:"down" }}">
+                    <a herf="{% url 'abonapp:people_list' abon_group.pk %}?order_by=house&dir={{ dir|default:"down" }}">
                         {% trans 'House' %}/{% trans 'Apartment' %}
                     </a>
                     {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -49,7 +49,7 @@
                 <th width="150">{% trans 'Telephone' %}</th>
                 <th width="150">{% trans 'Service' %}</th>
                 <th width="50">
-                    <a href="{% url 'abonapp:people_list' abon_group.id %}?order_by=ballance&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ballance&dir={{ dir|default:"down" }}">
                         {% trans 'Ballance' %}
                     </a>
                     {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -64,7 +64,7 @@
                     {% else %}
                     <tr class="danger">
                 {% endif %}
-                <td><a href="{% url 'abonapp:abon_home' human.group.id human.id %}">{{ human.username }}</a></td>
+                <td><a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a></td>
                 <td>{{ human.ip_address|default:_('Not assigned') }}</td>
                 <td>{{ human.fio }}</td>
                 <td>{{ human.street|default:_('Not assigned') }}</td>
@@ -73,7 +73,7 @@
                 <td>
                     {% if human.active_tariff %}
                         {% if perms.tariff_app.change_tariff %}
-                            <a href="{% url 'tarifs:edit' human.active_tariff.id %}">{{ human.active_tariff.title }}</a>
+                            <a href="{% url 'tarifs:edit' human.active_tariff.pk %}">{{ human.active_tariff.title }}</a>
                         {% else %}
                             {{ human.active_tariff.title }}
                         {% endif %}
@@ -83,7 +83,7 @@
                 <td>{{ human.ballance }}</td>
                 <td>
                     {% if perms.abonapp.delete_abon %}
-                        <a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.id }}" class="btn btn-danger btn-sm">
+                        <a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.pk }}" class="btn btn-danger btn-sm">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     {% endif %}
@@ -94,7 +94,7 @@
                     <td colspan="9">
                         {% trans 'Subscribers not found' %}.
                         {% if perms.abonapp.add_abon %}
-                            <a href="{% url 'abonapp:add_abon' abon_group.id %}">{% trans 'Add abon' %}</a>
+                            <a href="{% url 'abonapp:add_abon' abon_group.pk %}">{% trans 'Add abon' %}</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -104,12 +104,15 @@
             <tr>
                 <td colspan="9" class="btn-group">
                     {% if perms.abonapp.add_abon %}
-                        <a href="{% url 'abonapp:add_abon' abon_group.id %}" class="btn btn-sm btn-default" title="Добавить">
+                        <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="Добавить">
                             <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
                         </a>
                     {% endif %}
-                    <a href="{% url 'abonapp:update_nas' abon_group.id %}" class="btn btn-sm btn-default">
+                    <a href="{% url 'abonapp:update_nas' abon_group.pk %}" class="btn btn-sm btn-default">
                         <span class="glyphicon glyphicon-refresh"></span> {% trans 'Refresh subscribers on NAS' %}
+                    </a>
+                    <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}">
+                        <span class="glyphicon glyphicon-subscript"></span> {% trans 'Tariffs in groups' %}
                     </a>
                 </td>
             </tr>

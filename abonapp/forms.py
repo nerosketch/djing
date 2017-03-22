@@ -82,11 +82,3 @@ class AbonGroupForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'profiles': forms.TextInput(attrs={'class': 'form-control'})
         }
-
-
-class BuyTariff(forms.Form):
-    tariff = forms.ModelChoiceField(
-        queryset=models.Tariff.objects.all(),
-        required=True,
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
