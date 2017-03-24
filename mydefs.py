@@ -197,3 +197,11 @@ def require_ssl(view):
             return HttpResponseRedirect(target_url)
         return view(request, *args, **kwargs)
     return wrapper
+
+
+class MultipleException(Exception):
+
+    def __init__(self, err_list):
+        if not isinstance(err_list, list):
+            raise TypeError
+        self.err_list = err_list
