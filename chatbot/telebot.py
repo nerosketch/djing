@@ -2,10 +2,11 @@
 from telepot import helper, glance, Bot
 import os
 import socket
+import collections
+from django.utils.translation import ugettext as _
 from .models import TelegramBot, ChatException
 from chatbot.models import MessageHistory
 from accounts_app.models import UserProfile
-import collections
 
 token = '285129725:AAF9Si5_b1n1_cN3vJtwXt0gkgsqKBptut4'
 
@@ -56,7 +57,7 @@ class DjingTelebot(helper.ChatHandler):
             self._current_user = tbot.user
             self._message_log(initial_msg['text'])
         except TelegramBot.DoesNotExist:
-            self._question('Давай знакомиться, как тебя зовут? Напиши свой логин из биллинга.',
+            self._question(_("Let's get acquainted, what is your name? Write your login from billing."),
                            self.question_name)
         return True  # prevent on_message() from being called on the initial message
 
@@ -76,7 +77,7 @@ class DjingTelebot(helper.ChatHandler):
             self._dialog_fn(text)
             self._dialog_fn = None
         else:
-            self._sent_reply('Я пока не знаю ответа на это')
+            self._sent_reply(_('I do not know the answer to this yet.'))
 
         if not self._message_log(text):
             return
@@ -95,10 +96,10 @@ class DjingTelebot(helper.ChatHandler):
                     chat_id=self._chat_id
                 )
         except UserProfile.DoesNotExist:
-            self._question('Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. Попробуй ещё',
+            self._question(_("You are not found in the database, check that it correctly pointed out its LOGIN. Try again"),
                            self.question_name)
             return
-        self._sent_reply('Да, приятно познакомиться %s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)'
+        self._sent_reply("Yes, it's nice to meet %s, I will notify you about events in billing. Successful work;)"
                          % profile.get_full_name())
 
     # заканчивается время диалога
@@ -111,25 +112,24 @@ class DjingTelebot(helper.ChatHandler):
     # пингуем адрес
     def ping(self, ip=None):
         if ip is None:
-            self._question('Давай пинганём, напиши ip. Нужно будет подождать 10 сек', self.ping)
+            self._question("Let's ping, write ip. It will be necessary to wait 10 seconds", self.ping)
             return
         try:
             socket.inet_aton(ip)
             ret = os.popen('`which ping` -c 10 ' + ip).read()
             self._sent_reply(ret)
         except socket.error:
-            self._question('Это не похоже на ip адрес, попробуй ещё', self.ping)
+            self._question(_("It's not like ip address, try again"), self.ping)
 
     def say_me(self):
-        self._sent_reply('Ты ведь %s ?' % self._current_user.get_full_name())
+        self._sent_reply(_("You're '%s', right?") % self._current_user.get_full_name())
 
 
 # Просто отправляем текст оповещения указанному админу
 def send_notify(msg_text, account):
-    print(account)
     try:
         tb = TelegramBot.objects.get(user=account)
         tbot = Bot(token)
         tbot.sendMessage(tb.chat_id, msg_text)
     except TelegramBot.DoesNotExist:
-        raise ChatException('Цель оповещения не подписан на оповещения')
+        raise ChatException(_("Recipient '%s' does not subscribed on notifications") % account.get_full_name())
