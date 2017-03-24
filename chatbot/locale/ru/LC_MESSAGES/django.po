@@ -47,7 +47,7 @@ msgstr "Ты ведь %s ?"
 #: chatbot/telebot.py:135
 #, python-format
 msgid "Recipient '%s' does not subscribed on notifications"
-msgstr "Цель оповещения '%s' не подписан на оповещения"
+msgstr "%s не подписан на оповещения"
 
 msgid "Let's ping, write ip. It will be necessary to wait 10 seconds"
 msgstr "Давай пинганём, напиши ip. Нужно будет подождать 10 сек"
