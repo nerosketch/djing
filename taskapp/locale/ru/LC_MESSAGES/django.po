@@ -1,0 +1,227 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-27 12:27+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "A priority"
+msgstr "Приоритет"
+
+msgid "Access to all tasks"
+msgstr "Доступ ко всем задачам"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Active tasks"
+msgstr "Активные задачи"
+
+msgid "Add new task"
+msgstr "Добавьте новую задачу"
+
+msgid "All my tasks"
+msgstr "Все мои задачи"
+
+msgid "All tasks"
+msgstr "Все задачи"
+
+msgid "All your tasks has been performed"
+msgstr "Все ваши задачи выполнены"
+
+msgid "Attached image"
+msgstr "Прикреплённое изображение"
+
+msgid "Attachment"
+msgstr "Приложение"
+
+msgid "Average"
+msgstr "Средний"
+
+msgid "Begin"
+msgstr "Начать"
+
+msgid "Change task"
+msgstr "Изменение задачи"
+
+msgid "Complete"
+msgstr "Завершить"
+
+msgid "Completed"
+msgstr "Выполнена"
+
+msgid "Completed tasks"
+msgstr "Выполненные задачи"
+
+msgid "Completing tasks"
+msgstr "Завершение задачи"
+
+msgid "Condition"
+msgstr "Состояние"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "Create task"
+msgstr "Создание задачи"
+
+msgid "Date of create"
+msgstr "Дата создания"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Delete task"
+msgstr "Удаление задачи"
+
+msgid "Description"
+msgstr "Описание"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Employee has not yet signed up for notifications"
+msgstr "Исполнитель ещё не подписался на оповещения"
+
+msgid "Error in the form fields"
+msgstr "Ошибка в полях формы"
+
+msgid "Higher"
+msgstr "Высший"
+
+msgid "Implementers"
+msgstr "Исполнители"
+
+msgid "In fulfilling"
+msgstr "На выполнении"
+
+msgid "Low"
+msgstr "Низкий"
+
+msgid "New"
+msgstr "Новая"
+
+msgid "New tasks"
+msgstr "Новые задачи"
+
+msgid "No responsible employee for the users group"
+msgstr "Нет ответственных за группу, в которой находится выбранный абонент"
+
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+msgid "Reality (the date by which you must complete the task)"
+msgstr "Актуальность (дата, до которой нужно завершить задачу)"
+
+msgid "Records of all the tasks in the system"
+msgstr "Лог всех задач в системе"
+
+msgid "Remind"
+msgstr "Напомнить"
+
+msgid "Reminders of tasks"
+msgstr "Напоминания о задачах"
+
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Scheduled tasks me"
+msgstr "Назначенные мной задачи"
+
+msgid "Short description"
+msgstr "Краткое описание"
+
+msgid "Subscriber"
+msgstr "Абонент"
+
+msgid "Task"
+msgstr "Задача"
+
+msgid "Task author"
+msgstr "Кто назначил"
+
+msgid "Task completed"
+msgstr "Задача завершена"
+
+msgid "Task description"
+msgstr "Описание задачи"
+
+msgid "Task type"
+msgstr "Тип задачи"
+
+msgid "Tasks"
+msgstr "Задачи"
+
+msgid "Tasks to be performed"
+msgstr "Задачи, которые необходимо выполнить"
+
+msgid "The list is empty"
+msgstr "Список пуст"
+
+msgid "The nature of the damage"
+msgstr "Характер поломки"
+
+msgid "The task is valid until"
+msgstr "Задача действительна до"
+
+msgid "The task started"
+msgstr "Задача начата"
+
+msgid "View all tasks"
+msgstr "Просмотреть все задачи"
+
+msgid "You cannot delete task that assigned to you"
+msgstr "Вы не можете удалять назначенные на вас задачи"
+
+msgid "You must select the subscriber"
+msgstr "Нужно выбрать абонента"
+
+msgid "address %s. telephone %s. "
+msgstr "по адресу %s тел. %s. "
+
+msgid "cable break"
+msgstr "обрыв кабеля"
+
+msgid "configure onu"
+msgstr "настроить onu"
+
+msgid "connection"
+msgstr "подключение"
+
+msgid "crimp cable"
+msgstr "обжать кабель"
+
+msgid "locality %s. Task type - %s. "
+msgstr "с. %s. Тип задачи - %s. "
+
+msgid "not chosen"
+msgstr "не выбрано"
+
+msgid "other"
+msgstr "другое"
+
+msgid "periodic disappearance"
+msgstr "переодическое пропадание"
+
+msgid "red cross"
+msgstr "красный крестик"
+
+msgid "router setup"
+msgstr "настройка роутера"
+
+msgid "weak speed"
+msgstr "слабая скорость"
+
+msgid "yellow triangle"
+msgstr "жёлтый треугольник"
