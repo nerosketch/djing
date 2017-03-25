@@ -72,7 +72,7 @@ def load_groups(cursor):
 
 
 if __name__ == "__main__":
-    db = MySQLdb.connect(host="10.12.1.6", user="bashmak", passwd="HUhTubP4zT", db="nodeny", charset='utf8')
+    db = MySQLdb.connect(host="127.0.0.1", user="user", passwd="password", db="db", charset='utf8')
     cursor = db.cursor()
 
     result = dict()
