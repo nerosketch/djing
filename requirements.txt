@@ -1,7 +1,7 @@
 Django==1.9
 Pillow
-mysqlclient
 telepot
-easysnmp
 # for testing required xmltodict
 xmltodict
+mysqlclient
+easysnmp

@@ -4,11 +4,51 @@
 import os
 from json import load
 import django
+from django.utils import timezone
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
-from abonapp.models import Abon, AbonGroup, AbonRawPassword, AbonStreet
+from abonapp.models import Abon, AbonGroup, AbonRawPassword, AbonStreet, AbonTariff
 from ip_pool.models import IpPoolItem
+from tariff_app.models import Tariff
 
+
+
+class DumpService(object):
+    price = 0.0
+    speedIn = 0.0
+    speedOut = 0.0
+
+    def __init__(self, obj=None):
+        if obj is None: return
+        self.title = obj['title']
+        self.price = obj['price']
+        self.description = obj['description']
+        self.speedIn = int(obj['param']['speed_in1']) / 1000000
+        self.speedOut = int(obj['param']['speed_out1']) / 1000000
+
+    @staticmethod
+    def build_from_db(obj):
+        self = DumpService()
+        self.title = obj.title
+        self.price = obj.amount
+        self.description = obj.descr
+        self.speedIn = obj.speedIn
+        self.speedOut = obj.speedOut
+        return self
+
+    def __eq__(self, other):
+        assert isinstance(other, DumpService)
+        print('DBG:', type(other.price), other.price, type(self.price), self.price)
+        r = self.price == other.price
+        r = r and self.speedIn == other.speedIn
+        r = r and self.speedOut == other.speedOut
+        return r
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return "%s; '%.2f', %f %f" % (self.title, self.price, self.speedIn, self.speedOut)
 
 
 class DumpAbon(object):
@@ -22,9 +62,13 @@ class DumpAbon(object):
         self.house = obj['house']
         self.birth = obj['birth']
         self.grp = obj['grp']
-        self.ip = obj['ip']
+        self.ip = obj['ip'] if obj['ip'] != '' else None
         self.balance = obj['balance']
         self.passw = obj['passw']
+        if obj['service'] is not None:
+            self.service = DumpService(obj['service'])
+        else:
+            self.service = None
 
     @staticmethod
     def build_from_django(obj):
@@ -36,14 +80,25 @@ class DumpAbon(object):
         self.street = obj.street
         self.house = obj.house
         self.birth = obj.birth_day
-        self.grp = obj.group.pk
-        self.ip = obj.ip_address
+        if obj.group is None:
+            self.grp = None
+        else:
+            self.grp = obj.group.pk
+        if obj.ip_address is None:
+            self.ip = None
+        else:
+            self.ip = obj.ip_address
         self.balance = obj.ballance
         try:
             raw_passw = AbonRawPassword.objects.get(account=obj)
         except AbonRawPassword.DoesNotExist:
             raw_passw = ''
         self.passw = raw_passw
+        srv = obj.active_tariff()
+        if srv is not None:
+            self.service = DumpService.build_from_db(srv)
+        else:
+            self.service = None
         return self
 
     def __eq__(self, other):
@@ -64,7 +119,25 @@ class DumpAbon(object):
         return not self.__eq__(other)
 
 
+def add_service_if_not_exist(service):
+    assert isinstance(service, DumpService)
+    try:
+        obj = Tariff.objects.get(speedIn=service.speedIn, speedOut=service.speedOut, amount=service.price)
+    except Tariff.DoesNotExist:
+        obj = Tariff.objects.create(
+            title=service.title,
+            descr=service.description,
+            speedIn=service.speedIn,
+            speedOut=service.speedOut,
+            amount=service.price,
+            calc_type='Dp'
+        )
+    return obj
+
+
 def load_users(obj, group):
+    if len(obj) < 1:
+        return
     for usr in obj:
         # абонент из дампа
         dump_abon = DumpAbon(usr)
@@ -77,7 +150,22 @@ def load_users(obj, group):
                 update_user(abon, dump_abon, group)
         except Abon.DoesNotExist:
             # добавляем абонента
-            add_user(dump_abon, group)
+            abon = add_user(dump_abon, group)
+
+        abon_service_from_dump = dump_abon.service
+        if abon_service_from_dump is None:
+            continue
+        abon_service = add_service_if_not_exist(abon_service_from_dump)
+        try:
+            AbonTariff.objects.get(abon=abon, tariff=abon_service)
+        except AbonTariff.DoesNotExist:
+            calc_obj = abon_service.get_calc_type()(abon_service)
+            AbonTariff.objects.create(
+                abon=abon,
+                tariff=abon_service,
+                time_start=timezone.now(),
+                deadline=calc_obj.calc_deadline()
+            )
 
 
 def add_user(obj, user_group):
@@ -85,14 +173,16 @@ def add_user(obj, user_group):
     street = None
     ip = None
     try:
-        ip = IpPoolItem.objects.get(ip=obj.ip)
-        street = AbonStreet.objects.get(name=obj.street)
+        if obj.ip is not None:
+            ip = IpPoolItem.objects.get(ip=obj.ip)
+        street = AbonStreet.objects.get(name=obj.street, group=user_group)
     except IpPoolItem.DoesNotExist:
-        ip = IpPoolItem.objects.create(ip=obj.ip)
+        if obj.ip is not None:
+            ip = IpPoolItem.objects.create(ip=obj.ip)
     except AbonStreet.DoesNotExist:
         street = AbonStreet.objects.create(name=obj.street, group=user_group)
 
-    Abon.objects.create(
+    return Abon.objects.create(
         username=obj.name,
         fio=obj.fio,
         telephone=obj.tel,
@@ -111,10 +201,11 @@ def update_user(db_abon, obj, user_group):
     street = None
     ip = None
     try:
-        ip = IpPoolItem.objects.get(ip=obj.ip)
+        if obj.ip is not None:
+            ip = IpPoolItem.objects.get(ip=obj.ip)
         street = AbonStreet.objects.get(name=obj.street, group=user_group)
     except IpPoolItem.DoesNotExist:
-        if obj.ip:
+        if obj.ip is not None:
             ip = IpPoolItem.objects.create(ip=obj.ip)
     except AbonStreet.DoesNotExist:
         street = AbonStreet.objects.create(name=obj.street, group=user_group)
@@ -129,13 +220,12 @@ def update_user(db_abon, obj, user_group):
     db_abon.save()
 
 
-
 if __name__ == "__main__":
 
     with open('dump.json', 'r') as f:
         dat = load(f)
 
-    for grp in dat['groups']:
+    for grp in dat:
         try:
             abgrp=AbonGroup.objects.get(title=grp['gname'])
         except AbonGroup.DoesNotExist:

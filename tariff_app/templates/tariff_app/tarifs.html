@@ -62,7 +62,7 @@
                     <td>{{ tar.speedOut }}</td>
                     <td>{{ tar.amount }} руб</td>
                     <td>{{ tar.time_of_action }} дней</td>
-                    <td>{{ tar.calc_type }}</td>
+                    <td>{{ tar.get_calc_type_display }}</td>
                     <td>
                         {% if perms.tariff_app.delete_tariff %}
                             <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger">

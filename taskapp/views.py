@@ -6,11 +6,9 @@ from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
 from datetime import date
-from chatbot.models import TelegramBot
 from .models import Task
-from mydefs import pag_mn, only_admins, safe_int
+from mydefs import pag_mn, only_admins, safe_int, MultipleException
 from .forms import TaskFrm
-from .handle import TaskException
 
 
 @login_required
@@ -149,12 +147,11 @@ def task_add_edit(request, task_id=0):
                 messages.error(request, _('Error in the form fields'))
         elif uid:
             selected_abon = Abon.objects.get(username=str(uid))
-    except TelegramBot.DoesNotExist:
-        messages.error(request, _('Employee has not yet signed up for notifications'))
     except Abon.DoesNotExist:
         messages.warning(request, _("User '%s' does not exist") % str(uid))
-    except TaskException as e:
-        messages.error(request, e)
+    except MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
@@ -169,8 +166,9 @@ def task_finish(request, task_id):
     try:
         task = get_object_or_404(Task, id=task_id)
         task.finish(request.user)
-    except TaskException as e:
-        messages.error(request, e)
+    except MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return redirect('taskapp:home')
 
 
@@ -185,6 +183,10 @@ def task_begin(request, task_id):
 @login_required
 @permission_required('taskapp.can_remind')
 def remind(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    task.save(update_fields=['state'])
+    try:
+        task = get_object_or_404(Task, id=task_id)
+        task.save(update_fields=['state'])
+    except MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return redirect('taskapp:home')
