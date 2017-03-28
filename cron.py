@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
 import django
@@ -51,7 +51,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except NasNetworkError as e:
-        print(e)
-    except NasFailedResult as e:
-        print(e)
+    except (NasNetworkError, NasFailedResult) as e:
+        print('NAS:', e)
