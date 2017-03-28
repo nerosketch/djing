@@ -1,14 +1,8 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Dmitry Novikov nerosketch@gmail.com, 2017.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-27 12:27+0300\n"
+"POT-Creation-Date: 2017-03-25 00:40+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -31,116 +25,118 @@ msgstr "Задача"
 msgid "Task completed"
 msgstr "Задача завершена"
 
-#: taskapp/handle.py:29
-#, python-format
-msgid "address %s %s.\ntelephone %s\n"
-msgstr "адрес: %s %s\nтел. %s\n"
-
-#: taskapp/handle.py:32
+#: taskapp/handle.py:31
 #, python-format
 msgid "locality %s.\n"
-msgstr "с. %s.\n"
+msgstr "с. %s\n"
 
-msgid "Task type - %s.\n"
-msgstr "Тип задачи - %s.\n"
+#: taskapp/handle.py:33
+#, fuzzy, python-format
+#| msgid "address %s. telephone %s. "
+msgid ""
+"address %s %s.\n"
+"telephone %s\n"
+msgstr "по адресу %s тел. %s. "
 
-#: taskapp/handle.py:33 taskapp/templates/taskapp/view.html.py:34
-msgid "Not assigned"
-msgstr "&lt;Не назначено&gt;"
-
-#: taskapp/models.py:13
-msgid "Higher"
-msgstr "Высший"
-
-#: taskapp/models.py:14
-msgid "Average"
-msgstr "Средний"
-
-#: taskapp/models.py:15
-msgid "Low"
-msgstr "Низкий"
-
-#: taskapp/models.py:19
-msgid "New"
-msgstr "Новая"
-
-#: taskapp/models.py:20
-msgid "In fulfilling"
-msgstr "На выполнении"
-
-#: taskapp/models.py:21
-msgid "Completed"
-msgstr "Выполнена"
-
-#: taskapp/models.py:25
+#: taskapp/handle.py:34 taskapp/models.py:26
 msgid "not chosen"
 msgstr "не выбрано"
 
-#: taskapp/models.py:26
+#: taskapp/handle.py:38
+#, fuzzy, python-format
+#| msgid "Task type"
+msgid "Task type - %s.\n"
+msgstr "Тип задачи"
+
+#: taskapp/models.py:14
+msgid "Higher"
+msgstr "Высший"
+
+#: taskapp/models.py:15
+msgid "Average"
+msgstr "Средний"
+
+#: taskapp/models.py:16
+msgid "Low"
+msgstr "Низкий"
+
+#: taskapp/models.py:20
+msgid "New"
+msgstr "Новая"
+
+#: taskapp/models.py:21
+msgid "In fulfilling"
+msgstr "На выполнении"
+
+#: taskapp/models.py:22
+msgid "Completed"
+msgstr "Выполнена"
+
+#: taskapp/models.py:27
 msgid "yellow triangle"
 msgstr "жёлтый треугольник"
 
-#: taskapp/models.py:27
+#: taskapp/models.py:28
 msgid "red cross"
 msgstr "красный крестик"
 
-#: taskapp/models.py:28
+#: taskapp/models.py:29
 msgid "weak speed"
 msgstr "слабая скорость"
 
-#: taskapp/models.py:29
+#: taskapp/models.py:30
 msgid "cable break"
 msgstr "обрыв кабеля"
 
-#: taskapp/models.py:30
+#: taskapp/models.py:31
 msgid "connection"
 msgstr "подключение"
 
-#: taskapp/models.py:31
+#: taskapp/models.py:32
 msgid "periodic disappearance"
 msgstr "переодическое пропадание"
 
-#: taskapp/models.py:32
+#: taskapp/models.py:33
 msgid "router setup"
 msgstr "настройка роутера"
 
-#: taskapp/models.py:33
+#: taskapp/models.py:34
 msgid "configure onu"
 msgstr "настроить onu"
 
-#: taskapp/models.py:34
+#: taskapp/models.py:35
 msgid "crimp cable"
 msgstr "обжать кабель"
 
-#: taskapp/models.py:35
+#: taskapp/models.py:36
 msgid "other"
 msgstr "другое"
 
-#: taskapp/models.py:42
+#: taskapp/models.py:43
 msgid "Change task"
 msgstr "Изменение задачи"
 
-#: taskapp/models.py:43
+#: taskapp/models.py:44
 msgid "Create task"
 msgstr "Создание задачи"
 
-#: taskapp/models.py:44
+#: taskapp/models.py:45
 msgid "Delete task"
 msgstr "Удаление задачи"
 
-#: taskapp/models.py:45
+#: taskapp/models.py:46
 msgid "Completing tasks"
 msgstr "Завершение задачи"
 
-#: taskapp/models.py:46
+#: taskapp/models.py:47
 msgid "The task started"
 msgstr "Задача начата"
 
-#: taskapp/models.py:77
+#: taskapp/models.py:78
 msgid "Access to all tasks"
 msgstr "Доступ ко всем задачам"
 
-#: taskapp/models.py:78
+#: taskapp/models.py:79
 msgid "Reminders of tasks"
 msgstr "Напоминания о задачах"
 
@@ -317,52 +313,55 @@ msgid "The task is valid until"
 msgstr "Задача действительна до"
 
 #: taskapp/templates/taskapp/view.html:28
-#, fuzzy
-#| msgid "Time left"
 msgid "time left"
-msgstr "Времени осталось"
+msgstr ""
 
 #: taskapp/templates/taskapp/view.html:29
 msgid "Task type"
 msgstr "Тип задачи"
 
-#: taskapp/views.py:84
+#: taskapp/templates/taskapp/view.html:34
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+#: taskapp/views.py:82
 msgid "You cannot delete task that assigned to you"
 msgstr "Вы не можете удалять назначенные на вас задачи"
 
-#: taskapp/views.py:148
+#: taskapp/views.py:143
 msgid "No responsible employee for the users group"
 msgstr "Нет ответственных за группу, в которой находится выбранный абонент"
 
-#: taskapp/views.py:150
+#: taskapp/views.py:145
 msgid "You must select the subscriber"
 msgstr "Нужно выбрать абонента"
 
-#: taskapp/views.py:152
+#: taskapp/views.py:147
 msgid "Error in the form fields"
 msgstr "Ошибка в полях формы"
 
-#: taskapp/views.py:154
-msgid "Employee has not yet signed up for notifications"
-msgstr "Исполнитель ещё не подписался на оповещения"
-
-msgid "Tasks to be performed"
-msgstr "Задачи, которые необходимо выполнить"
-
-msgid "New tasks"
-msgstr "Новые задачи"
+#: taskapp/views.py:151
+#, python-format
+msgid "User '%s' does not exist"
+msgstr ""
 
 msgid "Active tasks"
 msgstr "Активные задачи"
 
+msgid "All my tasks"
+msgstr "Все мои задачи"
+
 msgid "Completed tasks"
 msgstr "Выполненные задачи"
+
+msgid "New tasks"
+msgstr "Новые задачи"
 
 msgid "Scheduled tasks me"
 msgstr "Назначенные мной задачи"
 
-msgid "All my tasks"
-msgstr "Все мои задачи"
+msgid "Tasks to be performed"
+msgstr "Задачи, которые необходимо выполнить"
 
-msgid "User '%s' does not exist"
-msgstr "Абонент с логином '%s' не найден"
+msgid "locality %s. Task type - %s. "
+msgstr "с. %s. Тип задачи - %s. "
