@@ -52,10 +52,11 @@ def addgroup(request):
                 return redirect('abonapp:group_list')
             else:
                 messages.error(request, _('fix form errors'))
-    except NasFailedResult as e:
+    except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
-    except NasNetworkError as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return render(request, 'abonapp/addGroup.html', {
         'form': frm
     })
@@ -88,10 +89,11 @@ def delgroup(request):
         get_object_or_404(models.AbonGroup, id=agd).delete()
         messages.success(request, _('delete group success msg'))
         return mydefs.res_success(request, 'abonapp:group_list')
-    except NasFailedResult as e:
+    except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
-    except NasNetworkError as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return mydefs.res_error(request, 'abonapp:group_list')
 
 
@@ -111,14 +113,11 @@ def addabon(request, gid):
             else:
                 messages.error(request, _('fix form errors'))
 
-    except IntegrityError as e:
+    except (IntegrityError, NasFailedResult, NasNetworkError, models.LogicError) as e:
         messages.error(request, e)
-    except models.LogicError as e:
-        messages.error(request, e)
-    except NasFailedResult as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     if not frm:
         frm = forms.AbonForm(initial={
@@ -159,6 +158,9 @@ def delentity(request):
         messages.error(request, e)
     except NasFailedResult as e:
         messages.error(request, _("NAS says: '%s'") % e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return redirect('abonapp:group_list')
 
 
@@ -177,10 +179,11 @@ def abonamount(request, gid, uid):
                 return redirect('abonapp:abon_home', gid=gid, uid=uid)
             else:
                 messages.error(request, _('I not know the account id'))
-    except NasNetworkError as e:
+    except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
-    except NasFailedResult as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
         'abon_group': get_object_or_404(models.AbonGroup, id=gid)
@@ -258,14 +261,15 @@ def abonhome(request, gid, uid):
         messages.error(request, _('Ip address already exist. %s') % e)
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
-    except NasFailedResult as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
+    except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
     except IpPoolItem.DoesNotExist:
         messages.error(request, _('Ip address not found'))
     except models.AbonRawPassword.DoesNotExist:
         messages.warning(request, _('User has not have password, and cannot login'))
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
@@ -315,10 +319,11 @@ def add_invoice(request, gid, uid):
             messages.success(request, _('Receipt has been created'))
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
-    except NasNetworkError as e:
+    except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
-    except NasFailedResult as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return render(request, 'abonapp/addInvoice.html', {
         'abon': abon,
         'invcount': models.InvoiceForPayment.objects.filter(abon=abon).count(),
@@ -338,15 +343,16 @@ def pick_tariff(request, gid, uid):
             abon.pick_tariff(trf, request.user)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
-    except models.LogicError as e:
-        messages.error(request, e)
-    except NasFailedResult as e:
+    except (models.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
         return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except Tariff.DoesNotExist:
         messages.error(request, _('Tariff your picked does not exist'))
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
@@ -368,10 +374,11 @@ def chpriority(request, gid, uid):
             current_abon_tariff.priority_up()
         elif act == 'down':
             current_abon_tariff.priority_down()
-    except NasFailedResult as e:
+    except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
-    except NasNetworkError as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
@@ -416,13 +423,14 @@ def complete_service(request, gid, uid, srvid):
 
         time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
-    except models.LogicError as e:
-        messages.error(request, e)
-    except NasFailedResult as e:
+    except (models.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
         return redirect('abonapp:abon_home', gid, uid)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
 
     return render(request, 'abonapp/complete_service.html', {
         'abtar': abtar,
@@ -449,12 +457,13 @@ def activate_service(request, gid, uid, srvid):
             messages.success(request, _('Service has been activated successfully'))
             return redirect('abonapp:abon_services', gid, uid)
 
-    except NasFailedResult as e:
+    except (NasFailedResult, models.LogicError) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
-    except models.LogicError as e:
-        messages.error(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     calc_obj = abtar.tariff.get_calc_type()(abtar)
     return render(request, 'abonapp/activate_service.html', {
         'abon': abtar.abon,
@@ -476,6 +485,9 @@ def unsubscribe_service(request, gid, uid, srvid):
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
@@ -483,9 +495,7 @@ def unsubscribe_service(request, gid, uid, srvid):
 @mydefs.only_admins
 def log_page(request):
     logs = models.AbonLog.objects.all()
-
     logs = mydefs.pag_mn(request, logs)
-
     return render(request, 'abonapp/log.html', {
         'logs': logs
     })
@@ -496,10 +506,8 @@ def log_page(request):
 def debtors(request):
     # peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
     #peoples_list = mydefs.pag_mn(request, peoples_list)
-
     invs = models.InvoiceForPayment.objects.filter(status=True)
     invs = mydefs.pag_mn(request, invs)
-
     return render(request, 'abonapp/debtors.html', {
         #'peoples': peoples_list
         'invoices': invs
@@ -521,6 +529,9 @@ def update_nas(request, group_id):
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
     return redirect('abonapp:people_list', gid=group_id)
 
 
