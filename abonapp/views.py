@@ -33,7 +33,7 @@ def peoples(request, gid):
 
     return render(request, 'abonapp/peoples.html', {
         'peoples': peoples_list,
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
         'dir': dr,
         'order_by': request.GET.get('order_by')
     })
@@ -86,7 +86,7 @@ def grouplist(request):
 def delgroup(request):
     try:
         agd = mydefs.safe_int(request.GET.get('id'))
-        get_object_or_404(models.AbonGroup, id=agd).delete()
+        get_object_or_404(models.AbonGroup, pk=agd).delete()
         messages.success(request, _('delete group success msg'))
         return mydefs.res_success(request, 'abonapp:group_list')
     except (NasFailedResult, NasNetworkError) as e:
@@ -103,7 +103,7 @@ def addabon(request, gid):
     frm = None
     group = None
     try:
-        group = get_object_or_404(models.AbonGroup, id=gid)
+        group = get_object_or_404(models.AbonGroup, pk=gid)
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
@@ -141,7 +141,7 @@ def delentity(request):
         if typ == 'a':
             if not request.user.has_perm('abonapp.delete_abon'):
                 raise PermissionDenied
-            abon = get_object_or_404(models.Abon, id=uid)
+            abon = get_object_or_404(models.Abon, pk=uid)
             gid = abon.group.id
             abon.delete()
             messages.success(request, _('delete abon success msg'))
@@ -149,7 +149,7 @@ def delentity(request):
         elif typ == 'g':
             if not request.user.has_perm('abonapp.delete_abongroup'):
                 raise PermissionDenied
-            get_object_or_404(models.AbonGroup, id=uid).delete()
+            get_object_or_404(models.AbonGroup, pk=uid).delete()
             messages.success(request, _('delete group success msg'))
             return mydefs.res_success(request, 'abonapp:group_list')
         else:
@@ -167,7 +167,7 @@ def delentity(request):
 @login_required
 @permission_required('abonapp.can_add_ballance')
 def abonamount(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     try:
         if request.method == 'POST':
             abonid = mydefs.safe_int(request.POST.get('abonid'))
@@ -186,14 +186,14 @@ def abonamount(request, gid, uid):
             messages.add_message(request, messages.constants.ERROR, err)
     return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid)
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid)
     }, request=request)
 
 
 @login_required
 @mydefs.only_admins
 def invoice_for_payment(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     invoices = models.InvoiceForPayment.objects.filter(abon=abon)
     invoices = mydefs.pag_mn(request, invoices)
     return render(request, 'abonapp/invoiceForPayment.html', {
@@ -206,7 +206,7 @@ def invoice_for_payment(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def pay_history(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
     pay_history = mydefs.pag_mn(request, pay_history)
     return render(request, 'abonapp/payHistory.html', {
@@ -219,7 +219,7 @@ def pay_history(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def abon_services(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     abon_tarifs = models.AbonTariff.objects.filter(abon=uid)
 
     active_abontariff = abon_tarifs.exclude(time_start=None)
@@ -235,8 +235,8 @@ def abon_services(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def abonhome(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
-    abon_group = get_object_or_404(models.AbonGroup, id=gid)
+    abon = get_object_or_404(models.Abon, pk=uid)
+    abon_group = get_object_or_404(models.AbonGroup, pk=gid)
     frm, passw = None, None
     try:
         if request.method == 'POST':
@@ -298,8 +298,8 @@ def terminal_pay(request):
 @permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid, uid):
     uid = mydefs.safe_int(uid)
-    abon = get_object_or_404(models.Abon, id=uid)
-    grp = get_object_or_404(models.AbonGroup, id=gid)
+    abon = get_object_or_404(models.Abon, pk=uid)
+    grp = get_object_or_404(models.AbonGroup, pk=gid)
 
     try:
         if request.method == 'POST':
@@ -334,8 +334,8 @@ def add_invoice(request, gid, uid):
 @login_required
 @permission_required('abonapp.can_buy_tariff')
 def pick_tariff(request, gid, uid):
-    grp = get_object_or_404(models.AbonGroup, id=gid)
-    abon = get_object_or_404(models.Abon, id=uid)
+    grp = get_object_or_404(models.AbonGroup, pk=gid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     tariffs = grp.tariffs.all()
     try:
         if request.method == 'POST':
@@ -367,7 +367,7 @@ def chpriority(request, gid, uid):
     t = request.GET.get('t')
     act = request.GET.get('a')
 
-    current_abon_tariff = get_object_or_404(models.AbonTariff, id=t)
+    current_abon_tariff = get_object_or_404(models.AbonTariff, pk=t)
 
     try:
         if act == 'up':
@@ -386,7 +386,7 @@ def chpriority(request, gid, uid):
 @login_required
 @permission_required('abonapp.can_complete_service')
 def complete_service(request, gid, uid, srvid):
-    abtar = get_object_or_404(models.AbonTariff, id=srvid)
+    abtar = get_object_or_404(models.AbonTariff, pk=srvid)
     abon = abtar.abon
     # считаем не использованные ресурсы
     calc_obj = abtar.tariff.get_calc_type()(abtar)
@@ -436,7 +436,7 @@ def complete_service(request, gid, uid, srvid):
         'abtar': abtar,
         'abon': abon,
         'time_use': time_use,
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
         'tcost': round(res_amount, 4),
         'cashback': round(cashback, 4)
     })
@@ -445,7 +445,7 @@ def complete_service(request, gid, uid, srvid):
 @login_required
 @permission_required('abonapp.can_activate_service')
 def activate_service(request, gid, uid, srvid):
-    abtar = get_object_or_404(models.AbonTariff, id=srvid)
+    abtar = get_object_or_404(models.AbonTariff, pk=srvid)
     amount = abtar.calc_amount_service()
 
     try:
@@ -479,7 +479,7 @@ def activate_service(request, gid, uid, srvid):
 @permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uid, srvid):
     try:
-        get_object_or_404(models.AbonTariff, id=int(srvid)).delete()
+        get_object_or_404(models.AbonTariff, pk=int(srvid)).delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -539,11 +539,11 @@ def update_nas(request, group_id):
 @mydefs.only_admins
 def task_log(request, gid, uid):
     from taskapp.models import Task
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     tasks = Task.objects.filter(abon=abon)
     return render(request, 'abonapp/task_log.html', {
         'tasks': tasks,
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
         'abon': abon
     })
 
@@ -551,9 +551,9 @@ def task_log(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def passport_view(request, gid, uid):
-    abon = get_object_or_404(models.Abon, id=uid)
+    abon = get_object_or_404(models.Abon, pk=uid)
     return render(request, 'abonapp/passport_view.html', {
-        'abon_group': get_object_or_404(models.AbonGroup, id=gid),
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
         'abon': abon
     })
 
@@ -578,14 +578,14 @@ def chgroup_tariff(request, gid):
 
 def abons(request):
     ablist = [{
-        'id': abn.id,
-        'tarif_id': abn.active_tariff().id if abn.active_tariff() else 0,
+        'id': abn.pk,
+        'tarif_id': abn.active_tariff().pk if abn.active_tariff() else 0,
         'ip': abn.ip_address.int_ip(),
         'is_active': abn.is_active
     } for abn in models.Abon.objects.all()]
 
     tarlist = [{
-        'id': trf.id,
+        'id': trf.pk,
         'speedIn': trf.speedIn,
         'speedOut': trf.speedOut
     } for trf in Tariff.objects.all()]
@@ -601,5 +601,5 @@ def abons(request):
 def search_abon(request):
     word = request.GET.get('s')
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = [{'id':usr.id, 'name':usr.username, 'fio':usr.fio} for usr in results]
+    results = [{'id':usr.pk, 'name':usr.username, 'fio':usr.fio} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))
