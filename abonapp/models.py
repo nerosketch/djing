@@ -400,25 +400,24 @@ class AbonRawPassword(models.Model):
 
 
 def abon_post_save(sender, instance, **kwargs):
-    #try:
+    timeout = None
+    if hasattr(instance, 'opt82'):
+        timeout = 3600
     tm = Transmitter()
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
     if kwargs['created']:
         # создаём абонента
-        tm.add_user(agent_abon)
+        tm.add_user(agent_abon, ip_timeout=timeout)
     else:
         # обновляем абонента на NAS
-        tm.update_user(agent_abon)
+        tm.update_user(agent_abon, ip_timeout=timeout)
         # если не активен то приостановим услугу
         if instance.is_active:
             tm.start_user(agent_abon)
         else:
             tm.pause_user(agent_abon)
-
-    #except NasFailedResult:
-    #    return True
 
 
 def abon_del_signal(sender, instance, **kwargs):
