@@ -9,6 +9,7 @@ from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
+from .fields import MACAddressField
 
 
 class LogicError(Exception):
@@ -187,6 +188,18 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
+class Opt82(models.Model):
+    mac = MACAddressField()
+    port = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return "%s-%d" % (self.mac, self.port)
+
+    class Meta:
+        db_table = 'opt_82'
+        unique_together = (('mac', 'port'),)
+
+
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
@@ -195,7 +208,8 @@ class Abon(UserProfile):
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
-    extra_fields = models.ManyToManyField(ExtraFieldsModel)
+    extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
+    opt82 = models.ForeignKey(Opt82, null=True, blank=True)
 
     _act_tar_cache = None
 
@@ -298,7 +312,8 @@ class Abon(UserProfile):
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
         ats = AbonTariff.objects.filter(abon=self).exclude(time_start=None)
-        if not ats or ats.count() < 1: return False
+        if not ats or ats.count() < 1:
+            return False
         trf = ats[0].tariff
         ct = trf.get_calc_type()(ats[0])
         if ct.manage_access(self):
