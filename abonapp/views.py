@@ -65,7 +65,7 @@ def addgroup(request):
 @login_required
 @mydefs.only_admins
 def grouplist(request):
-    groups = models.AbonGroup.objects.annotate(usercount=Count('abon'))
+    groups = models.AbonGroup.objects.annotate(usercount=Count('abon')).order_by('title')
 
     # фильтр
     directory, field = mydefs.order_helper(request)
