@@ -6,7 +6,7 @@ from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct, ShapeItem
 from . import settings
-from djing.settings import DEBUG
+#from djing.settings import DEBUG
 import re
 
 
@@ -293,20 +293,27 @@ class QueueManager(TransmitterManager):
 
 
 class IpAddressListManager(TransmitterManager):
-    def add(self, list_name, ip):
+
+    def add(self, list_name, ip, timeout=None):
         assert isinstance(ip, IpStruct)
-        return self._exec_cmd([
+        commands = [
             '/ip/firewall/address-list/add',
             '=list=%s' % list_name,
             '=address=%s' % ip.get_str()
-        ])
+        ]
+        if type(timeout) is int:
+            commands.append('=timeout=%d' % timeout)
+        return self._exec_cmd(commands)
 
-    def _edit(self, ip, mk_id):
+    def _edit(self, ip, mk_id, timeout=None):
         assert isinstance(ip, IpStruct)
-        return self._exec_cmd([
+        commands = [
             '/ip/firewall/address-list/set', '=.id=' + str(mk_id),
             '?address=%s' % ip.get_str()
-        ])
+        ]
+        if type(timeout) is int:
+            commands.append('=timeout=%d' % timeout)
+        return self._exec_cmd(commands)
 
     def remove(self, mk_id):
         return self._exec_cmd([
@@ -357,11 +364,11 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             if len(ip_list_entity) > 1:
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
-    def add_user(self, user):
+    def add_user(self, user, ip_timeout=None):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
         QueueManager.add(self, user)
-        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
         # удаляем из списка заблокированных абонентов
         firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_BLOCKED)
         if len(firewall_ip_list_obj) > 1:
@@ -374,7 +381,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     # обновляем основную инфу абонента
-    def update_user(self, user):
+    def update_user(self, user, ip_timeout=None):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
 
@@ -384,12 +391,12 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         # если не найден (mikrotik возвращает пустой словарь в списке если ничего нет)
         if len(find_res) < 2:
             # добавим запись об абоненте
-            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
         else:
             # если ip абонента в биллинге не такой как в mikrotik
             if find_res[0]['=address'] != user.ip.get_str():
                 # то обновляем запись в mikrotik
-                IpAddressListManager._edit(self, user.ip, find_res[0]['=.id'])
+                IpAddressListManager._edit(self, user.ip, find_res[0]['=.id'], ip_timeout)
 
         # Проверяем шейпер
         queue = QueueManager.find(self, 'uid%d' % user.uid)
