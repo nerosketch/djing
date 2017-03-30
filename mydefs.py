@@ -150,7 +150,7 @@ def only_admins(fn):
 
 
 def ping(hostname):
-    response = os.system("`which ping` -c 1 " + hostname)
+    response = os.system("`which ping` -c 1 %s > /dev/null" % hostname)
     return True if response == 0 else False
 
 
