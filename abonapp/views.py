@@ -276,7 +276,8 @@ def abonhome(request, gid, uid):
             'form': frm or forms.AbonForm(instance=abon, initial={'password': passw}),
             'abon': abon,
             'abon_group': abon_group,
-            'ip': abon.ip_address
+            'ip': abon.ip_address,
+            'tech_form': forms.Opt82Form(instance=abon.opt82)
         })
     else:
         return render(request, 'abonapp/viewAbon.html', {
@@ -285,6 +286,27 @@ def abonhome(request, gid, uid):
             'ip': abon.ip_address,
             'passw': passw
         })
+
+
+@login_required
+@mydefs.only_admins
+def opt82(request, gid, uid):
+    try:
+        abon = models.Abon.objects.get(pk=uid)
+        if request.method == 'POST':
+            if abon.opt82 is None:
+                frm = forms.Opt82Form(request.POST)
+            else:
+                frm = forms.Opt82Form(request.POST, instance=abon.opt82)
+            if frm.is_valid():
+                abon.opt82 = frm.save()
+                abon.save(update_fields=['opt82'])
+            else:
+                messages.error(request, _('fix form errors'))
+
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('User does not exist'))
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 @mydefs.require_ssl
