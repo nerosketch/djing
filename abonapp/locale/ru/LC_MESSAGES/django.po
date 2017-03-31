@@ -693,3 +693,12 @@ msgstr "История задач"
 
 msgid "Dynamic Field"
 msgstr "Динамическое поле"
+
+msgid "Mac Address"
+msgstr "Мак адрес"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Enter a valid MAC Address."
+msgstr "Введите валидный mac адрес"
