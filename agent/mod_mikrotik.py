@@ -10,7 +10,7 @@ from . import settings
 import re
 
 
-DEBUG=False
+DEBUG=True
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
@@ -205,7 +205,8 @@ class TransmitterManager(BaseTransmitter):
                 uid=int(info['=name'][3:]),
                 #FIXME: тут в разных микротиках или =target-addresses или =target
                 ip=info['=target'][:-3],
-                tariff=t
+                tariff=t,
+                is_active=False if info['=disabled'] == 'false' else True
             )
             return ShapeItem(abon=a, sid=info['=.id'].replace('*', ''))
         except KeyError:
@@ -388,6 +389,14 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         #ищем ip абонента в списке ip
         find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
 
+        if not user.is_active:
+            # если не активен - то и обновлять не надо
+            # но и выключить на всяк случай надо, а то вдруг был включён
+            if len(find_res) > 1:
+                # и если найден был - то удалим ip из разрешённых
+                IpAddressListManager.remove(self, find_res[0]['=.id'])
+            return
+
         # если не найден (mikrotik возвращает пустой словарь в списке если ничего нет)
         if len(find_res) < 2:
             # добавим запись об абоненте
@@ -408,13 +417,11 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     # приостановливаем обслуживание абонента
     def pause_user(self, user):
-        IpAddressListManager.disable(self, user)
-        QueueManager.disable(self, user)
+        pass
 
     # продолжаем обслуживание абонента
     def start_user(self, user):
-        QueueManager.enable(self, user)
-        IpAddressListManager.enable(self, user)
+        pass
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
     def add_tariff_range(self, tariff_list):
