@@ -1,17 +1,24 @@
-from django.forms import Field
+from django.forms import CharField
+from django.forms.widgets import TextInput
+from django.core.validators import RegexValidator, _lazy_re_compile
 from django.forms.fields import EMPTY_VALUES
-#"From Django 1.8: The django.forms.util module has been renamed. Use django.forms.utils instead."
-try:
-    from django.forms.utils import ValidationError
-except ImportError:
-    from django.forms.util import ValidationError
-
+from django.forms.utils import ValidationError
+from django.utils.translation import ugettext_lazy as _
 from netaddr import EUI, AddrFormatError
 
 
-class MACAddressField(Field):
+mac_address_validator = RegexValidator(
+    _lazy_re_compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'),
+    message=_('Enter a valid integer.'),
+    code='invalid',
+)
+
+
+class MACAddressField(CharField):
+    widget = TextInput
+    default_validators = [mac_address_validator]
     default_error_messages = {
-        'invalid': 'Enter a valid MAC Address.',
+        'invalid': _('Enter a valid MAC Address.'),
     }
 
     def clean(self, value):
@@ -27,5 +34,3 @@ class MACAddressField(Field):
         except (ValueError, TypeError, AddrFormatError):
             raise ValidationError(self.error_messages['invalid'])
         return value
-
-

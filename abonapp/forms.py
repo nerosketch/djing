@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password
 from random import choice
 from string import digits, ascii_lowercase
 from . import models
+from .formfields import MACAddressField
 
 
 def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
@@ -72,6 +73,19 @@ class AbonForm(forms.ModelForm):
                 passw_text=raw_password
             )
         return acc
+
+
+class Opt82Form(forms.ModelForm):
+    mac = MACAddressField(widget=forms.TextInput(attrs={'class': 'form-control', 'pattern': r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', 'required': ''}))
+    class Meta:
+        model = models.Opt82
+        fields = '__all__'
+        widgets = {
+            'port': forms.NumberInput(attrs={'class': 'form-control', 'required': ''})
+        }
+
+    #def save(self, commit=True):
+    #    super().save(commit=commit)
 
 
 class AbonGroupForm(forms.ModelForm):

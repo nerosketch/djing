@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/passport_view$', views.passport_view, name='passport_view'),
     url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='compl_srv'),
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='activate_service'),
+    url(r'^(?P<uid>\d+)/opt82$', views.opt82, name='opt82'),
 
     url(r'^(?P<uid>\d+)/unsubscribe_service(?P<srvid>\d+)$', views.unsubscribe_service,
         name='unsubscribe_service'),
