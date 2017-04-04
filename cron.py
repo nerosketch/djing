@@ -34,11 +34,6 @@ def main():
 
             # ищем абонента в списке инфы из nas
             tm.update_user(ab)
-            # если не активен то приостановим услугу
-            if user.is_active:
-                tm.start_user(ab)
-            else:
-                tm.pause_user(ab)
 
         except NasNetworkError as er:
             print("Error:", er)
