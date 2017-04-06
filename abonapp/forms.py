@@ -76,7 +76,7 @@ class AbonForm(forms.ModelForm):
 
 
 class Opt82Form(forms.ModelForm):
-    mac = MACAddressField(widget=forms.TextInput(attrs={'class': 'form-control', 'pattern': r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', 'required': ''}))
+    mac = MACAddressField(widget=forms.TextInput(attrs={'class': 'form-control', 'pattern': r'^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$', 'required': ''}))
     class Meta:
         model = models.Opt82
         fields = '__all__'
