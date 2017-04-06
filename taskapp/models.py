@@ -67,7 +67,7 @@ class Task(models.Model):
     out_date = models.DateField(null=True, blank=True, default=_delta_add_days)
     time_of_create = models.DateTimeField(auto_now_add=True)
     state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
-    attachment = models.ImageField(upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
+    attachment = models.ImageField(upload_to='media/task_attachments/%Y.%m.%d', blank=True, null=True)
     mode = models.CharField(max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
     abon = models.ForeignKey(Abon, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
