@@ -176,7 +176,7 @@ def abonamount(request, gid, uid):
                 abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
                 abon.save(update_fields=['ballance'])
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
-                return redirect('abonapp:abon_home', gid=gid, uid=uid)
+                return redirect('abonapp:abon_phistory', gid=gid, uid=uid)
             else:
                 messages.error(request, _('I not know the account id'))
     except (NasNetworkError, NasFailedResult) as e:
