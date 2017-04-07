@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 import socket
 import binascii
+from abc import ABCMeta
 from hashlib import md5
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct, ShapeItem
 from . import settings
-#from djing.settings import DEBUG
+from djing.settings import DEBUG
 import re
 
 
-DEBUG=False
+#DEBUG=False
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
@@ -141,7 +142,7 @@ class ApiRos:
         return ret
 
 
-class TransmitterManager(BaseTransmitter):
+class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or settings.NAS_IP
         if not ping(ip):
@@ -212,7 +213,7 @@ class TransmitterManager(BaseTransmitter):
             return
 
 
-class QueueManager(TransmitterManager):
+class QueueManager(TransmitterManager, metaclass=ABCMeta):
     # ищем правило по имени, и возвращаем всю инфу о найденном правиле
     def find(self, name):
         ret = self._exec_cmd(['/queue/simple/print', '?name=%s' % name])
@@ -292,7 +293,7 @@ class QueueManager(TransmitterManager):
             return self._exec_cmd(['/queue/simple/enable', '=.id=*' + q.sid])
 
 
-class IpAddressListManager(TransmitterManager):
+class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
 
     def add(self, list_name, ip, timeout=None):
         assert isinstance(ip, IpStruct)
