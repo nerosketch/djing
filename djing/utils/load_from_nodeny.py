@@ -35,9 +35,12 @@ def load_service(cursor, uid):
 def load_users(cursor, grp_id):
     # выбираем абонентов
     sql = r"SELECT users.name, users.fio, data0._adr_telefon, dictionary.v AS street, data0._adr_house, data0._birthday, " \
-           "users.grp, INET_NTOA(ip_pool.ip) AS ip, users.balance, AES_DECRYPT(users.passwd, 'Vu6saiZa') as decr_passwd, users.id " \
-           "FROM users LEFT JOIN data0 ON (data0.uid = users.id) LEFT JOIN dictionary ON (dictionary.k = data0._adr_street " \
-           "AND dictionary.type = 'street') LEFT JOIN ip_pool ON (ip_pool.uid = users.id) WHERE users.grp = %d" % grp_id
+           "users.grp, INET_NTOA(ip_pool.ip) AS ip, users.balance, AES_DECRYPT(users.passwd, 'Vu6saiZa') as decr_passwd, users.id, " \
+           "mac_uid.device_mac, mac_uid.device_port, mac_uid.oneconnect " \
+           "FROM users " \
+           "LEFT JOIN data0 ON (data0.uid = users.id) LEFT JOIN dictionary ON (dictionary.k = data0._adr_street AND dictionary.type = 'street') " \
+           "LEFT JOIN mac_uid ON (mac_uid.uid=users.id) " \
+           "LEFT JOIN ip_pool ON (ip_pool.uid = users.id) WHERE users.grp = %d" % grp_id
     cursor.execute(sql)
     users = [{
         'name': res[0],
@@ -50,7 +53,12 @@ def load_users(cursor, grp_id):
         'ip': str(res[7] or ''),
         'balance': float(res[8]),
         'passw': res[9].decode("utf-8") if res[9] is not None else '',
-        'service': load_service(cursor, int(res[10]))
+        'service': load_service(cursor, int(res[10])),
+        'opt82': {
+            'dev_mac': res[11],
+            'dev_port': res[12],
+            'oneconnect': res[13]
+        }
     } for res in cursor.fetchall()]
     return users
 

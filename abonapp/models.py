@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext as _
-from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
+from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
@@ -332,7 +332,7 @@ class Abon(UserProfile):
             agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
         else:
             agent_trf = TariffStruct()
-        return AbonStruct(self.pk, user_ip, agent_trf)
+        return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
 
 class InvoiceForPayment(models.Model):
@@ -403,21 +403,20 @@ def abon_post_save(sender, instance, **kwargs):
     timeout = None
     if hasattr(instance, 'opt82'):
         timeout = 3600
-    tm = Transmitter()
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
-    if kwargs['created']:
-        # создаём абонента
-        tm.add_user(agent_abon, ip_timeout=timeout)
-    else:
-        # обновляем абонента на NAS
-        tm.update_user(agent_abon, ip_timeout=timeout)
-        # если не активен то приостановим услугу
-        if instance.is_active:
-            tm.start_user(agent_abon)
+    try:
+        tm = Transmitter()
+        if kwargs['created']:
+            # создаём абонента
+            tm.add_user(agent_abon, ip_timeout=timeout)
         else:
-            tm.pause_user(agent_abon)
+            # обновляем абонента на NAS
+            tm.update_user(agent_abon, ip_timeout=timeout)
+
+    except (NasFailedResult, NasNetworkError):
+        return True
 
 
 def abon_del_signal(sender, instance, **kwargs):
@@ -427,7 +426,7 @@ def abon_del_signal(sender, instance, **kwargs):
         tm = Transmitter()
         # нашли абонента, и удаляем его на NAS
         tm.remove_user(ab)
-    except NasFailedResult:
+    except (NasFailedResult, NasNetworkError):
         return True
 
 
@@ -444,7 +443,7 @@ def abontariff_post_save(sender, instance, **kwargs):
             return True
         tm = Transmitter()
         tm.update_user(agent_abon)
-    except NasFailedResult:
+    except (NasFailedResult, NasNetworkError):
         return True
 
 
@@ -459,7 +458,7 @@ def abontariff_del_signal(sender, instance, **kwargs):
         agent_abon = instance.abon.build_agent_struct()
         tm = Transmitter()
         tm.pause_user(agent_abon)
-    except NasFailedResult:
+    except (NasFailedResult, NasNetworkError):
         return True
 
 

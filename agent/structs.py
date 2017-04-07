@@ -53,8 +53,8 @@ class TariffStruct(BaseStruct):
 
     def __init__(self, tariff_id=0, speedIn=None, speedOut=None):
         self.tid = tariff_id
-        self.speedIn = speedIn if speedIn is not None else 5.0625
-        self.speedOut = speedOut if speedOut is not None else 5.0625
+        self.speedIn = speedIn if speedIn is not None else 0.0625
+        self.speedOut = speedOut if speedOut is not None else 0.0625
 
     def serialize(self):
         dt = pack("!Iff", int(self.tid), float(self.speedIn), float(self.speedOut))
@@ -80,25 +80,27 @@ class TariffStruct(BaseStruct):
 # Абонент из базы
 class AbonStruct(BaseStruct):
 
-    def __init__(self, uid=None, ip=None, tariff=None):
+    def __init__(self, uid=None, ip=None, tariff=None, is_active=True):
         self.uid = int(uid)
         self.ip = IpStruct(ip)
         assert isinstance(tariff, TariffStruct)
         self.tariff = tariff
+        self.is_active = is_active
 
     def serialize(self):
         assert isinstance(self.tariff, TariffStruct)
         assert isinstance(self.ip, IpStruct)
-        dt = pack("!LII", self.uid, self.ip.get_int(), self.tariff.tid)
+        dt = pack("!LII?", self.uid, self.ip.get_int(), self.tariff.tid, self.is_active)
         return dt
 
     def deserialize(self, data, tariff=None):
-        dt = unpack("!LII", data)
+        dt = unpack("!LII?", data)
         self.uid = dt[0]
         self.ip = IpStruct(dt[1])
         if tariff is not None:
             assert isinstance(tariff, TariffStruct)
             self.tariff = tariff
+        self.is_active = dt['3']
         return self
 
     def __eq__(self, other):
