@@ -5,12 +5,12 @@ import os
 from json import load
 import django
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
-from abonapp.models import Abon, AbonGroup, AbonRawPassword, AbonStreet, AbonTariff
+from abonapp.models import Abon, AbonGroup, AbonRawPassword, AbonStreet, AbonTariff, Opt82
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
-
 
 
 class DumpService(object):
@@ -65,6 +65,12 @@ class DumpAbon(object):
         self.ip = obj['ip'] if obj['ip'] != '' else None
         self.balance = obj['balance']
         self.passw = obj['passw']
+        if obj['opt82']['dev_mac'] is not None and obj['opt82']['dev_port'] is not None:
+            self.opt82 = {
+                'dev_mac': obj['opt82']['dev_mac'],
+                'dev_port': obj['opt82']['dev_port']
+            }
+
         if obj['service'] is not None:
             self.service = DumpService(obj['service'])
         else:
@@ -99,6 +105,11 @@ class DumpAbon(object):
             self.service = DumpService.build_from_db(srv)
         else:
             self.service = None
+        if obj.opt82 is not None and obj.opt82.mac is not None and obj.opt82.port is not None:
+            self.opt82 = {
+                'dev_mac': obj.opt82.mac,
+                'dev_port': obj.opt82.port
+            }
         return self
 
     def __eq__(self, other):
@@ -135,6 +146,26 @@ def add_service_if_not_exist(service):
     return obj
 
 
+def add_raw_password_if_not_exist(acc, raw_passw):
+    try:
+        psw = AbonRawPassword.objects.get(account=acc)
+        #if psw != raw_passw:
+        #    psw.passw_text = raw_passw
+        #    psw.save(update_fields=['passw_text'])
+    except AbonRawPassword.DoesNotExist:
+        psw = AbonRawPassword.objects.create(account=acc, passw_text=raw_passw)
+    return psw
+
+
+def add_opt82_if_not_exist(mac, port):
+    print(mac, port)
+    try:
+        opt82 = Opt82.objects.get(mac=mac, port=port)
+    except Opt82.DoesNotExist:
+        opt82 = Opt82.objects.create(mac=mac, port=port)
+    return opt82
+
+
 def load_users(obj, group):
     if len(obj) < 1:
         return
@@ -151,6 +182,8 @@ def load_users(obj, group):
         except Abon.DoesNotExist:
             # добавляем абонента
             abon = add_user(dump_abon, group)
+        if abon is None:
+            raise Exception("Чё за херня!? Не создался абонент")
 
         abon_service_from_dump = dump_abon.service
         if abon_service_from_dump is None:
@@ -166,6 +199,12 @@ def load_users(obj, group):
                 time_start=timezone.now(),
                 deadline=calc_obj.calc_deadline()
             )
+        try:
+            if hasattr(dump_abon, 'opt82'):
+                abon.opt82 = add_opt82_if_not_exist(dump_abon.opt82['dev_mac'], dump_abon.opt82['dev_port'])
+                abon.save(update_fields=['opt82'])
+        except ValidationError as e:
+            print('\t', e)
 
 
 def add_user(obj, user_group):
@@ -182,17 +221,20 @@ def add_user(obj, user_group):
     except AbonStreet.DoesNotExist:
         street = AbonStreet.objects.create(name=obj.street, group=user_group)
 
-    return Abon.objects.create(
-        username=obj.name,
-        fio=obj.fio,
-        telephone=obj.tel,
-        street=street,
-        house=obj.house,
-        birth_day=obj.birth,
-        group = user_group,
-        ip_address=ip,
-        ballance=obj.balance
-    )
+    abon = Abon()
+    abon.username = obj.name
+    abon.fio = obj.fio
+    abon.telephone = obj.tel
+    abon.street = street
+    abon.house = obj.house
+    abon.birth_day = obj.birth
+    abon.group = user_group
+    abon.ip_address = ip
+    abon.ballance = obj.balance
+    abon.set_password(obj.passw)
+    abon.save()
+    add_raw_password_if_not_exist(abon, obj.passw)
+    return abon
 
 
 def update_user(db_abon, obj, user_group):
@@ -217,7 +259,9 @@ def update_user(db_abon, obj, user_group):
     db_abon.group = user_group
     db_abon.ip_address = ip
     db_abon.ballance = obj.balance
+    db_abon.set_password(obj.passw)
     db_abon.save()
+    add_raw_password_if_not_exist(db_abon, obj.passw)
 
 
 if __name__ == "__main__":
