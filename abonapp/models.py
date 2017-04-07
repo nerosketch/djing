@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext as _
-from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult
+from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
