@@ -130,14 +130,14 @@ class ApiRos:
         n = 0
         while n < len(s):
             r = self.sk.send(s[n:])
-            if r == 0: raise RuntimeError("connection closed by remote end")
+            if r == 0: raise NasFailedResult("connection closed by remote end")
             n += r
 
     def readBytes(self, length):
         ret = b''
         while len(ret) < length:
             s = self.sk.recv(length - len(ret))
-            if len(s) == 0: raise RuntimeError("connection closed by remote end")
+            if len(s) == 0: raise NasFailedResult("connection closed by remote end")
             ret += s
         return ret
 
@@ -307,15 +307,13 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             commands.append('=timeout=%d' % timeout)
         return self._exec_cmd(commands)
 
-    def _edit(self, ip, mk_id, timeout=None):
-        assert isinstance(ip, IpStruct)
-        commands = [
-            '/ip/firewall/address-list/set', '=.id=' + str(mk_id),
-            '?address=%s' % ip.get_str()
-        ]
-        if type(timeout) is int:
-            commands.append('=timeout=%d' % timeout)
-        return self._exec_cmd(commands)
+    def _edit(self, mk_id, timeout=None):
+        if timeout is not None:
+            commands = [
+                '/ip/firewall/address-list/set', '=.id=' + str(mk_id),
+                '=timeout=%d' % timeout
+            ]
+            return self._exec_cmd(commands)
 
     def remove(self, mk_id):
         return self._exec_cmd([
@@ -387,7 +385,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         assert isinstance(user.tariff, TariffStruct)
         assert isinstance(user.ip, IpStruct)
 
-        #ищем ip абонента в списке ip
+        # ищем ip абонента в списке ip
         find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
 
         if not user.is_active:
@@ -403,10 +401,9 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             # добавим запись об абоненте
             IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
         else:
-            # если ip абонента в биллинге не такой как в mikrotik
-            if find_res[0]['=address'] != user.ip.get_str():
-                # то обновляем запись в mikrotik
-                IpAddressListManager._edit(self, user.ip, find_res[0]['=.id'], ip_timeout)
+            mk_id = find_res[0]['=.id']
+            # то обновляем запись в mikrotik
+            IpAddressListManager._edit(self, mk_id, ip_timeout)
 
         # Проверяем шейпер
         queue = QueueManager.find(self, 'uid%d' % user.uid)
