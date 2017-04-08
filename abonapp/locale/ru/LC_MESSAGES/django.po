@@ -702,3 +702,12 @@ msgstr "Порт"
 
 msgid "Enter a valid MAC Address."
 msgstr "Введите валидный mac адрес"
+
+msgid "Reset option82"
+msgstr "Сбросить option82"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Instance of a option82 unexpectiadly disappeared"
+msgstr "Экземпляр option82 неожиданно исчез из базы"
