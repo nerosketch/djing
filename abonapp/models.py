@@ -401,7 +401,7 @@ class AbonRawPassword(models.Model):
 
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
-    if hasattr(instance, 'opt82'):
+    if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
         timeout = 3600
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
