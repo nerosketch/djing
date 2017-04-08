@@ -244,12 +244,14 @@ def abonhome(request, gid, uid):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                ip_str = request.POST.get('ip')
-                if ip_str:
-                    ip = IpPoolItem.objects.get(ip=ip_str)
-                    abon.ip_address = ip
-                else:
-                    abon.ip_address = None
+                # если нет option82, т.е. динамический ip то не сохраняем изменения ip
+                if abon.opt82 is None:
+                    ip_str = request.POST.get('ip')
+                    if ip_str:
+                        ip = IpPoolItem.objects.get(ip=ip_str)
+                        abon.ip_address = ip
+                    else:
+                        abon.ip_address = None
                 frm.save()
                 messages.success(request, _('edit abon success msg'))
             else:
@@ -303,9 +305,19 @@ def opt82(request, gid, uid):
                 abon.save(update_fields=['opt82'])
             else:
                 messages.error(request, _('fix form errors'))
+        else:
+            act = request.GET.get('act')
+            if act is not None and act == 'release':
+                if abon.opt82 is not None:
+                    #models.Opt82.objects.get(pk=abon.opt82.pk).delete()
+                    abon.opt82.delete()
+                    abon.save(update_fields=['opt82'])
+
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('User does not exist'))
+    except models.Opt82.DoesNotExist:
+        messages.error(request, _(''))
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
