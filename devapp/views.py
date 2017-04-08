@@ -140,7 +140,7 @@ def toggle_port(request, did, portid, status=0):
             messages.warning(request, _('Not Set snmp device password'))
     else:
         messages.error(request, _('Dot was not pinged'))
-    return redirect('devapp:view', dev.user_group or 0, did)
+    return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, did)
 
 
 @login_required
