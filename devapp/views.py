@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from easysnmp import EasySNMPTimeoutError
+from easysnmp import EasySNMPTimeoutError, EasySNMPError
 
 from .models import Device
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
@@ -36,7 +36,7 @@ def devices(request, grp):
 @login_required
 @only_admins
 def devices_null_group(request):
-    devs = Device.objects.all()
+    devs = Device.objects.filter(user_group=None)
     # фильтр
     dr, field = order_helper(request)
     if field:
@@ -114,6 +114,8 @@ def devview(request, did):
             messages.error(request, _('Dot was not pinged'))
     except EasySNMPTimeoutError:
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
+    except EasySNMPError:
+        messages.error(request, _('SNMP error on device'))
 
     return render(request, 'devapp/ports.html', {
         'dev': dev,

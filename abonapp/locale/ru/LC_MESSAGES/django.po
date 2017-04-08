@@ -711,3 +711,6 @@ msgstr "Удалить"
 
 msgid "Instance of a option82 unexpectiadly disappeared"
 msgstr "Экземпляр option82 неожиданно исчез из базы"
+
+msgid "SNMP error on device"
+msgstr "Ошибка в SNMP на устройстве"
