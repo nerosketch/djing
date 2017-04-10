@@ -37,13 +37,13 @@
                             {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th>
-                            <a herf="{% url 'abonapp:people_list' abon_group.pk %}?order_by=street&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=street&dir={{ dir|default:"down" }}">
                                 {% trans 'Street' %}
                             </a>
                             {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th width="100">
-                            <a herf="{% url 'abonapp:people_list' abon_group.pk %}?order_by=house&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=house&dir={{ dir|default:"down" }}">
                                 {% trans 'House' %}/{% trans 'Apartment' %}
                             </a>
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
