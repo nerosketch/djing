@@ -36,7 +36,7 @@ def devices(request, grp):
 @login_required
 @only_admins
 def devices_null_group(request):
-    devs = Device.objects.all()
+    devs = Device.objects.filter(user_group=None)
     # фильтр
     dr, field = order_helper(request)
     if field:
