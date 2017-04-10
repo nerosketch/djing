@@ -22,7 +22,11 @@ import mydefs
 @login_required
 @mydefs.only_admins
 def peoples(request, gid):
-    peoples_list = models.Abon.objects.filter(group=gid)
+    street_id = mydefs.safe_int(request.GET.get('street'))
+    if street_id > 0:
+        peoples_list = models.Abon.objects.filter(group=gid, street=street_id)
+    else:
+        peoples_list = models.Abon.objects.filter(group=gid)
 
     # фильтр
     dr, field = mydefs.order_helper(request)
@@ -31,9 +35,13 @@ def peoples(request, gid):
 
     peoples_list = mydefs.pag_mn(request, peoples_list)
 
+    streets = models.AbonStreet.objects.filter(group=gid)
+
     return render(request, 'abonapp/peoples.html', {
         'peoples': peoples_list,
         'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
+        'streets': streets,
+        'street_id': street_id,
         'dir': dr,
         'order_by': request.GET.get('order_by')
     })

@@ -714,3 +714,6 @@ msgstr "Экземпляр option82 неожиданно исчез из баз�
 
 msgid "SNMP error on device"
 msgstr "Ошибка в SNMP на устройстве"
+
+msgid "No streets found for that group"
+msgstr "Не найдены улицы для группы"
