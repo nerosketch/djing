@@ -317,10 +317,9 @@ def opt82(request, gid, uid):
             act = request.GET.get('act')
             if act is not None and act == 'release':
                 if abon.opt82 is not None:
-                    #models.Opt82.objects.get(pk=abon.opt82.pk).delete()
                     abon.opt82.delete()
+                    abon.opt82 = None
                     abon.save(update_fields=['opt82'])
-
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('User does not exist'))
