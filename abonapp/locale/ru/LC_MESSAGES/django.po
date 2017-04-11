@@ -341,8 +341,8 @@ msgid "Send account info to user"
 msgstr "Отправить данные абоненту"
 
 #: abonapp/templates/abonapp/editAbon.html:111
-msgid "Technical information"
-msgstr "Техническая информация"
+msgid "DHCP information"
+msgstr "DHCP информация"
 
 #: abonapp/templates/abonapp/group_list.html:27
 msgid "Number of subscribers"
@@ -695,7 +695,7 @@ msgid "Dynamic Field"
 msgstr "Динамическое поле"
 
 msgid "Mac Address"
-msgstr "Мак адрес"
+msgstr "Мак"
 
 msgid "Port"
 msgstr "Порт"
