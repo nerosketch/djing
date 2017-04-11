@@ -26,4 +26,10 @@ class Migration(migrations.Migration):
                 ('abon', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.Abon')),
             ],
         ),
+        migrations.AlterField(
+            model_name='abon',
+            name='opt82',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='abonapp.Opt82'),
+        )
     ]
