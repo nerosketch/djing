@@ -31,12 +31,8 @@ msgid "locality %s.\n"
 msgstr "с. %s\n"
 
 #: taskapp/handle.py:33
-#, fuzzy, python-format
-#| msgid "address %s. telephone %s. "
-msgid ""
-"address %s %s.\n"
-"telephone %s\n"
-msgstr "по адресу %s тел. %s. "
+msgid "address %s %s.\ntelephone %s\n"
+msgstr "по адресу %s %s тел. %s.\n"
 
 #: taskapp/handle.py:34 taskapp/models.py:26
 msgid "not chosen"
@@ -46,7 +42,7 @@ msgstr "не выбрано"
 #, fuzzy, python-format
 #| msgid "Task type"
 msgid "Task type - %s.\n"
-msgstr "Тип задачи"
+msgstr "Тип задачи - %s.\n"
 
 #: taskapp/models.py:14
 msgid "Higher"
