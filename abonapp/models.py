@@ -209,7 +209,7 @@ class Abon(UserProfile):
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
     extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
-    opt82 = models.ForeignKey(Opt82, null=True, blank=True)
+    opt82 = models.ForeignKey(Opt82, null=True, blank=True, on_delete=models.SET_NULL)
 
     _act_tar_cache = None
 
@@ -433,6 +433,8 @@ def abon_post_save(sender, instance, **kwargs):
 def abon_del_signal(sender, instance, **kwargs):
     try:
         ab = instance.build_agent_struct()
+        if ab is None:
+            return True
         # подключаемся к NAS'у
         tm = Transmitter()
         # нашли абонента, и удаляем его на NAS
