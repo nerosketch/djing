@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db import IntegrityError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -256,8 +256,13 @@ def abonhome(request, gid, uid):
                 if abon.opt82 is None:
                     ip_str = request.POST.get('ip')
                     if ip_str:
-                        ip = IpPoolItem.objects.get(ip=ip_str)
-                        abon.ip_address = ip
+                        try:
+                            ip = IpPoolItem.objects.get(ip=ip_str)
+                            abon.ip_address = ip
+                        except MultipleObjectsReturned:
+                            ips = models.IpPoolItem.objects.filter(ip=ip_str)
+                            ips[1:].delete()
+                            abon.ip_address = ips[0]
                     else:
                         abon.ip_address = None
                 frm.save()
@@ -592,10 +597,31 @@ def task_log(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def passport_view(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+    try:
+        abon = models.Abon.objects.get(pk=uid)
+        if request.method == 'POST':
+            frm = forms.PassportForm(request.POST)
+            if frm.is_valid():
+                passp_instance = frm.save(commit=False)
+                passp_instance.abon = abon
+                passp_instance.save()
+                messages.success(request, _('Passport information has been saved'))
+                return redirect('abonapp:passport_view', gid=gid, uid=uid)
+            else:
+                messages.error(request, _('fix form errors'))
+        else:
+            passp_instance = models.PassportInfo.objects.get(abon=abon)
+            frm = forms.PassportForm(instance=passp_instance)
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('Abon does not exist'))
+        return redirect('abonapp:people_list', gid=gid)
+    except models.PassportInfo.DoesNotExist:
+        messages.warning(request, _('Passport info for the user does not exist'))
+        frm = forms.PassportForm()
     return render(request, 'abonapp/passport_view.html', {
         'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
-        'abon': abon
+        'abon': abon,
+        'frm': frm
     })
 
 

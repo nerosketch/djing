@@ -21,7 +21,7 @@
                     {% else %}
                         <input name="tr" type="checkbox" value="{{ tariff.pk }}"/>
                     {% endif %}
-                    {{ tariff.title }}
+                    {{ tariff.title }}, {{ tariff.amount }}{% trans 'currency' %}, {{ tariff.speedOut }}Mbit/s | {{ tariff.speedIn }}Mbit/s
                 </label>
             </div>
         {% endfor %}

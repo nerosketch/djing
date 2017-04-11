@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.peoples, name='people_list'),
     url(r'^addabon$', views.addabon, name='add_abon'),
-    url(r'^groups$', views.chgroup_tariff, name='ch_group_tariff'),
+    url(r'^services$', views.chgroup_tariff, name='ch_group_tariff'),
     url(r'^(?P<uid>\d+)$', views.abonhome, name='abon_home'),
 
     url(r'^(?P<uid>\d+)/services$', views.abon_services, name='abon_services'),

@@ -335,6 +335,17 @@ class Abon(UserProfile):
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
 
+class PassportInfo(models.Model):
+    series = models.CharField(max_length=4, validators=[validators.integer_validator])
+    number = models.CharField(max_length=6, validators=[validators.integer_validator])
+    distributor = models.CharField(max_length=64)
+    date_of_acceptance = models.DateField()
+    abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __unicode__(self):
+        return "%s %s" % (self.series, self.number)
+
+
 class InvoiceForPayment(models.Model):
     abon = models.ForeignKey(Abon)
     status = models.BooleanField(default=False)

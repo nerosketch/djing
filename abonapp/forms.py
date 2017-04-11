@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
 from django.contrib.auth.hashers import make_password
@@ -95,4 +96,19 @@ class AbonGroupForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'profiles': forms.TextInput(attrs={'class': 'form-control'})
+        }
+
+
+class PassportForm(forms.ModelForm):
+    class Meta:
+        model = models.PassportInfo
+        exclude = ['abon']
+        widgets = {
+            'series': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'pattern': '^\d{4}$'}),
+            'number': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'pattern': '^\d{6}$'}),
+            'distributor': forms.TextInput(attrs={'class': 'form-control', 'required': ''}),
+            'date_of_acceptance': forms.DateInput(attrs={'class': 'form-control', 'required': ''})
+        }
+        initials = {
+            'date_of_acceptance': datetime(year=2014, month=6, day=1)
         }

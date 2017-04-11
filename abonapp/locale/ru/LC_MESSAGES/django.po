@@ -717,3 +717,18 @@ msgstr "Ошибка в SNMP на устройстве"
 
 msgid "No streets found for that group"
 msgstr "Не найдены улицы для группы"
+
+msgid "Date of acceptance"
+msgstr "Дата выдачи"
+
+msgid "Passport information has been saved"
+msgstr "Информация о паспорте сохранена"
+
+msgid "Abon does not exist"
+msgstr "Абонент не найден"
+
+msgid "Passport info for the user does not exist"
+msgstr "Для абонента не найдены паспортные данные"
+
+msgid "currency"
+msgstr "руб"
