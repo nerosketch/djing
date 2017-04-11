@@ -9,31 +9,39 @@
                     <h3 class="panel-title">{% trans 'Passport information' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="" method="get">
+                    <form role="form" class="form-horizontal" action="{% url 'abonapp:passport_view' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
                         <div class="form-group-sm">
-                            <label for="pasp_num" class="col-sm-3 control-label">{% trans 'Pasport serial' %}</label>
+                            <label for="id_series" class="col-sm-3 control-label">{% trans 'Pasport serial' %}</label>
                             <div class="col-sm-9">
-                                <input type="text" name="pasp_num" class="form-control" id="pasp_num"/>
+                                {{ frm.series }}{{ frm.series.errors }}
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <label for="pasp_sr" class="col-sm-3 control-label">{% trans 'Pasport number' %}</label>
+                            <label for="id_number" class="col-sm-3 control-label">{% trans 'Pasport number' %}</label>
                             <div class="col-sm-9">
-                                <input type="text" name="pasp_sr" class="form-control" id="pasp_sr"/>
+                                {{ frm.number }}{{ frm.number.errors }}
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <label for="wr" class="col-sm-3 control-label">{% trans 'Distributor' %}</label>
+                            <label for="id_distributor" class="col-sm-3 control-label">{% trans 'Distributor' %}</label>
                             <div class="col-sm-9">
-                                <input type="text" name="wr" class="form-control" id="wr"/>
+                                {{ frm.distributor }}{{ frm.distributor.errors }}
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <label for="birthday" class="col-sm-3 control-label">{% trans 'Birthday' %}</label>
+                            <label for="id_date_of_acceptance" class="col-sm-3 control-label">{% trans 'Date of acceptance' %}</label>
                             <div class="col-sm-9">
-                                <input type="text" name="birthday" class="form-control" id="birthday"/>
+                                {{ frm.date_of_acceptance }}{{ frm.date_of_acceptance.errors }}
                             </div>
+                            <script type="text/javascript" src="/static/js/datetime_with_moment.min.js"></script>
+                            <script type="text/javascript">
+                                $(function () {
+                                    $('#id_date_of_acceptance').datetimepicker({
+                                        format: 'YYYY-MM-DD'
+                                    });
+                                });
+                            </script>
                         </div>
 
                         <div class="form-group-sm">
