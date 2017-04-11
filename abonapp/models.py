@@ -415,7 +415,8 @@ def abon_post_save(sender, instance, **kwargs):
             # обновляем абонента на NAS
             tm.update_user(agent_abon, ip_timeout=timeout)
 
-    except (NasFailedResult, NasNetworkError):
+    except (NasFailedResult, NasNetworkError) as e:
+        print('ERROR:', e)
         return True
 
 
