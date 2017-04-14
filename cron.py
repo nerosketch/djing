@@ -9,7 +9,7 @@ from agent import Transmitter, NasNetworkError, NasFailedResult
 
 
 def main():
-    tm = Transmitter()
+    tm = None
 
     users = Abon.objects.all()
     for user in users:
@@ -32,12 +32,13 @@ def main():
                 # а если нет ip то и синхронизировать абонента без ip нельзя
                 continue
 
-            # ищем абонента в списке инфы из nas
-            tm.update_user(ab)
+            # обновляем абонента если он статический. Иначе его обновит dhcp
+            if user.opt82 is None:
+                if tm is None:
+                    tm = Transmitter()
+                tm.update_user(ab)
 
-        except NasNetworkError as er:
-            print("Error:", er)
-        except NasFailedResult as er:
+        except (NasNetworkError, NasFailedResult) as er:
             print("Error:", er)
         except LogicError as er:
             print("Notice:", er)
