@@ -241,7 +241,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
 
     def remove_range(self, q_ids):
         names = ['%d' % usr for usr in q_ids]
-        return self._exec_cmd(['/queue/simple/remove', *names])
+        return self._exec_cmd(['/queue/simple/remove'] + names)
 
     def update(self, user):
         assert isinstance(user, AbonStruct)
