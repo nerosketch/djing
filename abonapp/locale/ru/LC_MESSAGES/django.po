@@ -43,10 +43,6 @@ msgstr "Пополнение счёта"
 msgid "not enough money"
 msgstr "Не хватает денег на счету"
 
-#: abonapp/models.py:125
-msgid "service finish log"
-msgstr "Завершение и оплата услуги по истечению срока действия"
-
 #: abonapp/models.py:144
 msgid "finish service perm"
 msgstr "Снятие со счёта средств"

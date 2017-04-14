@@ -175,7 +175,7 @@ def debt_buy(request, d_id):
             if abon.ballance < debt.amount:
                 raise LogicError('Не достаточно средств на счету')
 
-            abon.make_pay(request.user, debt.amount, debt.comment)
+            abon.make_pay(request.user, debt.amount)
             debt.set_ok()
             abon.save(update_fields=['ballance'])
             debt.save(update_fields=['status', 'date_pay'])
