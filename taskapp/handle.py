@@ -35,7 +35,7 @@ def handle(task, author, recipient, abon_group):
                 task.abon.house,
                 task.abon.telephone
             )
-        fulltext += _('Task type - %s.\n') % task.get_mode_display()
+        fulltext += _('Task type - %s.') % task.get_mode_display() + '\n'
         fulltext += task.descr if task.descr else ''
         send_notify(fulltext, dst_account)
     except ChatException as e:

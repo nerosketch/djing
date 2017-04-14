@@ -39,10 +39,8 @@ msgid "not chosen"
 msgstr "не выбрано"
 
 #: taskapp/handle.py:38
-#, fuzzy, python-format
-#| msgid "Task type"
-msgid "Task type - %s.\n"
-msgstr "Тип задачи - %s.\n"
+msgid "Task type - %s."
+msgstr "Тип задачи - %s."
 
 #: taskapp/models.py:14
 msgid "Higher"
