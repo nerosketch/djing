@@ -309,27 +309,30 @@ def opt82(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
-            if abon.opt82 is None:
+            try:
+                opt82_instance = models.Opt82.objects.get(
+                    mac=request.POST.get('mac'),
+                    port=request.POST.get('port')
+                )
+            except models.Opt82.DoesNotExist:
                 frm = forms.Opt82Form(request.POST)
-            else:
-                frm = forms.Opt82Form(request.POST, instance=abon.opt82)
-            if frm.is_valid():
-                abon.opt82 = frm.save()
-                abon.save(update_fields=['opt82'])
-            else:
-                messages.error(request, _('fix form errors'))
+                if frm.is_valid():
+                    opt82_instance = frm.save()
+                else:
+                    messages.error(request, _('fix form errors'))
+                    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+            abon.opt82 = opt82_instance
         else:
             act = request.GET.get('act')
             if act is not None and act == 'release':
                 if abon.opt82 is not None:
                     abon.opt82.delete()
                     abon.opt82 = None
-                    abon.save(update_fields=['opt82'])
 
+        abon.save(update_fields=['opt82'])
     except models.Abon.DoesNotExist:
         messages.error(request, _('User does not exist'))
-    except models.Opt82.DoesNotExist:
-        messages.error(request, _(''))
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 

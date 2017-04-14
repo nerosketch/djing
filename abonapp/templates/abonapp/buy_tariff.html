@@ -28,7 +28,7 @@
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
                         <select class="form-control" name="tariff">
                             {% for trf in tariffs %}
-                                <option value="{{ trf.pk }}">{{ trf.title }}</option>
+			    <option value="{{ trf.pk }}">{{ trf.title }}. {{ trf.amount }}{% trans 'currency' %}</option>
                             {% endfor %}
                         </select>
                     </div>
