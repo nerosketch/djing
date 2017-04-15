@@ -46,7 +46,7 @@ def edit_tarif(request, tarif_id=0):
         if frm.is_valid():
             frm.save()
             messages.success(request, 'Тариф успешно сохранён')
-            return redirect('tarifs:home')
+            return redirect('tarifs:edit', tarif_id=tarif_id)
         else:
             messages.warning(request, 'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
     else:

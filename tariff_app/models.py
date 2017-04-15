@@ -21,6 +21,7 @@ class Tariff(models.Model):
     amount = models.FloatField(default=0.0)
     time_of_action = models.IntegerField(default=30)
     calc_type = models.CharField(max_length=2, default=TARIFF_CHOICES[0][0], choices=_TariffChoicesAdapter())
+    is_admin = models.BooleanField(default=False)
 
     # Возвращает потомок класса TariffBase, методы которого дают нужную логику оплаты по тарифу
     def get_calc_type(self):

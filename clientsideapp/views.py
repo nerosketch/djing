@@ -28,7 +28,7 @@ def pays(request):
 @login_required
 def services(request):
     abon = Abon.objects.get(pk=request.user.pk)
-    all_tarifs = abon.group.tariffs.all()
+    all_tarifs = abon.group.tariffs.filter(is_admin=False)
     own_abon_tariffs = AbonTariff.objects.filter(abon=abon)
     current_service = own_abon_tariffs.exclude(time_start=None)
     current_service = current_service[0] if current_service.count() > 0 else None
