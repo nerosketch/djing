@@ -732,3 +732,27 @@ msgstr "Для абонента не найдены паспортные дан�
 
 msgid "currency"
 msgstr "руб"
+
+msgid "Coupling"
+msgstr "Муфта"
+
+msgid "User device was not found"
+msgstr "Пользовательское устройство не найдено"
+
+msgid "Add clutch"
+msgstr "Добавить муфту"
+
+msgid "Remove clutch"
+msgstr "Удалить муфту"
+
+msgid "Select a device"
+msgstr "Выберите устройство"
+
+msgid "Device your selected already does not exist"
+msgstr "Устройство, выбранное вами, уже не существует"
+
+msgid "Device has successfully attached"
+msgstr "Устройство успешно прикреплено"
+
+msgid "Device has successfully unattached"
+msgstr "Устройство успешно откреплено"

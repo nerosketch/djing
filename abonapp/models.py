@@ -335,6 +335,18 @@ class Abon(UserProfile):
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
 
+class AbonDevice(models.Model):
+    abon = models.OneToOneField(Abon)
+    device = models.OneToOneField('devapp.Device')
+
+    def __str__(self):
+        return "%s - %s" % (self.abon, self.device)
+
+    class Meta:
+        db_table = 'abon_device'
+        unique_together = (('abon', 'device'),)
+
+
 class PassportInfo(models.Model):
     series = models.CharField(max_length=4, validators=[validators.integer_validator])
     number = models.CharField(max_length=6, validators=[validators.integer_validator])
@@ -476,8 +488,8 @@ def abontariff_del_signal(sender, instance, **kwargs):
         return True
 
 
-models.signals.post_save.connect(abon_post_save, sender=Abon)
-models.signals.post_delete.connect(abon_del_signal, sender=Abon)
+#models.signals.post_save.connect(abon_post_save, sender=Abon)
+#models.signals.post_delete.connect(abon_del_signal, sender=Abon)
 
-models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
-models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)
+#models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
+#models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)

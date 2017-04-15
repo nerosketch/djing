@@ -106,6 +106,23 @@
                             </div>
                         </div>
 
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
+                                {% if device %}
+                                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{{ device.ip_address }}">
+                                        <span class="glyphicon glyphicon-hdd"></span> {% trans 'Coupling' %} {{ device.ip_address }}
+                                    </a>
+                                    <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
+                                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove clutch' %}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'abonapp:dev' abon_group.pk abon.pk %}" class="btn btn-success btn-sm btn-modal">
+                                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add clutch' %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
                     </form>
                 </div>
             </div>
