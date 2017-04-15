@@ -482,8 +482,8 @@ def abontariff_del_signal(sender, instance, **kwargs):
         return True
 
 
-#models.signals.post_save.connect(abon_post_save, sender=Abon)
-#models.signals.post_delete.connect(abon_del_signal, sender=Abon)
+models.signals.post_save.connect(abon_post_save, sender=Abon)
+models.signals.post_delete.connect(abon_del_signal, sender=Abon)
 
-#models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
-#models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)
+models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
+models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)
