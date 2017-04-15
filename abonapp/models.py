@@ -123,7 +123,7 @@ class AbonTariff(models.Model):
         # считаем дату завершения услуги
         self.deadline = calc_obj.calc_deadline()
         # снимаем деньги за услугу
-        self.abon.make_pay(current_user, amnt, u_comment=_('service finish log'))
+        self.abon.make_pay(current_user, amnt)
         self.save()
 
     # Используется-ли услуга сейчас, если время старта есть то он активирован
@@ -235,13 +235,7 @@ class Abon(UserProfile):
         )
 
     # Платим за что-то
-    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=_('pay log')):
-        AbonLog.objects.create(
-            abon=self,
-            amount=-how_match_to_pay,
-            author=curuser,
-            comment=u_comment
-        )
+    def make_pay(self, curuser, how_match_to_pay=0.0):
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
 

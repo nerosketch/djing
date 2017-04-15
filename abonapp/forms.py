@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.http import QueryDict
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
@@ -27,6 +28,17 @@ def generate_random_password():
 
 
 class AbonForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AbonForm, self).__init__(*args, **kwargs)
+        if self.instance is not None and self.instance.group is not None:
+            abon_group_queryset = models.AbonStreet.objects.filter(group=self.instance.group)
+        elif 'group' in self.initial.keys() and self.initial['group'] is not None:
+            abon_group_queryset = models.AbonStreet.objects.filter(group=self.initial['group'])
+        else:
+            abon_group_queryset = None
+        if abon_group_queryset is not None:
+            self.fields['street'].queryset = abon_group_queryset
+
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username, widget=forms.TextInput(attrs={
         'placeholder': _('login'),
         'class': "form-control",
