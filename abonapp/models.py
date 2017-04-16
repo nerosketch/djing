@@ -360,7 +360,7 @@ class InvoiceForPayment(models.Model):
     comment = models.CharField(max_length=128)
     date_create = models.DateTimeField(auto_now_add=True)
     date_pay = models.DateTimeField(blank=True, null=True)
-    author = models.ForeignKey(UserProfile, related_name='+')
+    author = models.ForeignKey(UserProfile, related_name='+', on_delete=models.C, blank=True, null=True)
 
     def __str__(self):
         return "%s -> %.2f" % (self.abon.username, self.amount)
