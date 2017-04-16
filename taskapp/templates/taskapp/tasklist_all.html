@@ -32,14 +32,19 @@
             <tbody>
             {% for task in tasks %}
 
-                {% if task.priority == 'E' %}
-                    <tr class="success">
+                {% if task.out_date > current_date %}
+                    <tr class="text-muted">
+                {% else %}
+                    {% if task.priority == 'E' %}
+                        <tr class="success">
                     {% elif task.priority == 'C' %}
-                    <tr>
+                        <tr>
                     {% elif task.priority == 'A' %}
-                    <tr class="danger">
+                        <tr class="danger">
                     {% else %}
-                    <tr>{% endif %}
+                        <tr>
+                    {% endif %}
+                {% endif %}
 
                 <td><a href="{% url 'taskapp:view' task.id %}" target="_blank">{{ task.id }}</a></td>
                 <td>{{ task.descr }}</td>
