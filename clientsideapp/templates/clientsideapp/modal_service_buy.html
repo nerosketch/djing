@@ -18,9 +18,9 @@ And if you have already booked then just activate the service from the list orde
 
         <p>{{ service.descr }}</p>
 
-        <p>{% blocktrans %}Inbound speed: {{ service.speedIn }} MBit/s<br>
-Outgoing speed: {{service.speedOut}} MBit/s<br>
-Cost: {{ service.amount }} rubles.{% endblocktrans %}</p>
+        <p>{% blocktrans with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}Inbound speed: {{ speedIn }} MBit/s<br>
+Outgoing speed: {{ speedOut }} MBit/s<br>
+Cost: {{ amount }} rubles.{% endblocktrans %}</p>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-sm btn-primary">
