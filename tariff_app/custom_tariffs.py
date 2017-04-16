@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 from .base_intr import TariffBase
 from calendar import monthrange
@@ -23,7 +23,7 @@ class TariffDefault(TariffBase):
         time_diff = nw - self.abon_tariff.time_start if self.abon_tariff.time_start else timedelta(0)
 
         # времени в этом месяце
-        curr_month_time = timezone.datetime(nw.year, nw.month if nw.month == 12 else nw.month + 1, 1) - timedelta(days=1)
+        curr_month_time = datetime(nw.year, nw.month if nw.month == 12 else nw.month + 1, 1) - timedelta(days=1)
         curr_month_time = timedelta(days=curr_month_time.day)
 
         # Сколько это в процентах от всего месяца (k - коеффициент)
@@ -38,7 +38,7 @@ class TariffDefault(TariffBase):
     def calc_deadline(self):
         nw = timezone.now()
         last_day = monthrange(nw.year, nw.month)[1]
-        last_month_date = timezone.datetime(year=nw.year, month=nw.month, day=last_day,
+        last_month_date = datetime(year=nw.year, month=nw.month, day=last_day,
                                    hour=23, minute=59, second=59)
         return timezone.make_aware(last_month_date)
 
@@ -59,13 +59,19 @@ class TariffDp(TariffDefault):
         return 'Как в IS'
 
 
-class TariffCp(TariffDefault):
-    def calc_amount(self):
-        return 12.6
+# Как в IS только не на время, а на 10 лет
+class TariffCp(TariffDp):
+
+    def calc_deadline(self):
+        # делаем время окончания услуги на 10 лет вперёд
+        nw = timezone.now()
+        long_long_time = datetime(year=nw.year+10, month=nw.month, day=nw.day,
+                                  hour=23, minute=59, second=59)
+        return timezone.make_aware(long_long_time)
 
     @staticmethod
     def description():
-        return 'Пользовательский'
+        return 'Для внутреннего пользования'
 
 
 # Первый - всегда по умолчанию

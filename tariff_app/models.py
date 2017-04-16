@@ -19,7 +19,6 @@ class Tariff(models.Model):
     speedIn = models.FloatField(default=0.0)
     speedOut = models.FloatField(default=0.0)
     amount = models.FloatField(default=0.0)
-    time_of_action = models.IntegerField(default=30)
     calc_type = models.CharField(max_length=2, default=TARIFF_CHOICES[0][0], choices=_TariffChoicesAdapter())
     is_admin = models.BooleanField(default=False)
 
