@@ -302,6 +302,7 @@ class Abon(UserProfile):
 
                 # удаляем запись о текущей услугу.
                 at.delete()
+                return
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
