@@ -11,7 +11,6 @@
             <th>{% trans 'Sum' %}</th>
             <th>{% trans 'Input speed' %}</th>
             <th>{% trans 'Output speed' %}</th>
-            <th>{% trans 'Time of action' %}</th>
             <th>{% trans 'Edit' %}</th>
         </tr>
         </thead>
@@ -34,7 +33,6 @@
                 <td>{{ trf.tariff.amount }}</td>
                 <td>{{ trf.tariff.speedIn }}</td>
                 <td>{{ trf.tariff.speedOut }}</td>
-                <td>{{ trf.tariff.time_of_action }}</td>
                 {% if trf.id != active_abontariff_id %}
                     <td class="btn-group">
 
@@ -76,7 +74,7 @@
             </tr>
         {% empty %}
             <tr>
-                <td colspan="7">{% trans 'Services of subscribers not found' %}.
+                <td colspan="6">{% trans 'Services of subscribers not found' %}.
                     {% if perms.abonapp.can_buy_tariff %}
                         <a href="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}" class="lgtbx">{% trans 'Buy' %}</a>
                     {% endif %}
@@ -87,7 +85,7 @@
         {% if perms.abonapp.can_buy_tariff %}
             <tfoot>
             <tr>
-                <th colspan="7">
+                <th colspan="6">
                     <a href="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}" class="btn btn-sm btn-success">
                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Buy service' %}
                     </a>
