@@ -515,10 +515,6 @@ msgstr "Входящая скорость"
 msgid "Output speed"
 msgstr "Исходящая скорость"
 
-#: abonapp/templates/abonapp/services.html:14
-msgid "Time of action"
-msgstr "Время действия"
-
 #: abonapp/templates/abonapp/services.html:15
 msgid "Edit"
 msgstr "Ред."
