@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block main %}
 
-
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">Тарифы</li>
@@ -38,12 +37,6 @@
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th>
-                    <a href="{% url 'tarifs:home' %}?order_by=time_of_action&dir={{ dir|default:"down" }}">
-                        Время действия
-                    </a>
-                    {% if order_by == 'time_of_action' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
-                </th>
                 <th width="250">Название скрипта</th>
                 <th width="50">Do</th>
             </tr>
@@ -61,7 +54,6 @@
                     <td>{{ tar.speedIn }}</td>
                     <td>{{ tar.speedOut }}</td>
                     <td>{{ tar.amount }} руб</td>
-                    <td>{{ tar.time_of_action }} дней</td>
                     <td>{{ tar.get_calc_type_display }}</td>
                     <td>
                         {% if perms.tariff_app.delete_tariff %}
@@ -73,7 +65,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="7">Ещё нет созданных тарифов.
+                    <td colspan="6">Ещё нет созданных тарифов.
                         {% if perms.tariff_app.add_tariff %}
                             <a href="{% url 'tarifs:add' %}" class="lgtbx">Создать</a>
                         {% endif %}
@@ -85,7 +77,7 @@
             {% if perms.tariff_app.add_tariff %}
             <tfoot>
             <tr>
-                <td colspan="7">
+                <td colspan="6">
                     <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
                         <span class="glyphicon glyphicon-plus"></span> Добавить
                     </a>
