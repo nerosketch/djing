@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
-from django.utils import timezone
 from datetime import date
 from .models import Task
 from mydefs import pag_mn, only_admins, safe_int, MultipleException
@@ -68,8 +67,7 @@ def all_tasks(request):
     tasks = Task.objects.all()
     tasks = pag_mn(request, tasks)
     return render(request, 'taskapp/tasklist_all.html', {
-        'tasks': tasks,
-        'current_date': timezone.now()
+        'tasks': tasks
     })
 
 

@@ -32,7 +32,7 @@
             <tbody>
             {% for task in tasks %}
 
-                {% if task.out_date > current_date %}
+                {% if task.is_outdated %}
                     <tr class="text-muted">
                 {% else %}
                     {% if task.priority == 'E' %}
