@@ -91,13 +91,13 @@ msgstr ""
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:21
 #, python-format
 msgid ""
-"Inbound speed: %(service.speedIn)s MBit/s<br>\n"
-"Outgoing speed: %(service.speedOut)s MBit/s<br>\n"
-"Cost: %(service.amount)s rubles."
+"Inbound speed: %(speedIn)s MBit/s<br>\n"
+"Outgoing speed: %(speedOut)s MBit/s<br>\n"
+"Cost: %(amount)s rubles."
 msgstr ""
-"Входящая скорость: %(service.speedIn)s MBit/s<br>\n"
-"Исходящая скорость: %(service.speedOut)s MBit/s<br>\n"
-"Стоимость: %(service.amount)s руб."
+"Входящая скорость: %(speedIn)s MBit/s<br>\n"
+"Исходящая скорость: %(speedOut)s MBit/s<br>\n"
+"Стоимость: %(amount)s руб."
 
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:27
 msgid "Pick"
