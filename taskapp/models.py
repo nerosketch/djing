@@ -101,8 +101,8 @@ class Task(models.Model):
     def get_attachment_fname(self):
         return os.path.basename(self.attachment.name)
 
-    def is_outdated(self):
-        return self.out_date < timezone.now().date()
+    def is_relevant(self):
+        return self.out_date < timezone.now().date() or self.state == 'F'
 
 
 def task_handler(sender, instance, **kwargs):

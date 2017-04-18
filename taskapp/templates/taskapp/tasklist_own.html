@@ -19,7 +19,7 @@
             <tbody>
             {% for task in tasks %}
 
-                {% if task.is_outdated %}
+                {% if task.is_relevant %}
                     <tr class="text-muted">
                 {% else %}
                     {% if task.priority == 'E' %}
