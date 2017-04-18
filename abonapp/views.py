@@ -264,8 +264,9 @@ def abonhome(request, gid, uid):
                             abon.ip_address = ip
                         except MultipleObjectsReturned:
                             ips = models.IpPoolItem.objects.filter(ip=ip_str)
-                            ips[1:].delete()
-                            abon.ip_address = ips[0]
+                            one_ip = ips[0]
+                            models.IpPoolItem.objects.filter(pk__in=[ip.pk for ip in ips if ip != one_ip]).delete()
+                            abon.ip_address = one_ip
                     else:
                         abon.ip_address = None
                 frm.save()
