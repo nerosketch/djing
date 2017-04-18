@@ -331,15 +331,15 @@ class Abon(UserProfile):
 
 
 class AbonDevice(models.Model):
-    abon = models.OneToOneField(Abon)
-    device = models.OneToOneField('devapp.Device')
+    abon = models.ForeignKey(Abon)
+    device = models.ForeignKey('devapp.Device')
 
     def __str__(self):
         return "%s - %s" % (self.abon, self.device)
 
     class Meta:
         db_table = 'abon_device'
-        unique_together = (('abon', 'device'),)
+        unique_together = ('abon', 'device')
 
 
 class PassportInfo(models.Model):
