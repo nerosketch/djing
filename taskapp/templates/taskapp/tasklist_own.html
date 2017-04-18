@@ -7,12 +7,12 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-sm-4">{% trans 'Description' %}</th>
+                <th class="col-sm-3">{% trans 'Name' %}</th>
+                <th class="col-sm-1">{% trans 'Address' %}</th>
                 <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
+                <th class="col-sm-4">{% trans 'Description' %}</th>
                 <th class="col-sm-1">{% trans 'Condition' %}</th>
-                <th class="col-sm-1">{% trans 'A priority' %}</th>
                 <th class="col-sm-1">{% trans 'Date of create' %}</th>
-                <th class="col-sm-3">{% trans 'Attachment' %}</th>
                 <th class="col-sm-1">{% trans 'Actions' %}</th>
             </tr>
             </thead>
@@ -34,12 +34,20 @@
                 {% endif %}
 
                 <td><a href="{% url 'taskapp:view' task.id %}" target="_blank">{{ task.id }}</a></td>
-                <td>{{ task.descr }}</td>
+
+                {% if task.abon and task.abon.group %}
+                    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank">{{ task.abon.get_full_name }}</a></td>
+                    <td>{{ task.abon.street|default:_('Not assigned') }} {{ task.abon.house|default:_('Not assigned') }}</td>
+                {% else %}
+                    <td>{% trans 'User does not exist' %}</td>
+                    <td>---</td>
+                {% endif %}
+
                 <td>{{ task.get_mode_display }}</td>
+                <td>{{ task.descr }}</td>
                 <td>{{ task.get_state_display }}</td>
-                <td>{{ task.get_priority_display }}</td>
                 <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
-                <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.get_attachment_fname|truncatechars:32 }}</a>{% else %}&horbar;{% endif %}</td>
+
                 <td class="btn-group btn-group-justified">
                     {% if perms.taskapp.change_task %}
                     <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">

@@ -7,7 +7,7 @@ from abonapp.models import Abon
 from django.utils.translation import ugettext as _
 from datetime import date
 from .models import Task
-from mydefs import pag_mn, only_admins, safe_int, MultipleException
+from mydefs import pag_mn, only_admins, safe_int, MultipleException, RuTimedelta
 from .forms import TaskFrm
 
 
@@ -91,7 +91,7 @@ def view(request, task_id):
     time_diff = tsk.out_date - toc
     return render(request, 'taskapp/view.html', {
         'task': tsk,
-        'time_diff': time_diff
+        'time_diff': RuTimedelta(time_diff)
     })
 
 
@@ -148,7 +148,7 @@ def task_add_edit(request, task_id=0):
         elif uid:
             selected_abon = Abon.objects.get(username=str(uid))
     except Abon.DoesNotExist:
-        messages.warning(request, _("User '%s' does not exist") % str(uid))
+        messages.warning(request, _("User does not exist"))
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)

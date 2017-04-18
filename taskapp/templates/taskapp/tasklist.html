@@ -7,14 +7,13 @@
             <thead>
             <tr>
                 <th>#</th>
+                <th class="col-sm-3">{% trans 'Name' %}</th>
+                <th class="col-sm-1">{% trans 'Address' %}</th>
+                <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
                 <th class="col-sm-4">{% trans 'Description' %}</th>
                 <th class="col-sm-1">{% trans 'Task author' %}</th>
-                <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
-                <th class="col-sm-1">{% trans 'Condition' %}</th>
-                <th class="col-sm-1">{% trans 'A priority' %}</th>
                 <th class="col-sm-1">{% trans 'Date of create' %}</th>
-                <th class="col-sm-1">{% trans 'Attachment' %}</th>
-                <th class="col-sm-2" colspan="3">{% trans 'Actions' %}</th>
+                <th class="col-sm-1">{% trans 'Actions' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -35,14 +34,22 @@
                 {% endif %}
 
                 <td><a href="{% url 'taskapp:view' task.id %}" target="_blank">{{ task.id }}</a></td>
-                <td>{{ task.descr }}</td>
-                <td><a href="{% url 'acc_app:other_profile' task.author.id %}" title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
+
+                {% if task.abon and task.abon.group %}
+                    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank">{{ task.abon.get_full_name }}</a></td>
+                    <td>{{ task.abon.street|default:_('Not assigned') }} {{ task.abon.house|default:_('Not assigned') }}</td>
+                {% else %}
+                    <td>{% trans 'User does not exist' %}</td>
+                    <td>---</td>
+                {% endif %}
+
                 <td>{{ task.get_mode_display }}</td>
-                <td>{{ task.get_state_display }}</td>
-                <td>{{ task.get_priority_display }}</td>
+                <td>{{ task.descr }}</td>
+                <td><a href="{% url 'acc_app:other_profile' task.author.pk %}"
+                       title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
                 <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
-                <td>{% if task.attachment %}<a href="{{ task.attachment.url }}" target="_blank">{{ task.get_attachment_fname|truncatechars:32|truncatechars:32 }}</a>{% else %}&horbar;{% endif %}</td>
-                <td colspan="3" class="btn-group btn-group-justified">
+
+                <td class="btn-group btn-group-justified">
                     <a href="{% url 'taskapp:begin' task.id %}" class="btn btn-primary btn-xs" title="{% trans 'Begin' %}">
                         <span class="glyphicon glyphicon-cog"></span>
                     </a>
@@ -58,13 +65,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="11">{% trans 'The list is empty' %}</td>
+                    <td colspan="8">{% trans 'The list is empty' %}</td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="11">
+                <td colspan="8">
                     {% include 'taskapp/footer_btns.html' %}
                 </td>
             </tr>
