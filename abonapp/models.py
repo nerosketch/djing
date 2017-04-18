@@ -420,7 +420,7 @@ class AbonRawPassword(models.Model):
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
     if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = 3600
+        timeout = 14400
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
