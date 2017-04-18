@@ -110,7 +110,7 @@
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
                                 {% if device %}
                                     <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{{ device.ip_address }}">
-                                        <span class="glyphicon glyphicon-hdd"></span> {% trans 'Coupling' %} {{ device.ip_address }}
+                                        <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
                                     </a>
                                     <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
                                         <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove clutch' %}
