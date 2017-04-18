@@ -660,12 +660,10 @@ def dev(request, gid, uid):
             dev = Device.objects.get(pk=request.POST.get('dev'))
             abon = models.Abon.objects.get(pk=uid)
             try:
-                abdev = models.AbonDevice.objects.get(device=dev)
-                abdev.abon = abon
-                abdev.save(update_fields=['abon'])
+                models.AbonDevice.objects.get(device=dev, abon=abon)
             except models.AbonDevice.DoesNotExist:
                 models.AbonDevice.objects.create(abon=abon, device=dev)
-            messages.success(request, _('Device has successfully attached'))
+                messages.success(request, _('Device has successfully attached'))
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
         else:
             abon_dev = models.AbonDevice.objects.get(abon=uid).device
