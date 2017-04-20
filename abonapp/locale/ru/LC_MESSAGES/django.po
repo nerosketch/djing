@@ -515,10 +515,6 @@ msgstr "Входящая скорость"
 msgid "Output speed"
 msgstr "Исходящая скорость"
 
-#: abonapp/templates/abonapp/services.html:15
-msgid "Edit"
-msgstr "Ред."
-
 #: abonapp/templates/abonapp/services.html:52
 msgid "Priority up"
 msgstr "Повысить приоритет"
@@ -745,3 +741,9 @@ msgstr "Устройство успешно прикреплено"
 
 msgid "Device has successfully unattached"
 msgstr "Устройство успешно откреплено"
+
+msgid "Works until"
+msgstr "Действует до"
+
+msgid "Do"
+msgstr "Действия"

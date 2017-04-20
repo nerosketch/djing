@@ -5,8 +5,8 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
-        <li><a href="{% url 'abonapp:people_list' abon_group.id %}">{{ abon_group.title }}</a></li>
-        <li><a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:people_list' abon_group.pk %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' abon_group.pk abon.pk %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Pick a service' %}</li>
     </ol>
 
@@ -15,23 +15,43 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Pick a service for' %}
-                <a href="{% url 'abonapp:abon_home' abon_group.id abon.id %}"><u>{% trans 'Sub' %}</u></a>
+                <a href="{% url 'abonapp:abon_home' abon_group.pk abon.pk %}"><u>{% trans 'Sub' %}</u></a>
             </h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.id abon.id %}"
+            <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
                     <label for="id_tariff">{% trans 'Pick a service' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
-                        <select class="form-control" name="tariff">
+                        <select class="form-control" name="tariff" id="id_tariffs">
                             {% for trf in tariffs %}
-			    <option value="{{ trf.pk }}">{{ trf.title }}. {{ trf.amount }}{% trans 'currency' %}</option>
+            			    <option value="{{ trf.pk }}" data-deadline="{{ trf.calc_deadline|date:"Y-m-d" }}">
+                                {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %}
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
+                    {% if not abon.active_tariff %}
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        <input type="text" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:"Y-m-d" }}">
+                        <script type="text/javascript" src="/static/js/datetime_with_moment.min.js"></script>
+                        <script type="text/javascript">
+                            $(function () {
+                                $('#id_deadline').datetimepicker({
+                                    format: 'YYYY-MM-DD'
+                                });
+                                $('#id_tariffs').on('change', function(){
+                                    var a = $(this).find('option:selected');
+                                    $('#id_deadline').val(a.attr('data-deadline'));
+                                });
+                            });
+                        </script>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">

@@ -18,6 +18,7 @@ from . import models
 from ip_pool.models import IpPoolItem
 import mydefs
 from devapp.models import Device
+from datetime import datetime
 
 
 @login_required
@@ -397,7 +398,12 @@ def pick_tariff(request, gid, uid):
     try:
         if request.method == 'POST':
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
-            abon.pick_tariff(trf, request.user)
+            deadline = request.POST.get('deadline')
+            if deadline == '' or deadline is None:
+                abon.pick_tariff(trf, request.user)
+            else:
+                deadline = datetime.strptime(deadline, '%Y-%m-%d')
+                abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except (models.LogicError, NasFailedResult) as e:
@@ -410,6 +416,8 @@ def pick_tariff(request, gid, uid):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except ValueError as e:
+        messages.error(request, "%s: %s" % (_('fix form errors'), e))
 
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,

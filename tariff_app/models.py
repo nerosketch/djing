@@ -30,5 +30,10 @@ class Tariff(models.Model):
             assert issubclass(res_type, TariffBase)
             return res_type
 
+    def calc_deadline(self):
+        calc_type = self.get_calc_type()
+        calc_obj = calc_type(self)
+        return calc_obj.calc_deadline()
+
     def __str__(self):
         return "%s (%.2f)" % (self.title, self.amount)

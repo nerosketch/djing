@@ -112,7 +112,7 @@ class AbonTariff(models.Model):
         return round(amount, 2)
 
     # Активируем тариф
-    def activate(self, current_user):
+    def activate(self, current_user, deadline=None):
         calc_obj = self.tariff.get_calc_type()(self)
         amnt = self.tariff.amount
         # если не хватает денег
@@ -121,7 +121,10 @@ class AbonTariff(models.Model):
         # считаем дату активации услуги
         self.time_start = timezone.now()
         # считаем дату завершения услуги
-        self.deadline = calc_obj.calc_deadline()
+        if deadline is None:
+            self.deadline = calc_obj.calc_deadline()
+        else:
+            self.deadline = deadline
         # снимаем деньги за услугу
         self.abon.make_pay(current_user, amnt)
         self.save()
@@ -225,7 +228,6 @@ class Abon(UserProfile):
             return ats[0].tariff
         else:
             self._act_tar_cache = None
-            return
 
     class Meta:
         db_table = 'abonent'
@@ -250,7 +252,7 @@ class Abon(UserProfile):
         self.ballance += amount
 
     # покупаем тариф
-    def pick_tariff(self, tariff, author, comment=None):
+    def pick_tariff(self, tariff, author, comment=None, deadline=None):
         assert isinstance(tariff, Tariff)
 
         # выбераем связь ТарифАбонент с самым низким приоритетом
@@ -267,7 +269,7 @@ class Abon(UserProfile):
         # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
         if not abtrf:
             # значит пробуем её активировать
-            new_abtar.activate(author)
+            new_abtar.activate(author, deadline)
         else:
             new_abtar.save()
 
