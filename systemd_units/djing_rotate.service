@@ -1,0 +1,12 @@
+[Unit]
+Description=A job for rotate djing netflow data
+
+[Service]
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/bin"
+Type=oneshot
+ExecStart=/bin/bash -c "kill -HUP `cat /run/flow.pid.6343`"
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

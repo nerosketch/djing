@@ -1,0 +1,11 @@
+[Unit]
+Description=Run every one minute rotate flows for djing
+
+[Timer]
+OnCalendar=*-*-* *:*:59
+Persistent=true
+RandomizedDelaySec=5
+Unit=djing_rotate.service
+
+[Install]
+WantedBy=timers.target
