@@ -4,6 +4,7 @@ import os
 import socket
 import collections
 from django.utils.translation import ugettext as _
+from urllib3.exceptions import ProtocolError
 from .models import TelegramBot, ChatException
 from chatbot.models import MessageHistory
 from accounts_app.models import UserProfile
@@ -133,3 +134,6 @@ def send_notify(msg_text, account):
         tbot.sendMessage(tb.chat_id, msg_text)
     except TelegramBot.DoesNotExist:
         raise ChatException(_("Recipient '%s' does not subscribed on notifications") % account.get_full_name())
+    except ProtocolError as e:
+        raise ChatException(e)
+
