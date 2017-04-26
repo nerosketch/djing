@@ -1,7 +1,6 @@
 #!/bin/sh
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/home/dn/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
 
-flow-capture -R /home/dn/bin/netflow_handler.py -w /var/db/flows -n1 -N0 0.0.0.0/0.0.0.0/8888
+flow-capture -R /srv/http/djing/agent/netflow/netflow_handler.sh -p /run/flow.pid -w /tmp/djing_flow -n1 -N0 0/0/6343
 
-softflowd -v 5 -i wlp3s0 -n 127.0.0.1:8888
