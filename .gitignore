@@ -12,3 +12,5 @@ gmap/fixtures
 *.json
 *.bak
 *.mo
+agent/netflow/djing_flow
+
