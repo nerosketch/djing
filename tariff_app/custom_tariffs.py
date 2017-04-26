@@ -56,7 +56,7 @@ class TariffDp(TariffDefault):
 
     @staticmethod
     def description():
-        return 'Как в IS'
+        return 'IS'
 
 
 # Как в IS только не на время, а на 10 лет
