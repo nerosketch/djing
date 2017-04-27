@@ -72,10 +72,10 @@ msgstr "Вы уверены что хотите заказать услугу?"
 #, python-format
 msgid ""
 "Your current service <a href=\"#dv\">%(current_service.title)s</a>\n"
-"for the <b>%(current_service.amount)s</b> rub."
+"for the <b>%(amount)s</b> rub."
 msgstr ""
 "Ваша текущая услуга <a href=\"#dv\">%(current_service.title)s</a>\n"
-"за <b>%(current_service.amount)s</b> руб."
+"за <b>%(amount)s</b> руб."
 
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:13
 msgid ""
