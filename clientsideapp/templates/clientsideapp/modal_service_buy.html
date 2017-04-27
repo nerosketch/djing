@@ -7,8 +7,8 @@
     <div class="modal-body">
         <h3>{% trans 'Are you sure you want to order the service?' %}</h3>
         {% if current_service %}
-            <p>{% blocktrans %}Your current service <a href="#dv">{{ current_service.title }}</a>
-for the <b>{{ current_service.amount }}</b> rub.{% endblocktrans %}</p>
+            <p>{% blocktrans with amount=current_service.amount %}Your current service <a href="#dv">{{ current_service.title }}</a>
+for the <b>{{ amount }}</b> rub.{% endblocktrans %}</p>
         {% else %}
             <p>{% blocktrans %}You do not have an active service for the use of resources required service purchase from the selection below.<br>
 And if you have already booked then just activate the service from the list ordered.{% endblocktrans %}</p>
@@ -18,9 +18,10 @@ And if you have already booked then just activate the service from the list orde
 
         <p>{{ service.descr }}</p>
 
-        <p>{% blocktrans with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}Inbound speed: {{ speedIn }} MBit/s<br>
+        <!--<p>{% blocktrans with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}Inbound speed: {{ speedIn }} MBit/s<br>
 Outgoing speed: {{ speedOut }} MBit/s<br>
-Cost: {{ amount }} rubles.{% endblocktrans %}</p>
+Cost: {{ amount }} rubles.{% endblocktrans %}</p>-->
+        <p>Стоимость {{ service.amount }} руб.</p>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-sm btn-primary">
