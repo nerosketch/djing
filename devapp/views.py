@@ -102,12 +102,14 @@ def devview(request, did):
     ports = None
     uptime = 0
     dev = get_object_or_404(Device, id=did)
+    template_name = 'devapp/ports.html'
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
                 manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
                 uptime = manager.uptime()
                 ports = manager.get_ports()
+                template_name = manager.get_template_name()
             else:
                 messages.warning(request, _('Not Set snmp device password'))
         else:
@@ -117,7 +119,7 @@ def devview(request, did):
     except EasySNMPError:
         messages.error(request, _('SNMP error on device'))
 
-    return render(request, 'devapp/ports.html', {
+    return render(request, template_name, {
         'dev': dev,
         'ports': ports,
         'uptime': uptime

@@ -24,6 +24,10 @@ class DevBase(object, metaclass=ABCMeta):
     def uptime(self):
         pass
 
+    @abstractmethod
+    def get_template_name(self):
+        """Получаем путь к html шаблону отображения устройства"""
+
 
 class BasePort(object, metaclass=ABCMeta):
     def __init__(self, num, name, status, mac, speed):
