@@ -53,8 +53,8 @@ class TariffStruct(BaseStruct):
 
     def __init__(self, tariff_id=0, speedIn=None, speedOut=None):
         self.tid = tariff_id
-        self.speedIn = speedIn if speedIn is not None else 0.0625
-        self.speedOut = speedOut if speedOut is not None else 0.0625
+        self.speedIn = speedIn if speedIn is not None else 0.001
+        self.speedOut = speedOut if speedOut is not None else 0.001
 
     def serialize(self):
         dt = pack("!Iff", int(self.tid), float(self.speedIn), float(self.speedOut))

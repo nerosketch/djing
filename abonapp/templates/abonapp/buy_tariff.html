@@ -29,7 +29,7 @@
                         <select class="form-control" name="tariff" id="id_tariffs">
                             {% for trf in tariffs %}
             			    <option value="{{ trf.pk }}" data-deadline="{{ trf.calc_deadline|date:"Y-m-d" }}">
-                                {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %}
+				    {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %} (Вх:{{ trf.speedIn }}MBit/s. Исх:{{ trf.speedOut }} MBit/s)
                             </option>
                             {% endfor %}
                         </select>
