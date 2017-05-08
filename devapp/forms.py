@@ -25,7 +25,7 @@ class DeviceForm(forms.ModelForm):
             }),
             'man_passw': forms.PasswordInput(attrs={
                 'class': 'form-control'
-            }),
+            }, render_value=True),
             'map_dot': forms.Select(attrs={
                 'class': 'form-control'
             }),
