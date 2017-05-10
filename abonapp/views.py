@@ -2,7 +2,7 @@
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
-from django.db import IntegrityError
+from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
@@ -570,13 +570,14 @@ def log_page(request):
 @mydefs.only_admins
 def debtors(request):
     # peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
-    #peoples_list = mydefs.pag_mn(request, peoples_list)
+    # peoples_list = mydefs.pag_mn(request, peoples_list)
     invs = models.InvoiceForPayment.objects.filter(status=True)
     invs = mydefs.pag_mn(request, invs)
     return render(request, 'abonapp/debtors.html', {
-        #'peoples': peoples_list
+        # 'peoples': peoples_list
         'invoices': invs
     })
+
 
 @login_required
 @mydefs.only_admins
@@ -704,6 +705,48 @@ def clear_dev(request, gid, uid):
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
+@login_required
+@mydefs.only_admins
+def charts(request, gid, uid):
+    from statistics.models import getModel
+    from datetime import datetime, date, time, timedelta
+    try:
+        StatElem = getModel()
+        abon = models.Abon.objects.get(pk=uid)
+        if abon.group is None:
+            abon.group = models.AbonGroup.objects.get(pk=gid)
+            abon.save(update_fields=['group'])
+        abongroup = abon.group
+
+        if abon.ip_address is None:
+            charts_data = None
+        else:
+            charts_data = StatElem.objects.filter(ip=abon.ip_address.ip)
+            oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
+            charts_data = ["{x:%d,y:%d}" % (cd.cur_time.timestamp(), cd.octets) for cd in charts_data if
+                           cd.octets < oct_limit and cd.octets > 102400]
+
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('Abon does not exist'))
+        return redirect('abonapp:people_list', gid)
+    except models.AbonGroup.DoesNotExist:
+        messages.error(request, _("Group what you want doesn't exist"))
+        return redirect('abonapp:group_list')
+    except ProgrammingError as e:
+        messages.error(request, e)
+        return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+    midnight = datetime.combine(date.today(), time.min)
+
+    return render(request, 'abonapp/charts.html', {
+        'abon_group': abongroup,
+        'abon': abon,
+        'charts_data': ','.join(charts_data),
+        'time_min': midnight.timestamp(),
+        'time_max': (midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp()
+    })
+
+
 # API's
 
 def abons(request):
@@ -731,5 +774,5 @@ def abons(request):
 def search_abon(request):
     word = request.GET.get('s')
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = [{'id':usr.pk, 'name':usr.username, 'fio':usr.fio} for usr in results]
+    results = [{'id': usr.pk, 'name': usr.username, 'fio': usr.fio} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))

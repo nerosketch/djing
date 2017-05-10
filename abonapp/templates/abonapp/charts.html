@@ -1,0 +1,48 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">График использования</h3>
+                </div>
+                <div class="panel-body">
+                    <canvas id="netChart" width="300" height="100"></canvas>
+                    <script type="text/javascript">
+                        var myChart = new Chart('netChart', {
+                            type: 'line',
+                            data: {
+                                datasets: [{
+                                    label: 'Траффик абонента',
+                                    data: [{{ charts_data }}],
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    lineTension: 0.1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    xAxes: [{
+                                        type: 'time',
+                                        time: {
+                                            unit: 'hour',
+                                            min: {{ time_min }},
+                                            max: {{ time_max }},
+                                            displayFormats: {
+                                                hour: 'HH:MM:SS'
+                                            }
+                                        },
+                                        position: 'bottom'
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
