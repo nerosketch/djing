@@ -93,6 +93,9 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
     def from_db_value(value, expression, connection, context):
         return int2ip(value)
 
+    def int_ip(self):
+        return ip2int(self)
+
 
 # Предназначен для Django CHOICES чтоб можно было передавать классы вместо просто описания поля,
 # классы передавать для того чтоб по значению кода из базы понять какой класс нужно взять для нужной функциональности.
