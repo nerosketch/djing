@@ -15,11 +15,11 @@
                             type: 'line',
                             data: {
                                 datasets: [{
-                                    label: 'Траффик абонента',
+                                    label: 'Траффик в Mbit/s',
                                     data: [{{ charts_data }}],
                                     borderWidth: 1,
-                                    pointRadius: 1,
-                                    lineTension: 0.1
+                                    pointRadius: 0,
+                                    lineTension: 0
                                 }]
                             },
                             options: {
@@ -29,12 +29,15 @@
                                         time: {
                                             unit: 'hour',
                                             min: {{ time_min }},
-                                            max: {{ time_max }},
-                                            displayFormats: {
-                                                hour: 'HH:MM:SS'
-                                            }
+                                            max: {{ time_max }}
                                         },
                                         position: 'bottom'
+                                    }],
+                                    yAxes: [{
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Mbit/s'
+                                        }
                                     }]
                                 }
                             }
