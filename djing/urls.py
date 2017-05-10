@@ -10,7 +10,6 @@ urlpatterns = [
     url(r'^accounts/', include('accounts_app.urls', namespace='acc_app')),
     url(r'^abons/', include('abonapp.urls', namespace='abonapp')),
     url(r'^tarifs/', include('tariff_app.urls', namespace='tarifs')),
-    url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
     url(r'^search/', include('searchapp.urls', namespace='searchapp')),
     url(r'^dev/', include('devapp.urls', namespace='devapp')),
     url(r'^map/', include('mapapp.urls', namespace='mapapp')),

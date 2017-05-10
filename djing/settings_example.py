@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'photo_app',
     'abonapp',
     'tariff_app',
-    'ip_pool',
     'searchapp',
     'devapp',
     'mapapp',

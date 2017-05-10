@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('accounts_app', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('ip_pool', '0001_initial'),
         ('tariff_app', '0001_initial'),
     ]
 
@@ -101,12 +100,6 @@ class Migration(migrations.Migration):
             name='group',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
                                     to='abonapp.AbonGroup'),
-        ),
-        migrations.AddField(
-            model_name='abon',
-            name='ip_address',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                       to='ip_pool.IpPoolItem'),
         ),
         migrations.AlterUniqueTogether(
             name='abontariff',

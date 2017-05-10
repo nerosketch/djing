@@ -63,13 +63,6 @@
                     <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
                 </a></li>
 
-
-            {% url 'ip_pool:home' as ip_pool_home %}
-            <li{% if ip_pool_home in request.path %} class="active"{% endif %}>
-                <a href="{{ ip_pool_home }}">
-                    <span class="glyphicon glyphicon-compressed"></span> ip пул
-                </a></li>
-
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_groups }}">
