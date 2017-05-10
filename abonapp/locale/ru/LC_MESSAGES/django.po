@@ -732,3 +732,9 @@ msgstr "Для абонента не найдены паспортные дан�
 
 msgid "currency"
 msgstr "руб"
+
+msgid "Charts"
+msgstr "Графики"
+
+msgid "Group what you want doesn't exist"
+msgstr "Указанная вами группа не найдена"
