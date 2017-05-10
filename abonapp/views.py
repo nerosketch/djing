@@ -745,7 +745,7 @@ def charts(request, gid, uid):
     return render(request, 'abonapp/charts.html', {
         'abon_group': abongroup,
         'abon': abon,
-        'charts_data': ','.join(charts_data),
+        'charts_data': ','.join(charts_data) if charts_data is not None else None,
         'time_min': int(midnight.timestamp()),
         'time_max': int((midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp())
     })
