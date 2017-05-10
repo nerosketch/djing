@@ -710,6 +710,9 @@ def clear_dev(request, gid, uid):
 def charts(request, gid, uid):
     from statistics.models import getModel
     from datetime import datetime, date, time, timedelta
+
+    def byte_to_mbit(x):
+        return ((x/60)*8)/2**20
     try:
         StatElem = getModel()
         abon = models.Abon.objects.get(pk=uid)
@@ -722,9 +725,10 @@ def charts(request, gid, uid):
             charts_data = None
         else:
             charts_data = StatElem.objects.filter(ip=abon.ip_address.ip)
-            oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
-            charts_data = ["{x:%d,y:%d}" % (cd.cur_time.timestamp(), cd.octets) for cd in charts_data if
-                           cd.octets < oct_limit and cd.octets > 102400]
+            oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.01)
+            # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
+            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data if
+                           cd.octets < oct_limit]
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -742,8 +746,8 @@ def charts(request, gid, uid):
         'abon_group': abongroup,
         'abon': abon,
         'charts_data': ','.join(charts_data),
-        'time_min': midnight.timestamp(),
-        'time_max': (midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp()
+        'time_min': int(midnight.timestamp()),
+        'time_max': int((midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp())
     })
 
 
