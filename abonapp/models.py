@@ -333,7 +333,7 @@ class Abon(UserProfile):
 
     def save(self, *args, **kwargs):
         # проверяем не-ли у кого такого-же ip
-        if Abon.objects.filter(ip_address=self.ip_address).count() > 0:
+        if Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
