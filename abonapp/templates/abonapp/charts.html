@@ -9,6 +9,7 @@
                     <h3 class="panel-title">График использования</h3>
                 </div>
                 <div class="panel-body">
+                    {% if charts_data %}
                     <canvas id="netChart" width="300" height="100"></canvas>
                     <script type="text/javascript">
                         var myChart = new Chart('netChart', {
@@ -43,6 +44,9 @@
                             }
                         });
                     </script>
+                    {% else %}
+                    <h2>Данные не переданы</h2>
+                    {% endif %}
                 </div>
             </div>
         </div>
