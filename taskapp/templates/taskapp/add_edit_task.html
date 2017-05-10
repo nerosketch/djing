@@ -4,8 +4,8 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-	<li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
-	<li class="active">{% if task_id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
+	    <li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
+	    <li class="active">{% if task_id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
     </ol>
 
     {% include 'message_block.html' %}
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="form-group">
-		<label for="id_mode">{% trans 'The nature of the damage' %}</label>
+		        <label for="id_mode">{% trans 'The nature of the damage' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-pawn"></span></span>
@@ -40,7 +40,7 @@
                 </div>
             </div>
             <div class="form-group">
-		<label for="id_priority">{% trans 'A priority' %}</label>
+		        <label for="id_priority">{% trans 'A priority' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="form-group">
-		    <label for="id_state">{% trans 'Condition' %}</label>
+		        <label for="id_state">{% trans 'Condition' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-retweet"></span></span>
@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div class="form-group">
-		<label for="id_abon">{% trans 'Subscriber' %}</label>
+		        <label for="id_abon">{% trans 'Subscriber' %}</label>
 
                 <div class="input-group selectajax">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -72,13 +72,12 @@
                 </div>
             </div>
             <div class="form-group">
-		<label for="id_out_date">{% trans 'Reality (the date by which you must complete the task)' %}</label>
+		        <label for="id_out_date">{% trans 'Reality (the date by which you must complete the task)' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     {{ form.out_date }}{{ form.out_date.errors }}
                 </div>
-                <script type="text/javascript" src="/static/js/datetime_with_moment.min.js"></script>
                 <script type="text/javascript">
                     $(function () {
                         $('#id_out_date').datetimepicker({

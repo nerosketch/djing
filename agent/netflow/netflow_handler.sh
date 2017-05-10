@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 FNAME="$1"
 
@@ -14,11 +14,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
 TMP_DUMP=/tmp/djing_flow/djing_flow_dump.tmp
 
 cd $CUR_DIR
-
+mkdir -p /tmp/djing_flow
 mv $DUMP_FILE $TMP_DUMP
-
 
 ./djing_flow < $TMP_DUMP | /usr/bin/mysql -uUSER -h <IP Database> -p <DBUSER> --password=<DB_PASSWORD>
 
 rm $TMP_DUMP
-

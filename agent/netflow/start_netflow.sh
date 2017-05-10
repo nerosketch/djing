@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
 
