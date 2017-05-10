@@ -9,7 +9,7 @@ from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNet
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from .fields import MACAddressField
-from mydefs import MyGenericIPAddressField
+from mydefs import MyGenericIPAddressField, ip2int
 
 
 class LogicError(Exception):
@@ -321,7 +321,7 @@ class Abon(UserProfile):
     # создаём абонента из структуры агента
     def build_agent_struct(self):
         if self.ip_address:
-            user_ip = self.ip_address.int_ip()
+            user_ip = ip2int(self.ip_address)
         else:
             return
         inst_tariff = self.active_tariff()
