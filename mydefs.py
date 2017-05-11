@@ -91,7 +91,7 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
 
     @staticmethod
     def from_db_value(value, expression, connection, context):
-        return int2ip(value)
+        return int2ip(value) if value != 0 else None
 
     def int_ip(self):
         return ip2int(self)
