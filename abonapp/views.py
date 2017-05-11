@@ -15,7 +15,6 @@ from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
-from ip_pool.models import IpPoolItem
 import mydefs
 from devapp.models import Device
 from datetime import datetime
@@ -260,14 +259,7 @@ def abonhome(request, gid, uid):
                 if abon.opt82 is None:
                     ip_str = request.POST.get('ip')
                     if ip_str:
-                        try:
-                            ip = IpPoolItem.objects.get(ip=ip_str)
-                            abon.ip_address = ip
-                        except MultipleObjectsReturned:
-                            ips = models.IpPoolItem.objects.filter(ip=ip_str)
-                            one_ip = ips[0]
-                            models.IpPoolItem.objects.filter(pk__in=[ip.pk for ip in ips if ip != one_ip]).delete()
-                            abon.ip_address = one_ip
+                        abon.ip_address = ip_str
                     else:
                         abon.ip_address = None
                 frm.save()
@@ -278,14 +270,13 @@ def abonhome(request, gid, uid):
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
             abon_device = models.AbonDevice.objects.get(abon=abon)
-    except IntegrityError as e:
-        messages.error(request, _('Ip address already exist. %s') % e)
+    except models.LogicError as e:
+        messages.error(request, e)
+        passw = models.AbonRawPassword.objects.get(account=abon).passw_text
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
     except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
-    except IpPoolItem.DoesNotExist:
-        messages.error(request, _('Ip address not found'))
     except models.AbonRawPassword.DoesNotExist:
         messages.warning(request, _('User has not have password, and cannot login'))
     except models.AbonDevice.DoesNotExist:
@@ -300,6 +291,7 @@ def abonhome(request, gid, uid):
             'abon': abon,
             'abon_group': abon_group,
             'ip': abon.ip_address,
+            'is_bad_ip': getattr(abon, 'is_bad_ip', False),
             'tech_form': forms.Opt82Form(instance=abon.opt82),
             'device': abon_device.device if abon_device is not None else None
         })
@@ -745,7 +737,7 @@ def charts(request, gid, uid):
     return render(request, 'abonapp/charts.html', {
         'abon_group': abongroup,
         'abon': abon,
-        'charts_data': ','.join(charts_data),
+        'charts_data': ','.join(charts_data) if charts_data is not None else None,
         'time_min': int(midnight.timestamp()),
         'time_max': int((midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp())
     })

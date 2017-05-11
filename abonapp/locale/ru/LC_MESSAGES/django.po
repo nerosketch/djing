@@ -619,14 +619,8 @@ msgstr "Абонент успешно изменён"
 
 #: abonapp/views.py:258
 #, python-format
-msgid "Ip address already exist. %s"
-msgstr ""
-"Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. "
-"А вообще: %s"
-
-#: abonapp/views.py:266
-msgid "Ip address not found"
-msgstr "Указанный вами ip отсутствует в ip pool"
+msgid "Ip address already exist"
+msgstr "Такой ip уже у кого-то есть"
 
 #: abonapp/views.py:268
 msgid "User has not have password, and cannot login"
