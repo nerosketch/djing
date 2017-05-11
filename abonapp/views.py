@@ -725,11 +725,10 @@ def charts(request, gid, uid):
         if abon.ip_address is None:
             charts_data = None
         else:
-            charts_data = StatElem.objects.filter(ip=abon.ip_address.ip)
-            oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.01)
+            charts_data = StatElem.objects.filter(ip=abon.ip_address)
+            #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
             # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
-            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data if
-                           cd.octets < oct_limit]
+            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data]
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
