@@ -8,7 +8,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from agent import NasFailedResult, NasNetworkError
 from abonapp.models import Abon, Opt82
-from ip_pool.models import IpPoolItem
 
 
 def die(text):
@@ -27,17 +26,6 @@ def get_82_opts(switch_mac, switch_port):
     return opt82
 
 
-def get_or_create_pool_item(ip):
-    try:
-        ip_item = IpPoolItem.objects.get(ip=ip)
-    except IpPoolItem.DoesNotExist:
-        ip_item = IpPoolItem.objects.create(ip=ip)
-    except MultipleObjectsReturned:
-        IpPoolItem.objects.filter(ip=ip)[1:].delete()
-        return get_or_create_pool_item(ip)
-    return ip_item
-
-
 def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
     opt82 = get_82_opts(switch_mac, switch_port)
     if opt82 is None:
@@ -45,7 +33,7 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
         return
     try:
         abon = Abon.objects.get(opt82=opt82)
-        abon.ip_address = get_or_create_pool_item(client_ip)
+        abon.ip_address = client_ip
         abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
         print(_('Ip address update for %s successfull') % abon.get_short_name())
@@ -55,13 +43,10 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
 
 def dhcp_expiry(client_ip):
     try:
-        ip_item = IpPoolItem.objects.get(ip=client_ip)
-        abon = Abon.objects.get(ip_address=ip_item)
+        abon = Abon.objects.get(ip_address=client_ip)
         abon.ip_address = None
         abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
-    except IpPoolItem.DoesNotExist:
-        pass
     except Abon.DoesNotExist:
         pass
 
