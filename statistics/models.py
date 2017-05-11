@@ -9,14 +9,16 @@ from .fields import UnixDateTimeField
 class StatManager(models.Manager):
 
     def traffic_by_ip(self, ip):
-        # ip = IPv4Address(ip)
-        traf = self.filter(ip=ip, octets__gt=524288)[0]
-        now = datetime.now()
-        if traf.cur_time < now - timedelta(minutes=5):
-            # значит трафа небыло больше 5 минут
-            return False, traf
-        else:
-            return True, traf
+        try:
+            traf = self.filter(ip=ip, octets__gt=524288)[0]
+            now = datetime.now()
+            if traf.cur_time < now - timedelta(minutes=55):
+                # значит трафа небыло больше 5 минут
+                return False, traf
+            else:
+                return True, traf
+        except IndexError:
+            return False, None
 
 
 class StatElem(models.Model):
