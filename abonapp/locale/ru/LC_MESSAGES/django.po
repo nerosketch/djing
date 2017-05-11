@@ -747,3 +747,6 @@ msgstr "Действует до"
 
 msgid "Do"
 msgstr "Действия"
+
+msgid "Last traffic"
+msgstr "Последний траффик"
