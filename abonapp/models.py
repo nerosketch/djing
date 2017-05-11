@@ -6,10 +6,10 @@ from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
-from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from .fields import MACAddressField
+from mydefs import MyGenericIPAddressField
 
 
 class LogicError(Exception):
@@ -207,7 +207,7 @@ class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
     ballance = models.FloatField(default=0.0)
-    ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
+    ip_address = MyGenericIPAddressField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
@@ -330,6 +330,13 @@ class Abon(UserProfile):
         else:
             agent_trf = TariffStruct()
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
+
+    def save(self, *args, **kwargs):
+        # проверяем не-ли у кого такого-же ip
+        if Abon.objects.filter(ip_address=self.ip_address).count() > 0:
+            self.is_bad_ip = True
+            raise LogicError(_('Ip address already exist'))
+        super(Abon, self).save(*args, **kwargs)
 
 
 class AbonDevice(models.Model):
