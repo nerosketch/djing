@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
+from statistics.models import getModel
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
@@ -29,12 +30,20 @@ def peoples(request, gid):
     else:
         peoples_list = models.Abon.objects.filter(group=gid)
 
+    StatModel = getModel()
+
     # фильтр
     dr, field = mydefs.order_helper(request)
     if field:
         peoples_list = peoples_list.order_by(field)
 
     peoples_list = mydefs.pag_mn(request, peoples_list)
+    for abon in peoples_list:
+        if abon.ip_address is not None:
+            traf = StatModel.objects.traffic_by_ip( abon.ip_address )
+            if traf[1] is not None:
+                abon.traf = traf[1]
+                abon.is_online =traf[0]
 
     streets = models.AbonStreet.objects.filter(group=gid)
 
