@@ -1,9 +1,22 @@
 import math
+from datetime import datetime, timedelta
 from django.db import models
 from django.utils import timezone
-
 from mydefs import MyGenericIPAddressField
 from .fields import UnixDateTimeField
+
+
+class StatManager(models.Manager):
+
+    def traffic_by_ip(self, ip):
+        # ip = IPv4Address(ip)
+        traf = self.filter(ip=ip, octets__gt=524288)[0]
+        now = datetime.now()
+        if traf.cur_time < now - timedelta(minutes=5):
+            # значит трафа небыло больше 5 минут
+            return False, traf
+        else:
+            return True, traf
 
 
 class StatElem(models.Model):
@@ -11,6 +24,8 @@ class StatElem(models.Model):
     ip = MyGenericIPAddressField()
     octets = models.PositiveIntegerField(default=0)
     packets = models.PositiveIntegerField(default=0)
+
+    objects = StatManager()
 
     @staticmethod
     def percentile(N, percent, key=lambda x:x):
