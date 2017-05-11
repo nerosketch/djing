@@ -104,7 +104,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="9">
+                            <td colspan="10">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' abon_group.pk %}">{% trans 'Add abon' %}</a>
@@ -115,7 +115,7 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="9" class="btn-group">
+                        <td colspan="10" class="btn-group">
                             {% if perms.abonapp.add_abon %}
                                 <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="Добавить">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
