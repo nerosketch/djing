@@ -24,6 +24,7 @@
                             </a>
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
+                        <th>{% trans 'Last traffic' %}</th>
                         <th>
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
                                 {% trans 'Ip address' %}
@@ -66,7 +67,17 @@
                             {% else %}
                             <tr class="danger">
                         {% endif %}
-                        <td><a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a></td>
+                        <td>
+                            <a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a>
+                            {% if human.is_online %}
+                                <span class="glyphicon glyphicon-ok text-success"></span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if human.traf %}
+                                {{ human.traf.cur_time|date:"H:i" }}
+                            {% endif %}
+                        </td>
                         <td>{{ human.ip_address|default:_('Not assigned') }}</td>
                         <td>{{ human.fio }}</td>
                         <td>{{ human.street|default:_('Not assigned') }}</td>
