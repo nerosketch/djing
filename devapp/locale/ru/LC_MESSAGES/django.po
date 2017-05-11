@@ -187,3 +187,30 @@ msgstr "Порты"
 
 msgid "Edit"
 msgstr "Редактировать"
+
+msgid "PON ONU"
+msgstr "ONU Голова"
+
+msgid "does not fetch the name"
+msgstr "не получил имя"
+
+msgid "does not fetch the mac"
+msgstr "не нашёл мак"
+
+msgid "Ports not found"
+msgstr "Онушки не получил"
+
+msgid "DLink switch"
+msgstr "Свич D'Link"
+
+msgid "Mac"
+msgstr "Мак"
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Distance(m)"
+msgstr "Расстояние (м)"
+
+msgid "Signal"
+msgstr "Ур. сигнала"

@@ -112,7 +112,7 @@ class AbonTariff(models.Model):
         return round(amount, 2)
 
     # Активируем тариф
-    def activate(self, current_user):
+    def activate(self, current_user, deadline=None):
         calc_obj = self.tariff.get_calc_type()(self)
         amnt = self.tariff.amount
         # если не хватает денег
@@ -121,9 +121,12 @@ class AbonTariff(models.Model):
         # считаем дату активации услуги
         self.time_start = timezone.now()
         # считаем дату завершения услуги
-        self.deadline = calc_obj.calc_deadline()
+        if deadline is None:
+            self.deadline = calc_obj.calc_deadline()
+        else:
+            self.deadline = deadline
         # снимаем деньги за услугу
-        self.abon.make_pay(current_user, amnt, u_comment=_('service finish log'))
+        self.abon.make_pay(current_user, amnt)
         self.save()
 
     # Используется-ли услуга сейчас, если время старта есть то он активирован
@@ -225,7 +228,6 @@ class Abon(UserProfile):
             return ats[0].tariff
         else:
             self._act_tar_cache = None
-            return
 
     class Meta:
         db_table = 'abonent'
@@ -235,13 +237,7 @@ class Abon(UserProfile):
         )
 
     # Платим за что-то
-    def make_pay(self, curuser, how_match_to_pay=0.0, u_comment=_('pay log')):
-        AbonLog.objects.create(
-            abon=self,
-            amount=-how_match_to_pay,
-            author=curuser,
-            comment=u_comment
-        )
+    def make_pay(self, curuser, how_match_to_pay=0.0):
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
 
@@ -256,7 +252,7 @@ class Abon(UserProfile):
         self.ballance += amount
 
     # покупаем тариф
-    def pick_tariff(self, tariff, author, comment=None):
+    def pick_tariff(self, tariff, author, comment=None, deadline=None):
         assert isinstance(tariff, Tariff)
 
         # выбераем связь ТарифАбонент с самым низким приоритетом
@@ -273,7 +269,7 @@ class Abon(UserProfile):
         # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
         if not abtrf:
             # значит пробуем её активировать
-            new_abtar.activate(author)
+            new_abtar.activate(author, deadline)
         else:
             new_abtar.save()
 
@@ -308,6 +304,7 @@ class Abon(UserProfile):
 
                 # удаляем запись о текущей услугу.
                 at.delete()
+                return
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
@@ -335,6 +332,18 @@ class Abon(UserProfile):
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
 
+class AbonDevice(models.Model):
+    abon = models.ForeignKey(Abon)
+    device = models.ForeignKey('devapp.Device')
+
+    def __str__(self):
+        return "%s - %s" % (self.abon, self.device)
+
+    class Meta:
+        db_table = 'abon_device'
+        unique_together = ('abon', 'device')
+
+
 class PassportInfo(models.Model):
     series = models.CharField(max_length=4, validators=[validators.integer_validator])
     number = models.CharField(max_length=6, validators=[validators.integer_validator])
@@ -353,7 +362,7 @@ class InvoiceForPayment(models.Model):
     comment = models.CharField(max_length=128)
     date_create = models.DateTimeField(auto_now_add=True)
     date_pay = models.DateTimeField(blank=True, null=True)
-    author = models.ForeignKey(UserProfile, related_name='+')
+    author = models.ForeignKey(UserProfile, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return "%s -> %.2f" % (self.abon.username, self.amount)
@@ -413,7 +422,7 @@ class AbonRawPassword(models.Model):
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
     if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = 3600
+        timeout = 14400
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True

@@ -308,7 +308,7 @@ msgstr "Задача действительна до"
 
 #: taskapp/templates/taskapp/view.html:28
 msgid "time left"
-msgstr ""
+msgstr "Времени осталось"
 
 #: taskapp/templates/taskapp/view.html:29
 msgid "Task type"
@@ -335,9 +335,8 @@ msgid "Error in the form fields"
 msgstr "Ошибка в полях формы"
 
 #: taskapp/views.py:151
-#, python-format
-msgid "User '%s' does not exist"
-msgstr ""
+msgid "User does not exist"
+msgstr "Абонент не найден"
 
 msgid "Active tasks"
 msgstr "Активные задачи"
@@ -359,3 +358,9 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "locality %s. Task type - %s. "
 msgstr "с. %s. Тип задачи - %s. "
+
+msgid "Name"
+msgstr "ФИО"
+
+msgid "Address"
+msgstr "Адрес"

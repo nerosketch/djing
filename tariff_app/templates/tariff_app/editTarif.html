@@ -69,21 +69,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_time_of_action">Время действия (в днях)</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                        {{ form.time_of_action }}{{ form.time_of_action.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="id_calc_type">Скрипт</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                         {{ form.calc_type }}{{ form.calc_type.errors }}
                     </div>
+                </div>
+
+                <div class="checkbox">
+                    <label>{{ form.is_admin }}Административный тариф</label>
                 </div>
 
                 <div class="btn-group">

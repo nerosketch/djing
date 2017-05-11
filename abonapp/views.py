@@ -17,6 +17,8 @@ from . import forms
 from . import models
 from ip_pool.models import IpPoolItem
 import mydefs
+from devapp.models import Device
+from datetime import datetime
 
 
 @login_required
@@ -245,7 +247,9 @@ def abon_services(request, gid, uid):
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     abon_group = get_object_or_404(models.AbonGroup, pk=gid)
-    frm, passw = None, None
+    frm = None
+    passw = None
+    abon_device = None
     try:
         if request.method == 'POST':
             if not request.user.has_perm('abonapp.change_abon'):
@@ -261,8 +265,9 @@ def abonhome(request, gid, uid):
                             abon.ip_address = ip
                         except MultipleObjectsReturned:
                             ips = models.IpPoolItem.objects.filter(ip=ip_str)
-                            ips[1:].delete()
-                            abon.ip_address = ips[0]
+                            one_ip = ips[0]
+                            models.IpPoolItem.objects.filter(pk__in=[ip.pk for ip in ips if ip != one_ip]).delete()
+                            abon.ip_address = one_ip
                     else:
                         abon.ip_address = None
                 frm.save()
@@ -272,6 +277,7 @@ def abonhome(request, gid, uid):
         else:
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
+            abon_device = models.AbonDevice.objects.get(abon=abon)
     except IntegrityError as e:
         messages.error(request, _('Ip address already exist. %s') % e)
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
@@ -282,6 +288,8 @@ def abonhome(request, gid, uid):
         messages.error(request, _('Ip address not found'))
     except models.AbonRawPassword.DoesNotExist:
         messages.warning(request, _('User has not have password, and cannot login'))
+    except models.AbonDevice.DoesNotExist:
+        messages.warning(request, _('User device was not found'))
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
@@ -292,7 +300,8 @@ def abonhome(request, gid, uid):
             'abon': abon,
             'abon_group': abon_group,
             'ip': abon.ip_address,
-            'tech_form': forms.Opt82Form(instance=abon.opt82)
+            'tech_form': forms.Opt82Form(instance=abon.opt82),
+            'device': abon_device.device if abon_device is not None else None
         })
     else:
         return render(request, 'abonapp/viewAbon.html', {
@@ -389,7 +398,12 @@ def pick_tariff(request, gid, uid):
     try:
         if request.method == 'POST':
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
-            abon.pick_tariff(trf, request.user)
+            deadline = request.POST.get('deadline')
+            if deadline == '' or deadline is None:
+                abon.pick_tariff(trf, request.user)
+            else:
+                deadline = datetime.strptime(deadline, '%Y-%m-%d')
+                abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except (models.LogicError, NasFailedResult) as e:
@@ -402,6 +416,8 @@ def pick_tariff(request, gid, uid):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except ValueError as e:
+        messages.error(request, "%s: %s" % (_('fix form errors'), e))
 
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
@@ -643,6 +659,50 @@ def chgroup_tariff(request, gid):
         'abon_group': grp,
         'tariffs': tariffs
     })
+
+
+@login_required
+@mydefs.only_admins
+def dev(request, gid, uid):
+    abon_dev = None
+    try:
+        if request.method == 'POST':
+            dev = Device.objects.get(pk=request.POST.get('dev'))
+            abon = models.Abon.objects.get(pk=uid)
+            try:
+                models.AbonDevice.objects.get(device=dev, abon=abon)
+            except models.AbonDevice.DoesNotExist:
+                models.AbonDevice.objects.create(abon=abon, device=dev)
+                messages.success(request, _('Device has successfully attached'))
+            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+        else:
+            abon_dev = models.AbonDevice.objects.get(abon=uid).device
+    except Device.DoesNotExist:
+        messages.warning(request, _('Device your selected already does not exist'))
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('Abon does not exist'))
+        return redirect('abonapp:people_list', gid=gid)
+    except models.AbonDevice.DoesNotExist:
+        messages.warning(request, _('User device was not found'))
+    return render(request, 'abonapp/modal_dev.html', {
+        'devices': Device.objects.filter(user_group=gid),
+        'dev': abon_dev,
+        'gid': gid, 'uid': uid
+    })
+
+
+@login_required
+@mydefs.only_admins
+def clear_dev(request, gid, uid):
+    try:
+        abon = models.Abon.objects.get(pk=uid)
+        abdev = models.AbonDevice.objects.get(abon=abon)
+        abdev.delete()
+        messages.success(request, _('Device has successfully unattached'))
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('Abon does not exist'))
+        return redirect('abonapp:people_list', gid=gid)
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 @login_required

@@ -4,83 +4,99 @@
     <div class="page-header">
         <h3>Управление услугами</h3>
         {% if current_service %}
-            <p>Ваша текущая услуга <a href="#dv">{{ current_service.tariff.title }}</a>
+            <p>Ваша текущая услуга <b>{{ current_service.tariff.title }}</b>
                 за <b>{{ current_service.tariff.amount }}</b> руб.</p>
         {% else %}
             <p>У вас нет активной услуги, для использования ресурсов приобретите нужную услугу из представленных
                 ниже.<br>
-                А если уже заказали то просто активируйте услугу из списка заказанных.</p>
+                А если уже заказали, то просто активируйте услугу из списка заказанных.</p>
         {% endif %}
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4">
-                <h4>Ваши заказанные услуги</h4>
-                <ul class="list-group">
-                    {% for abon_tariff in own_abon_tariffs %}
-                        <li class="list-group-item">
-                            <div class="btn-group">
-                                {% if abon_tariff == current_service %}
-                                    <a href="{% url 'client_side:complete_service' abon_tariff.pk %}"
-                                       class="btn btn-xs btn-danger btn-modal" title="Завершить услугу досрочно">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                    </a>
-                                {% else %}
-                                    {% if not current_service %}
-                                        <a href="{% url 'client_side:activate_service' abon_tariff.pk %}"
-                                           class="btn btn-xs btn-success btn-modal" title="Активировать">
-                                            <span class="glyphicon glyphicon-fire"></span>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h4>Ваши текущие услуги</h4>
+                    <ul class="list-group">
+                        {% for abon_tariff in own_abon_tariffs %}
+                            <li class="list-group-item">
+                                <div class="btn-group">
+                                    {% if abon_tariff == current_service %}
+                                        <a href="{% url 'client_side:complete_service' abon_tariff.pk %}"
+                                           class="btn btn-xs btn-danger btn-modal" title="Завершить услугу досрочно">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </a>
+                                    {% else %}
+                                        {% if not current_service %}
+                                            <a href="{% url 'client_side:activate_service' abon_tariff.pk %}"
+                                               class="btn btn-xs btn-success btn-modal" title="Активировать">
+                                                <span class="glyphicon glyphicon-fire"></span>
+                                            </a>
+                                        {% endif %}
+                                        <a href="{% url 'client_side:unsubscribe_service' abon_tariff.pk %}"
+                                           class="btn btn-xs btn-danger btn-modal" title="Удалить услугу из списка">
+                                            <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     {% endif %}
-                                    <a href="{% url 'client_side:unsubscribe_service' abon_tariff.pk %}"
-                                       class="btn btn-xs btn-danger btn-modal" title="Удалить услугу из списка">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                    </a>
-                                {% endif %}
-                            </div>
-                            <span class="badge">{{ abon_tariff.tariff.amount }}</span>
-                            <a href="#sdv">
+                                </div>
+                                <span class="badge">{{ abon_tariff.tariff.amount }}</span>
                                 {% if abon_tariff.is_started %}
                                     <b>{{ abon_tariff.tariff.title }}</b>
                                 {% else %}
                                     {{ abon_tariff.tariff.title }}
                                 {% endif %}
-                            </a>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item">У вас нет заказанных услуг</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="col-lg-8">
-                <h4>Выберите ещё услугу</h4>
-
-                <div class="container-fluid">
-                    <div class="row">
-                        {% for tarif in tarifs %}
-                            <div class="col-lg-4">
-                                <h3>{{ tarif.title }}</h3>
-
-                                <p>{{ tarif.descr }}</p>
-
-                                <p>Входящая скорость: {{ tarif.speedIn }} MBit/s<br>
-                                    Исходящая скорость: {{ tarif.speedOut }} MBit/s<br>
-                                    Стоимость: {{ tarif.amount }} руб.</p>
-
-                                {% if request.user.is_staff %}
-                                    <a href="#" class="btn btn-primary disabled">
-                                {% else %}
-                                    <a href="{% url 'client_side:buy_service' tarif.id %}" class="btn btn-primary btn-modal">
-                                {% endif %}
-                                    <span class="glyphicon glyphicon-shopping-cart"></span> Заказать
-                                </a>
-                            </div>
+                            </li>
                         {% empty %}
-                            <div class="col-lg-4">
-                                <h3 class="panel-title">Нет доступных услуг для заказа</h3>
-                            </div>
+                            <li class="list-group-item">У вас нет заказанных услуг</li>
                         {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-lg-8">
+
+                    <div class="container-fluid">
+                        <div class="row">
+                            {% for tarif in tarifs %}
+                                <div class="col-lg-12">
+                                    <h3>{{ tarif.title }}</h3>
+
+                                    <i>{{ tarif.amount }} руб.</i>
+                                    <p>{{ tarif.descr }}</p>
+
+                                    {% if request.user.is_staff %}
+                                        <a href="#" class="btn btn-primary disabled">
+                                    {% else %}
+                                        <a href="{% url 'client_side:buy_service' tarif.id %}" class="btn btn-primary btn-modal">
+                                    {% endif %}
+                                        <span class="glyphicon glyphicon-shopping-cart"></span> Заказать
+                                    </a>
+                                </div>
+                            {% empty %}
+                                <div class="col-lg-4">
+                                    <h3 class="panel-title">Нет доступных услуг для заказа</h3>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Как работает личный кабинет, раздел услуг
+                </div>
+                <div class="panel-body">
+                    <p>Перед вами список ваших текущих (подключённых) услуг под надписью "<b>Ваши текущие услуги</b>", и список доступных для подключения услуг справа.
+                    Когда у вас нет текущих услуг, то внизу в рамочке вы видите надпись "<b>У вас нет заказанных услуг</b>". Чтобы заказать новую услугу, вам надо нажать на кнопку "<b>Заказать</b>" справа
+                    в разделе доступных услуг. Когда вы заказываете услугу, то видите диалог в котором вам поясняется какую услугу вы подключаете и сколько денег спишется с вашего счёта.</p>
+                    <p>Когда у вас уже есть подключённая услуга и вы заказываете новую услугу, то она встаёт в очередь подключений, деньги в этот момент не снимаются. По истечению текущей услуги в конце месяца вам автоматически подключится услуга
+                    из очереди. Услуга не может быть подключена если на счету не достаточно средств.</p>
+                    <p>Когда вы хотите досрочно завершить услугу, то можете нажать на красный крестик восле вашей активной услуги, в этот момент вам показывается диалог, в котором указываются подробности операции. Вы должны подтвердить действие
+                    нажатием кнопки <b>Завершить</b>. Внимательно прочитайте предупреждение в диалоге, так как там вы увидите что будет с вашими средствами. Если вы нажимаете красный крестик возле услуги которая ещё не стала активной, то она просто
+                    уберётся из очереди на подключение, и ваши средства никак не затронутся.</p>
                 </div>
             </div>
         </div>

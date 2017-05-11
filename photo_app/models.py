@@ -33,10 +33,14 @@ class Photo(models.Model):
         im = Image.open(self.image.path)
         im.thumbnail((759, 759), Image.ANTIALIAS)
 
-        hs = hashlib.md5(str(time.time())).hexdigest()
+        hs = hashlib.md5(str(time.time()).encode()).hexdigest()
         ext = self.image.path.split('.')[1:][0]
-        fname = "%s/media/%s.%s" % (BASE_DIR, hs, ext)
-
+        path = "%s/media" % BASE_DIR
+        fname = "%s/%s.%s" % (path, hs, ext)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        if not os.path.exists(path + '/min'):
+            os.makedirs(path + '/min')
         im.save(fname)
         os.remove(self.image.path)
         self.image = "%s.%s" % (hs, ext)

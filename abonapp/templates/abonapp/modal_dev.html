@@ -1,0 +1,37 @@
+{% load i18n %}
+
+<form role="form" action="{% url 'abonapp:dev' gid uid %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span>{% trans 'Add clutch' %}</h4>
+    </div>
+
+    {% include 'message_block.html' %}
+
+    <div class="modal-body">
+        <div class="form-group-sm">
+            <label for="id_dev">{% trans 'Select a device' %}</label>
+
+            <div class="input-group">
+                <select name="dev" id="id_dev" class="form-control">
+                    {% for device in devices %}
+                        <option value="{{ device.pk }}">{{ device }}</option>
+                    {% empty %}
+                        <option value="0">---</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-primary">
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

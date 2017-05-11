@@ -17,6 +17,6 @@ cd $CUR_DIR
 mkdir -p /tmp/djing_flow
 mv $DUMP_FILE $TMP_DUMP
 
-./djing_flow < $TMP_DUMP | /usr/bin/mysql -uDB_USER -h <DB_IP> -p djingdb --password=PASSWORD
+./djing_flow < $TMP_DUMP | /usr/bin/mysql -uUSER -h <IP Database> -p <DBUSER> --password=<DB_PASSWORD>
 
 rm $TMP_DUMP
