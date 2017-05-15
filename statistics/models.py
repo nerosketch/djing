@@ -13,7 +13,6 @@ class StatManager(models.Manager):
             traf = self.order_by('-cur_time').filter(ip=ip, octets__gt=524288)[0]
             now = datetime.now()
             if traf.cur_time < now - timedelta(minutes=55):
-                # значит трафа небыло больше 5 минут
                 return False, traf
             else:
                 return True, traf
