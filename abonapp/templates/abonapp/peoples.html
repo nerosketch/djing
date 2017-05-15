@@ -50,7 +50,7 @@
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th width="150">{% trans 'Telephone' %}</th>
-                        <th width="150">{% trans 'Service' %}</th>
+                        <!--<th width="150">{% trans 'Service' %}</th>-->
                         <th width="50">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ballance&dir={{ dir|default:"down" }}">
                                 {% trans 'Ballance' %}
@@ -83,16 +83,16 @@
                         <td>{{ human.street|default:_('Not assigned') }}</td>
                         <td>{{ human.house|default:_('Not assigned') }}</td>
                         <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
-                        <td>
-                            {% if human.active_tariff %}
-                                {% if perms.tariff_app.change_tariff %}
-                                    <a href="{% url 'tarifs:edit' human.active_tariff.pk %}">{{ human.active_tariff.title }}</a>
-                                {% else %}
-                                    {{ human.active_tariff.title }}
-                                {% endif %}
-                            {% else %}&mdash;&mdash;&mdash;
-                            {% endif %}
-                        </td>
+                        <!--<td>
+                            { % if human.active_tariff %}
+                                { % if perms.tariff_app.change_tariff %}
+                                    <a href="{ % url 'tarifs:edit' human.active_tariff.pk %}">{ { human.active_tariff.title }}</a>
+                                { % else %}
+                                    { { human.active_tariff.title }}
+                                { % endif %}
+                            { % else %}&mdash;&mdash;&mdash;
+                            { % endif %}
+                        </td>-->
                         <td>{{ human.ballance }}</td>
                         <td>
                             {% if perms.abonapp.delete_abon %}
@@ -104,7 +104,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="10">
+                            <td colspan="9">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' abon_group.pk %}">{% trans 'Add abon' %}</a>
@@ -115,7 +115,7 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="10" class="btn-group">
+                        <td colspan="9" class="btn-group">
                             {% if perms.abonapp.add_abon %}
                                 <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="Добавить">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
