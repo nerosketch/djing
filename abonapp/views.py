@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
+from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -25,10 +25,11 @@ from datetime import datetime
 @mydefs.only_admins
 def peoples(request, gid):
     street_id = mydefs.safe_int(request.GET.get('street'))
+    peoples_list = models.Abon.objects.select_related('group', 'street')
     if street_id > 0:
-        peoples_list = models.Abon.objects.filter(group=gid, street=street_id)
+        peoples_list = peoples_list.filter(group=gid, street=street_id)
     else:
-        peoples_list = models.Abon.objects.filter(group=gid)
+        peoples_list = peoples_list.filter(group=gid)
 
     StatModel = getModel()
 
@@ -725,11 +726,10 @@ def charts(request, gid, uid):
         if abon.ip_address is None:
             charts_data = None
         else:
-            charts_data = StatElem.objects.filter(ip=abon.ip_address.ip)
-            oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.01)
+            charts_data = StatElem.objects.filter(ip=abon.ip_address)
+            #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
             # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
-            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data if
-                           cd.octets < oct_limit]
+            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data]
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
