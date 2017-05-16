@@ -75,12 +75,12 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
     description = "Int32 notation ip address"
 
     def __init__(self, protocol='ipv4', *args, **kwargs):
-        super().__init__(protocol=protocol, *args, **kwargs)
+        super(MyGenericIPAddressField, self).__init__(protocol=protocol, *args, **kwargs)
         self.max_length = 8
 
     def get_prep_value(self, value):
         # strIp to Int
-        value = super().get_prep_value(value)
+        value = super(MyGenericIPAddressField, self).get_prep_value(value)
         return ip2int(value)
 
     def to_python(self, addr):
