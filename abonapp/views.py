@@ -732,9 +732,10 @@ def charts(request, gid, uid):
             # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
             midnight = datetime.combine(date.today(), time.min)
             charts_data = [(cd.cur_time.timestamp()*1000, byte_to_mbit(cd.octets)) for cd in charts_data]
-            charts_data.append( (charts_data[-1:][0][0], 0.0) )
-            charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
-            charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+            if len(charts_data) > 0:
+                charts_data.append( (charts_data[-1:][0][0], 0.0) )
+                charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+                charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
 
             abontariff = abon.active_tariff()
             high = abontariff.speedIn + abontariff.speedOut
