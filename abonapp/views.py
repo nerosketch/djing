@@ -712,6 +712,7 @@ def clear_dev(request, gid, uid):
 def charts(request, gid, uid):
     from statistics.models import getModel
     from datetime import datetime, date, time, timedelta
+    high = 100
 
     def byte_to_mbit(x):
         return ((x/60)*8)/2**20
@@ -729,7 +730,16 @@ def charts(request, gid, uid):
             charts_data = StatElem.objects.filter(ip=abon.ip_address)
             #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
             # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
-            charts_data = ["{x:%d,y:%.4f}" % (cd.cur_time.timestamp(), byte_to_mbit(cd.octets)) for cd in charts_data]
+            midnight = datetime.combine(date.today(), time.min)
+            charts_data = [(cd.cur_time.timestamp()*1000, byte_to_mbit(cd.octets)) for cd in charts_data]
+            charts_data.append( (charts_data[-1:][0][0], 0.0) )
+            charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+            charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+
+            abontariff = abon.active_tariff()
+            high = abontariff.speedIn + abontariff.speedOut
+            if high > 100:
+                high = 100
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -741,14 +751,11 @@ def charts(request, gid, uid):
         messages.error(request, e)
         return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
-    midnight = datetime.combine(date.today(), time.min)
-
     return render(request, 'abonapp/charts.html', {
         'abon_group': abongroup,
         'abon': abon,
-        'charts_data': ','.join(charts_data) if charts_data is not None else None,
-        'time_min': int(midnight.timestamp()),
-        'time_max': int((midnight + timedelta(hours=23, minutes=59, seconds=59)).timestamp())
+        'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
+        'high': high
     })
 
 

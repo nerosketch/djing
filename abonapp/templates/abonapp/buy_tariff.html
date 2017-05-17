@@ -38,7 +38,6 @@
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                         <input type="text" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:"Y-m-d" }}">
-                        <script type="text/javascript" src="/static/js/datetime_with_moment.min.js"></script>
                         <script type="text/javascript">
                             $(function () {
                                 $('#id_deadline').datetimepicker({

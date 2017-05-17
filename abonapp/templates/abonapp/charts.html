@@ -10,42 +10,41 @@
                 </div>
                 <div class="panel-body">
                     {% if charts_data %}
-                    <canvas id="netChart" width="300" height="100"></canvas>
-                    <script type="text/javascript">
-                        var myChart = new Chart('netChart', {
-                            type: 'line',
-                            data: {
-                                datasets: [{
-                                    label: 'Траффик в Mbit/s',
-                                    data: [{{ charts_data }}],
-                                    borderWidth: 1,
-                                    pointRadius: 0,
-                                    lineTension: 0
-                                }]
-                            },
-                            options: {
-                                scales: {
-                                    xAxes: [{
-                                        type: 'time',
-                                        time: {
-                                            unit: 'hour',
-                                            min: {{ time_min }},
-                                            max: {{ time_max }}
-                                        },
-                                        position: 'bottom'
-                                    }],
-                                    yAxes: [{
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: 'Mbit/s'
+                        <div id="chrt"></div>
+                        <script type="text/javascript">
+                            $(document).ready(function ($) {
+                                new Chartist.Line('#chrt', {
+                                    series: [
+                                        {
+                                            name: 'График траффика',
+                                            data: [
+                                                {{ charts_data }}
+                                            ]
                                         }
-                                    }]
-                                }
-                            }
-                        });
-                    </script>
+                                    ]
+                                }, {
+                                    height: '600px',
+                                    showArea: true,
+                                    showLine: false,
+                                    showPoint: false,
+                                    high: {{ high }},
+                                    axisX: {
+                                        type: Chartist.FixedScaleAxis,
+                                        divisor: 12,
+                                        labelInterpolationFnc: function (value) {
+                                            return moment(value).format('HH:mm:ss');
+                                        }
+                                    },
+                                    axisY: {
+                                        labelInterpolationFnc: function (value) {
+                                            return value + ' MBit/s';
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
                     {% else %}
-                    <h2>Данные не переданы</h2>
+                        <h2>Данные не переданы</h2>
                     {% endif %}
                 </div>
             </div>
