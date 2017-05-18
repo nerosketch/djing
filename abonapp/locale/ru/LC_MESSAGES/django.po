@@ -785,7 +785,7 @@ msgid "One or more extra fields has not been saved"
 msgstr "Поле или одно из полей не найдено"
 
 msgid "ok ping, %d/%d loses"
-msgstr "пингуется, потери:%d/%d"
+msgstr "пингуется, %d/%d"
 
 msgid "no ping"
 msgstr "не пингуется"
