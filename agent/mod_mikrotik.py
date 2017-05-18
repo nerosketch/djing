@@ -413,6 +413,21 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         if queue.abon != user:
             QueueManager.update(self, user)
 
+    def ping(self, host, count=10):
+        r = self._exec_cmd([
+            '/ip/arp/print',
+            '?address=%s' % host
+        ])
+        if r == [{}]:
+            return
+        interface = r[0]['=interface']
+        r = self._exec_cmd([
+            '/ping', '=address=%s' % host, '=arp-ping=yes', '=interval=100ms', '=count=%d' % count,
+            '=interface=%s' % interface
+        ])
+        received, sent = int(r[-2:][0]['=received']), int(r[-2:][0]['=sent'])
+        return received, sent
+
     # приостановливаем обслуживание абонента
     def pause_user(self, user):
         pass
