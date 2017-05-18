@@ -19,6 +19,8 @@ urlpatterns = [
 
     url(r'^debtors$', views.debtors, name='debtors'),
 
+    url(r'^(?P<uid>\d+)/ping$', views.abon_ping, name='ping'),
+
     url(r'^refresh_group_nas(?P<group_id>\d+)$', views.update_nas, name='update_nas'),
 
     # Api's

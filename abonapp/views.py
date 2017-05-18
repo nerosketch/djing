@@ -825,6 +825,22 @@ def extra_field_delete(request, gid, uid, fid):
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
+@login_required
+def abon_ping(request, uid):
+    ip = request.GET.get('cmd_param')
+    if mydefs.ping(ip, 10):
+        status = 0
+        res = '<span class="glyphicon glyphicon-ok"></span> Ok Ping'
+    else:
+        status = 1
+        res = '<span class="glyphicon glyphicon-danger"></span> No Ping'
+
+    return HttpResponse(dumps({
+        'status': status,
+        'dat': res
+    }))
+
+
 # API's
 
 def abons(request):
