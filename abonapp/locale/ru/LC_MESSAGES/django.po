@@ -750,3 +750,36 @@ msgstr "Действия"
 
 msgid "Last traffic"
 msgstr "Последний траффик"
+
+msgid "Extra field successfully created"
+msgstr "Динамичесое поле добавлено успешно"
+
+msgid "Extra field successfully deleted"
+msgstr "Динамическое поле успешно удалено"
+
+msgid "Extra field does not exist"
+msgstr "Поле не найдено"
+
+msgid "Extra fields"
+msgstr "Доп поля"
+
+msgid "Add extra field"
+msgstr "Добавить новое динамическое поле"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Field title"
+msgstr "Название поля"
+
+msgid "Field type"
+msgstr "Тип динамического поля"
+
+msgid "Field content"
+msgstr "Содержимое динамического поля"
+
+msgid "Extra fields has been saved"
+msgstr "Динамические поля сохранены"
+
+msgid "One or more extra fields has not been saved"
+msgstr "Поле или одно из полей не найдено"
