@@ -129,4 +129,24 @@ $(document).ready(function () {
         return false;
     });
 
+	// кнопка посылающая комманду и возвращающая результат выполнения
+	$('.btn-cmd').on('click', function(){
+		var cmd_param = $(this).attr('data-param');
+		var self = $(this);
+		self.removeClass('btn-default');
+        self.removeClass('btn-danger');
+        self.removeClass('btn-success');
+		self.addClass('btn-info');
+		self.html('<span class="glyphicon glyphicon-ok"></span> Подождите...');
+		$.getJSON(this.href, {cmd_param: cmd_param}, function(r){
+            self.removeClass('btn-info');
+			if(r.status == 0)
+				self.addClass('btn-success');
+			else
+                self.addClass('btn-danger');
+            self.html(r.dat);
+		});
+		return false;
+	})
+
 });

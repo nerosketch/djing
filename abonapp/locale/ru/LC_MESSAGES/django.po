@@ -761,7 +761,7 @@ msgid "Extra field does not exist"
 msgstr "Поле не найдено"
 
 msgid "Extra fields"
-msgstr "Доп поля"
+msgstr "Динамические записи"
 
 msgid "Add extra field"
 msgstr "Добавить новое динамическое поле"
