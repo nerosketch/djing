@@ -38,13 +38,17 @@ def peoples(request, gid):
     if field:
         peoples_list = peoples_list.order_by(field)
 
-    peoples_list = mydefs.pag_mn(request, peoples_list)
-    for abon in peoples_list:
-        if abon.ip_address is not None:
-            traf = StatModel.objects.traffic_by_ip( abon.ip_address )
-            if traf[1] is not None:
-                abon.traf = traf[1]
-                abon.is_online =traf[0]
+    try:
+        peoples_list = mydefs.pag_mn(request, peoples_list)
+        for abon in peoples_list:
+            if abon.ip_address is not None:
+                traf = StatModel.objects.traffic_by_ip(abon.ip_address)
+                if traf[1] is not None:
+                    abon.traf = traf[1]
+                    abon.is_online =traf[0]
+
+    except mydefs.LogicError as e:
+        messages.warning(request, e)
 
     streets = models.AbonStreet.objects.filter(group=gid)
 
@@ -132,7 +136,7 @@ def addabon(request, gid):
             else:
                 messages.error(request, _('fix form errors'))
 
-    except (IntegrityError, NasFailedResult, NasNetworkError, models.LogicError) as e:
+    except (IntegrityError, NasFailedResult, NasNetworkError, mydefs.LogicError) as e:
         messages.error(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
@@ -280,7 +284,7 @@ def abonhome(request, gid, uid):
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
             abon_device = models.AbonDevice.objects.get(abon=abon)
-    except models.LogicError as e:
+    except mydefs.LogicError as e:
         messages.error(request, e)
         passw = models.AbonRawPassword.objects.get(account=abon).passw_text
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
@@ -408,7 +412,7 @@ def pick_tariff(request, gid, uid):
                 abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
-    except (models.LogicError, NasFailedResult) as e:
+    except (mydefs.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
@@ -486,11 +490,11 @@ def complete_service(request, gid, uid, srvid):
                 messages.success(request, _('Service has been finished successfully'))
                 return redirect('abonapp:abon_services', gid, uid)
             else:
-                raise models.LogicError(_('Not confirmed'))
+                raise mydefs.LogicError(_('Not confirmed'))
 
         time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
-    except (models.LogicError, NasFailedResult) as e:
+    except (mydefs.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
@@ -524,7 +528,7 @@ def activate_service(request, gid, uid, srvid):
             messages.success(request, _('Service has been activated successfully'))
             return redirect('abonapp:abon_services', gid, uid)
 
-    except (NasFailedResult, models.LogicError) as e:
+    except (NasFailedResult, mydefs.LogicError) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
@@ -758,6 +762,67 @@ def charts(request, gid, uid):
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
         'high': high
     })
+
+
+@login_required
+@permission_required('abonapp.add_extra_fields_model')
+def make_extra_field(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    try:
+        if request.method == 'POST':
+            frm = forms.ExtraFieldForm(request.POST)
+            if frm.is_valid():
+                field_instance = frm.save()
+                abon.extra_fields.add(field_instance)
+                messages.success(request, _('Extra field successfully created'))
+            else:
+                messages.error(request, _('fix form errors'))
+            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+        else:
+            frm = forms.ExtraFieldForm()
+
+    except (NasNetworkError, NasFailedResult) as e:
+        messages.error(request, e)
+        frm = forms.ExtraFieldForm()
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
+        frm = forms.ExtraFieldForm()
+    return render_to_text('abonapp/modal_extra_field.html', {
+        'abon': abon,
+        'gid': gid,
+        'frm': frm
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_extra_fields_model')
+def extra_field_change(request, gid, uid):
+    extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
+    print(extras)
+    try:
+        for ex in extras:
+            extra_field = models.ExtraFieldsModel.objects.get(pk=ex[0])
+            extra_field.data = ex[1]
+            extra_field.save(update_fields=['data'])
+        messages.success(request, _("Extra fields has been saved"))
+    except models.ExtraFieldsModel.DoesNotExist:
+        messages.error(request, _('One or more extra fields has not been saved'))
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+
+@login_required
+@permission_required('abonapp.delete_extra_fields_model')
+def extra_field_delete(request, gid, uid, fid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    try:
+        extra_field = models.ExtraFieldsModel.objects.get(pk=fid)
+        abon.extra_fields.remove(extra_field)
+        extra_field.delete()
+        messages.success(request, _('Extra field successfully deleted'))
+    except models.ExtraFieldsModel.DoesNotExist:
+        messages.warning(request, _('Extra field does not exist'))
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 # API's
