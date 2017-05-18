@@ -5,9 +5,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 
-from abonapp.models import AbonLog, AbonTariff, InvoiceForPayment, Abon, LogicError
+from abonapp.models import AbonLog, AbonTariff, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
-from mydefs import pag_mn, RuTimedelta
+from mydefs import pag_mn, RuTimedelta, LogicError
 from agent import NasFailedResult, NasNetworkError
 
 
