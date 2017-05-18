@@ -839,7 +839,7 @@ def abon_ping(request):
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
         else:
             if type(ping_result) is tuple:
-                loses_percent = (ping_result[0] / ping_result[1])
+                loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
                 if loses_percent > 0.5:
                     text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
                     status = True
