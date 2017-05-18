@@ -833,7 +833,7 @@ def abon_ping(request, uid):
         res = '<span class="glyphicon glyphicon-ok"></span> Ok Ping'
     else:
         status = 1
-        res = '<span class="glyphicon glyphicon-danger"></span> No Ping'
+        res = '<span class="glyphicon glyphicon-exclamation-sign"></span> No Ping'
 
     return HttpResponse(dumps({
         'status': status,

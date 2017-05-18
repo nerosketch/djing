@@ -137,7 +137,7 @@ $(document).ready(function () {
         self.removeClass('btn-danger');
         self.removeClass('btn-success');
 		self.addClass('btn-info');
-		self.html('<span class="glyphicon glyphicon-ok"></span> Подождите...');
+		self.html('<span class="glyphicon glyphicon-refresh"></span> Подождите...');
 		$.getJSON(this.href, {cmd_param: cmd_param}, function(r){
             self.removeClass('btn-info');
 			if(r.status == 0)
