@@ -21,6 +21,9 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/activate_service(?P<srvid>\d+)$', views.activate_service, name='activate_service'),
     url(r'^(?P<uid>\d+)/opt82$', views.opt82, name='opt82'),
     url(r'^(?P<uid>\d+)/chart$', views.charts, name='charts'),
+    url(r'^(?P<uid>\d+)/extra_field$', views.make_extra_field, name='extra_field'),
+    url(r'^(?P<uid>\d+)/extra_field/(?P<fid>\d+)/delete$', views.extra_field_delete, name='extra_field_delete'),
+    url(r'^(?P<uid>\d+)/extra_field/edit$', views.extra_field_change, name='extra_field_edit'),
 
     url(r'^(?P<uid>\d+)/unsubscribe_service(?P<srvid>\d+)$', views.unsubscribe_service,
         name='unsubscribe_service'),
