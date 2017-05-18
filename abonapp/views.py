@@ -826,14 +826,35 @@ def extra_field_delete(request, gid, uid, fid):
 
 
 @login_required
-def abon_ping(request, uid):
+def abon_ping(request):
     ip = request.GET.get('cmd_param')
-    if mydefs.ping(ip, 10):
+    status = False
+    text = _('no ping')
+    try:
+        tm = Transmitter()
+        r = tm.ping(ip)
+        if r is None:
+            if mydefs.ping(ip, 10):
+                status = True
+                text = _('ping ok')
+        else:
+            if type(r) is tuple:
+                text = _('ok ping, %d/%d loses') % r
+            else:
+                text = _('ping ok') + ' ' + str(r)
+            status = True
+
+    except NasFailedResult as e:
+        messages.error(request, e)
+    except NasNetworkError as e:
+        messages.warning(request, e)
+
+    if status:
         status = 0
-        res = '<span class="glyphicon glyphicon-ok"></span> Ok Ping'
+        res = '<span class="glyphicon glyphicon-ok"></span> %s' % text
     else:
         status = 1
-        res = '<span class="glyphicon glyphicon-exclamation-sign"></span> No Ping'
+        res = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % text
 
     return HttpResponse(dumps({
         'status': status,
