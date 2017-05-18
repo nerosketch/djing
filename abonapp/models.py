@@ -9,11 +9,7 @@ from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNet
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from .fields import MACAddressField
-from mydefs import MyGenericIPAddressField, ip2int
-
-
-class LogicError(Exception):
-    pass
+from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 
 
 class AbonGroup(models.Model):
@@ -165,11 +161,23 @@ class ExtraFieldsModel(models.Model):
     DYNAMIC_FIELD_TYPES = (
         ('int', _('Digital field')),
         ('str', _('Text field')),
-        ('dbl', _('Floating field'))
+        ('dbl', _('Floating field')),
+        ('ipa', _('Ip Address'))
     )
 
-    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES)
+    title = models.CharField(max_length=16, default='no title')
+    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES, default='str')
     data = models.CharField(max_length=64, null=True, blank=True)
+
+    def get_regexp(self):
+        if self.field_type == 'int':
+            return r'^[+-]?\d+$'
+        elif self.field_type == 'dbl':
+            return r'^[-+]?\d+[,.]\d+$'
+        elif self.field_type == 'str':
+            return r'^[a-zA-ZА-Яа-я0-9]+$'
+        elif self.field_type == 'ipa':
+            return ip_addr_regex
 
     def clean(self):
         d = self.data
