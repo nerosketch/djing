@@ -1,9 +1,10 @@
 import math
 from datetime import datetime, timedelta
-from django.db import models
+from django.db import models, ProgrammingError
 from django.utils import timezone
 from mydefs import MyGenericIPAddressField
 from .fields import UnixDateTimeField
+from mydefs import LogicError
 
 
 class StatManager(models.Manager):
@@ -18,6 +19,8 @@ class StatManager(models.Manager):
                 return True, traf
         except IndexError:
             return False, None
+        except ProgrammingError as e:
+            raise LogicError(e)
 
 
 class StatElem(models.Model):
