@@ -4,8 +4,9 @@ import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
-from abonapp.models import Abon, LogicError
+from abonapp.models import Abon
 from agent import Transmitter, NasNetworkError, NasFailedResult
+from mydefs import LogicError
 
 
 def main():
