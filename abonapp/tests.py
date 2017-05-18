@@ -2,8 +2,9 @@ from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.test.client import Client
 from agent import NasNetworkError
-from .models import AbonTariff, Abon, AbonGroup, LogicError, AbonRawPassword
+from .models import AbonTariff, Abon, AbonGroup, AbonRawPassword
 from tariff_app.models import Tariff
+from mydefs import LogicError
 
 
 class AbonTestCase(TestCase):
