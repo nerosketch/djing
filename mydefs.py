@@ -208,3 +208,7 @@ class MultipleException(Exception):
         if not isinstance(err_list, list):
             raise TypeError
         self.err_list = err_list
+
+
+class LogicError(Exception):
+    pass
