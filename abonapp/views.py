@@ -829,36 +829,34 @@ def extra_field_delete(request, gid, uid, fid):
 def abon_ping(request):
     ip = request.GET.get('cmd_param')
     status = False
-    text = _('no ping')
+    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
     try:
         tm = Transmitter()
-        r = tm.ping(ip)
-        if r is None:
+        ping_result = tm.ping(ip)
+        if ping_result is None:
             if mydefs.ping(ip, 10):
                 status = True
-                text = _('ping ok')
+                text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
         else:
-            if type(r) is tuple:
-                text = _('ok ping, %d/%d loses') % r
+            if type(ping_result) is tuple:
+                loses_percent = (ping_result[0] / ping_result[1])
+                if loses_percent > 0.5:
+                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
+                    status = True
+                else:
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
             else:
-                text = _('ping ok') + ' ' + str(r)
-            status = True
+                text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
+                status = True
 
     except NasFailedResult as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
 
-    if status:
-        status = 0
-        res = '<span class="glyphicon glyphicon-ok"></span> %s' % text
-    else:
-        status = 1
-        res = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % text
-
     return HttpResponse(dumps({
-        'status': status,
-        'dat': res
+        'status': 0 if status else 1,
+        'dat': text
     }))
 
 

@@ -787,6 +787,9 @@ msgstr "Поле или одно из полей не найдено"
 msgid "ok ping, %d/%d loses"
 msgstr "пингуется, %d/%d"
 
+msgid "no ping, %d/%d loses"
+msgstr "не пингуется, %d/%d"
+
 msgid "no ping"
 msgstr "не пингуется"
 
