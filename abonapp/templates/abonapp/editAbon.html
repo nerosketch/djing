@@ -123,6 +123,7 @@
                             </div>
                         </div>
 
+                        {% if ip %}
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
                                 <a href="{% url 'abonapp:ping' abon.pk %}" class="btn btn-sm btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
@@ -130,6 +131,7 @@
                                 </a>
                             </div>
                         </div>
+                        {% endif %}
 
                     </form>
                 </div>
