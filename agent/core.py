@@ -90,3 +90,12 @@ class BaseTransmitter(metaclass=ABCMeta):
     @check_input_type(TariffStruct)
     def remove_tariff(self, tid):
         """удаляем тариф"""
+
+    @abstractmethod
+    @check_input_type(TariffStruct)
+    def ping(self, host, count=10):
+        """
+        :param host: ip адрес в текстовом виде, например '192.168.0.1'
+        :param count: количество пингов
+        :return: None если не пингуется, иначе кортеж, в котором (сколько вернулось, сколько было отправлено)
+        """

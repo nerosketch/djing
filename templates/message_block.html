@@ -3,12 +3,16 @@
 
         {% if message.tags == 'error' %}
             <div class="alert alert-danger alert-dismissable">
+                <span class="glyphicon glyphicon-exclamation-sign"></span>
         {% elif message.tags == 'warning' %}
             <div class="alert alert-warning alert-dismissable">
+                <span class="glyphicon glyphicon-warning-sign"></span>
         {% elif message.tags == 'success' %}
             <div class="alert alert-success alert-dismissable">
+                <span class="glyphicon glyphicon-ok-circle"></span>
         {% elif message.tags == 'info' %}
             <div class="alert alert-info alert-dismissable">
+                <span class="glyphicon glyphicon-info-sign"></span>
         {% endif %}
 
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

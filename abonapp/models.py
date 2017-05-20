@@ -6,14 +6,10 @@ from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
-from ip_pool.models import IpPoolItem
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from .fields import MACAddressField
-
-
-class LogicError(Exception):
-    pass
+from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 
 
 class AbonGroup(models.Model):
@@ -165,11 +161,23 @@ class ExtraFieldsModel(models.Model):
     DYNAMIC_FIELD_TYPES = (
         ('int', _('Digital field')),
         ('str', _('Text field')),
-        ('dbl', _('Floating field'))
+        ('dbl', _('Floating field')),
+        ('ipa', _('Ip Address'))
     )
 
-    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES)
+    title = models.CharField(max_length=16, default='no title')
+    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES, default='str')
     data = models.CharField(max_length=64, null=True, blank=True)
+
+    def get_regexp(self):
+        if self.field_type == 'int':
+            return r'^[+-]?\d+$'
+        elif self.field_type == 'dbl':
+            return r'^[-+]?\d+[,.]\d+$'
+        elif self.field_type == 'str':
+            return r'^[a-zA-ZА-Яа-я0-9]+$'
+        elif self.field_type == 'ipa':
+            return ip_addr_regex
 
     def clean(self):
         d = self.data
@@ -207,7 +215,7 @@ class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
     ballance = models.FloatField(default=0.0)
-    ip_address = models.OneToOneField(IpPoolItem, on_delete=models.SET_NULL, null=True, blank=True)
+    ip_address = MyGenericIPAddressField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
@@ -321,7 +329,7 @@ class Abon(UserProfile):
     # создаём абонента из структуры агента
     def build_agent_struct(self):
         if self.ip_address:
-            user_ip = self.ip_address.int_ip()
+            user_ip = ip2int(self.ip_address)
         else:
             return
         inst_tariff = self.active_tariff()
@@ -330,6 +338,13 @@ class Abon(UserProfile):
         else:
             agent_trf = TariffStruct()
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
+
+    def save(self, *args, **kwargs):
+        # проверяем не-ли у кого такого-же ip
+        if Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
+            self.is_bad_ip = True
+            raise LogicError(_('Ip address already exist'))
+        super(Abon, self).save(*args, **kwargs)
 
 
 class AbonDevice(models.Model):

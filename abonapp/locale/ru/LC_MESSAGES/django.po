@@ -619,14 +619,8 @@ msgstr "Абонент успешно изменён"
 
 #: abonapp/views.py:258
 #, python-format
-msgid "Ip address already exist. %s"
-msgstr ""
-"Проверте введённые вами значения, скорее всего такой ip уже у кого-то есть. "
-"А вообще: %s"
-
-#: abonapp/views.py:266
-msgid "Ip address not found"
-msgstr "Указанный вами ip отсутствует в ip pool"
+msgid "Ip address already exist"
+msgstr "Такой ip уже у кого-то есть"
 
 #: abonapp/views.py:268
 msgid "User has not have password, and cannot login"
@@ -721,6 +715,12 @@ msgstr "Для абонента не найдены паспортные дан�
 msgid "currency"
 msgstr "руб"
 
+msgid "Charts"
+msgstr "Графики"
+
+msgid "Group what you want doesn't exist"
+msgstr "Указанная вами группа не найдена"
+
 msgid "User device was not found"
 msgstr "Пользовательское устройство не найдено"
 
@@ -747,3 +747,51 @@ msgstr "Действует до"
 
 msgid "Do"
 msgstr "Действия"
+
+msgid "Last traffic"
+msgstr "Последний траффик"
+
+msgid "Extra field successfully created"
+msgstr "Динамичесое поле добавлено успешно"
+
+msgid "Extra field successfully deleted"
+msgstr "Динамическое поле успешно удалено"
+
+msgid "Extra field does not exist"
+msgstr "Поле не найдено"
+
+msgid "Extra fields"
+msgstr "Динамические записи"
+
+msgid "Add extra field"
+msgstr "Добавить новое динамическое поле"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Field title"
+msgstr "Название поля"
+
+msgid "Field type"
+msgstr "Тип динамического поля"
+
+msgid "Field content"
+msgstr "Содержимое динамического поля"
+
+msgid "Extra fields has been saved"
+msgstr "Динамические поля сохранены"
+
+msgid "One or more extra fields has not been saved"
+msgstr "Поле или одно из полей не найдено"
+
+msgid "ok ping, %d/%d loses"
+msgstr "пингуется, %d/%d"
+
+msgid "no ping, %d/%d loses"
+msgstr "не пингуется, %d/%d"
+
+msgid "no ping"
+msgstr "не пингуется"
+
+msgid "ping ok"
+msgstr "пингуется"

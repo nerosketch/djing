@@ -124,3 +124,15 @@ class PassportForm(forms.ModelForm):
         initials = {
             'date_of_acceptance': datetime(year=2014, month=6, day=1)
         }
+
+
+class ExtraFieldForm(forms.ModelForm):
+
+    class Meta:
+        model = models.ExtraFieldsModel
+        fields = '__all__'
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'field_type': forms.Select(attrs={'class': 'form-control'}),
+            'data': forms.TextInput(attrs={'class': 'form-control'})
+        }

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
-from django.db import IntegrityError
+from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
@@ -11,11 +11,11 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
+from statistics.models import getModel
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
-from ip_pool.models import IpPoolItem
 import mydefs
 from devapp.models import Device
 from datetime import datetime
@@ -25,17 +25,30 @@ from datetime import datetime
 @mydefs.only_admins
 def peoples(request, gid):
     street_id = mydefs.safe_int(request.GET.get('street'))
+    peoples_list = models.Abon.objects.select_related('group', 'street')
     if street_id > 0:
-        peoples_list = models.Abon.objects.filter(group=gid, street=street_id)
+        peoples_list = peoples_list.filter(group=gid, street=street_id)
     else:
-        peoples_list = models.Abon.objects.filter(group=gid)
+        peoples_list = peoples_list.filter(group=gid)
+
+    StatModel = getModel()
 
     # фильтр
     dr, field = mydefs.order_helper(request)
     if field:
         peoples_list = peoples_list.order_by(field)
 
-    peoples_list = mydefs.pag_mn(request, peoples_list)
+    try:
+        peoples_list = mydefs.pag_mn(request, peoples_list)
+        for abon in peoples_list:
+            if abon.ip_address is not None:
+                traf = StatModel.objects.traffic_by_ip(abon.ip_address)
+                if traf[1] is not None:
+                    abon.traf = traf[1]
+                    abon.is_online =traf[0]
+
+    except mydefs.LogicError as e:
+        messages.warning(request, e)
 
     streets = models.AbonStreet.objects.filter(group=gid)
 
@@ -123,7 +136,7 @@ def addabon(request, gid):
             else:
                 messages.error(request, _('fix form errors'))
 
-    except (IntegrityError, NasFailedResult, NasNetworkError, models.LogicError) as e:
+    except (IntegrityError, NasFailedResult, NasNetworkError, mydefs.LogicError) as e:
         messages.error(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
@@ -260,14 +273,7 @@ def abonhome(request, gid, uid):
                 if abon.opt82 is None:
                     ip_str = request.POST.get('ip')
                     if ip_str:
-                        try:
-                            ip = IpPoolItem.objects.get(ip=ip_str)
-                            abon.ip_address = ip
-                        except MultipleObjectsReturned:
-                            ips = models.IpPoolItem.objects.filter(ip=ip_str)
-                            one_ip = ips[0]
-                            models.IpPoolItem.objects.filter(pk__in=[ip.pk for ip in ips if ip != one_ip]).delete()
-                            abon.ip_address = one_ip
+                        abon.ip_address = ip_str
                     else:
                         abon.ip_address = None
                 frm.save()
@@ -278,14 +284,13 @@ def abonhome(request, gid, uid):
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
             abon_device = models.AbonDevice.objects.get(abon=abon)
-    except IntegrityError as e:
-        messages.error(request, _('Ip address already exist. %s') % e)
+    except mydefs.LogicError as e:
+        messages.error(request, e)
+        passw = models.AbonRawPassword.objects.get(account=abon).passw_text
         frm = forms.AbonForm(instance=abon, initial={'password': passw})
 
     except (NasFailedResult, NasNetworkError) as e:
         messages.error(request, e)
-    except IpPoolItem.DoesNotExist:
-        messages.error(request, _('Ip address not found'))
     except models.AbonRawPassword.DoesNotExist:
         messages.warning(request, _('User has not have password, and cannot login'))
     except models.AbonDevice.DoesNotExist:
@@ -300,6 +305,7 @@ def abonhome(request, gid, uid):
             'abon': abon,
             'abon_group': abon_group,
             'ip': abon.ip_address,
+            'is_bad_ip': getattr(abon, 'is_bad_ip', False),
             'tech_form': forms.Opt82Form(instance=abon.opt82),
             'device': abon_device.device if abon_device is not None else None
         })
@@ -406,7 +412,7 @@ def pick_tariff(request, gid, uid):
                 abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
-    except (models.LogicError, NasFailedResult) as e:
+    except (mydefs.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
@@ -484,11 +490,11 @@ def complete_service(request, gid, uid, srvid):
                 messages.success(request, _('Service has been finished successfully'))
                 return redirect('abonapp:abon_services', gid, uid)
             else:
-                raise models.LogicError(_('Not confirmed'))
+                raise mydefs.LogicError(_('Not confirmed'))
 
         time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
 
-    except (models.LogicError, NasFailedResult) as e:
+    except (mydefs.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
@@ -522,7 +528,7 @@ def activate_service(request, gid, uid, srvid):
             messages.success(request, _('Service has been activated successfully'))
             return redirect('abonapp:abon_services', gid, uid)
 
-    except (NasFailedResult, models.LogicError) as e:
+    except (NasFailedResult, mydefs.LogicError) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
@@ -570,13 +576,14 @@ def log_page(request):
 @mydefs.only_admins
 def debtors(request):
     # peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
-    #peoples_list = mydefs.pag_mn(request, peoples_list)
+    # peoples_list = mydefs.pag_mn(request, peoples_list)
     invs = models.InvoiceForPayment.objects.filter(status=True)
     invs = mydefs.pag_mn(request, invs)
     return render(request, 'abonapp/debtors.html', {
-        #'peoples': peoples_list
+        # 'peoples': peoples_list
         'invoices': invs
     })
+
 
 @login_required
 @mydefs.only_admins
@@ -704,6 +711,155 @@ def clear_dev(request, gid, uid):
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
+@login_required
+@mydefs.only_admins
+def charts(request, gid, uid):
+    from statistics.models import getModel
+    from datetime import datetime, date, time, timedelta
+    high = 100
+
+    def byte_to_mbit(x):
+        return ((x/60)*8)/2**20
+    try:
+        StatElem = getModel()
+        abon = models.Abon.objects.get(pk=uid)
+        if abon.group is None:
+            abon.group = models.AbonGroup.objects.get(pk=gid)
+            abon.save(update_fields=['group'])
+        abongroup = abon.group
+
+        if abon.ip_address is None:
+            charts_data = None
+        else:
+            charts_data = StatElem.objects.filter(ip=abon.ip_address)
+            #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
+            # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
+            midnight = datetime.combine(date.today(), time.min)
+            charts_data = [(cd.cur_time.timestamp()*1000, byte_to_mbit(cd.octets)) for cd in charts_data]
+            if len(charts_data) > 0:
+                charts_data.append( (charts_data[-1:][0][0], 0.0) )
+                charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+                charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+
+            abontariff = abon.active_tariff()
+            high = abontariff.speedIn + abontariff.speedOut
+            if high > 100:
+                high = 100
+
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('Abon does not exist'))
+        return redirect('abonapp:people_list', gid)
+    except models.AbonGroup.DoesNotExist:
+        messages.error(request, _("Group what you want doesn't exist"))
+        return redirect('abonapp:group_list')
+    except ProgrammingError as e:
+        messages.error(request, e)
+        return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+    return render(request, 'abonapp/charts.html', {
+        'abon_group': abongroup,
+        'abon': abon,
+        'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
+        'high': high
+    })
+
+
+@login_required
+@permission_required('abonapp.add_extra_fields_model')
+def make_extra_field(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    try:
+        if request.method == 'POST':
+            frm = forms.ExtraFieldForm(request.POST)
+            if frm.is_valid():
+                field_instance = frm.save()
+                abon.extra_fields.add(field_instance)
+                messages.success(request, _('Extra field successfully created'))
+            else:
+                messages.error(request, _('fix form errors'))
+            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+        else:
+            frm = forms.ExtraFieldForm()
+
+    except (NasNetworkError, NasFailedResult) as e:
+        messages.error(request, e)
+        frm = forms.ExtraFieldForm()
+    except mydefs.MultipleException as errs:
+        for err in errs.err_list:
+            messages.add_message(request, messages.constants.ERROR, err)
+        frm = forms.ExtraFieldForm()
+    return render_to_text('abonapp/modal_extra_field.html', {
+        'abon': abon,
+        'gid': gid,
+        'frm': frm
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_extra_fields_model')
+def extra_field_change(request, gid, uid):
+    extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
+    print(extras)
+    try:
+        for ex in extras:
+            extra_field = models.ExtraFieldsModel.objects.get(pk=ex[0])
+            extra_field.data = ex[1]
+            extra_field.save(update_fields=['data'])
+        messages.success(request, _("Extra fields has been saved"))
+    except models.ExtraFieldsModel.DoesNotExist:
+        messages.error(request, _('One or more extra fields has not been saved'))
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+
+@login_required
+@permission_required('abonapp.delete_extra_fields_model')
+def extra_field_delete(request, gid, uid, fid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    try:
+        extra_field = models.ExtraFieldsModel.objects.get(pk=fid)
+        abon.extra_fields.remove(extra_field)
+        extra_field.delete()
+        messages.success(request, _('Extra field successfully deleted'))
+    except models.ExtraFieldsModel.DoesNotExist:
+        messages.warning(request, _('Extra field does not exist'))
+    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+
+
+@login_required
+def abon_ping(request):
+    ip = request.GET.get('cmd_param')
+    status = False
+    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
+    try:
+        tm = Transmitter()
+        ping_result = tm.ping(ip)
+        if ping_result is None:
+            if mydefs.ping(ip, 10):
+                status = True
+                text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
+        else:
+            if type(ping_result) is tuple:
+                loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
+                if loses_percent > 0.5:
+                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
+                    status = True
+                else:
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
+            else:
+                text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
+                status = True
+
+    except NasFailedResult as e:
+        messages.error(request, e)
+    except NasNetworkError as e:
+        messages.warning(request, e)
+
+    return HttpResponse(dumps({
+        'status': 0 if status else 1,
+        'dat': text
+    }))
+
+
 # API's
 
 def abons(request):
@@ -731,5 +887,5 @@ def abons(request):
 def search_abon(request):
     word = request.GET.get('s')
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = [{'id':usr.pk, 'name':usr.username, 'fio':usr.fio} for usr in results]
+    results = [{'id': usr.pk, 'name': usr.username, 'fio': usr.fio} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))

@@ -231,3 +231,11 @@ button[data-toggle=offcanvas]{
     background-color: #44596b;
     border: 0;
 }
+
+
+/*
+ * Цвет заливки графика
+ */
+.ct-series-a .ct-area {
+    fill: black;
+}

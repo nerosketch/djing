@@ -75,12 +75,12 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
     description = "Int32 notation ip address"
 
     def __init__(self, protocol='ipv4', *args, **kwargs):
-        super().__init__(protocol=protocol, *args, **kwargs)
+        super(MyGenericIPAddressField, self).__init__(protocol=protocol, *args, **kwargs)
         self.max_length = 8
 
     def get_prep_value(self, value):
         # strIp to Int
-        value = super().get_prep_value(value)
+        value = super(MyGenericIPAddressField, self).get_prep_value(value)
         return ip2int(value)
 
     def to_python(self, addr):
@@ -91,7 +91,10 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
 
     @staticmethod
     def from_db_value(value, expression, connection, context):
-        return int2ip(value)
+        return int2ip(value) if value != 0 else None
+
+    def int_ip(self):
+        return ip2int(self)
 
 
 # Предназначен для Django CHOICES чтоб можно было передавать классы вместо просто описания поля,
@@ -149,8 +152,8 @@ def only_admins(fn):
     return wrapped
 
 
-def ping(hostname):
-    response = os.system("`which ping` -c 1 %s > /dev/null" % hostname)
+def ping(hostname, count=1):
+    response = os.system("`which ping` -4Anq -c%d -W1 %s > /dev/null" % (count, hostname))
     return True if response == 0 else False
 
 
@@ -205,3 +208,7 @@ class MultipleException(Exception):
         if not isinstance(err_list, list):
             raise TypeError
         self.err_list = err_list
+
+
+class LogicError(Exception):
+    pass

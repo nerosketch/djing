@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<form role="form" action="{% url 'abonapp:extra_field' gid abon.pk %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> {% trans 'Add extra field' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="id_title">{% trans 'Field title' %}</label>
+
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-text-background"></span></span>
+                {{ frm.title }}{{ frm.title.errors }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_field_type">{% trans 'Field type' %}</label>
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-ice-lolly"></span></span>
+                {{ frm.field_type }}{{ frm.field_type.errors }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_data">{% trans 'Field content' %}</label>
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-paperclip"></span></span>
+                {{ frm.data }}{{ frm.data.errors }}
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+            </button>
+            <button type="reset" class="btn btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

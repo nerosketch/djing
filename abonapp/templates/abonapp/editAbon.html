@@ -32,7 +32,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group-sm">
+                        <div class="form-group-sm{% if is_bad_ip %} has-error{% endif %}">
                             <label for="id_ip" class="col-sm-4 control-label">{% trans 'Ip Address' %}</label>
                             <div class="col-sm-8">
                                 <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="{% trans 'Not assigned' %}" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"{% if abon.opt82 %} disabled{% endif %}/>
@@ -123,6 +123,16 @@
                             </div>
                         </div>
 
+                        {% if ip %}
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
+                                <a href="{% url 'abonapp:ping' %}" class="btn btn-sm btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
+                                    <span class="glyphicon glyphicon-check"></span> Ping
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
                     </form>
                 </div>
             </div>
@@ -143,7 +153,7 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Port' %}</label>
+                            <label for="id_port" class="col-sm-2 control-label">{% trans 'Port' %}</label>
                             <div class="col-sm-10">
                                 {{ tech_form.port }}{{ tech_form.port.errors }}
                             </div>
@@ -165,19 +175,43 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Доп поля</h3>
+                    <h3 class="panel-title">{% trans 'Extra fields' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="#" method="post">{% csrf_token %}
+                    <form role="form" class="form-horizontal" action="{% url 'abonapp:extra_field_edit' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
-
+                        {% for ef in abon.extra_fields.all %}
                         <div class="form-group-sm">
-                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Ip Address' %}</label>
+                            <label class="col-sm-2 control-label">{{ ef.title }}</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="192.168.0.101" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
+
+                                <div class="input-group input-group-sm">
+                                    <input type="text" value="{{ ef.data|default:_('Not assigned') }}" class="form-control" pattern="{{ ef.get_regexp }}" name="ex">
+                                    <input type="hidden" value="{{ ef.pk }}" name="ed">
+                                    <span class="input-group-btn">
+                                        <a href="{% url 'abonapp:extra_field_delete' abon_group.pk abon.pk ef.pk %}" class="btn btn-danger" title="{% trans 'Delete' %}">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </a>
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
+                        {% empty %}
+                            <h3>{% trans 'Extra field does not exist' %}</h3>
+                        {% endfor %}
 
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-2 col-sm-10 btn-group btn-group-sm">
+                                <a href="{% url 'abonapp:extra_field' abon_group.pk abon.pk %}" class="btn btn-success btn-modal" title="{% trans 'Add extra field' %}">
+                                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                                </a>
+
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="glyphicon glyphicon-edit"></span> {% trans 'Save' %}
+                                </button>
+                            </div>
+                        </div>
 
                     </form>
                 </div>
@@ -186,4 +220,3 @@
     </div>
 
 {% endblock %}
-
