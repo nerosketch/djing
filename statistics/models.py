@@ -31,6 +31,12 @@ class StatElem(models.Model):
 
     objects = StatManager()
 
+    def save(self, *args, **kwargs):
+        return
+
+    def delete(self, *args, **kwargs):
+        return
+
     @staticmethod
     def percentile(N, percent, key=lambda x:x):
         """
