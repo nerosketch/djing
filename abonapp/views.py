@@ -19,6 +19,7 @@ from . import models
 import mydefs
 from devapp.models import Device
 from datetime import datetime
+from taskapp.models import Task
 
 
 @login_required
@@ -610,7 +611,6 @@ def update_nas(request, group_id):
 @login_required
 @mydefs.only_admins
 def task_log(request, gid, uid):
-    from taskapp.models import Task
     abon = get_object_or_404(models.Abon, pk=uid)
     tasks = Task.objects.filter(abon=abon)
     return render(request, 'abonapp/task_log.html', {
@@ -715,11 +715,8 @@ def clear_dev(request, gid, uid):
 @mydefs.only_admins
 def charts(request, gid, uid):
     from statistics.models import getModel
-    from datetime import datetime, date, time, timedelta
     high = 100
 
-    def byte_to_mbit(x):
-        return ((x/60)*8)/2**20
     try:
         StatElem = getModel()
         abon = models.Abon.objects.get(pk=uid)
@@ -731,15 +728,7 @@ def charts(request, gid, uid):
         if abon.ip_address is None:
             charts_data = None
         else:
-            charts_data = StatElem.objects.filter(ip=abon.ip_address)
-            #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
-            # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
-            midnight = datetime.combine(date.today(), time.min)
-            charts_data = [(cd.cur_time.timestamp()*1000, byte_to_mbit(cd.octets)) for cd in charts_data]
-            if len(charts_data) > 0:
-                charts_data.append( (charts_data[-1:][0][0], 0.0) )
-                charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
-                charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+            charts_data = StatElem.objects.chart(abon.ip_address)
 
             abontariff = abon.active_tariff()
             high = abontariff.speedIn + abontariff.speedOut

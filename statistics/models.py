@@ -1,5 +1,5 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 from django.db import models, ProgrammingError
 from django.utils import timezone
 from mydefs import MyGenericIPAddressField
@@ -21,6 +21,35 @@ class StatManager(models.Manager):
             return False, None
         except ProgrammingError as e:
             raise LogicError(e)
+
+    def chart(self, ip_addr, count_of_parts=12):
+        def byte_to_mbit(x):
+            return ((x/60)*8)/2**20
+
+        def split_list(lst, chunk_count):
+            chunk_size = len(lst) // chunk_count
+            return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
+
+        def avarage(elements):
+            return sum(elements) / len(elements)
+
+        charts_data = self.filter(ip=ip_addr)
+        charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
+        charts_octets = [byte_to_mbit(cd.octets) for cd in charts_data]
+        if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
+            charts_octets = split_list(charts_octets, count_of_parts)
+            charts_octets = [avarage(c) for c in charts_octets]
+
+            charts_times = split_list(charts_times, count_of_parts)
+            charts_times = [avarage(t) for t in charts_times]
+
+            charts_data = map(lambda x, y: (x, y), charts_times, charts_octets)
+            charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+            midnight = datetime.combine(date.today(), time.min)
+            charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+            return charts_data
+        else:
+            return
 
 
 class StatElem(models.Model):
@@ -67,6 +96,6 @@ def getModel():
 
     class DynamicStatElem(StatElem):
         class Meta:
-            db_table = 'flowstat_%s' % timezone.now().strftime("%d%m%Y")
+            db_table = 'flowstat_%s' % datetime.now().strftime("%d%m%Y")
             abstract = False
     return DynamicStatElem
