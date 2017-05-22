@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-27 12:27+0300\n"
+"POT-Creation-Date: 2017-05-22 11:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,6 +18,22 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: devapp/dev_types.py:54
+msgid "DLink switch"
+msgstr "Свич D'Link"
+
+#: devapp/dev_types.py:70
+msgid "does not fetch the name"
+msgstr "не получил имя"
+
+#: devapp/dev_types.py:72
+msgid "does not fetch the mac"
+msgstr "не нашёл мак"
+
+#: devapp/dev_types.py:116
+msgid "PON ONU"
+msgstr "ONU Голова"
 
 #: devapp/templates/devapp/add_dev.html:7
 #: devapp/templates/devapp/devices.html:7
@@ -114,6 +130,26 @@ msgstr "Эта точка не пингуется"
 msgid "Add group"
 msgstr ""
 
+#: devapp/templates/devapp/olt.html:13
+msgid "Mac"
+msgstr "Мак"
+
+#: devapp/templates/devapp/olt.html:14
+msgid "Name"
+msgstr "Имя"
+
+#: devapp/templates/devapp/olt.html:15
+msgid "Distance(m)"
+msgstr "Расстояние (м)"
+
+#: devapp/templates/devapp/olt.html:16
+msgid "Signal"
+msgstr "Ур. сигнала"
+
+#: devapp/templates/devapp/olt.html:34
+msgid "Ports not found"
+msgstr "Онушки не получил"
+
 #: devapp/templates/devapp/ports.html:9
 msgid "Title of the type of switch"
 msgstr "Название типа свича"
@@ -170,47 +206,21 @@ msgstr "Инфа о точке сохранена"
 msgid "Form is invalid, check fields and try again"
 msgstr "Ошибка в данных, проверте их ещё раз"
 
-#: devapp/views.py:112 devapp/views.py:140
+#: devapp/views.py:114 devapp/views.py:144
 msgid "Not Set snmp device password"
 msgstr "Не указан snmp пароль для устройства"
 
-#: devapp/views.py:114 devapp/views.py:142
+#: devapp/views.py:116 devapp/views.py:146
 msgid "Dot was not pinged"
 msgstr "Эта точка не пингуется"
 
-#: devapp/views.py:116
+#: devapp/views.py:118
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
 
-msgid "Ports"
-msgstr "Порты"
+#: devapp/views.py:120
+msgid "SNMP error on device"
+msgstr "Ошибка SNMP на устройстве"
 
 msgid "Edit"
 msgstr "Редактировать"
-
-msgid "PON ONU"
-msgstr "ONU Голова"
-
-msgid "does not fetch the name"
-msgstr "не получил имя"
-
-msgid "does not fetch the mac"
-msgstr "не нашёл мак"
-
-msgid "Ports not found"
-msgstr "Онушки не получил"
-
-msgid "DLink switch"
-msgstr "Свич D'Link"
-
-msgid "Mac"
-msgstr "Мак"
-
-msgid "Name"
-msgstr "Имя"
-
-msgid "Distance(m)"
-msgstr "Расстояние (м)"
-
-msgid "Signal"
-msgstr "Ур. сигнала"
