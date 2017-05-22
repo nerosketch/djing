@@ -731,9 +731,10 @@ def charts(request, gid, uid):
             charts_data = StatElem.objects.chart(abon.ip_address)
 
             abontariff = abon.active_tariff()
-            high = abontariff.speedIn + abontariff.speedOut
-            if high > 100:
-                high = 100
+            if abontariff is not None:
+                high = abontariff.speedIn + abontariff.speedOut
+                if high > 100:
+                    high = 100
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
