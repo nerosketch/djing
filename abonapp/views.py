@@ -788,7 +788,6 @@ def make_extra_field(request, gid, uid):
 @permission_required('abonapp.change_extra_fields_model')
 def extra_field_change(request, gid, uid):
     extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
-    print(extras)
     try:
         for ex in extras:
             extra_field = models.ExtraFieldsModel.objects.get(pk=ex[0])
