@@ -831,15 +831,6 @@ msgstr "пингуется, %d/%d"
 msgid "no ping, %d/%d loses"
 msgstr "не пингуется, %d/%d"
 
-msgid "Field title"
-msgstr "Название поля"
-
-msgid "Field type"
-msgstr "Тип динамического поля"
-
-msgid "Field content"
-msgstr "Содержимое динамического поля"
-
 msgid "Services"
 msgstr "Услуги"
 
