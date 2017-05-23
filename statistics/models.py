@@ -1,7 +1,6 @@
 import math
 from datetime import datetime, timedelta, date, time
-from django.db import models, ProgrammingError
-from django.utils import timezone
+from django.db import models, ProgrammingError, connection
 from mydefs import MyGenericIPAddressField
 from .fields import UnixDateTimeField
 from mydefs import LogicError
@@ -22,7 +21,7 @@ class StatManager(models.Manager):
         except ProgrammingError as e:
             raise LogicError(e)
 
-    def chart(self, ip_addr, count_of_parts=12):
+    def chart(self, ip_addr, count_of_parts=12, want_date=date.today()):
         def byte_to_mbit(x):
             return ((x/60)*8)/2**20
 
@@ -45,12 +44,17 @@ class StatManager(models.Manager):
 
             charts_data = map(lambda x, y: (x, y), charts_times, charts_octets)
             charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
-            midnight = datetime.combine(date.today(), time.min)
+            midnight = datetime.combine(want_date, time.min)
             charts_data.append("{x:new Date(%d),y:0}" % (int(charts_times[-1:][0]) + 1))
             charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
             return charts_data
         else:
             return
+
+    def get_dates(self):
+        tables = connection.introspection.table_names()
+        tables = [t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_')]
+        return [datetime.strptime(t, '%d%m%Y').date() for t in tables]
 
 
 class StatElem(models.Model):
@@ -93,10 +97,10 @@ class StatElem(models.Model):
         abstract = True
 
 
-def getModel():
+def getModel(want_date=datetime.now()):
 
     class DynamicStatElem(StatElem):
         class Meta:
-            db_table = 'flowstat_%s' % datetime.now().strftime("%d%m%Y")
+            db_table = 'flowstat_%s' % want_date.strftime("%d%m%Y")
             abstract = False
     return DynamicStatElem
