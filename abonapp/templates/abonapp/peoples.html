@@ -134,12 +134,15 @@
             </div>
         </div>
         <div class="col-lg-2 sidebar-offcanvas">
-            <div class="list-group">
-                {% for street in streets %}
-                    <a href="{% url 'abonapp:people_list' abon_group.pk  %}?street={{ street.pk }}" class="list-group-item{% if street_id == street.pk %} active{% endif %}">{{ street.name }}</a>
-                {% empty %}
-                    <a href="#" class="list-group-item">{% trans 'No streets found for that group' %}</a>
-                {% endfor %}
+            <div class="panel panel-default">
+                <div class="panel-heading">{% trans 'Streets' %}</div>
+                <div class="list-group">
+                    {% for street in streets %}
+                        <a href="{% url 'abonapp:people_list' abon_group.pk  %}?street={{ street.pk }}" class="list-group-item{% if street_id == street.pk %} active{% endif %}">{{ street.name }}</a>
+                    {% empty %}
+                        <a href="#" class="list-group-item">{% trans 'No streets found for that group' %}</a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
