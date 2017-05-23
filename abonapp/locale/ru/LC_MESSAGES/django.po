@@ -854,3 +854,6 @@ msgstr "Ошибка в SNMP на устройстве"
 
 msgid "Charts"
 msgstr "Графики"
+
+msgid "Sub information"
+msgstr "Информация абонента"

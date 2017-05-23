@@ -35,10 +35,10 @@ class StatManager(models.Manager):
 
         charts_data = self.filter(ip=ip_addr)
         charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
-        charts_octets = [byte_to_mbit(cd.octets) for cd in charts_data]
+        charts_octets = [cd.octets for cd in charts_data]
         if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
             charts_octets = split_list(charts_octets, count_of_parts)
-            charts_octets = [avarage(c) for c in charts_octets]
+            charts_octets = [byte_to_mbit(avarage(c)) for c in charts_octets]
 
             charts_times = split_list(charts_times, count_of_parts)
             charts_times = [avarage(t) for t in charts_times]
@@ -46,6 +46,7 @@ class StatManager(models.Manager):
             charts_data = map(lambda x, y: (x, y), charts_times, charts_octets)
             charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
             midnight = datetime.combine(date.today(), time.min)
+            charts_data.append("{x:new Date(%d),y:0}" % (int(charts_times[-1:][0]) + 1))
             charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
             return charts_data
         else:
