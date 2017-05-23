@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load telephone_filters %}
 {% block main %}
 
 
@@ -16,45 +17,37 @@
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
+                <th>{% trans 'Play' %}</th>
                 <th>{% trans 'calldate' %}</th>
                 <th>{% trans 'src' %}</th>
                 <th>{% trans 'dst' %}</th>
-                <th>{% trans 'dcontext' %}</th>
-                <th>{% trans 'channel' %}</th>
-                <th>{% trans 'dstchannel' %}</th>
-                <th>{% trans 'lastdata' %}</th>
                 <th>{% trans 'duration' %}</th>
-                <th>{% trans 'billsec' %}</th>
                 <th>{% trans 'start' %}</th>
                 <th>{% trans 'answer' %}</th>
                 <th>{% trans 'end' %}</th>
                 <th>{% trans 'disposition' %}</th>
-                <th>{% trans 'amaflags' %}</th>
-                <th>{% trans 'uniqueid' %}</th>
             </tr>
             </thead>
             <tbody>
             {% for log in logs %}
                 <tr>
+                    <td>
+                        <audio preload="metadata" controls>
+                            <source src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" type="audio/wav"/>
+                        </audio>
+                    </td>
                     <td>{{ log.calldate|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.src }}</td>
-                    <td>{{ log.dst }}</td>
-                    <td>{{ log.dcontext }}</td>
-                    <td>{{ log.channel }}</td>
-                    <td>{{ log.dstchannel }}</td>
-                    <td>{{ log.lastdata }}</td>
+                    <td>{{ log.src|abon_if_telephone|safe }}</td>
+                    <td>{{ log.dst|abon_if_telephone|safe }}</td>
                     <td>{{ log.duration }}</td>
-                    <td>{{ log.billsec }}</td>
                     <td>{{ log.start|date:'d E Y, H:i:s' }}</td>
                     <td>{{ log.answer|date:'d E Y, H:i:s' }}</td>
                     <td>{{ log.end|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.disposition }}</td>
-                    <td>{{ log.amaflags }}</td>
-                    <td>{{ log.uniqueid }}</td>
+                    <td>{{ log.locate_disposition }}</td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="15">{% trans 'Calls was not found' %}</td>
+                    <td colspan="9">{% trans 'Calls was not found' %}</td>
                 </tr>
             {% endfor %}
             </tbody>
