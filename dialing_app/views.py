@@ -25,8 +25,12 @@ def to_abon(request, tel):
     abon_count = abon.count()
     if abon_count > 1:
         messages.warning(request, _('Multiple users with the telephone number'))
-        abon = abon[0]
     elif abon_count == 0:
         messages.error(request, _('User with the telephone number not found'))
         return redirect('dialapp:home')
-    return redirect('abonapp:abon_home', gid=abon.group_id, uid=abon.pk)
+    abon = abon[0]
+    if abon.group:
+        return redirect('abonapp:abon_home', gid=abon.group.pk, uid=abon.pk)
+    else:
+        return redirect('abonapp:group_list')
+
