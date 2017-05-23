@@ -56,12 +56,4 @@ class AsteriskCDR(models.Model):
         return getattr(settings, 'DIALING_MEDIA', '/media')
 
     class Meta:
-        abstract = True
-
-
-def getModel():
-    class DynamicCDR(AsteriskCDR):
-        class Meta:
-            abstract = False
-            db_table = 'cdr'
-    return DynamicCDR
+        db_table = 'cdr'
