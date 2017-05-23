@@ -239,3 +239,9 @@ button[data-toggle=offcanvas]{
 .ct-series-a .ct-area {
     fill: black;
 }
+
+
+/*
+ * Сужаем аудио элемент чтоб скрыть большинство контролов
+ */
+audio{width: 100px;}
