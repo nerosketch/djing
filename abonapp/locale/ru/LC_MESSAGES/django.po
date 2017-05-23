@@ -857,3 +857,15 @@ msgstr "Графики"
 
 msgid "Sub information"
 msgstr "Информация абонента"
+
+msgid "Streets"
+msgstr "Улицы"
+
+msgid "Static info was Not found"
+msgstr "Статистика не найдена"
+
+msgid "Graphs by dates"
+msgstr "Графики по датам"
+
+msgid "Graph of use"
+msgstr "График использования"

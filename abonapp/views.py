@@ -18,7 +18,7 @@ from . import forms
 from . import models
 import mydefs
 from devapp.models import Device
-from datetime import datetime
+from datetime import datetime, date
 from taskapp.models import Task
 
 
@@ -717,8 +717,14 @@ def charts(request, gid, uid):
     from statistics.models import getModel
     high = 100
 
+    wandate = request.GET.get('wantdate')
+    if wandate:
+        wandate = datetime.strptime(wandate, '%d%m%Y').date()
+    else:
+        wandate = date.today()
+
     try:
-        StatElem = getModel()
+        StatElem = getModel(wandate)
         abon = models.Abon.objects.get(pk=uid)
         if abon.group is None:
             abon.group = models.AbonGroup.objects.get(pk=gid)
@@ -728,7 +734,11 @@ def charts(request, gid, uid):
         if abon.ip_address is None:
             charts_data = None
         else:
-            charts_data = StatElem.objects.chart(abon.ip_address)
+            charts_data = StatElem.objects.chart(
+                abon.ip_address,
+                count_of_parts=24,
+                want_date=wandate
+            )
 
             abontariff = abon.active_tariff()
             if abontariff is not None:
@@ -750,7 +760,8 @@ def charts(request, gid, uid):
         'abon_group': abongroup,
         'abon': abon,
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
-        'high': high
+        'high': high,
+        'dates': StatElem.objects.get_dates()
     })
 
 
