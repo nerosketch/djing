@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from djing import settings
 
 
 class AsteriskCDR(models.Model):
@@ -35,6 +36,24 @@ class AsteriskCDR(models.Model):
 
     def delete(self, *args, **kwargs):
         return
+
+    def locate_disposition(self):
+        dsp = self.disposition
+        if dsp == 'NO ANSWER':
+            return _('No answer')
+        elif dsp == 'FAILED':
+            return _('Failed')
+        elif dsp == 'BUSY':
+            return _('Busy')
+        elif dsp == 'ANSWERED':
+            return _('Answered')
+        elif dsp == 'UNKNOWN':
+            return _('Unknown')
+        return ''
+
+    @staticmethod
+    def path_to_media():
+        return getattr(settings, 'DIALING_MEDIA', '/media')
 
     class Meta:
         abstract = True

@@ -59,29 +59,9 @@ msgstr "кто"
 msgid "dst"
 msgstr "куда"
 
-#: dialing_app/templates/index.html:22
-msgid "dcontext"
-msgstr "контекст"
-
-#: dialing_app/templates/index.html:23
-msgid "channel"
-msgstr "канал"
-
-#: dialing_app/templates/index.html:24
-msgid "dstchannel"
-msgstr "канал назначения"
-
-#: dialing_app/templates/index.html:25
-msgid "lastdata"
-msgstr "lastdata"
-
 #: dialing_app/templates/index.html:26
 msgid "duration"
 msgstr "продолжительность"
-
-#: dialing_app/templates/index.html:27
-msgid "billsec"
-msgstr "вся продолж."
 
 #: dialing_app/templates/index.html:28
 msgid "start"
@@ -99,14 +79,15 @@ msgstr "конец"
 msgid "disposition"
 msgstr "состояние"
 
-#: dialing_app/templates/index.html:32
-msgid "amaflags"
-msgstr "amaflags"
-
-#: dialing_app/templates/index.html:33
-msgid "uniqueid"
-msgstr "uniqueid"
-
 #: dialing_app/templates/index.html:57
 msgid "Calls was not found"
 msgstr "Звонки не найдены"
+
+msgid "Play"
+msgstr "Слушать"
+
+msgid "User with the telephone number not found"
+msgstr "Абонент с таким номером телефона не найден"
+
+msgid "Multiple users with the telephone number"
+msgstr "Несколько абонентов с указанным номером телефона"
