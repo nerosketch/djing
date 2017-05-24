@@ -40,7 +40,7 @@ class TariffDefault(TariffBase):
         last_day = monthrange(nw.year, nw.month)[1]
         last_month_date = datetime(year=nw.year, month=nw.month, day=last_day,
                                    hour=23, minute=59, second=59)
-        return timezone.make_aware(last_month_date)
+        return last_month_date
 
     @staticmethod
     def description():
@@ -67,7 +67,7 @@ class TariffCp(TariffDp):
         nw = timezone.now()
         long_long_time = datetime(year=nw.year+10, month=nw.month, day=nw.day,
                                   hour=23, minute=59, second=59)
-        return timezone.make_aware(long_long_time)
+        return long_long_time
 
     @staticmethod
     def description():
