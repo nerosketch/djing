@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
@@ -292,7 +291,7 @@ class Abon(UserProfile):
     def activate_next_tariff(self, author):
         ats = AbonTariff.objects.filter(abon=self).order_by('tariff_priority')
 
-        nw = timezone.make_aware(datetime.now())
+        nw = timezone.now()
 
         for at in ats:
             # услуга не активна, продолжаем
