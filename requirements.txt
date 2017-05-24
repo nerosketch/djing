@@ -7,3 +7,4 @@ netaddr
 xmltodict
 mysqlclient
 easysnmp
+rq
