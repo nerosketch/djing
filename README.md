@@ -18,3 +18,9 @@
 ```
 # pip install git+https://github.com/nerosketch/djing.git
 ```
+
+На Fedora ставил так
+```
+# dnf install uwsgi python3 python3-devel nginx python-pip git redis mariadb mariadb-devel net-snmp net-snmp-devel gcc redhat-rpm-config
+# pip3 install rq mysqlclient easysnmp xmltodict netaddr telepot Pillow Django==1.9
+```
