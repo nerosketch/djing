@@ -53,6 +53,11 @@
             <a href="{{ abtasklog }}">{% trans 'Charts' %}</a>
         </li>
 
+        {% url 'abonapp:dials' abon_group.pk abon.pk as abdials %}
+        <li{% if abdials == request.path %} class="active"{% endif %}>
+            <a href="{{ abdials }}">{% trans 'Dialing' %}</a>
+        </li>
+
     </ul>
 
     <div class="tab-content">

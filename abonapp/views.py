@@ -3,7 +3,7 @@ from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
@@ -20,6 +20,7 @@ import mydefs
 from devapp.models import Device
 from datetime import datetime, date
 from taskapp.models import Task
+from dialing_app.models import AsteriskCDR
 
 
 @login_required
@@ -736,7 +737,7 @@ def charts(request, gid, uid):
         else:
             charts_data = StatElem.objects.chart(
                 abon.ip_address,
-                count_of_parts=24,
+                count_of_parts=30,
                 want_date=wandate
             )
 
@@ -858,6 +859,28 @@ def abon_ping(request):
         'status': 0 if status else 1,
         'dat': text
     }))
+
+
+@login_required
+@mydefs.only_admins
+def dials(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    if hasattr(abon.group, 'pk') and abon.group.pk != int(gid):
+        print(gid, type(gid), abon.group.pk, type(abon.group.pk))
+        return redirect('abonapp:dials', abon.group.pk, abon.pk)
+    if abon.telephone is not None and abon.telephone != '':
+        tel = abon.telephone.replace('+', '')
+        logs = AsteriskCDR.objects.filter(
+            Q(src__contains=tel) | Q(dst__contains=tel)
+        )
+        logs = mydefs.pag_mn(request, logs)
+    else:
+        logs = None
+    return render(request, 'abonapp/dial_log.html', {
+        'logs': logs,
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
+        'abon': abon
+    })
 
 
 # API's

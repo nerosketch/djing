@@ -869,3 +869,36 @@ msgstr "Графики по датам"
 
 msgid "Graph of use"
 msgstr "График использования"
+
+msgid "Play"
+msgstr "Слушать"
+
+msgid "calldate"
+msgstr "дата звонка"
+
+msgid "src"
+msgstr "кто"
+
+msgid "dst"
+msgstr "куда"
+
+msgid "duration"
+msgstr "продолжительность"
+
+msgid "start"
+msgstr "начало"
+
+msgid "answer"
+msgstr "ответ"
+
+msgid "end"
+msgstr "конец"
+
+msgid "disposition"
+msgstr "состояние"
+
+msgid "Calls was not found"
+msgstr "Звонки не найдены"
+
+msgid "Dialing"
+msgstr "Звонки"
