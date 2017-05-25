@@ -28,7 +28,14 @@
                         <div class="form-group-sm">
                             <label for="id_telephone" class="col-sm-4 control-label">{% trans 'Telephone' %}</label>
                             <div class="col-sm-8">
-                                {{ form.telephone }}{{ form.telephone.errors }}
+                                <div class="input-group input-group-sm">
+                                    {{ form.telephone }}{{ form.telephone.errors }}
+                                    <span class="input-group-btn">
+                                        <a href="tel:{{ form.telephone.value }}" class="btn btn-default">
+                                            <span class="glyphicon glyphicon-earphone"></span>
+                                        </a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
