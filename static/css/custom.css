@@ -238,6 +238,8 @@ button[data-toggle=offcanvas]{
  */
 .ct-series-a .ct-area {
     fill: black;
+    opacity: 0.3;
+    fill-opacity: 0.3;
 }
 
 
