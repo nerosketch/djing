@@ -33,7 +33,10 @@
                                         labelInterpolationFnc: function (value) {
                                             return moment(value).format('HH:mm:ss');
                                         }
-                                    }
+                                    },
+                                    lineSmooth: Chartist.Interpolation.cardinal({
+                                        tension: 0
+                                    })
                                 });
                             });
                         </script>
