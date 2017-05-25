@@ -4,14 +4,15 @@ from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 
 from abonapp.models import Abon
-from mydefs import only_admins
+from mydefs import only_admins, pag_mn
 from .models import AsteriskCDR
 
 
 @login_required
 @only_admins
 def home(request):
-    logs = AsteriskCDR.objects.filter()
+    logs = AsteriskCDR.objects.all()
+    logs = pag_mn(request, logs)
     return render(request, 'index.html', {
         'logs': logs
     })
