@@ -75,7 +75,7 @@
                         </td>
                         <td>
                             {% if human.traf %}
-                                {{ human.traf.cur_time|date:"H:i" }}
+                                {{ human.traf.cur_time|date:"D H:i" }}
                             {% endif %}
                         </td>
                         <td>{{ human.ip_address|default:_('Not assigned') }}</td>
