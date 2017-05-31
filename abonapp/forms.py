@@ -12,6 +12,7 @@ from .formfields import MACAddressField
 
 def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
     username = ''.join([choice(chars) for i in range(length)])
+    username = str(int(username))
 
     if split:
         username = delimiter.join([username[start:start+split] for start in range(0, len(username), split)])
