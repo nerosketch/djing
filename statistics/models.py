@@ -101,7 +101,7 @@ class StatCache(models.Model):
     packets = models.PositiveIntegerField(default=0)
 
     def is_online(self):
-        return self.last_time < now() - timedelta(minutes=55)
+        return self.last_time > now() - timedelta(minutes=55)
 
     def is_today(self):
         return date.today() == self.last_time.date()
