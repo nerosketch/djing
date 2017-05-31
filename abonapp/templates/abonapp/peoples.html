@@ -69,13 +69,17 @@
                         {% endif %}
                         <td>
                             <a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a>
-                            {% if human.is_online %}
+                            {% if human.stat_cache and human.stat_cache.is_online %}
                                 <span class="glyphicon glyphicon-ok text-success"></span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if human.traf %}
-                                {{ human.traf.cur_time|date:"H:i" }}
+                            {% if human.stat_cache %}
+                                {% if human.stat_cache.is_today %}
+                                    {{ human.stat_cache.last_time|date:"H:i" }}
+                                {% else %}
+                                    {{ human.stat_cache.last_time|date:"D H:i" }}
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td>{{ human.ip_address|default:_('Not assigned') }}</td>
