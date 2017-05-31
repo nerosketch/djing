@@ -2,7 +2,6 @@
 import sys
 from redis import Redis
 from rq import Queue
-from django.utils.translation import ugettext as _
 
 
 def die(text):
@@ -13,12 +12,12 @@ def die(text):
 if __name__ == "__main__":
     argv = sys.argv
     if len(argv) < 3:
-        die(_('Too few arguments, exiting...'))
+        die('Too few arguments, exiting...')
     action = argv[1]
     q = Queue(connection=Redis())
     if action == 'commit':
         if len(argv) < 6:
-            die(_('Too few arguments, exiting...'))
+            die('Too few arguments, exiting...')
         q.enqueue('agent.commands.dhcp.dhcp_commit', argv[2], argv[3], argv[4], int(argv[5]))
     elif action == 'expiry':
         q.enqueue('agent.commands.dhcp.dhcp_expiry', argv[2])

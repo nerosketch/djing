@@ -12,6 +12,7 @@ def replace_without_case(orig, old, new):
 
 def home(request):
     s = request.GET.get('s')
+    s = s.replace('+', '')
 
     if s:
         if bool(re.match(ip_addr_regex, s)):
