@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.http import QueryDict
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
@@ -97,9 +96,6 @@ class Opt82Form(forms.ModelForm):
         widgets = {
             'port': forms.NumberInput(attrs={'class': 'form-control', 'required': ''})
         }
-
-    #def save(self, commit=True):
-    #    super().save(commit=commit)
 
 
 class AbonGroupForm(forms.ModelForm):
