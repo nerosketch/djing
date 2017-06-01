@@ -4,6 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count, Q
+from django.db.transaction import atomic
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
@@ -351,7 +352,7 @@ def opt82(request, gid, uid):
     return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
-@mydefs.require_ssl
+@atomic
 def terminal_pay(request):
     from .pay_systems import allpay
     ret_text = allpay(request)
