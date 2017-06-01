@@ -21,8 +21,8 @@
                             <li class="list-group-item">
                                 <div class="btn-group">
                                     {% if abon_tariff == current_service %}
-                                        <a href="{% url 'client_side:complete_service' abon_tariff.pk %}"
-                                           class="btn btn-xs btn-danger btn-modal" title="Завершить услугу досрочно">
+                                        <a href="#{% url 'client_side:complete_service' abon_tariff.pk %}"
+                                           class="btn btn-xs btn-danger btn-modal disabled" title="Завершить услугу досрочно">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     {% else %}
