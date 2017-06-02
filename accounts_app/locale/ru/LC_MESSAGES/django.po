@@ -184,3 +184,9 @@ msgstr "Редактировать"
 
 msgid "Set a task"
 msgstr "Дать задачу"
+
+msgid "Empty password, fill it"
+msgstr "Пустой пароль, впишите что-то в пароль"
+
+msgid "New password is empty, fill it"
+msgstr "Новый пароль пустой, придумайте себе пароль"
