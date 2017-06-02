@@ -162,3 +162,41 @@ msgstr "Комментарий"
 #: clientsideapp/templates/clientsideapp/pays.html:25
 msgid "You have not spent payments"
 msgstr "У вас нет проведённых платежей"
+
+msgid "Buy the service via user side, service '%s'"
+msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
+
+msgid ""
+"You are subscribed on new service. "
+"That will enable service when your current service has expired."
+
+msgstr ""
+"Вы подписались на новую услугу. Она встала на очередь подключений. "
+"Когда закончится ваша текущая услуга, то включится эта"
+
+msgid "Service '%s' has been finished"
+msgstr "Услуга '%s' успешно завершена"
+
+msgid "The service '%s' wan successfully activated"
+msgstr "Услуга '%s' успешно активирована"
+
+msgid "Early terminated service '%s' via client side"
+msgstr "Досрочное завершение услуги '%s' из личного кабинета"
+
+msgid "Act is not confirmed"
+msgstr "Действие не подтверждено"
+
+msgid "Temporary network bug"
+msgstr "Временные неполадки в сети"
+
+msgid "You has been successfully unsubscribed from service, '%s'"
+msgstr "Вы успешно отписались от услуги, '%s'"
+
+msgid "The service was not found"
+msgstr "Указанная подписка на услугу не найдена"
+
+msgid "Are you not sure that you want buy the service?"
+msgstr "Вы не уверены что хотите оплатить долг?"
+
+msgid "Your account have not enough money"
+msgstr "Недостаточно средств на счету"
