@@ -853,7 +853,7 @@ msgid "SNMP error on device"
 msgstr "Ошибка в SNMP на устройстве"
 
 msgid "Charts"
-msgstr "Графики"
+msgstr "График"
 
 msgid "Sub information"
 msgstr "Информация абонента"
