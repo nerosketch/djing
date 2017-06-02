@@ -190,6 +190,7 @@ def delentity(request):
 
 @login_required
 @permission_required('abonapp.can_add_ballance')
+@atomic
 def abonamount(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
@@ -398,6 +399,7 @@ def add_invoice(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.can_buy_tariff')
+@atomic
 def pick_tariff(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
@@ -457,6 +459,7 @@ def chpriority(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.can_complete_service')
+@atomic
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, pk=srvid)
     abon = abtar.abon
@@ -516,6 +519,7 @@ def complete_service(request, gid, uid, srvid):
 
 @login_required
 @permission_required('abonapp.can_activate_service')
+@atomic
 def activate_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, pk=srvid)
     amount = abtar.calc_amount_service()
