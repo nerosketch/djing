@@ -41,11 +41,11 @@ msgstr "ONU Голова"
 #: devapp/templates/devapp/group_list.html:7
 #: devapp/templates/devapp/group_list.html:10
 msgid "Groups"
-msgstr ""
+msgstr "Группы"
 
 #: devapp/templates/devapp/add_dev.html:8
 msgid "Add new device"
-msgstr ""
+msgstr "Добавить устройство"
 
 #: devapp/templates/devapp/add_dev.html:14
 #: devapp/templates/devapp/ports.html:143
@@ -84,7 +84,7 @@ msgstr "Точка топологии"
 
 #: devapp/templates/devapp/add_dev.html:71 devapp/templates/devapp/dev.html:59
 msgid "User group"
-msgstr ""
+msgstr "Группа"
 
 #: devapp/templates/devapp/add_dev.html:81 devapp/templates/devapp/dev.html:69
 msgid "Save"
@@ -118,7 +118,7 @@ msgstr "Устройства без группы"
 
 #: devapp/templates/devapp/group_list.html:18
 msgid "Group title"
-msgstr ""
+msgstr "Название"
 
 #: devapp/templates/devapp/group_list.html:28
 #, fuzzy
@@ -128,7 +128,7 @@ msgstr "Эта точка не пингуется"
 
 #: devapp/templates/devapp/group_list.html:37
 msgid "Add group"
-msgstr ""
+msgstr "Добавить группу"
 
 #: devapp/templates/devapp/olt.html:13
 msgid "Mac"
@@ -224,3 +224,9 @@ msgstr "Ошибка SNMP на устройстве"
 
 msgid "Edit"
 msgstr "Редактировать"
+
+msgid "Enable port"
+msgstr "Включить порт"
+
+msgid "Disable port"
+msgstr "Выключить порт"
