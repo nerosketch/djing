@@ -14,29 +14,30 @@
                     {% for port in ports %}
                         {% if port.st %}
                             {% if port.sp == 10 %}
-                                <div class="port kilo">
+                                <div class="port kilo text-center">
                             {% elif port.sp == 100 %}
-                                <div class="port mega">
+                                <div class="port mega text-center">
                             {% elif port.sp == 1000 %}
-                                <div class="port giga">
+                                <div class="port giga text-center">
                             {% else %}
-                                <div class="port">
+                                <div class="port text-center">
                             {% endif %}
                         {% else %}
-                            <div class="port dis">
+                            <div class="port dis text-center">
                         {% endif %}
 
-                            <a href="#" class="port-img" title="{{ port.nm }}">
+                            <a href="javascript:void(0);" class="port-img" title="{{ port.nm }}">
                                 <b>{{ port.num }}</b>
                             </a>
-                            <div class="btn-group btn-group-xs btn-group-justified">
-                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 1 %}" class="btn btn-success">
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                </a>
-                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 0 %}" class="btn btn-danger">
+                            {% if port.st %}
+                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 0 %}" class="btn btn-xs btn-danger" title="{% trans 'Disable port' %}">
                                     <span class="glyphicon glyphicon-off"></span>
                                 </a>
-                            </div>
+                            {% else %}
+                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 1 %}" class="btn btn-xs btn-success" title="{% trans 'Enable port' %}">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </a>
+                            {% endif %}
                         </div>
                     {% empty %}
                         <h3>{% trans 'We have not received info, please check options :(' %}</h3>
@@ -65,58 +66,7 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Err:bug</td>
-                            <td>port Eth1 state Up</td>
-                            <td>21 Dec 12:15:23</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Err:Other</td>
-                            <td>port Eth1 state Up</td>
-                            <td>21 Dec 12:15:45</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Err:Disable</td>
-                            <td>port Eth1 state Down</td>
-                            <td>21 Dec 12:14:55</td>
+                            <td colspan="4">Coming soon..</td>
                         </tr>
                         </tbody>
                     </table>
