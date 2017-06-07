@@ -318,7 +318,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
     def remove(self, mk_id):
         return self._exec_cmd([
             '/ip/firewall/address-list/remove',
-            '=.id=*' + str(mk_id)
+            '=.id=*' + str(mk_id).replace('*', '')
         ])
 
     def find(self, ip, list_name):
