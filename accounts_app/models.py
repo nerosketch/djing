@@ -49,7 +49,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     telephone = models.CharField(
         max_length=16,
-        verbose_name=_('Telephone number'),
+        verbose_name=_('Telephone'),
         #unique=True,
         validators=[RegexValidator('^\+[7,8,9,3]\d{10,11}$')]
     )
