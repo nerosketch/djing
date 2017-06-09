@@ -430,7 +430,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     # приостановливаем обслуживание абонента
     def pause_user(self, user):
-        pass
+        self.remove_user(user)
 
     # продолжаем обслуживание абонента
     def start_user(self, user):
