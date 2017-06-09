@@ -561,7 +561,7 @@ msgstr "Народ в выбранной группе"
 
 #: abonapp/templates/abonapp/peoples.html:27
 msgid "Last traffic"
-msgstr "Последний траффик"
+msgstr "Траф."
 
 #: abonapp/templates/abonapp/peoples.html:30
 #, fuzzy
