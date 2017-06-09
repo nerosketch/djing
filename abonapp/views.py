@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count, Q
 from django.db.transaction import atomic
@@ -300,6 +300,9 @@ def abonhome(request, gid, uid):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except MultipleObjectsReturned:
+        abon_device = models.AbonDevice.objects.filter(abon=abon)[0]
+        models.AbonDevice.objects.exclude(pk=abon_device).delete()
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
