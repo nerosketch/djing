@@ -630,10 +630,9 @@ def passport_view(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
-            frm = forms.PassportForm(request.POST)
+            frm = forms.PassportForm(request.POST, initial={'abon': abon})
             if frm.is_valid():
                 passp_instance = frm.save(commit=False)
-                passp_instance.abon = abon
                 passp_instance.save()
                 messages.success(request, _('Passport information has been saved'))
                 return redirect('abonapp:passport_view', gid=gid, uid=uid)
