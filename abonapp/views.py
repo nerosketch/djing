@@ -272,7 +272,7 @@ def abonhome(request, gid, uid):
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
                 # если нет option82, т.е. динамический ip то не сохраняем изменения ip
-                if abon.opt82 is None:
+                if not abon.is_dhcp():
                     ip_str = request.POST.get('ip')
                     if ip_str:
                         abon.ip_address = ip_str
