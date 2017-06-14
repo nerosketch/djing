@@ -303,7 +303,7 @@ class Abon(UserProfile):
                 # выберем следующую по приоритету
                 # next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)
                 next_tarifs = [tr for tr in ats if tr.tariff_priority > at.tariff_priority][:2]
-                #next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
+                # next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
 
                 # и если что-нибудь из списка следующих услуг вернулось - то активируем
                 if len(next_tarifs) > 0:
@@ -332,10 +332,10 @@ class Abon(UserProfile):
         else:
             return
         inst_tariff = self.active_tariff()
-        if inst_tariff:
+        if inst_tariff is not None:
             agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
         else:
-            agent_trf = TariffStruct()
+            agent_trf = None
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
     def save(self, *args, **kwargs):
