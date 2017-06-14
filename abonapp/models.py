@@ -9,6 +9,7 @@ from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from .fields import MACAddressField
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
+from djing import settings
 
 
 class AbonGroup(models.Model):
@@ -248,6 +249,9 @@ class Abon(UserProfile):
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
 
+    def is_dhcp(self):
+        return self.opt82 is not None
+
     # Пополняем счёт
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
@@ -320,10 +324,7 @@ class Abon(UserProfile):
             return False
         trf = ats[0].tariff
         ct = trf.get_calc_type()(ats[0])
-        if ct.manage_access(self):
-            return True
-        else:
-            return False
+        return ct.manage_access(self)
 
     # создаём абонента из структуры агента
     def build_agent_struct(self):
@@ -435,8 +436,8 @@ class AbonRawPassword(models.Model):
 
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
-    if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = 14400
+    if hasattr(instance, 'is_dhcp') and instance.is_dhcp():
+        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
