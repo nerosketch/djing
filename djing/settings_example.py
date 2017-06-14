@@ -162,3 +162,5 @@ pay_SERV_ID = '<service id>'
 pay_SECRET = '<secret>'
 
 DIALING_MEDIA = 'path/to/asterisk_records'
+
+DHCP_TIMEOUT = 14400
