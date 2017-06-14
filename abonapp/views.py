@@ -630,10 +630,15 @@ def passport_view(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
-            frm = forms.PassportForm(request.POST, initial={'abon': abon})
+            try:
+                passport_instance = models.PassportInfo.objects.get(abon=abon)
+            except models.PassportInfo.DoesNotExist:
+                passport_instance = None
+            frm = forms.PassportForm(request.POST, instance=passport_instance)
             if frm.is_valid():
-                passp_instance = frm.save(commit=False)
-                passp_instance.save()
+                pi = frm.save(commit=False)
+                pi.abon = abon
+                pi.save()
                 messages.success(request, _('Passport information has been saved'))
                 return redirect('abonapp:passport_view', gid=gid, uid=uid)
             else:
@@ -868,7 +873,6 @@ def abon_ping(request):
 def dials(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     if hasattr(abon.group, 'pk') and abon.group.pk != int(gid):
-        print(gid, type(gid), abon.group.pk, type(abon.group.pk))
         return redirect('abonapp:dials', abon.group.pk, abon.pk)
     if abon.telephone is not None and abon.telephone != '':
         tel = abon.telephone.replace('+', '')
