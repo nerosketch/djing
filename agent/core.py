@@ -99,3 +99,27 @@ class BaseTransmitter(metaclass=ABCMeta):
         :param count: количество пингов
         :return: None если не пингуется, иначе кортеж, в котором (сколько вернулось, сколько было отправлено)
         """
+
+    @abstractmethod
+    def read_users(self):
+        """
+        Читаем пользователей с NAS
+        :return: список AbonStruct
+        """
+
+    def _diff_users(self, users_from_db):
+        """
+        :param users_from_db: QuerySet всех абонентов у которых может быть обслуживание
+        :return: на выходе получаем абонентов которых надо добавить в nas и которых надо удалить
+        """
+        users_from_db = [ab.build_agent_struct() for ab in users_from_db if ab.is_access()]
+        users_from_db = set([ab for ab in users_from_db if ab is not None and ab.tariff is not None])
+        users_from_nas = set(self.read_users())
+        list_for_del = (users_from_db ^ users_from_nas) - users_from_db
+        list_for_add = users_from_db - users_from_nas
+        return list_for_add, list_for_del
+
+    def sync_nas(self, users_from_db):
+        list_for_add, list_for_del = self._diff_users(users_from_db)
+        self.remove_user_range( list_for_del )
+        self.add_user_range( list_for_add )

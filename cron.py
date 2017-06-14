@@ -10,40 +10,17 @@ from mydefs import LogicError
 
 
 def main():
-    tm = None
+    try:
+        users = Abon.objects.filter(is_active=True, is_admin=False).exclude(ip_address=None)
+        tm = Transmitter()
+        tm.sync_nas(users)
 
-    users = Abon.objects.all()
-    for user in users:
-        try:
-            # бдим за услугами абонента: просроченные отключить, заказанные подключить
-            user.activate_next_tariff(user)
-
-            # если нет ip то и нет смысла лезть в NAS
-            if user.ip_address is None:
-                continue
-
-            # а есть-ли у абонента доступ к услуге
-            if not user.is_access():
-                continue
-
-            # строим структуру агента
-            ab = user.build_agent_struct()
-            if ab is None:
-                # если не построилась структура агента, значит нет ip
-                # а если нет ip то и синхронизировать абонента без ip нельзя
-                continue
-
-            # обновляем абонента если он статический. Иначе его обновит dhcp
-            if user.opt82 is None:
-                if tm is None:
-                    tm = Transmitter()
-                tm.update_user(ab)
-
-        except (NasNetworkError, NasFailedResult) as er:
-            print("Error:", er)
-        except LogicError as er:
-            print("Notice:", er)
-
+    except (NasNetworkError, NasFailedResult) as er:
+        print("Error:", er)
+        exit(1)
+    except LogicError as er:
+        print("Notice:", er)
+        exit(1)
 
 if __name__ == "__main__":
     try:
