@@ -22,6 +22,8 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
         return
     try:
         abon = Abon.objects.get(opt82=opt82)
+        if not abon.is_access():
+            return
         abon.ip_address = client_ip
         abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
