@@ -15,6 +15,8 @@ class StatManager(models.Manager):
 
         def split_list(lst, chunk_count):
             chunk_size = len(lst) // chunk_count
+            if chunk_size == 0:
+                chunk_size = 1
             return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
 
         def avarage(elements):
