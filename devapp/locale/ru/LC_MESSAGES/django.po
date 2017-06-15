@@ -48,7 +48,7 @@ msgid "Add new device"
 msgstr "Добавить устройство"
 
 #: devapp/templates/devapp/add_dev.html:14
-#: devapp/templates/devapp/ports.html:143
+#: devapp/templates/devapp/ports.html:93
 msgid "Not assigned"
 msgstr "&lt;Не назначено&gt;"
 
@@ -158,39 +158,47 @@ msgstr "Название типа свича"
 msgid "Uptime"
 msgstr "Без перезагрузки"
 
-#: devapp/templates/devapp/ports.html:42
+#: devapp/templates/devapp/ports.html:33
+msgid "Disable port"
+msgstr "Выключить порт"
+
+#: devapp/templates/devapp/ports.html:37
+msgid "Enable port"
+msgstr "Включить порт"
+
+#: devapp/templates/devapp/ports.html:43
 msgid "We have not received info, please check options :("
 msgstr "Инфа не получена, проверьте настройки :("
 
-#: devapp/templates/devapp/ports.html:54
+#: devapp/templates/devapp/ports.html:55
 msgid "Device log"
 msgstr "Лог устройства"
 
-#: devapp/templates/devapp/ports.html:61
+#: devapp/templates/devapp/ports.html:62
 msgid "Level"
 msgstr "Уровень"
 
-#: devapp/templates/devapp/ports.html:62
+#: devapp/templates/devapp/ports.html:63
 msgid "Description"
 msgstr "Описание"
 
-#: devapp/templates/devapp/ports.html:63
+#: devapp/templates/devapp/ports.html:64
 msgid "Date"
 msgstr "Дата"
 
-#: devapp/templates/devapp/ports.html:129
+#: devapp/templates/devapp/ports.html:79
 msgid "Ports comment"
 msgstr "Комментарии портов"
 
-#: devapp/templates/devapp/ports.html:135
+#: devapp/templates/devapp/ports.html:85
 msgid "Port"
 msgstr "Порт"
 
-#: devapp/templates/devapp/ports.html:136
+#: devapp/templates/devapp/ports.html:86
 msgid "Title"
 msgstr "Название"
 
-#: devapp/templates/devapp/ports.html:147
+#: devapp/templates/devapp/ports.html:97
 msgid "We have not received info for ports"
 msgstr "Инфа о портах не получена"
 
