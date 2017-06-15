@@ -31,7 +31,10 @@ msgid "locality %s.\n"
 msgstr "с. %s\n"
 
 #: taskapp/handle.py:33
-msgid "address %s %s.\ntelephone %s\n"
+#, python-format
+msgid ""
+"address %s %s.\n"
+"telephone %s\n"
 msgstr "по адресу %s %s тел. %s.\n"
 
 #: taskapp/handle.py:34 taskapp/models.py:26
@@ -39,6 +42,7 @@ msgid "not chosen"
 msgstr "не выбрано"
 
 #: taskapp/handle.py:38
+#, python-format
 msgid "Task type - %s."
 msgstr "Тип задачи - %s."
 
@@ -141,11 +145,11 @@ msgid "Tasks"
 msgstr "Задачи"
 
 #: taskapp/templates/taskapp/add_edit_task.html:8
-#: taskapp/templates/taskapp/tasklist.html:48
-#: taskapp/templates/taskapp/tasklist_active.html:46
-#: taskapp/templates/taskapp/tasklist_all.html:54
-#: taskapp/templates/taskapp/tasklist_finish.html:43
-#: taskapp/templates/taskapp/tasklist_own.html:40
+#: taskapp/templates/taskapp/tasklist.html:60
+#: taskapp/templates/taskapp/tasklist_active.html:57
+#: taskapp/templates/taskapp/tasklist_all.html:72
+#: taskapp/templates/taskapp/tasklist_finish.html:54
+#: taskapp/templates/taskapp/tasklist_own.html:53
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -156,17 +160,17 @@ msgstr "Создать"
 #: taskapp/templates/taskapp/add_edit_task.html:15
 #: taskapp/templates/taskapp/footer_btns.html:3
 #: taskapp/templates/taskapp/footer_btns.html:4
-#: taskapp/templates/taskapp/tasklist_all.html:75
-#: taskapp/templates/taskapp/tasklist_all.html:76
+#: taskapp/templates/taskapp/tasklist_all.html:93
+#: taskapp/templates/taskapp/tasklist_all.html:94
 msgid "Add new task"
 msgstr "Добавьте новую задачу"
 
 #: taskapp/templates/taskapp/add_edit_task.html:27
-#: taskapp/templates/taskapp/tasklist.html:10
-#: taskapp/templates/taskapp/tasklist_active.html:10
-#: taskapp/templates/taskapp/tasklist_all.html:22
-#: taskapp/templates/taskapp/tasklist_finish.html:10
-#: taskapp/templates/taskapp/tasklist_own.html:10
+#: taskapp/templates/taskapp/tasklist.html:13
+#: taskapp/templates/taskapp/tasklist_active.html:13
+#: taskapp/templates/taskapp/tasklist_all.html:25
+#: taskapp/templates/taskapp/tasklist_finish.html:13
+#: taskapp/templates/taskapp/tasklist_own.html:13
 #: taskapp/templates/taskapp/view.html:19
 msgid "Description"
 msgstr "Описание"
@@ -176,30 +180,24 @@ msgstr "Описание"
 #: taskapp/templates/taskapp/tasklist_active.html:12
 #: taskapp/templates/taskapp/tasklist_all.html:24
 #: taskapp/templates/taskapp/tasklist_finish.html:12
-#: taskapp/templates/taskapp/tasklist_own.html:11
+#: taskapp/templates/taskapp/tasklist_own.html:12
 msgid "The nature of the damage"
 msgstr "Характер поломки"
 
 #: taskapp/templates/taskapp/add_edit_task.html:43
-#: taskapp/templates/taskapp/tasklist.html:14
-#: taskapp/templates/taskapp/tasklist_active.html:14
-#: taskapp/templates/taskapp/tasklist_all.html:26
-#: taskapp/templates/taskapp/tasklist_finish.html:14
-#: taskapp/templates/taskapp/tasklist_own.html:13
+#: taskapp/templates/taskapp/view.html:29
 msgid "A priority"
 msgstr "Приоритет"
 
 #: taskapp/templates/taskapp/add_edit_task.html:51
-#: taskapp/templates/taskapp/tasklist.html:13
-#: taskapp/templates/taskapp/tasklist_active.html:13
-#: taskapp/templates/taskapp/tasklist_all.html:25
-#: taskapp/templates/taskapp/tasklist_finish.html:13
-#: taskapp/templates/taskapp/tasklist_own.html:12
+#: taskapp/templates/taskapp/tasklist_all.html:27
+#: taskapp/templates/taskapp/tasklist_own.html:14
+#: taskapp/templates/taskapp/view.html:34
 msgid "Condition"
 msgstr "Состояние"
 
 #: taskapp/templates/taskapp/add_edit_task.html:59
-#: taskapp/templates/taskapp/view.html:30
+#: taskapp/templates/taskapp/view.html:35
 msgid "Subscriber"
 msgstr "Абонент"
 
@@ -207,15 +205,15 @@ msgstr "Абонент"
 msgid "Reality (the date by which you must complete the task)"
 msgstr "Актуальность (дата, до которой нужно завершить задачу)"
 
-#: taskapp/templates/taskapp/add_edit_task.html:91
+#: taskapp/templates/taskapp/add_edit_task.html:90
 msgid "Attached image"
 msgstr "Прикреплённое изображение"
 
-#: taskapp/templates/taskapp/add_edit_task.html:99
+#: taskapp/templates/taskapp/add_edit_task.html:98
 msgid "Save"
 msgstr "Сохранить"
 
-#: taskapp/templates/taskapp/add_edit_task.html:102
+#: taskapp/templates/taskapp/add_edit_task.html:101
 msgid "Reset"
 msgstr "Сбросить"
 
@@ -223,52 +221,78 @@ msgstr "Сбросить"
 msgid "View all tasks"
 msgstr "Просмотреть все задачи"
 
+#: taskapp/templates/taskapp/tasklist.html:10
+#: taskapp/templates/taskapp/tasklist_active.html:10
+#: taskapp/templates/taskapp/tasklist_all.html:22
+#: taskapp/templates/taskapp/tasklist_finish.html:10
+#: taskapp/templates/taskapp/tasklist_own.html:10
+msgid "Name"
+msgstr "ФИО"
+
 #: taskapp/templates/taskapp/tasklist.html:11
 #: taskapp/templates/taskapp/tasklist_active.html:11
 #: taskapp/templates/taskapp/tasklist_all.html:23
 #: taskapp/templates/taskapp/tasklist_finish.html:11
+#: taskapp/templates/taskapp/tasklist_own.html:11
+msgid "Address"
+msgstr "Адрес"
+
+#: taskapp/templates/taskapp/tasklist.html:14
+#: taskapp/templates/taskapp/tasklist_active.html:14
+#: taskapp/templates/taskapp/tasklist_all.html:26
+#: taskapp/templates/taskapp/tasklist_finish.html:14
+#: taskapp/templates/taskapp/view.html:21
 msgid "Task author"
 msgstr "Кто назначил"
 
 #: taskapp/templates/taskapp/tasklist.html:15
 #: taskapp/templates/taskapp/tasklist_active.html:15
-#: taskapp/templates/taskapp/tasklist_all.html:27
+#: taskapp/templates/taskapp/tasklist_all.html:28
 #: taskapp/templates/taskapp/tasklist_finish.html:15
-#: taskapp/templates/taskapp/tasklist_own.html:14
-#: taskapp/templates/taskapp/view.html:27
+#: taskapp/templates/taskapp/tasklist_own.html:15
+#: taskapp/templates/taskapp/view.html:31
 msgid "Date of create"
 msgstr "Дата создания"
 
 #: taskapp/templates/taskapp/tasklist.html:16
 #: taskapp/templates/taskapp/tasklist_active.html:16
-#: taskapp/templates/taskapp/tasklist_all.html:28
-#: taskapp/templates/taskapp/tasklist_finish.html:16
-#: taskapp/templates/taskapp/tasklist_own.html:15
-#: taskapp/templates/taskapp/view.html:37
-msgid "Attachment"
-msgstr "Приложение"
-
-#: taskapp/templates/taskapp/tasklist.html:17
-#: taskapp/templates/taskapp/tasklist_active.html:17
 #: taskapp/templates/taskapp/tasklist_all.html:29
-#: taskapp/templates/taskapp/tasklist_finish.html:17
+#: taskapp/templates/taskapp/tasklist_finish.html:16
 #: taskapp/templates/taskapp/tasklist_own.html:16
 msgid "Actions"
 msgstr "Действия"
 
-#: taskapp/templates/taskapp/tasklist.html:41
+#: taskapp/templates/taskapp/tasklist.html:40
+#: taskapp/templates/taskapp/tasklist_active.html:40
+#: taskapp/templates/taskapp/tasklist_all.html:53
+#: taskapp/templates/taskapp/tasklist_all.html:64
+#: taskapp/templates/taskapp/tasklist_finish.html:40
+#: taskapp/templates/taskapp/tasklist_own.html:40
+#: taskapp/templates/taskapp/view.html:39
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+#: taskapp/templates/taskapp/tasklist.html:42
+#: taskapp/templates/taskapp/tasklist_active.html:42
+#: taskapp/templates/taskapp/tasklist_all.html:55
+#: taskapp/templates/taskapp/tasklist_finish.html:42
+#: taskapp/templates/taskapp/tasklist_own.html:42 taskapp/views.py:151
+msgid "User does not exist"
+msgstr "Абонент не найден"
+
+#: taskapp/templates/taskapp/tasklist.html:53
 msgid "Begin"
 msgstr "Начать"
 
-#: taskapp/templates/taskapp/tasklist.html:44
-#: taskapp/templates/taskapp/tasklist_active.html:42
+#: taskapp/templates/taskapp/tasklist.html:56
+#: taskapp/templates/taskapp/tasklist_active.html:53
 msgid "Complete"
 msgstr "Завершить"
 
-#: taskapp/templates/taskapp/tasklist.html:56
-#: taskapp/templates/taskapp/tasklist_active.html:54
-#: taskapp/templates/taskapp/tasklist_all.html:67
-#: taskapp/templates/taskapp/tasklist_finish.html:56
+#: taskapp/templates/taskapp/tasklist.html:68
+#: taskapp/templates/taskapp/tasklist_active.html:65
+#: taskapp/templates/taskapp/tasklist_all.html:85
+#: taskapp/templates/taskapp/tasklist_finish.html:67
 msgid "The list is empty"
 msgstr "Список пуст"
 
@@ -280,17 +304,17 @@ msgstr "Все задачи"
 msgid "Records of all the tasks in the system"
 msgstr "Лог всех задач в системе"
 
-#: taskapp/templates/taskapp/tasklist_all.html:59
-#: taskapp/templates/taskapp/tasklist_own.html:45
+#: taskapp/templates/taskapp/tasklist_all.html:77
+#: taskapp/templates/taskapp/tasklist_own.html:58
 msgid "Remind"
 msgstr "Напомнить"
 
-#: taskapp/templates/taskapp/tasklist_finish.html:48
-#: taskapp/templates/taskapp/tasklist_own.html:50
+#: taskapp/templates/taskapp/tasklist_finish.html:59
+#: taskapp/templates/taskapp/tasklist_own.html:63
 msgid "Delete"
 msgstr "Удалить"
 
-#: taskapp/templates/taskapp/tasklist_own.html:58
+#: taskapp/templates/taskapp/tasklist_own.html:71
 msgid "All your tasks has been performed"
 msgstr "Все ваши задачи выполнены"
 
@@ -298,25 +322,25 @@ msgstr "Все ваши задачи выполнены"
 msgid "Task description"
 msgstr "Описание задачи"
 
-#: taskapp/templates/taskapp/view.html:20
+#: taskapp/templates/taskapp/view.html:23
 msgid "Implementers"
 msgstr "Исполнители"
 
-#: taskapp/templates/taskapp/view.html:26
+#: taskapp/templates/taskapp/view.html:30
 msgid "The task is valid until"
 msgstr "Задача действительна до"
 
-#: taskapp/templates/taskapp/view.html:28
+#: taskapp/templates/taskapp/view.html:32
 msgid "time left"
 msgstr "Времени осталось"
 
-#: taskapp/templates/taskapp/view.html:29
+#: taskapp/templates/taskapp/view.html:33
 msgid "Task type"
 msgstr "Тип задачи"
 
-#: taskapp/templates/taskapp/view.html:34
-msgid "Not assigned"
-msgstr "&lt;Не назначено&gt;"
+#: taskapp/templates/taskapp/view.html:42
+msgid "Attachment"
+msgstr "Приложение"
 
 #: taskapp/views.py:82
 msgid "You cannot delete task that assigned to you"
