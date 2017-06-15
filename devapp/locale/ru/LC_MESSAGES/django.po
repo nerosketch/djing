@@ -232,9 +232,3 @@ msgstr "Ошибка SNMP на устройстве"
 
 msgid "Edit"
 msgstr "Редактировать"
-
-msgid "Enable port"
-msgstr "Включить порт"
-
-msgid "Disable port"
-msgstr "Выключить порт"
