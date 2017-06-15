@@ -1,43 +1,44 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li class="active">Тарифы</li>
+        <li class="active">{% trans 'Tarifs' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>Список тарифов</h3>
+    <h3>{% trans 'Service list' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
                 <th>
                     <a href="{% url 'tarifs:home' %}?order_by=title&dir={{ dir|default:"down" }}">
-                        Тариф
+                        {% trans 'tariff' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a href="{% url 'tarifs:home' %}?order_by=speedIn&dir={{ dir|default:"down" }}">
-                        Входящая скорость
+                        {% trans 'Speed In' %}
                     </a>
                     {% if order_by == 'speedIn' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a href="{% url 'tarifs:home' %}?order_by=speedOut&dir={{ dir|default:"down" }}">
-                        Исходящая скорость
+                        {% trans 'Speed Out' %}
                     </a>
                     {% if order_by == 'speedOut' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
                     <a href="{% url 'tarifs:home' %}?order_by=amount&dir={{ dir|default:"down" }}">
-                        Стоимость
+                        {% trans 'Price' %}
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="250">Название скрипта</th>
+                <th width="250">{% trans 'Service title' %}</th>
                 <th width="50">Do</th>
             </tr>
             </thead>
@@ -57,7 +58,7 @@
                     <td>{{ tar.get_calc_type_display }}</td>
                     <td>
                         {% if perms.tariff_app.delete_tariff %}
-                            <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger">
+                            <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger btn-modal">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </a>
                         {% endif %}
@@ -65,9 +66,9 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6">Ещё нет созданных тарифов.
+                    <td colspan="6">{% trans 'Услуги пока не существуют' %}.
                         {% if perms.tariff_app.add_tariff %}
-                            <a href="{% url 'tarifs:add' %}" class="lgtbx">Создать</a>
+                            <a href="{% url 'tarifs:add' %}" class="lgtbx">{% trans 'Create' %}</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -79,7 +80,7 @@
             <tr>
                 <td colspan="6">
                     <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
-                        <span class="glyphicon glyphicon-plus"></span> Добавить
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
                     </a>
                 </td>
             </tr>

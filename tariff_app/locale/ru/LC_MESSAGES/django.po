@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-06-15 13:44+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:23
+msgid "Delete"
+msgstr "Удалить"
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:26
+msgid "Reset"
+msgstr "Сбросить"
+
+msgid "Tarifs"
+msgstr "Тарифы"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Edit"
+msgstr "Редактировать"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "tariff"
+msgstr "тариф"
+
+msgid "Service title"
+msgstr "Название тарифа"
+
+msgid "Service description"
+msgstr "Описание тарифа"
+
+msgid "Speed In"
+msgstr "Входящая скорость"
+
+msgid "Speed Out"
+msgstr "Исходящая скорость"
+
+msgid "Price"
+msgstr "Стоимость"
+
+msgid "Script"
+msgstr "Скрипт"
+
+msgid "Tech service"
+msgstr "Административный тариф"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Service list"
+msgstr "Список тарифов"
+
+msgid "Services does not exist yet"
+msgstr "Ещё нет созданных тарифов"
+
+msgid "Base calculate functionality"
+msgstr "Базовый расчётный функционал"
+
+msgid "Private service"
+msgstr "Для внутреннего пользования"
+
+msgid "Service has been saved"
+msgstr "Тариф успешно сохранён"
+
+msgid "Some fields were filled incorrect, please try again"
+msgstr "Не все поля заполнены правильно, проверте и попробуйте ещё раз"
+
+msgid "Service has been deleted"
+msgstr "Тарифный план успешно удалён"
+
+msgid "Not have a confirmations of delete"
+msgstr "Нет подтверждения удаления"
+
+msgid "Delete service"
+msgstr "Удалить тарифный план"
+
+msgid "Attention"
+msgstr "Внимание"
+
+msgid ""
+"after delete the tariff, subscribers who use that tariff will be disconnected from it."
+msgstr ""
+"После того как вы удалите тарифный план то абоненты, подписанные на него, сразу потеряют услугу по этому тарифу. "
+"Так что сначала убедитесь что уже никто не пользуется тарифом, и только после этого удалите его."

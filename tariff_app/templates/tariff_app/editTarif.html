@@ -1,15 +1,15 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'tarifs:home' %}">Тарифы</a></li>
+        <li><a href="{% url 'tarifs:home' %}">{% trans 'Tarifs' %}</a></li>
         <li class="active">
             {% if tarif_id == 0 %}
-                Добавить
+                {% trans 'Add' %}
             {% else %}
-                Редактировать
+                {% trans 'Edit' %}
             {% endif %}
         </li>
     </ol>
@@ -18,13 +18,13 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">{% if tarif_id == 0 %}Создать{% else %}Редактировать{% endif %} тариф</h3>
+            <h3 class="panel-title">{% if tarif_id == 0 %}{% trans 'Create' %}{% else %}{% trans 'Edit' %}{% endif %} {% trans 'tariff' %}</h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
-                    <label for="id_title">Название тарифа</label>
+                    <label for="id_title">{% trans 'Service title' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_descr">Описание тарифа</label>
+                    <label for="id_descr">{% trans 'Service description' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_speedIn">Входящая скорость</label>
+                    <label for="id_speedIn">{% trans 'Speed In' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-chevron-down"></span></span>
@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_speedOut">Исходящая скорость</label>
+                    <label for="id_speedOut">{% trans 'Speed Out' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-chevron-up"></span></span>
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_amount">Стоимость</label>
+                    <label for="id_amount">{% trans 'Price' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-usd"></span></span>
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_calc_type">Скрипт</label>
+                    <label for="id_calc_type">{% trans 'Script' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-link"></span></span>
@@ -78,15 +78,15 @@
                 </div>
 
                 <div class="checkbox">
-                    <label>{{ form.is_admin }}Административный тариф</label>
+                    <label>{{ form.is_admin }} {% trans 'Tech service' %}</label>
                 </div>
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
                     <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>
 
