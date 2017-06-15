@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-22 11:59+0300\n"
+"POT-Creation-Date: 2017-06-15 13:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -29,19 +29,19 @@ msgstr "Введите валидный mac адрес"
 msgid "Enter a valid MAC Address."
 msgstr "Введите валидный mac адрес"
 
-#: abonapp/forms.py:43 abonapp/templates/abonapp/addAbon.html.py:21
+#: abonapp/forms.py:42 abonapp/templates/abonapp/addAbon.html.py:21
 #: abonapp/templates/abonapp/editAbon.html:15
 #: abonapp/templates/abonapp/viewAbon.html:28
 msgid "login"
 msgstr "Логин"
 
-#: abonapp/forms.py:56 abonapp/templates/abonapp/editAbon.html.py:22
-#: abonapp/templates/abonapp/peoples.html:36
+#: abonapp/forms.py:55 abonapp/templates/abonapp/editAbon.html.py:22
+#: abonapp/templates/abonapp/peoples.html:37
 #: abonapp/templates/abonapp/viewAbon.html:32
 msgid "fio"
 msgstr "ФИО"
 
-#: abonapp/forms.py:61
+#: abonapp/forms.py:60
 msgid "telephone placeholder"
 msgstr "+[7,8,9,3] и 10,11 цифр"
 
@@ -73,7 +73,7 @@ msgstr "Текстовое поле"
 msgid "Floating field"
 msgstr "Дробное с плавающей точкой"
 
-#: abonapp/models.py:165 abonapp/templates/abonapp/editAbon.html.py:36
+#: abonapp/models.py:165 abonapp/templates/abonapp/editAbon.html.py:43
 #: abonapp/templates/abonapp/viewAbon.html:50
 msgid "Ip Address"
 msgstr "IP Адрес"
@@ -82,23 +82,23 @@ msgstr "IP Адрес"
 msgid "Double invalid value"
 msgstr "Введите число с плавающей запятой"
 
-#: abonapp/models.py:243
+#: abonapp/models.py:244
 msgid "Buy service perm"
 msgstr "Покупка тарифа абоненту"
 
-#: abonapp/models.py:244
+#: abonapp/models.py:245
 msgid "Can view passport"
 msgstr "Может просматривать паспортные данные"
 
-#: abonapp/models.py:288
+#: abonapp/models.py:292
 msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
 
-#: abonapp/models.py:303
+#: abonapp/models.py:307
 msgid "service overdue log"
 msgstr "Услуга просрочена, отключаем, и подключаем новую"
 
-#: abonapp/models.py:346
+#: abonapp/models.py:347
 msgid "Ip address already exist"
 msgstr "Такой ip уже у кого-то есть"
 
@@ -116,7 +116,7 @@ msgstr "Такой ip уже у кого-то есть"
 #: abonapp/templates/abonapp/invoiceForPayment.html:7
 #: abonapp/templates/abonapp/log.html:7
 #: abonapp/templates/abonapp/peoples.html:8
-#: abonapp/templates/abonapp/peoples.html:127
+#: abonapp/templates/abonapp/peoples.html:132
 msgid "User groups"
 msgstr "Группы абонентов"
 
@@ -149,9 +149,9 @@ msgstr ""
 #: abonapp/templates/abonapp/addInvoice.html:46
 #: abonapp/templates/abonapp/buy_tariff.html:57
 #: abonapp/templates/abonapp/complete_service.html:49
-#: abonapp/templates/abonapp/editAbon.html:96
-#: abonapp/templates/abonapp/editAbon.html:165
-#: abonapp/templates/abonapp/editAbon.html:211
+#: abonapp/templates/abonapp/editAbon.html:103
+#: abonapp/templates/abonapp/editAbon.html:192
+#: abonapp/templates/abonapp/editAbon.html:238
 #: abonapp/templates/abonapp/group_tariffs.html:29
 #: abonapp/templates/abonapp/modal_dev.html:29
 #: abonapp/templates/abonapp/passport_view.html:49
@@ -160,8 +160,8 @@ msgstr "Сохранить"
 
 #: abonapp/templates/abonapp/addAbon.html:9
 #: abonapp/templates/abonapp/addAbon.html:16
-#: abonapp/templates/abonapp/peoples.html:110
-#: abonapp/templates/abonapp/peoples.html:121
+#: abonapp/templates/abonapp/peoples.html:115
+#: abonapp/templates/abonapp/peoples.html:126
 msgid "Add abon"
 msgstr "Добавить абонента"
 
@@ -171,13 +171,13 @@ msgstr "Фамилия и Имя"
 
 #: abonapp/templates/abonapp/addAbon.html:37
 #: abonapp/templates/abonapp/editAbon.html:29
-#: abonapp/templates/abonapp/peoples.html:52
+#: abonapp/templates/abonapp/peoples.html:53
 #: abonapp/templates/abonapp/viewAbon.html:36
 msgid "Telephone"
 msgstr "Телефон"
 
 #: abonapp/templates/abonapp/addAbon.html:45
-#: abonapp/templates/abonapp/editAbon.html:66
+#: abonapp/templates/abonapp/editAbon.html:73
 #: abonapp/templates/abonapp/viewAbon.html:16
 msgid "User group"
 msgstr "Группа"
@@ -185,7 +185,7 @@ msgstr "Группа"
 #: abonapp/templates/abonapp/addAbon.html:53
 #: abonapp/templates/abonapp/addInvoice.html:40
 #: abonapp/templates/abonapp/debtors.html:22
-#: abonapp/templates/abonapp/editAbon.html:87
+#: abonapp/templates/abonapp/editAbon.html:94
 #: abonapp/templates/abonapp/invoiceForPayment.html:23
 #: abonapp/templates/abonapp/log.html:20
 #: abonapp/templates/abonapp/payHistory.html:12
@@ -194,19 +194,19 @@ msgid "Comment"
 msgstr "Комментарий"
 
 #: abonapp/templates/abonapp/addAbon.html:59
-#: abonapp/templates/abonapp/editAbon.html:43
-#: abonapp/templates/abonapp/peoples.html:42
+#: abonapp/templates/abonapp/editAbon.html:50
+#: abonapp/templates/abonapp/peoples.html:43
 #: abonapp/templates/abonapp/viewAbon.html:40
 msgid "Street"
 msgstr "Улица"
 
 #: abonapp/templates/abonapp/addAbon.html:67
-#: abonapp/templates/abonapp/peoples.html:48
+#: abonapp/templates/abonapp/peoples.html:49
 msgid "Apartment"
 msgstr "Квартира"
 
 #: abonapp/templates/abonapp/addAbon.html:76
-#: abonapp/templates/abonapp/editAbon.html:73
+#: abonapp/templates/abonapp/editAbon.html:80
 #: abonapp/templates/abonapp/viewAbon.html:54
 msgid "Password"
 msgstr "Пароль"
@@ -265,7 +265,7 @@ msgstr "Купить новую услугу (заказать тариф) дл�
 #: abonapp/templates/abonapp/debtors.html:20
 #: abonapp/templates/abonapp/log.html:19
 #: abonapp/templates/abonapp/payHistory.html:8
-#: abonapp/templates/abonapp/peoples.html:23
+#: abonapp/templates/abonapp/peoples.html:24
 msgid "Sub"
 msgstr "Абонент"
 
@@ -273,6 +273,19 @@ msgstr "Абонент"
 #: abonapp/templates/abonapp/group_tariffs.html:24
 msgid "currency"
 msgstr "руб"
+
+#: abonapp/templates/abonapp/charts.html:9
+msgid "Graph of use"
+msgstr "График использования"
+
+#: abonapp/templates/abonapp/charts.html:44
+#: abonapp/templates/abonapp/charts.html:56
+msgid "Static info was Not found"
+msgstr "Статистика не найдена"
+
+#: abonapp/templates/abonapp/charts.html:51
+msgid "Graphs by dates"
+msgstr "Графики по датам"
 
 #: abonapp/templates/abonapp/complete_service.html:10
 #: abonapp/templates/abonapp/complete_service.html:17
@@ -335,15 +348,54 @@ msgstr "Автор"
 msgid "Debts not found"
 msgstr "Нет должников"
 
+#: abonapp/templates/abonapp/dial_log.html:8
+msgid "Play"
+msgstr "Слушать"
+
+#: abonapp/templates/abonapp/dial_log.html:9
+msgid "calldate"
+msgstr "дата звонка"
+
+#: abonapp/templates/abonapp/dial_log.html:10
+msgid "src"
+msgstr "кто"
+
+#: abonapp/templates/abonapp/dial_log.html:11
+msgid "dst"
+msgstr "куда"
+
+#: abonapp/templates/abonapp/dial_log.html:12
+msgid "duration"
+msgstr "продолжительность"
+
+#: abonapp/templates/abonapp/dial_log.html:13
+msgid "start"
+msgstr "начало"
+
+#: abonapp/templates/abonapp/dial_log.html:14
+msgid "answer"
+msgstr "ответ"
+
+#: abonapp/templates/abonapp/dial_log.html:15
+msgid "end"
+msgstr "конец"
+
+#: abonapp/templates/abonapp/dial_log.html:16
+msgid "disposition"
+msgstr "состояние"
+
+#: abonapp/templates/abonapp/dial_log.html:38
+msgid "Calls was not found"
+msgstr "Звонки не найдены"
+
 #: abonapp/templates/abonapp/editAbon.html:9
 msgid "Change subscriber"
 msgstr "Изменение абонента"
 
-#: abonapp/templates/abonapp/editAbon.html:38
-#: abonapp/templates/abonapp/editAbon.html:189
-#: abonapp/templates/abonapp/peoples.html:81
-#: abonapp/templates/abonapp/peoples.html:83
-#: abonapp/templates/abonapp/peoples.html:84
+#: abonapp/templates/abonapp/editAbon.html:45
+#: abonapp/templates/abonapp/editAbon.html:216
+#: abonapp/templates/abonapp/peoples.html:86
+#: abonapp/templates/abonapp/peoples.html:88
 #: abonapp/templates/abonapp/viewAbon.html:18
 #: abonapp/templates/abonapp/viewAbon.html:29
 #: abonapp/templates/abonapp/viewAbon.html:33
@@ -354,72 +406,71 @@ msgstr "Изменение абонента"
 msgid "Not assigned"
 msgstr "&lt;Не назначен&gt;"
 
-#: abonapp/templates/abonapp/editAbon.html:51
-#: abonapp/templates/abonapp/peoples.html:48
+#: abonapp/templates/abonapp/editAbon.html:58
 #: abonapp/templates/abonapp/viewAbon.html:46
 msgid "House"
 msgstr "Дом"
 
-#: abonapp/templates/abonapp/editAbon.html:59
+#: abonapp/templates/abonapp/editAbon.html:66
 #: abonapp/templates/abonapp/viewAbon.html:22
 msgid "Is active"
 msgstr "Активен"
 
-#: abonapp/templates/abonapp/editAbon.html:99
+#: abonapp/templates/abonapp/editAbon.html:106
 msgid "Send account info to user"
 msgstr "Отправить данные абоненту"
 
-#: abonapp/templates/abonapp/editAbon.html:102
-#: abonapp/templates/abonapp/editAbon.html:103
+#: abonapp/templates/abonapp/editAbon.html:109
+#: abonapp/templates/abonapp/editAbon.html:110
 #, fuzzy
 #| msgid "Add debt"
 msgid "Add new task"
 msgstr "Добавить квитанцию"
 
-#: abonapp/templates/abonapp/editAbon.html:116
+#: abonapp/templates/abonapp/editAbon.html:123
 msgid "Remove clutch"
 msgstr "Удалить муфту"
 
-#: abonapp/templates/abonapp/editAbon.html:120
+#: abonapp/templates/abonapp/editAbon.html:127
 #: abonapp/templates/abonapp/modal_dev.html:6
 msgid "Add clutch"
 msgstr "Добавить муфту"
 
-#: abonapp/templates/abonapp/editAbon.html:143
+#: abonapp/templates/abonapp/editAbon.html:170
 msgid "DHCP information"
 msgstr "DHCP информация"
 
-#: abonapp/templates/abonapp/editAbon.html:149
+#: abonapp/templates/abonapp/editAbon.html:176
 msgid "Mac Address"
 msgstr "Мак"
 
-#: abonapp/templates/abonapp/editAbon.html:156
+#: abonapp/templates/abonapp/editAbon.html:183
 msgid "Port"
 msgstr "Порт"
 
-#: abonapp/templates/abonapp/editAbon.html:167
+#: abonapp/templates/abonapp/editAbon.html:194
 msgid "Reset option82"
 msgstr "Сбросить option82"
 
-#: abonapp/templates/abonapp/editAbon.html:168
-#: abonapp/templates/abonapp/editAbon.html:192
+#: abonapp/templates/abonapp/editAbon.html:195
+#: abonapp/templates/abonapp/editAbon.html:219
 msgid "Delete"
 msgstr "Удалить"
 
-#: abonapp/templates/abonapp/editAbon.html:178
+#: abonapp/templates/abonapp/editAbon.html:205
 msgid "Extra fields"
 msgstr "Динамические записи"
 
-#: abonapp/templates/abonapp/editAbon.html:201 abonapp/views.py:824
+#: abonapp/templates/abonapp/editAbon.html:228 abonapp/views.py:835
 msgid "Extra field does not exist"
 msgstr "Поле не найдено"
 
-#: abonapp/templates/abonapp/editAbon.html:206
+#: abonapp/templates/abonapp/editAbon.html:233
 #: abonapp/templates/abonapp/modal_extra_field.html:6
 msgid "Add extra field"
 msgstr "Добавить новое динамическое поле"
 
-#: abonapp/templates/abonapp/editAbon.html:207
+#: abonapp/templates/abonapp/editAbon.html:234
 #: abonapp/templates/abonapp/modal_extra_field.html:37
 msgid "Add"
 msgstr "Добавить"
@@ -559,38 +610,42 @@ msgstr "Пополнить счёт"
 msgid "The people in the selected group"
 msgstr "Народ в выбранной группе"
 
-#: abonapp/templates/abonapp/peoples.html:27
+#: abonapp/templates/abonapp/peoples.html:28
 msgid "Last traffic"
 msgstr "Траф."
 
-#: abonapp/templates/abonapp/peoples.html:30
+#: abonapp/templates/abonapp/peoples.html:31
 #, fuzzy
 #| msgid "Ip Address"
 msgid "Ip address"
 msgstr "IP Адрес"
 
-#: abonapp/templates/abonapp/peoples.html:53
+#: abonapp/templates/abonapp/peoples.html:54
 #: abonapp/templates/abonapp/services.html:10
 msgid "Service"
 msgstr "Услуга"
 
-#: abonapp/templates/abonapp/peoples.html:56
+#: abonapp/templates/abonapp/peoples.html:57
 msgid "Ballance"
 msgstr "Балланс"
 
-#: abonapp/templates/abonapp/peoples.html:108
+#: abonapp/templates/abonapp/peoples.html:113
 msgid "Subscribers not found"
 msgstr "Абоненты не найдены"
 
-#: abonapp/templates/abonapp/peoples.html:125
+#: abonapp/templates/abonapp/peoples.html:130
 msgid "Refresh subscribers on NAS"
 msgstr "Обновить абонентов в NAS"
 
-#: abonapp/templates/abonapp/peoples.html:128
+#: abonapp/templates/abonapp/peoples.html:133
 msgid "Tariffs in groups"
 msgstr "Тарифы в группах"
 
-#: abonapp/templates/abonapp/peoples.html:141
+#: abonapp/templates/abonapp/peoples.html:143
+msgid "Streets"
+msgstr "Улицы"
+
+#: abonapp/templates/abonapp/peoples.html:148
 msgid "No streets found for that group"
 msgstr "Не найдены улицы для группы"
 
@@ -670,235 +725,187 @@ msgstr "Просмотр абонента"
 msgid "yes,no"
 msgstr "Да,Нет"
 
-#: abonapp/views.py:74
+#: abonapp/views.py:75
 msgid "create group success msg"
 msgstr "Группа успешно создана"
 
-#: abonapp/views.py:77 abonapp/views.py:137 abonapp/views.py:282
-#: abonapp/views.py:337 abonapp/views.py:426 abonapp/views.py:637
-#: abonapp/views.py:779
+#: abonapp/views.py:78 abonapp/views.py:138 abonapp/views.py:284
+#: abonapp/views.py:342 abonapp/views.py:432 abonapp/views.py:648
+#: abonapp/views.py:791
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#: abonapp/views.py:113 abonapp/views.py:176
+#: abonapp/views.py:114 abonapp/views.py:177
 msgid "delete group success msg"
 msgstr "Группа успешно удалена"
 
-#: abonapp/views.py:134
+#: abonapp/views.py:135
 msgid "create abon success msg"
 msgstr "Абонент успешно создан"
 
-#: abonapp/views.py:148
+#: abonapp/views.py:149
 msgid "Address"
 msgstr "Адрес"
 
-#: abonapp/views.py:170
+#: abonapp/views.py:171
 msgid "delete abon success msg"
 msgstr "Абонент успешно удалён"
 
-#: abonapp/views.py:179
+#: abonapp/views.py:180
 msgid "I not know what to delete"
 msgstr "Не понятно что удалять"
 
-#: abonapp/views.py:183
+#: abonapp/views.py:184
 #, python-format
 msgid "NAS says: '%s'"
 msgstr "NAS сказал: '%s'"
 
-#: abonapp/views.py:199
+#: abonapp/views.py:201
 msgid "fill account through admin side"
 msgstr "Пополнение счёта через админку"
 
-#: abonapp/views.py:201
+#: abonapp/views.py:203
 #, python-format
 msgid "Account filled successfully on %.2f"
 msgstr ""
 
-#: abonapp/views.py:204
+#: abonapp/views.py:206
 msgid "I not know the account id"
 msgstr "Счёт успешно пополнен на %.2f"
 
-#: abonapp/views.py:280
+#: abonapp/views.py:282
 msgid "edit abon success msg"
 msgstr "Абонент успешно изменён"
 
-#: abonapp/views.py:295
+#: abonapp/views.py:297
 msgid "User has not have password, and cannot login"
 msgstr "Для абонента не задан пароль, он не сможет войти в учётку"
 
-#: abonapp/views.py:297 abonapp/views.py:692
+#: abonapp/views.py:299 abonapp/views.py:703
 msgid "User device was not found"
 msgstr "Пользовательское устройство не найдено"
 
-#: abonapp/views.py:350
+#: abonapp/views.py:355
 #, fuzzy
 #| msgid "Abon does not exist"
 msgid "User does not exist"
 msgstr "Абонент не найден"
 
-#: abonapp/views.py:383
+#: abonapp/views.py:388
 msgid "Receipt has been created"
 msgstr "Квитанция на оплату была создана"
 
-#: abonapp/views.py:413
+#: abonapp/views.py:419
 msgid "Tariff has been picked"
 msgstr "Тариф успешно выбран"
 
-#: abonapp/views.py:421
+#: abonapp/views.py:427
 msgid "Tariff your picked does not exist"
 msgstr "Тариф, который вы выбрали, не существует"
 
-#: abonapp/views.py:484
+#: abonapp/views.py:491
 msgid "Refunds for unused resources"
 msgstr "Возврат средств за неиспользованные ресурсы"
 
-#: abonapp/views.py:490
+#: abonapp/views.py:497
 msgid "Service has been finished successfully"
 msgstr "Услуга успешно завершена"
 
-#: abonapp/views.py:493 abonapp/views.py:525
+#: abonapp/views.py:500 abonapp/views.py:533
 msgid "Not confirmed"
 msgstr "Действие не подтверждено"
 
-#: abonapp/views.py:528
+#: abonapp/views.py:536
 msgid "Service has been activated successfully"
 msgstr "Услуга успешно активирована"
 
-#: abonapp/views.py:554
+#: abonapp/views.py:562
 msgid "User has been detached from service"
 msgstr "Абонент отвязан от услуги"
 
-#: abonapp/views.py:634
+#: abonapp/views.py:645
 msgid "Passport information has been saved"
 msgstr "Информация о паспорте сохранена"
 
-#: abonapp/views.py:642 abonapp/views.py:689 abonapp/views.py:709
-#: abonapp/views.py:750
+#: abonapp/views.py:653 abonapp/views.py:700 abonapp/views.py:720
+#: abonapp/views.py:761
 msgid "Abon does not exist"
 msgstr "Абонент не найден"
 
-#: abonapp/views.py:645
+#: abonapp/views.py:656
 msgid "Passport info for the user does not exist"
 msgstr "Для абонента не найдены паспортные данные"
 
-#: abonapp/views.py:682
+#: abonapp/views.py:693
 msgid "Device has successfully attached"
 msgstr "Устройство успешно прикреплено"
 
-#: abonapp/views.py:687
+#: abonapp/views.py:698
 msgid "Device your selected already does not exist"
 msgstr "Устройство, выбранное вами, уже не существует"
 
-#: abonapp/views.py:707
+#: abonapp/views.py:718
 msgid "Device has successfully unattached"
 msgstr "Устройство успешно откреплено"
 
-#: abonapp/views.py:753
+#: abonapp/views.py:764
 msgid "Group what you want doesn't exist"
 msgstr "Указанная вами группа не найдена"
 
-#: abonapp/views.py:777
+#: abonapp/views.py:789
 msgid "Extra field successfully created"
 msgstr "Динамичесое поле добавлено успешно"
 
-#: abonapp/views.py:808
+#: abonapp/views.py:819
 msgid "Extra fields has been saved"
 msgstr "Динамические поля сохранены"
 
-#: abonapp/views.py:810
+#: abonapp/views.py:821
 msgid "One or more extra fields has not been saved"
 msgstr "Поле или одно из полей не найдено"
 
-#: abonapp/views.py:822
+#: abonapp/views.py:833
 msgid "Extra field successfully deleted"
 msgstr "Динамическое поле успешно удалено"
 
-#: abonapp/views.py:832
+#: abonapp/views.py:843
 msgid "no ping"
 msgstr "не пингуется"
 
-#: abonapp/views.py:839 abonapp/views.py:849
+#: abonapp/views.py:850 abonapp/views.py:860
 msgid "ping ok"
 msgstr "пингуется"
 
-#: abonapp/views.py:844
+#: abonapp/views.py:855
 #, python-format
 msgid "ok ping, %d/%d loses"
 msgstr "пингуется, %d/%d"
 
-#: abonapp/views.py:847
+#: abonapp/views.py:858
 #, python-format
 msgid "no ping, %d/%d loses"
 msgstr "не пингуется, %d/%d"
 
+#: abonapp/templates/abonapp/ext.html:31
 msgid "Services"
 msgstr "Услуги"
 
-msgid "Payment history"
-msgstr "История платежей"
-
+#: abonapp/templates/abonapp/ext.html:43
 msgid "Payments"
 msgstr "Финансы"
 
+#: abonapp/templates/abonapp/ext.html:48
 msgid "History of tasks"
 msgstr "История задач"
 
-msgid "Dynamic Field"
-msgstr "Динамическое поле"
-
-msgid "Instance of a option82 unexpectiadly disappeared"
-msgstr "Экземпляр option82 неожиданно исчез из базы"
-
-msgid "SNMP error on device"
-msgstr "Ошибка в SNMP на устройстве"
-
+#: abonapp/templates/abonapp/ext.html:53
 msgid "Charts"
 msgstr "График"
 
+#: abonapp/templates/abonapp/ext.html:26
 msgid "Sub information"
 msgstr "Информация абонента"
 
-msgid "Streets"
-msgstr "Улицы"
-
-msgid "Static info was Not found"
-msgstr "Статистика не найдена"
-
-msgid "Graphs by dates"
-msgstr "Графики по датам"
-
-msgid "Graph of use"
-msgstr "График использования"
-
-msgid "Play"
-msgstr "Слушать"
-
-msgid "calldate"
-msgstr "дата звонка"
-
-msgid "src"
-msgstr "кто"
-
-msgid "dst"
-msgstr "куда"
-
-msgid "duration"
-msgstr "продолжительность"
-
-msgid "start"
-msgstr "начало"
-
-msgid "answer"
-msgstr "ответ"
-
-msgid "end"
-msgstr "конец"
-
-msgid "disposition"
-msgstr "состояние"
-
-msgid "Calls was not found"
-msgstr "Звонки не найдены"
-
+#: abonapp/templates/abonapp/ext.html:58
 msgid "Dialing"
 msgstr "Звонки"
