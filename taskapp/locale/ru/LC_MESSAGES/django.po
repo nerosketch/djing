@@ -358,10 +358,6 @@ msgstr "Нужно выбрать абонента"
 msgid "Error in the form fields"
 msgstr "Ошибка в полях формы"
 
-#: taskapp/views.py:151
-msgid "User does not exist"
-msgstr "Абонент не найден"
-
 msgid "Active tasks"
 msgstr "Активные задачи"
 
@@ -382,9 +378,3 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "locality %s. Task type - %s. "
 msgstr "с. %s. Тип задачи - %s. "
-
-msgid "Name"
-msgstr "ФИО"
-
-msgid "Address"
-msgstr "Адрес"
