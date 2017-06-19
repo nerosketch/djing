@@ -102,15 +102,20 @@ def chgroup(request, uid):
 @mydefs.only_admins
 def ch_ava(request):
     if request.method == 'POST':
-        user = request.user
-        if user.avatar:
-            user.avatar.delete()
-        photo = Photo()
-        photo.image = request.FILES.get('avatar')
-        photo.save()
-        user.avatar = photo
-        user.save(update_fields=['avatar'])
-        request.user = user
+        phname = request.FILES.get('avatar')
+        if phname is None:
+            messages.error(request, _('Please select an image'))
+        else:
+            user = request.user
+            if user.avatar:
+                user.avatar.delete()
+            photo = Photo()
+            photo.image = phname
+            photo.save()
+            user.avatar = photo
+            user.save(update_fields=['avatar'])
+            request.user = user
+            messages.success(request, _('Avatar successfully changed'))
 
     return render(request, 'accounts/settings/ch_info.html', {
         'user': request.user
