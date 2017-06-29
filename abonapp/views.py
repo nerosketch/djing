@@ -302,7 +302,7 @@ def abonhome(request, gid, uid):
             messages.add_message(request, messages.constants.ERROR, err)
     except MultipleObjectsReturned:
         abon_device = models.AbonDevice.objects.filter(abon=abon)[0]
-        models.AbonDevice.objects.exclude(pk=abon_device).delete()
+        models.AbonDevice.objects.exclude(pk=abon_device.pk).delete()
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
@@ -533,6 +533,7 @@ def activate_service(request, gid, uid, srvid):
                 return HttpResponse(_('Not confirmed'))
 
             abtar.activate(request.user)
+            abtar.abon.save()
             messages.success(request, _('Service has been activated successfully'))
             return redirect('abonapp:abon_services', gid, uid)
 
