@@ -11,7 +11,7 @@ from djing.settings import DEBUG
 import re
 
 
-#DEBUG=False
+#DEBUG=True
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
@@ -236,7 +236,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
         assert isinstance(user, AbonStruct)
         q = self.find('uid%d' % user.uid)
         if q is not None:
-            return self._exec_cmd(['/queue/simple/remove', '=.id=*' + getattr(q, 'queue_id', '')])
+            return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
 
     def remove_range(self, q_ids):
         if q_ids is not None and len(q_ids) > 0:
@@ -253,7 +253,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
         else:
             mk_id = getattr(queue, 'queue_id', '')
             # обновляем шейпер абонента
-            return self._exec_cmd(['/queue/simple/set', '=.id=*' + mk_id,
+            return self._exec_cmd(['/queue/simple/set', '=.id=' + mk_id,
                                    '=name=uid%d' % user.uid,
                                    '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                                    # FIXME: тут в разных микротиках или =target-addresses или =target
@@ -375,8 +375,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def add_user_range(self, user_list):
         for usr in user_list:
-            if hasattr(usr, 'is_dhcp') and not usr.is_dhcp():
-                self.add_user(usr)
+            self.add_user(usr)
 
     def remove_user_range(self, users):
         queue_ids = [usr.queue_id for usr in users if usr is not None]
@@ -390,8 +389,6 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
     def add_user(self, user, ip_timeout=None):
         assert isinstance(user.ip, IpStruct)
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
-            return
-        if not user.is_access():
             return
         QueueManager.add(self, user)
         IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
