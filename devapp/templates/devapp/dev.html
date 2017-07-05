@@ -20,6 +20,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="id_mac_addr">{% trans 'Mac address' %}</label>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+                        {{ form.mac_addr }}{{ form.mac_addr.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="id_comment">{% trans 'Comment' %}</label>
 
                     <div class="input-group">

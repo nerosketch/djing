@@ -32,7 +32,7 @@ msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
 #: devapp/dev_types.py:116
-msgid "PON ONU"
+msgid "PON OLT"
 msgstr "ONU Голова"
 
 #: devapp/templates/devapp/add_dev.html:7
@@ -134,6 +134,9 @@ msgstr "Добавить группу"
 msgid "Mac"
 msgstr "Мак"
 
+msgid "Mac address"
+msgstr "Мак адрес"
+
 #: devapp/templates/devapp/olt.html:14
 msgid "Name"
 msgstr "Имя"
@@ -148,7 +151,7 @@ msgstr "Ур. сигнала"
 
 #: devapp/templates/devapp/olt.html:34
 msgid "Ports not found"
-msgstr "Онушки не получил"
+msgstr "Порты не найдены"
 
 #: devapp/templates/devapp/ports.html:9
 msgid "Title of the type of switch"
@@ -194,6 +197,9 @@ msgstr "Комментарии портов"
 msgid "Port"
 msgstr "Порт"
 
+msgid "Ports"
+msgstr "Порты"
+
 #: devapp/templates/devapp/ports.html:86
 msgid "Title"
 msgstr "Название"
@@ -232,3 +238,48 @@ msgstr "Ошибка SNMP на устройстве"
 
 msgid "Edit"
 msgstr "Редактировать"
+
+msgid "Device does not exist"
+msgstr "Устойство не найдено"
+
+msgid "Number"
+msgstr "Номер"
+
+msgid "Mode"
+msgstr "Режим"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Add ports"
+msgstr "Добавить порты"
+
+msgid "Device is not have a group, please fix that"
+msgstr "У устройства нет группы, пожалуйста, исправьте это"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Port does not exist"
+msgstr "Порт не найден"
+
+msgid "Port successfully removed"
+msgstr "Порт успешно удалён"
+
+msgid "PON ONU"
+msgstr "Онушка"
+
+msgid "Are you sure that you want to delete switch port from db?"
+msgstr "Вы уверены что хотите удалить порт свича из бд?"
+
+msgid "Port successfully saved"
+msgstr "Порт успешно сохранён"
+
+msgid "Port number on device must be unique"
+msgstr "Номер порта на устройстве должен быть уникальным"
+
+msgid "Mac address is required for fill"
+msgstr "MAC-адрес необходим для заполнения"
+
+msgid "Device with that mac is already exist"
+msgstr "Устройство с этим мак-адресом уже есть"

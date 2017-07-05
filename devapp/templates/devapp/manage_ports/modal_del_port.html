@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<form role="form" action="{% url 'devapp:del_port' grp did port_id %}" method="post">{% csrf_token %}
+    <input type="hidden" value="yes" name="confirm">
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{% trans 'Are you sure?' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        <p>{% trans 'Are you sure that you want to delete switch port from db?' %}</p>
+
+        <button type="submit" class="btn btn-sm btn-danger">
+            <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+        </button>
+    </div>
+
+</form>

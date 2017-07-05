@@ -83,13 +83,21 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return tm
 
     def get_template_name(self):
-        return 'devapp/ports.html'
+        return 'ports.html'
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return True
+
+    @staticmethod
+    def is_use_device_port():
+        return True
 
 
 class ONUdev(BasePort):
     def __init__(self, num, name, status, mac, speed, signal, snmpWorker):
-        BasePort.__init__(self, num, name, status, mac, speed)
-        assert issubclass(snmpWorker.__class__ , SNMPBaseWorker)
+        super(ONUdev, self).__init__(num, name, status, mac, speed)
+        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
         self.snmp_worker = snmpWorker
         self.signal = signal
 
@@ -113,7 +121,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
     @staticmethod
     def description():
-        return _('PON ONU')
+        return _('PON OLT')
 
     def reboot(self):
         pass
@@ -146,10 +154,42 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         return tm
 
     def get_template_name(self):
-        return 'devapp/olt.html'
+        return 'olt.html'
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return False
+
+    @staticmethod
+    def is_use_device_port():
+        return False
 
 
-DEVICE_TYPES = (
-    ('Dl', DLinkDevice),
-    ('Pn', OLTDevice)
-)
+class OnuDevice(DevBase, SNMPBaseWorker):
+
+    @staticmethod
+    def description():
+        return _('PON ONU')
+
+    def reboot(self):
+        pass
+
+    def get_ports(self):
+        pass
+
+    def get_device_name(self):
+        pass
+
+    def uptime(self):
+        pass
+
+    def get_template_name(self):
+        return "onu.html"
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return True
+
+    @staticmethod
+    def is_use_device_port():
+        return False
