@@ -11,7 +11,7 @@ from .models import AsteriskCDR
 @login_required
 @only_admins
 def home(request):
-    logs = AsteriskCDR.objects.all()
+    logs = AsteriskCDR.objects.order_by('-calldate')
     logs = pag_mn(request, logs)
     return render(request, 'index.html', {
         'logs': logs

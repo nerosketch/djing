@@ -317,18 +317,21 @@ def toggle_port(request, did, portid, status=0):
     portid = int(portid)
     status = int(status)
     dev = get_object_or_404(Device, id=int(did))
-    if ping(dev.ip_address):
-        if dev.man_passw:
-            manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
-            ports = manager.get_ports()
-            if status:
-                ports[portid-1].enable()
+    try:
+        if ping(dev.ip_address):
+            if dev.man_passw:
+                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+                ports = manager.get_ports()
+                if status:
+                    ports[portid-1].enable()
+                else:
+                    ports[portid-1].disable()
             else:
-                ports[portid-1].disable()
+                messages.warning(request, _('Not Set snmp device password'))
         else:
-            messages.warning(request, _('Not Set snmp device password'))
-    else:
-        messages.error(request, _('Dot was not pinged'))
+            messages.error(request, _('Dot was not pinged'))
+    except EasySNMPTimeoutError:
+        messages.error(request, _('wait for a reply from the SNMP Timeout'))
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, did)
 
 

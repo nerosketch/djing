@@ -11,7 +11,7 @@ from djing.settings import DEBUG
 import re
 
 
-#DEBUG=False
+#DEBUG=True
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
@@ -236,7 +236,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
         assert isinstance(user, AbonStruct)
         q = self.find('uid%d' % user.uid)
         if q is not None:
-            return self._exec_cmd(['/queue/simple/remove', '=.id=*' + str(q.sid)])
+            return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
 
     def remove_range(self, q_ids):
         if q_ids is not None and len(q_ids) > 0:
@@ -251,13 +251,13 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             # не нашли запись в шейпере об абоненте, добавим
             return self.add(user)
         else:
-            mk_id = queue.sid
+            mk_id = getattr(queue, 'queue_id', '')
             # обновляем шейпер абонента
-            return self._exec_cmd(['/queue/simple/set', '=.id=*' + mk_id,
+            return self._exec_cmd(['/queue/simple/set', '=.id=' + mk_id,
                                    '=name=uid%d' % user.uid,
                                    '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                                    # FIXME: тут в разных микротиках или =target-addresses или =target
-                                   '=target=%s' % user.ip.get_str(),
+                                   '=target=%s' % str(user.ip),
                                    '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
                                    '=burst-time=1/1'
                                    ])
@@ -285,7 +285,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             self.add(user)
             return self.disable(user)
         else:
-            return self._exec_cmd(['/queue/simple/disable', '=.id=*' + q.sid])
+            return self._exec_cmd(['/queue/simple/disable', '=.id=*' + getattr(q, 'queue_id', '')])
 
     def enable(self, user):
         assert isinstance(user, AbonStruct)
@@ -294,7 +294,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             self.add(user)
             self.enable(user)
         else:
-            return self._exec_cmd(['/queue/simple/enable', '=.id=*' + q.sid])
+            return self._exec_cmd(['/queue/simple/enable', '=.id=*' + getattr(q, 'queue_id', '')])
 
 
 class IpAddressListObj(IpStruct):
@@ -390,8 +390,6 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         assert isinstance(user.ip, IpStruct)
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
-        if not user.is_access():
-            return
         QueueManager.add(self, user)
         IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
         # удаляем из списка заблокированных абонентов
@@ -441,7 +439,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         if queue is None:
             QueueManager.add(self, user)
             return
-        if queue.abon != user:
+        if queue != user:
             QueueManager.update(self, user)
 
     def ping(self, host, count=10):
