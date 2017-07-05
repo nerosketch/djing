@@ -28,4 +28,7 @@ class Migration(migrations.Migration):
                 'db_table': 'flowcache',
             },
         ),
+        migrations.DeleteModel(
+            name='StatElem',
+        ),
     ]
