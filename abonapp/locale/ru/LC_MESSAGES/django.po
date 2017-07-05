@@ -560,7 +560,7 @@ msgid "Refill"
 msgstr "Пополнить"
 
 #: abonapp/templates/abonapp/modal_dev.html:13
-msgid "Select a device"
+msgid "Select the device"
 msgstr "Выберите устройство"
 
 #: abonapp/templates/abonapp/modal_extra_field.html:11
@@ -909,3 +909,25 @@ msgstr "Информация абонента"
 #: abonapp/templates/abonapp/ext.html:58
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "Device port"
+msgstr "Порт&nbsp;устройства"
+
+
+msgid "Ports does not exist"
+msgstr "Порты не найдены"
+
+msgid "User port has been saved"
+msgstr "Порт абонента успешно выбран"
+
+msgid "Selected port does not exist"
+msgstr "Выбранный порт не существует"
+
+msgid "Device"
+msgstr "Устройство"
+
+msgid "Is dynamic network settings"
+msgstr "Динамические настройки по dhcp"
+
+msgid "Method is not POST"
+msgstr "Метод не POST"
