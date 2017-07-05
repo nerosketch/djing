@@ -375,8 +375,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def add_user_range(self, user_list):
         for usr in user_list:
-            if hasattr(usr, 'is_dhcp') and not usr.is_dhcp():
-                self.add_user(usr)
+            self.add_user(usr)
 
     def remove_user_range(self, users):
         queue_ids = [usr.queue_id for usr in users if usr is not None]
