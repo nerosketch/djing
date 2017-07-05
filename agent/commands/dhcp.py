@@ -1,35 +1,40 @@
 # -*- coding: utf-8 -*-
+from builtins import print
 from django.core.exceptions import MultipleObjectsReturned
 from django.utils.translation import ugettext as _
-from abonapp.models import Abon, Opt82
-
-
-def get_82_opts(switch_mac, switch_port):
-    try:
-        opt82 = Opt82.objects.get(mac=switch_mac, port=switch_port)
-    except MultipleObjectsReturned:
-        Opt82.objects.filter(mac=switch_mac, port=switch_port)[1:].delete()
-        return get_82_opts(switch_mac, switch_port)
-    except Opt82.DoesNotExist:
-        opt82 = Opt82.objects.create(mac=switch_mac, port=switch_port)
-    return opt82
+from abonapp.models import Abon
+from devapp.models import Device, Port
 
 
 def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
-    opt82 = get_82_opts(switch_mac, switch_port)
-    if opt82 is None:
-        print(_("ERROR: opt82 with mac:%s and port:%d does not exist in db") % (switch_mac, switch_port))
-        return
     try:
-        abon = Abon.objects.get(opt82=opt82)
+        dev = Device.objects.get(mac_addr=switch_mac)
+        mngr_class = dev.get_manager_klass()
+
+        port = _('<never mind>')
+        if mngr_class.is_use_device_port():
+            port = Port.objects.get(device=dev, num=switch_port)
+            abon = Abon.objects.get(dev_port=port, device=dev)
+        else:
+            abon = Abon.objects.get(device=dev)
+        if not abon.is_dynamic_ip:
+            print('D:', _('User settings is not dynamic'))
+            return
         if not abon.is_access():
+            print('D:', _('User is not access to service'))
             return
         abon.ip_address = client_ip
         abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
-        print(_('Ip address update for %s successfull') % abon.get_short_name())
+        print('S:', _("Ip address:'%s' update for '%s' successfull, on port: %s") % (client_ip, abon.get_short_name(), port))
     except Abon.DoesNotExist:
-        print('ERROR: abon with option82(%s-%d) does not exist' % (opt82.mac, opt82.port))
+        print('N:', _("User with device '%s' does not exist") % dev)
+    except Device.DoesNotExist:
+        print('N:', _('Device with mac %s not found') % switch_mac)
+    except Port.DoesNotExist:
+        print('N:', _('Port %d on device with mac %s does not exist') % (int(switch_port), switch_mac))
+    except MultipleObjectsReturned as e:
+        print('E:', 'MultipleObjectsReturned:', type(e), e)
 
 
 def dhcp_expiry(client_ip):
