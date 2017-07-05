@@ -188,3 +188,9 @@ msgstr "Редактировать"
 
 msgid "Set a task"
 msgstr "Дать задачу"
+
+msgid "Please select an image"
+msgstr "Пожалуйста выберите изображение"
+
+msgid "Avatar successfully changed"
+msgstr "Аватар успешно изменён"
