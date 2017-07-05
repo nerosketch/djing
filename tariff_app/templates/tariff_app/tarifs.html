@@ -43,10 +43,11 @@
             </tr>
             </thead>
             <tbody>
+            {% with can_ch_trf=perms.tariff_app.change_tariff can_del_trf=perms.tariff_app.delete_tariff %}
             {% for tar in tariflist %}
                 <tr>
                     <td>
-                        {% if perms.tariff_app.change_tariff %}
+                        {% if can_ch_trf %}
                             <a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a>
                         {% else %}
                             {{ tar.title }}
@@ -57,7 +58,7 @@
                     <td>{{ tar.amount }} руб</td>
                     <td>{{ tar.get_calc_type_display }}</td>
                     <td>
-                        {% if perms.tariff_app.delete_tariff %}
+                        {% if can_del_trf %}
                             <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger btn-modal">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                             </a>
@@ -73,6 +74,7 @@
                     </td>
                 </tr>
             {% endfor %}
+            {% endwith %}
             </tbody>
 
             {% if perms.tariff_app.add_tariff %}
