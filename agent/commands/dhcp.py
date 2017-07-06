@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from builtins import print
 from django.core.exceptions import MultipleObjectsReturned
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
