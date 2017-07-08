@@ -247,3 +247,8 @@ button[data-toggle=offcanvas]{
  * Сужаем аудио элемент чтоб скрыть большинство контролов
  */
 audio{width: 100px;}
+
+a.navbar-brand {
+    padding-left: 88px;
+}
+
