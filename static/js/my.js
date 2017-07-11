@@ -72,15 +72,6 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 
 $(document).ready(function () {
 
-	// ajax tabs
-	$('.nav-tabs a').on('show.bs.tab', function (e) {
-		var ct = $(e.target).attr('href');
-		var remoteUrl = $(this).attr('data-tab-remote');
-		if (remoteUrl !== '') {
-			$(ct).load(remoteUrl);
-		}
-	});
-
 	// Live html5 image preview
 	if (window.File && window.FileReader && window.FileList && window.Blob) {
 		$('input[type=file].live_review').on('change', function () {

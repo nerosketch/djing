@@ -32,7 +32,7 @@ msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
 #: devapp/dev_types.py:116
-msgid "PON ONU"
+msgid "PON OLT"
 msgstr "ONU Голова"
 
 #: devapp/templates/devapp/add_dev.html:7
@@ -48,7 +48,7 @@ msgid "Add new device"
 msgstr "Добавить устройство"
 
 #: devapp/templates/devapp/add_dev.html:14
-#: devapp/templates/devapp/ports.html:143
+#: devapp/templates/devapp/ports.html:93
 msgid "Not assigned"
 msgstr "&lt;Не назначено&gt;"
 
@@ -134,6 +134,9 @@ msgstr "Добавить группу"
 msgid "Mac"
 msgstr "Мак"
 
+msgid "Mac address"
+msgstr "Мак адрес"
+
 #: devapp/templates/devapp/olt.html:14
 msgid "Name"
 msgstr "Имя"
@@ -148,7 +151,7 @@ msgstr "Ур. сигнала"
 
 #: devapp/templates/devapp/olt.html:34
 msgid "Ports not found"
-msgstr "Онушки не получил"
+msgstr "Порты не найдены"
 
 #: devapp/templates/devapp/ports.html:9
 msgid "Title of the type of switch"
@@ -158,39 +161,50 @@ msgstr "Название типа свича"
 msgid "Uptime"
 msgstr "Без перезагрузки"
 
-#: devapp/templates/devapp/ports.html:42
+#: devapp/templates/devapp/ports.html:33
+msgid "Disable port"
+msgstr "Выключить порт"
+
+#: devapp/templates/devapp/ports.html:37
+msgid "Enable port"
+msgstr "Включить порт"
+
+#: devapp/templates/devapp/ports.html:43
 msgid "We have not received info, please check options :("
 msgstr "Инфа не получена, проверьте настройки :("
 
-#: devapp/templates/devapp/ports.html:54
+#: devapp/templates/devapp/ports.html:55
 msgid "Device log"
 msgstr "Лог устройства"
 
-#: devapp/templates/devapp/ports.html:61
+#: devapp/templates/devapp/ports.html:62
 msgid "Level"
 msgstr "Уровень"
 
-#: devapp/templates/devapp/ports.html:62
+#: devapp/templates/devapp/ports.html:63
 msgid "Description"
 msgstr "Описание"
 
-#: devapp/templates/devapp/ports.html:63
+#: devapp/templates/devapp/ports.html:64
 msgid "Date"
 msgstr "Дата"
 
-#: devapp/templates/devapp/ports.html:129
+#: devapp/templates/devapp/ports.html:79
 msgid "Ports comment"
 msgstr "Комментарии портов"
 
-#: devapp/templates/devapp/ports.html:135
+#: devapp/templates/devapp/ports.html:85
 msgid "Port"
 msgstr "Порт"
 
-#: devapp/templates/devapp/ports.html:136
+msgid "Ports"
+msgstr "Порты"
+
+#: devapp/templates/devapp/ports.html:86
 msgid "Title"
 msgstr "Название"
 
-#: devapp/templates/devapp/ports.html:147
+#: devapp/templates/devapp/ports.html:97
 msgid "We have not received info for ports"
 msgstr "Инфа о портах не получена"
 
@@ -225,8 +239,47 @@ msgstr "Ошибка SNMP на устройстве"
 msgid "Edit"
 msgstr "Редактировать"
 
-msgid "Enable port"
-msgstr "Включить порт"
+msgid "Device does not exist"
+msgstr "Устойство не найдено"
 
-msgid "Disable port"
-msgstr "Выключить порт"
+msgid "Number"
+msgstr "Номер"
+
+msgid "Mode"
+msgstr "Режим"
+
+msgid "Add"
+msgstr "Добавить"
+
+msgid "Add ports"
+msgstr "Добавить порты"
+
+msgid "Device is not have a group, please fix that"
+msgstr "У устройства нет группы, пожалуйста, исправьте это"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Port does not exist"
+msgstr "Порт не найден"
+
+msgid "Port successfully removed"
+msgstr "Порт успешно удалён"
+
+msgid "PON ONU"
+msgstr "Онушка"
+
+msgid "Are you sure that you want to delete switch port from db?"
+msgstr "Вы уверены что хотите удалить порт свича из бд?"
+
+msgid "Port successfully saved"
+msgstr "Порт успешно сохранён"
+
+msgid "Port number on device must be unique"
+msgstr "Номер порта на устройстве должен быть уникальным"
+
+msgid "Mac address is required for fill"
+msgstr "MAC-адрес необходим для заполнения"
+
+msgid "Device with that mac is already exist"
+msgstr "Устройство с этим мак-адресом уже есть"

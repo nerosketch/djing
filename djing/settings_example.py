@@ -164,3 +164,5 @@ pay_SECRET = '<secret>'
 DIALING_MEDIA = 'path/to/asterisk_records'
 
 DHCP_TIMEOUT = 14400
+
+DEFAULT_SNMP_PASSWORD = 'public'

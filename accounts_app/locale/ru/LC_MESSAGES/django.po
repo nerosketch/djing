@@ -136,27 +136,35 @@ msgstr "Старый пароль"
 msgid "New password"
 msgstr "Новый пароль"
 
-#: accounts_app/views.py:43
+#: accounts_app/views.py:42
 msgid "Wrong login or password, please try again"
 msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
-#: accounts_app/views.py:137
+#: accounts_app/views.py:141
+msgid "New password is empty, fill it"
+msgstr "Новый пароль пустой, придумайте себе пароль"
+
+#: accounts_app/views.py:143
 msgid "Wrong password"
 msgstr "Неправильный пароль"
 
-#: accounts_app/views.py:162
+#: accounts_app/views.py:145
+msgid "Empty password, fill it"
+msgstr "Пустой пароль, впишите что-то в пароль"
+
+#: accounts_app/views.py:168
 msgid "You forget specify a password for the new account"
 msgstr "Забыли указать пароль для нового аккаунта"
 
-#: accounts_app/views.py:165
+#: accounts_app/views.py:171
 msgid "You forget to repeat a password for the new account"
 msgstr "Забыли повторить пароль для нового аккаунта"
 
-#: accounts_app/views.py:174
+#: accounts_app/views.py:180
 msgid "Subscriber with this name already exist"
 msgstr "Пользователь с таким именем уже есть"
 
-#: accounts_app/views.py:176
+#: accounts_app/views.py:182
 msgid "Passwords does not match, try again"
 msgstr "Пароли не совпадают, попробуйте ещё раз"
 
@@ -181,8 +189,8 @@ msgstr "Редактировать"
 msgid "Set a task"
 msgstr "Дать задачу"
 
-msgid "Empty password, fill it"
-msgstr "Пустой пароль, впишите что-то в пароль"
+msgid "Please select an image"
+msgstr "Пожалуйста выберите изображение"
 
-msgid "New password is empty, fill it"
-msgstr "Новый пароль пустой, придумайте себе пароль"
+msgid "Avatar successfully changed"
+msgstr "Аватар успешно изменён"

@@ -58,10 +58,11 @@
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th width="100">#</th>
+                        <th width="10">#</th>
                     </tr>
                     </thead>
                     <tbody>
+                    {% with can_ch_trf=perms.tariff_app.change_tariff can_del_trf=perms.abonapp.delete_abon %}
                     {% for human in peoples %}
                         {% if human.is_active %}
                             <tr>
@@ -90,7 +91,7 @@
                         <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                         <td>
                             {% if human.active_tariff %}
-                                {% if perms.tariff_app.change_tariff %}
+                                {% if can_ch_trf %}
                                     <a href="{ % url 'tarifs:edit' human.active_tariff.pk %}">{{ human.active_tariff.title }}</a>
                                 {% else %}
                                     {{ human.active_tariff.title }}
@@ -100,7 +101,7 @@
                         </td>
                         <td>{{ human.ballance }}</td>
                         <td>
-                            {% if perms.abonapp.delete_abon %}
+                            {% if can_del_trf %}
                                 <a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.pk }}" class="btn btn-danger btn-sm">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </a>
@@ -117,6 +118,7 @@
                             </td>
                         </tr>
                     {% endfor %}
+                    {% endwith %}
                     </tbody>
                     <tfoot>
                     <tr>

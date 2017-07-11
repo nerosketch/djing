@@ -27,9 +27,7 @@ class Photo(models.Model):
     def save(self, *args, **kwargs):
         if not self.image:
             return
-
-        super().save()
-
+        super(Photo, self).save()
         im = Image.open(self.image.path)
         im.thumbnail((759, 759), Image.ANTIALIAS)
 
@@ -44,8 +42,7 @@ class Photo(models.Model):
         im.save(fname)
         os.remove(self.image.path)
         self.image = "%s.%s" % (hs, ext)
-        super().save()
-
+        super(Photo, self).save()
 
         # class Meta:
         #    unique_together = (('image',),)

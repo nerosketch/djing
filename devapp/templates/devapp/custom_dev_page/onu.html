@@ -1,0 +1,33 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">{{ dev.get_devtype_display|default:_('Title of the type of switch') }}.
+                        {% if uptime %}
+                            {% trans 'Uptime' %} {{ uptime }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">{{ dev.ip_address }}</li>
+                        <li class="list-group-item">{{ dev.mac_addr }}</li>
+                        <li class="list-group-item"> {{ dev.comment }}</li>
+                        {% for da in dev_accs %}
+                            {% if da.group %}
+                                <li class="list-group-item"><a href="{% url 'abonapp:abon_home' da.group.pk da.pk %}" target="_blank">{{ da.get_full_name }}</a></li>
+                            {% else %}
+                                <li class="list-group-item">{{ da.get_full_name }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

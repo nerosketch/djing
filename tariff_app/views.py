@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.gis.shortcuts import render_to_text
+from django.utils.translation import ugettext as _
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -45,10 +47,10 @@ def edit_tarif(request, tarif_id=0):
         frm = forms.TariffForm(request.POST, instance=tarif)
         if frm.is_valid():
             frm.save()
-            messages.success(request, 'Тариф успешно сохранён')
+            messages.success(request, _('Service has been saved'))
             return redirect('tarifs:edit', tarif_id=tarif_id)
         else:
-            messages.warning(request, 'Не все поля заполнены правильно, проверте и попробуйте ещё раз')
+            messages.warning(request, _('Some fields were filled incorrect, please try again'))
     else:
         frm = forms.TariffForm(instance=tarif)
 
@@ -60,7 +62,12 @@ def edit_tarif(request, tarif_id=0):
 
 @login_required
 @permission_required('tariff_app.delete_tariff')
-def del_tarif(request, id):
-    tar_id = mydefs.safe_int(id)
-    get_object_or_404(Tariff, id=tar_id).delete()
-    return mydefs.res_success(request, 'tarifs:home')
+def del_tarif(request, tid):
+    if request.method == 'POST':
+        if request.POST.get('confirm') == 'yes':
+            get_object_or_404(Tariff, id=tid).delete()
+            messages.success(request, _('Service has been deleted'))
+        else:
+            messages.error(request, _('Not have a confirmations of delete'))
+        return mydefs.res_success(request, 'tarifs:home')
+    return render_to_text('tariff_app/modal_del_warning.html', {'tid': tid}, request=request)

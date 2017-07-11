@@ -7,7 +7,10 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="panel-title">{{ dev.get_devtype_display|default:_('Title of the type of switch') }}.
-                        {% trans 'Uptime' %} {{ uptime }}</div>
+                        {% if uptime %}
+                            {% trans 'Uptime' %} {{ uptime }}
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="panel-body">
 

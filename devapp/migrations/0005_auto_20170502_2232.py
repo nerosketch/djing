@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='device',
             name='devtype',
-            field=models.CharField(choices=[('Dl', 'DLink switch'), ('Pn', 'PON ONU')], default='Dl', max_length=2),
+            field=models.CharField(choices=[('Dl', 'DLink switch'), ('Pn', 'PON OLT')], default='Dl', max_length=2),
         ),
     ]

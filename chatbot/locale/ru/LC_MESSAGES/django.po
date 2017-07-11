@@ -20,31 +20,32 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: chatbot/telebot.py:60
+#: chatbot/telebot.py:61
 msgid "Let's get acquainted, what is your name? Write your login from billing."
 msgstr "Давай знакомиться, как тебя зовут? Напиши свой логин из биллинга."
 
-#: chatbot/telebot.py:80
+#: chatbot/telebot.py:81
 msgid "I do not know the answer to this yet."
 msgstr "Я пока не знаю ответа на это"
 
-#: chatbot/telebot.py:99
+#: chatbot/telebot.py:100
 msgid ""
 "You are not found in the database, check that it correctly pointed out its "
 "LOGIN. Try again"
 msgstr ""
-"Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. Попробуй ещё"
+"Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. "
+"Попробуй ещё"
 
-#: chatbot/telebot.py:122
+#: chatbot/telebot.py:123
 msgid "It's not like ip address, try again"
 msgstr "Это не похоже на ip адрес, попробуй ещё"
 
-#: chatbot/telebot.py:125
+#: chatbot/telebot.py:126
 #, python-format
 msgid "You're '%s', right?"
 msgstr "Ты ведь %s ?"
 
-#: chatbot/telebot.py:135
+#: chatbot/telebot.py:136
 #, python-format
 msgid "Recipient '%s' does not subscribed on notifications"
 msgstr "%s не подписан на оповещения"

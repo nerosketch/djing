@@ -5,10 +5,11 @@ from django.forms.fields import EMPTY_VALUES
 from django.forms.utils import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from netaddr import EUI, AddrFormatError
+from . import MAC_ADDR_REGEX
 
 
 mac_address_validator = RegexValidator(
-    _lazy_re_compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'),
+    _lazy_re_compile(MAC_ADDR_REGEX),
     message=_('Enter a valid integer.'),
     code='invalid',
 )

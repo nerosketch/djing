@@ -7,7 +7,6 @@ from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
-from .fields import MACAddressField
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from djing import settings
 
@@ -199,18 +198,6 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
-class Opt82(models.Model):
-    mac = MACAddressField()
-    port = models.PositiveSmallIntegerField(default=0)
-
-    def __str__(self):
-        return "%s-%d" % (self.mac, self.port)
-
-    class Meta:
-        db_table = 'opt_82'
-        unique_together = (('mac', 'port'),)
-
-
 class Abon(UserProfile):
     current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
@@ -220,7 +207,9 @@ class Abon(UserProfile):
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
     extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
-    opt82 = models.ForeignKey(Opt82, null=True, blank=True, on_delete=models.SET_NULL)
+    device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
+    dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
+    is_dynamic_ip = models.BooleanField(default=False)
 
     _act_tar_cache = None
 
@@ -248,9 +237,6 @@ class Abon(UserProfile):
     def make_pay(self, curuser, how_match_to_pay=0.0):
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
-
-    def is_dhcp(self):
-        return self.opt82 is not None
 
     # Пополняем счёт
     def add_ballance(self, current_user, amount, comment):
@@ -347,18 +333,6 @@ class Abon(UserProfile):
         super(Abon, self).save(*args, **kwargs)
 
 
-class AbonDevice(models.Model):
-    abon = models.ForeignKey(Abon)
-    device = models.ForeignKey('devapp.Device')
-
-    def __str__(self):
-        return "%s - %s" % (self.abon, self.device)
-
-    class Meta:
-        db_table = 'abon_device'
-        unique_together = ('abon', 'device')
-
-
 class PassportInfo(models.Model):
     series = models.CharField(max_length=4, validators=[validators.integer_validator])
     number = models.CharField(max_length=6, validators=[validators.integer_validator])
@@ -436,13 +410,8 @@ class AbonRawPassword(models.Model):
 
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
-    if hasattr(instance, 'is_dhcp'):
-        if callable(instance.is_dhcp):
-            if instance.is_dhcp():
-                timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
-        else:
-            if instance.is_dhcp:
-                timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
+    if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
+        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
