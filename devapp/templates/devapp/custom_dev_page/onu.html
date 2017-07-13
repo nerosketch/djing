@@ -14,16 +14,25 @@
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
-                        <li class="list-group-item">{{ dev.ip_address }}</li>
-                        <li class="list-group-item">{{ dev.mac_addr }}</li>
-                        <li class="list-group-item"> {{ dev.comment }}</li>
+			<li class="list-group-item">{% trans 'Ip address' %}: {{ dev.ip_address }}</li>
+			<li class="list-group-item">{% trans 'Mac' %}: {{ dev.mac_addr }}</li>
+			<li class="list-group-item">{% trans 'Description' %} {{ dev.comment }}</li>
                         {% for da in dev_accs %}
+			    <li class="list-group-item">{% trans 'Attached user' %}:
                             {% if da.group %}
-                                <li class="list-group-item"><a href="{% url 'abonapp:abon_home' da.group.pk da.pk %}" target="_blank">{{ da.get_full_name }}</a></li>
+                                <a href="{% url 'abonapp:abon_home' da.group.pk da.pk %}" target="_blank">{{ da.get_full_name }}</a>
                             {% else %}
-                                <li class="list-group-item">{{ da.get_full_name }}</li>
+                                {{ da.get_full_name }}
                             {% endif %}
+			    </li>
                         {% endfor %}
+			{% if dev.parent_dev %}
+			<li class="list-group-item">
+			    {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.user_group %}
+			    {% trans 'Parent device' %}: <a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}" title="{{ pdev.mac_addr|default:'' }}" target="_blank">{{ pdev.ip_address }} {{ pdev.comment }}</a>
+			    {% endwith %}
+			</li>
+			{% endif %}
                     </ul>
                 </div>
             </div>
