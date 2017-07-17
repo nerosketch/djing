@@ -931,3 +931,6 @@ msgstr "Динамические настройки по dhcp"
 
 msgid "Method is not POST"
 msgstr "Метод не POST"
+
+msgid "Call to"
+msgstr "Позвонить"
