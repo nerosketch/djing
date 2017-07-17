@@ -241,9 +241,3 @@ button[data-toggle=offcanvas]{
     opacity: 0.3;
     fill-opacity: 0.3;
 }
-
-
-/*
- * Сужаем аудио элемент чтоб скрыть большинство контролов
- */
-audio{width: 100px;}
