@@ -10,7 +10,7 @@
                 <th>{% trans 'Play' %}</th>
                 <th>{% trans 'calldate' %}</th>
                 <th>{% trans 'src' %}</th>
-                <th>{% trans 'dst' %}</th>
+                <th>{% trans 'Type' %}</th>
                 <th>{% trans 'duration' %}</th>
                 <th>{% trans 'start' %}</th>
                 <th>{% trans 'answer' %}</th>
@@ -19,25 +19,29 @@
             </tr>
             </thead>
             <tbody>
-            {% for log in logs %}
+            {% for vmail in vmessages %}
                 <tr>
                     <td class="btn-group btn-group-sm">
                         <button class="btn btn-default player-btn disabled">
                             <span class="glyphicon glyphicon-play"></span>
-                            <audio preload="metadata" src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav"></audio>
+                            <audio preload="metadata" src="{{ vmail.path_to_media }}/{{ vmail.calldate|date:"YmdHi" }}-{{ vmail.src }}-{{ vmail.dst }}.wav"></audio>
                         </button>
-                        <a href="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" class="btn btn-default disabled" target="_blank">
+                        <a href="{{ vmail.path_to_media }}/{{ vmail.calldate|date:"YmdHi" }}-{{ vmail.src }}-{{ vmail.dst }}.wav" class="btn btn-default disabled" target="_blank">
                             <span class="glyphicon glyphicon-download-alt"></span>
                         </a>
                     </td>
-                    <td>{{ log.calldate|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.src|abon_if_telephone|safe }}</td>
-                    <td>{{ log.dst|abon_if_telephone|safe }}</td>
-                    <td>{{ log.duration }}</td>
-                    <td>{{ log.start|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.answer|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.end|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.locate_disposition }}</td>
+                    <td>{{ vmail.calldate|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ vmail.src|abon_if_telephone|safe }}</td>
+                    <td>
+                        {% if vmail.userfield == 'request' %}{% trans 'Request' %}
+                        {% elif vmail.userfield == 'report' %}{% trans 'Report' %}
+                        {% else %}{{ vmail.userfield }}{% endif %}
+                    </td>
+                    <td>{{ vmail.duration }}</td>
+                    <td>{{ vmail.start|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ vmail.answer|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ vmail.end|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ vmail.locate_disposition }}</td>
                 </tr>
             {% empty %}
                 <tr>
@@ -48,6 +52,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=logs %}
+    {% include 'toolbar_page.html' with pag=vmessages %}
 
 {% endblock %}

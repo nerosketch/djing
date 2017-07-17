@@ -40,7 +40,6 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 			var hr = a.attr('href');
 			var tx = a.text();
 			selecthid.val(hr.substr(1));
-			console.debug(tx);
 			selectbtn.text(tx).removeClass('hidden');
 			selectinp.addClass('hidden').val(tx);
 		};
@@ -68,6 +67,54 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 		selectul.children().on('click', selectajax_click);
 	};
 })(jQuery);
+
+
+// AudioPlayer
+(function ($) {
+	$.fn.aplayer = function(){
+
+		var def_play = function(e){
+			var audiotag = e.data['audiotag'][0];
+
+			if(audiotag.readyState == 0){
+				$(this).prop('disabled', true);
+				return;
+			}else
+				$(this).prop('disabled', false);
+
+			if(audiotag.paused)
+                audiotag.play();
+            else
+                audiotag.pause();
+		};
+
+		var def_canplay = function(){
+			var els = $(this).parent();
+			els.prop('disabled', false).removeClass('disabled');
+			els.siblings().prop('disabled', false).removeClass('disabled');
+		};
+
+		var def_on_play = function(){
+			$(this).siblings('span.glyphicon').attr('class', 'glyphicon glyphicon-pause');
+        };
+
+		var def_on_pause = function(){
+			$(this).siblings('span.glyphicon').attr('class', 'glyphicon glyphicon-play');
+        };
+
+		this.each(function(){
+			var i = $(this);
+			var audiotag = i.children('audio');
+			var icon = i.children('span.glyphicon');
+			i.on('click', {'audiotag': audiotag}, def_play);
+			audiotag.on('canplay', def_canplay);
+			audiotag.on('play', def_on_play);
+			audiotag.on('pause', def_on_pause);
+		});
+
+	};
+})(jQuery);
+
 
 
 $(document).ready(function () {
@@ -138,6 +185,8 @@ $(document).ready(function () {
             self.html(r.dat);
 		});
 		return false;
-	})
+	});
+
+	$('button.player-btn').aplayer();
 
 });

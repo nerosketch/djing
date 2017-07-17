@@ -94,3 +94,15 @@ msgstr "Несколько абонентов с указанным номеро
 #: dialing_app/views.py:29
 msgid "User with the telephone number not found"
 msgstr "Абонент с таким номером телефона не найден"
+
+msgid "Voice mail"
+msgstr "Оставленные сообщения"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Request"
+msgstr "Заявка"
+
+msgid "Report"
+msgstr "Поломка"

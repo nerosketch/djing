@@ -51,9 +51,13 @@ class AsteriskCDR(models.Model):
             return _('Unknown')
         return ''
 
-    @staticmethod
-    def path_to_media():
-        return getattr(settings, 'DIALING_MEDIA', '/media')
+    def path_to_media(self):
+        path = getattr(settings, 'DIALING_MEDIA', '/media')
+        if self.userfield == 'request':
+            return "%s/recording/request" % path
+        elif self.userfield == 'report':
+            return "%s/recording/bug" % path
+        return path
 
     class Meta:
         db_table = 'cdr'

@@ -1,0 +1,40 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Last calls' %}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <div class="page-header">
+        <h3>{{ title }}</h3>
+    </div>
+
+    <ul class="nav nav-tabs">
+
+        {% url 'dialapp:home' as dialhome %}
+        <li{% if dialhome == request.path %} class="active"{% endif %}>
+            <a href="{{ dialhome }}">
+                {% trans 'Last calls' %}
+            </a>
+        </li>
+
+        {% url 'dialapp:vmail' as dialmail %}
+        <li{% if dialmail == request.path %} class="active"{% endif %}>
+            <a href="{{ dialmail }}">
+                {% trans 'Voice mail' %}
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
