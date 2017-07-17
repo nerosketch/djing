@@ -154,6 +154,7 @@ def add_ports(request, devid):
             return "p:%d\tM:%s\tT:%s" % (self.pid, self.text)
 
     try:
+        res_ports = list()
         dev = Device.objects.get(pk=devid)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
@@ -193,6 +194,8 @@ def add_ports(request, devid):
         return redirect('devapp:group_list')
     except DeviceDBException as e:
         messages.error(request, e)
+    except EasySNMPTimeoutError:
+        messages.error(request, _('wait for a reply from the SNMP Timeout'))
     return render(request, 'devapp/manage_ports/add_ports.html', {
         'ports': res_ports,
         'dev': dev

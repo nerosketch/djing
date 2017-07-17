@@ -241,3 +241,8 @@ button[data-toggle=offcanvas]{
     opacity: 0.3;
     fill-opacity: 0.3;
 }
+
+a.navbar-brand {
+    padding-left: 88px;
+}
+

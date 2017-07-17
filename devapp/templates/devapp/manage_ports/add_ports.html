@@ -70,10 +70,14 @@
                 <tfoot>
                     <tr>
                         <td colspan="4" class="btn-group">
-                            {% if perms.devapp.add_port %}
+                            {% if perms.devapp.add_port and ports %}
                                 <button type="submit" class="btn btn-primary">
                                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                                 </button>
+			    {% else %}
+			        <button type="button" class="btn btn-primary" disabled>
+                                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+				</button>
                             {% endif %}
                         </td>
                     </tr>

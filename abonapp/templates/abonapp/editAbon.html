@@ -140,7 +140,7 @@
                         <label for="id_method" class="col-sm-2 control-label">{% trans 'Device' %}</label>
                             <div class="col-sm-10 btn-group btn-group-sm">
                                 {% if device %}
-                                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{{ device.ip_address }}">
+				    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %} {{ device.mac_addr }}">
                                         <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
                                     </a>
                                     <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
@@ -162,9 +162,9 @@
                                     <option value="0">{% trans 'Not assigned' %}</option>
                                     {% for port in dev_ports %}
                                         {% if port == abon.dev_port %}
-                                            <option value="{{ port.pk }}" selected>{{ port.descr }}</option>
+					    <option value="{{ port.pk }}" selected>{{ port.num }}: {{ port.descr }}</option>
                                         {% else %}
-                                            <option value="{{ port.pk }}">{{ port.descr }}</option>
+					    <option value="{{ port.pk }}">{{ port.num }}: {{ port.descr }}</option>
                                         {% endif %}
                                     {% empty %}
                                         <option value="0">{% trans 'Ports does not exist' %}</option>

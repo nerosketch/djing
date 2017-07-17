@@ -4,12 +4,14 @@ from django.shortcuts import render
 from django.utils.html import escape
 from abonapp.models import Abon
 from mydefs import ip_addr_regex
+from django.contrib.auth.decorators import login_required
 
 
 def replace_without_case(orig, old, new):
     return re.sub(old, new, orig, flags=re.IGNORECASE)
 
 
+@login_required
 def home(request):
     s = request.GET.get('s')
     s = s.replace('+', '')
