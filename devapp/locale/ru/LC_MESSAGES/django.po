@@ -289,3 +289,8 @@ msgstr "Родительское устройство"
 msgid "Attached user"
 msgstr "Прикрепленный абонент"
 
+msgid "Find the device"
+msgstr "Найти устройство"
+
+msgid "Find the subscriber"
+msgstr "Найти абонента"

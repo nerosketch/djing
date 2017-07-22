@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^(\d+)/(?P<devid>\d+)/ports_add', views.add_ports, name='add_ports'),
     url(r'^(\d+)/(?P<did>\d+)/(?P<portid>\d+)_(?P<status>[0-1]{1})$', views.toggle_port, name='port_toggle'),
     url(r'^(?P<grp>\d+)/(?P<did>\d+)/(?P<portid>\d+)/del$', views.delete_single_port, name='del_port'),
-    url(r'^(?P<grp>\d+)/(?P<did>\d+)/(?P<pid>\d+)/edit$', views.edit_single_port, name='edit_port')
+    url(r'^(?P<grp>\d+)/(?P<did>\d+)/(?P<pid>\d+)/edit$', views.edit_single_port, name='edit_port'),
+    url(r'^search_dev$', views.search_dev)
 ]

@@ -42,6 +42,9 @@ class DeviceForm(forms.ModelForm):
             }),
             'user_group': forms.Select(attrs={
                 'class': 'form-control'
+            }),
+            'parent_dev': forms.Select(attrs={
+                'class': 'form-control'
             })
         }
 

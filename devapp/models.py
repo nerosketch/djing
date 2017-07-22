@@ -52,7 +52,7 @@ class Device(models.Model):
         return mngr_class.has_attachable_to_subscriber()
 
     def __str__(self):
-        return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address, self.mac_addr)
+        return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address, self.mac_addr or '')
 
 
 class Port(models.Model):

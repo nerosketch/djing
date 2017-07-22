@@ -2,10 +2,13 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
+from json import dumps
 
 from .models import Device, Port, DeviceDBException
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
@@ -108,7 +111,8 @@ def dev(request, grp, devid=0):
     else:
         return render(request, 'devapp/dev.html', {
             'form': frm,
-            'dev': devinst
+            'dev': devinst,
+            'selected_parent_dev': devinst.parent_dev or None
         })
 
 
@@ -345,3 +349,14 @@ def group_list(request):
     return render(request, 'devapp/group_list.html', {
         'groups': groups
     })
+
+
+@login_required
+def search_dev(request):
+    word = request.GET.get('s')
+    if word is None:
+        results = [{'id': 0, 'text': ''}]
+    else:
+        results = Device.objects.filter(Q(comment__icontains=word) | Q(ip_address=word))[:16]
+        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
+    return HttpResponse(dumps(results, ensure_ascii=False))
