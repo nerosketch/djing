@@ -63,8 +63,8 @@ msgid "New"
 msgstr "Новая"
 
 #: taskapp/models.py:21
-msgid "In fulfilling"
-msgstr "На выполнении"
+msgid "Confused"
+msgstr "Провалена"
 
 #: taskapp/models.py:22
 msgid "Completed"
@@ -127,8 +127,8 @@ msgid "Completing tasks"
 msgstr "Завершение задачи"
 
 #: taskapp/models.py:47
-msgid "The task started"
-msgstr "Задача начата"
+msgid "The task failed"
+msgstr "Задача провалена"
 
 #: taskapp/models.py:78
 msgid "Access to all tasks"
@@ -281,8 +281,8 @@ msgid "User does not exist"
 msgstr "Абонент не найден"
 
 #: taskapp/templates/taskapp/tasklist.html:53
-msgid "Begin"
-msgstr "Начать"
+msgid "Mark as unsuccessful"
+msgstr "Отметить задачу как проваленную"
 
 #: taskapp/templates/taskapp/tasklist.html:56
 #: taskapp/templates/taskapp/tasklist_active.html:53
@@ -358,8 +358,8 @@ msgstr "Нужно выбрать абонента"
 msgid "Error in the form fields"
 msgstr "Ошибка в полях формы"
 
-msgid "Active tasks"
-msgstr "Активные задачи"
+msgid "Failed tasks"
+msgstr "Проваленные задачи"
 
 msgid "All my tasks"
 msgstr "Все мои задачи"
