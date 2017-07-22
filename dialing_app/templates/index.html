@@ -21,7 +21,7 @@
             <tbody>
             {% for log in logs %}
                 <tr>
-                    <td class="btn-group btn-group-sm">
+                    <td class="btn-group btn-group-sm btn-group-justify">
                         <button class="btn btn-default player-btn disabled">
                             <span class="glyphicon glyphicon-play"></span>
                             <audio preload="metadata" src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav"></audio>
