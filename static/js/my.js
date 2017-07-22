@@ -27,7 +27,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 	$.fn.selectajax = function (opt) {
 
 		var settings = $.extend( {
-			url		 : '/api'
+			url		 : this.attr('data-dst')
 		}, opt);
 
 		var selectbtn = this.children('button.selectajax-btn');
@@ -48,7 +48,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 			$.getJSON(settings.url, {'s': this.value}, function (r) {
 				selectul.empty();
 				r.forEach(function (o) {
-					var li = $('<li><a href="#' + o.id + '">' + o.name + ": " + o.fio + '</a></li>');
+					var li = $('<li><a href="#' + o.id + '">' + o.text + '</a></li>');
 					selectul.append(li);
 					li.on('click', selectajax_click)
 				});
@@ -152,9 +152,7 @@ $(document).ready(function () {
 	});
 
 
-	$('div.selectajax').selectajax({
-		url: '/abons/api/abon_filter'
-	});
+	$('div.selectajax').selectajax();
 
 	$('[data-toggle=offcanvas]').click(function () {
 		$('.row-offcanvas').toggleClass('active');
