@@ -23,10 +23,10 @@ def home(request):
 
 @login_required
 @only_admins
-def active_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user, state='C')  # На выполнении
+def failed_tasks(request):
+    tasks = Task.objects.filter(recipients=request.user, state='C')  # Проваленные
     tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_active.html', {
+    return render(request, 'taskapp/tasklist_failed.html', {
         'tasks': tasks
     })
 
@@ -174,9 +174,9 @@ def task_finish(request, task_id):
 
 @login_required
 @only_admins
-def task_begin(request, task_id):
+def task_failed(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    task.begin(request.user)
+    task.do_fail(request.user)
     return redirect('taskapp:home')
 
 

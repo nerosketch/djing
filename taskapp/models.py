@@ -18,7 +18,7 @@ TASK_PRIORITIES = (
 
 TASK_STATES = (
     ('S', _('New')),
-    ('C', _('In fulfilling')),
+    ('C', _('Confused')),
     ('F', _('Completed'))
 )
 
@@ -44,7 +44,7 @@ class ChangeLog(models.Model):
         ('c', _('Create task')),
         ('d', _('Delete task')),
         ('f', _('Completing tasks')),
-        ('b', _('The task started'))
+        ('b', _('The task failed'))
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
@@ -89,8 +89,8 @@ class Task(models.Model):
         )
         self.save(update_fields=['state', 'out_date'])
 
-    def begin(self, current_user):
-        self.state = 'C'  # Начата
+    def do_fail(self, current_user):
+        self.state = 'C'  # Провалена
         ChangeLog.objects.create(
             task=self,
             act_type='b',
