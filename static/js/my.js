@@ -189,4 +189,6 @@ $(document).ready(function () {
 
 	$('button.player-btn').aplayer();
 
+	$('[data-toggle="tooltip"]').tooltip({container:'body'});
+
 });
