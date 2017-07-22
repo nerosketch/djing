@@ -57,7 +57,7 @@ class AsteriskCDR(models.Model):
             return "%s/recording/request" % path
         elif self.userfield == 'report':
             return "%s/recording/bug" % path
-        return path
+        return "%s/monitor" % path
 
     class Meta:
         db_table = 'cdr'
