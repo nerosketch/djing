@@ -121,3 +121,13 @@ class ExtraFieldForm(forms.ModelForm):
             'field_type': forms.Select(attrs={'class': 'form-control'}),
             'data': forms.TextInput(attrs={'class': 'form-control'})
         }
+
+
+class AbonStreetForm(forms.ModelForm):
+    class Meta:
+        model = models.AbonStreet
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'required':'', 'autofocus':''}),
+            'group': forms.Select(attrs={'class': 'form-control'})
+        }

@@ -6,6 +6,9 @@ urlpatterns = [
     url(r'^$', views.peoples, name='people_list'),
     url(r'^addabon$', views.addabon, name='add_abon'),
     url(r'^services$', views.chgroup_tariff, name='ch_group_tariff'),
+    url(r'^street/add$', views.street_add, name='street_add'),
+    url(r'^street/edit', views.street_edit, name='street_edit'),
+    url(r'^street/(?P<sid>\d+)/delete$', views.street_del, name='street_del'),
     url(r'^(?P<uid>\d+)$', views.abonhome, name='abon_home'),
 
     url(r'^(?P<uid>\d+)/services$', views.abon_services, name='abon_services'),

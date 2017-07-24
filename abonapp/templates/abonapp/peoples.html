@@ -149,6 +149,14 @@
                     {% empty %}
                         <a href="#" class="list-group-item">{% trans 'No streets found for that group' %}</a>
                     {% endfor %}
+                    <div class="btn-group btn-group-sm btn-group-justified">
+                        <a href="{% url 'abonapp:street_add' abon_group.pk %}" class="btn btn-success btn-modal" data-toggle="tooltip" title="{% trans 'Add street' %}">
+                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                        </a>
+                        <a href="{% url 'abonapp:street_edit' abon_group.pk %}" class="btn btn-primary btn-modal" data-toggle="tooltip" title="{% trans 'Edit streets' %}">
+                            <span class="glyphicon glyphicon-edit"></span> {% trans 'Edit' %}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

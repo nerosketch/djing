@@ -1,0 +1,38 @@
+{% load i18n %}
+<form role="form" action="{% url 'abonapp:street_add' gid %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span>{% trans 'Add street' %}</h4>
+    </div>
+
+    {% include 'message_block.html' %}
+
+    <div class="modal-body">
+        <div class="form-group-sm">
+            <label for="id_name">{% trans 'Street title' %}</label>
+
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-font"></span></span>
+                {{ form.name }}{{ form.name.errors }}
+            </div>
+        </div>
+
+        <div class="form-group-sm">
+            <label for="id_group">{% trans 'User group' %}</label>
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                {{ form.group }}{{ form.group.errors }}
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-success">
+                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

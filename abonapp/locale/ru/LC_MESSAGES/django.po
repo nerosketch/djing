@@ -653,6 +653,33 @@ msgstr "Не найдены улицы для группы"
 msgid "Services of subscriber"
 msgstr "Купленные абонентом услуги (назначенные тарифные планы)"
 
+msgid "Add street"
+msgstr "Добавить улицу"
+
+msgid "Edit streets"
+msgstr "Редактировать улицы"
+
+msgid "Street successfully saved"
+msgstr "Улица успешно сохранена"
+
+msgid "Streets has been saved"
+msgstr "Улицы сохранены"
+
+msgid "Street title"
+msgstr "Название улицы"
+
+msgid "One of these streets has not been found"
+msgstr "Одна из этих улиц не была найдена"
+
+msgid "The street has not been found"
+msgstr "Улица не найдена"
+
+msgid "The street successfully deleted"
+msgstr "Улица успешно удалена"
+
+msgid "Streets has not been found"
+msgstr "Улицы не найдены"
+
 #: abonapp/templates/abonapp/services.html:9
 msgid "Priority"
 msgstr "Приоритет"

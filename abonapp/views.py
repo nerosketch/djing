@@ -873,6 +873,60 @@ def save_user_dev_port(request, gid, uid):
     return redirect('abonapp:abon_home', gid, uid)
 
 
+@login_required
+@permission_required('abonapp.add_abonstreet')
+def street_add(request, gid):
+    if request.method == 'POST':
+        frm = forms.AbonStreetForm(request.POST)
+        if frm.is_valid():
+            frm.save()
+            messages.success(request, _('Street successfully saved'))
+            return redirect('abonapp:people_list', gid)
+        else:
+            messages.error(request, _('fix form errors'))
+    else:
+        frm = forms.AbonStreetForm(initial={'group': gid})
+    return render_to_text('abonapp/modal_addstreet.html', {
+        'form': frm,
+        'gid': gid
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_abonstreet')
+def street_edit(request, gid):
+    try:
+        if request.method == 'POST':
+            streets_pairs = [(int(sid), sname) for sid, sname in zip(request.POST.getlist('sid'), request.POST.getlist('sname'))]
+            for sid, sname in streets_pairs:
+                street = models.AbonStreet.objects.get(pk=sid)
+                street.name = sname
+                street.save()
+            messages.success(request, _('Streets has been saved'))
+        else:
+            return render_to_text('abonapp/modal_editstreet.html', {
+                'gid': gid,
+                'streets': models.AbonStreet.objects.filter(group=gid)
+            }, request=request)
+
+    except models.AbonStreet.DoesNotExist:
+        messages.error(request, _('One of these streets has not been found'))
+
+    return redirect('abonapp:people_list', gid)
+
+
+@login_required
+@permission_required('abonapp.delete_abonstreet')
+def street_del(request, gid, sid):
+    try:
+        models.AbonStreet.objects.get(pk=sid, group=gid).delete()
+        messages.success(request, _('The street successfully deleted'))
+    except models.AbonStreet.DoesNotExist:
+        messages.error(request, _('The street has not been found'))
+    return redirect('abonapp:people_list', gid)
+
+
+
 # API's
 
 def abons(request):
