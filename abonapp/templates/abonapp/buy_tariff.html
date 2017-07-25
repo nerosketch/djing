@@ -22,7 +22,7 @@
             <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
-                    <label for="id_tariff">{% trans 'Pick a service' %}</label>
+                    <label for="id_tariffs">{% trans 'Pick a service' %}</label>
 
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>

@@ -54,7 +54,7 @@ def buy_service(request, srv_id):
         else:
             return render_to_text('clientsideapp/modal_service_buy.html', {
                 'service': service,
-                'current_service': current_service
+                'current_service': current_service.tariff if current_service is not None else None
             }, request=request)
     except LogicError as e:
         messages.error(request, e)

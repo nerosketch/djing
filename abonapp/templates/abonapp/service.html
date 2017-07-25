@@ -1,0 +1,54 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-6">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'Services of subscriber' %}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if abon_tariff %}
+                        <p>
+                            <b>{% trans 'Service' %}</b>:
+                            {% if perms.tariff_app.change_tariff %}
+                                <a href="{% url 'tarifs:edit' abon_tariff.pk %}" title="{{ abon_tariff.time_start|default:'' }}">
+                                    {{ abon_tariff.tariff.title }}
+                                </a>
+                            {% else %}
+                                {{ abon_tariff.tariff.title }}
+                            {% endif %}
+                        </p>
+                        <i><b>{% trans 'Sum' %}</b>: {{ abon_tariff.tarif.amount }} руб.</i>
+                        <p><b>{% trans 'Input speed' %}</b>: {{ abon_tariff.tariff.speedIn }}</p>
+                        <p><b>{% trans 'Output speed' %}</b>: {{ abon_tariff.tariff.speedOut }}</p>
+                        <p><b>{% trans 'Works until' %}</b>: {{ abon_tariff.deadline|date:"d E Y, l" }}</p>
+                        <p>{{ abon_tariff.tarif.descr }}</p>
+                    {% else %}
+                        No service, <a href="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}" class="btn btn-sm btn-success">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Buy service' %}
+                    </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Услуги для заказа</h3>
+                </div>
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+{% endblock %}

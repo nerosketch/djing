@@ -102,7 +102,7 @@ class DumpAbon(object):
         self.passw = raw_passw
         srv = obj.active_tariff()
         if srv is not None:
-            self.service = DumpService.build_from_db(srv)
+            self.service = DumpService.build_from_db(srv.tariff)
         else:
             self.service = None
         if obj.opt82 is not None and obj.opt82.mac is not None and obj.opt82.port is not None:

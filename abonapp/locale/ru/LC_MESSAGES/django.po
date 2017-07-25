@@ -57,10 +57,6 @@ msgstr "Не хватает денег на счету"
 msgid "finish service perm"
 msgstr "Снятие со счёта средств"
 
-#: abonapp/models.py:145
-msgid "activate service perm"
-msgstr "Активация услуги абонента"
-
 #: abonapp/models.py:162
 msgid "Digital field"
 msgstr "Цифровое поле"
@@ -93,10 +89,6 @@ msgstr "Может просматривать паспортные данные"
 #: abonapp/models.py:288
 msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
-
-#: abonapp/models.py:303
-msgid "service overdue log"
-msgstr "Услуга просрочена, отключаем, и подключаем новую"
 
 #: abonapp/models.py:346
 msgid "Ip address already exist"
@@ -598,10 +590,6 @@ msgstr "Не найдены улицы для группы"
 msgid "Services of subscriber"
 msgstr "Купленные абонентом услуги (назначенные тарифные планы)"
 
-#: abonapp/templates/abonapp/services.html:9
-msgid "Priority"
-msgstr "Приоритет"
-
 #: abonapp/templates/abonapp/services.html:12
 msgid "Input speed"
 msgstr "Входящая скорость"
@@ -613,18 +601,6 @@ msgstr "Исходящая скорость"
 #: abonapp/templates/abonapp/services.html:14
 msgid "Works until"
 msgstr "Действует до"
-
-#: abonapp/templates/abonapp/services.html:15
-msgid "Do"
-msgstr "Действия"
-
-#: abonapp/templates/abonapp/services.html:52
-msgid "Priority up"
-msgstr "Повысить приоритет"
-
-#: abonapp/templates/abonapp/services.html:58
-msgid "Priority down"
-msgstr "Понизить приоритет"
 
 #: abonapp/templates/abonapp/services.html:64
 msgid "Delete service"
@@ -902,3 +878,9 @@ msgstr "Звонки не найдены"
 
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "That service already activated"
+msgstr "Эта услуга уже подключена"
+
+msgid "Service already activated"
+msgstr "Услуга уже подключена"

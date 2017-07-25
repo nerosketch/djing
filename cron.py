@@ -16,7 +16,7 @@ def main():
     for user in users:
         try:
             # бдим за услугами абонента: просроченные отключить, заказанные подключить
-            user.activate_next_tariff(user)
+            user.bill_service(user)
 
             # если нет ip то и нет смысла лезть в NAS
             if user.ip_address is None:
