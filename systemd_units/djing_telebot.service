@@ -1,0 +1,15 @@
+[Unit]
+Description=A job for djing
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 ./telebot.py > /dev/null
+PIDFile=/run/telebot.py.pid
+WorkingDirectory=/srv/http/djing
+TimeoutSec=9
+Restart=always
+User=http
+Group=http
+
+[Install]
+WantedBy=multi-user.target
