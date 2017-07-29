@@ -22,6 +22,7 @@ from devapp.models import Device, Port as DevPort
 from datetime import datetime, date
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
+from statistics.models import getModel, get_dates
 
 
 @login_required
@@ -678,7 +679,6 @@ def clear_dev(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def charts(request, gid, uid):
-    from statistics.models import getModel
     high = 100
 
     wandate = request.GET.get('wantdate')
@@ -725,7 +725,7 @@ def charts(request, gid, uid):
         'abon': abon,
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
         'high': high,
-        'dates': StatElem.objects.get_dates()
+        'dates': get_dates()
     })
 
 

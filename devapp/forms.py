@@ -27,7 +27,7 @@ class DeviceForm(forms.ModelForm):
                 'placeholder': '192.168.0.100',
                 'class': 'form-control'
             }),
-            'comment': forms.Textarea(attrs={
+            'comment': forms.TextInput(attrs={
                 'required': True,
                 'class': 'form-control'
             }),

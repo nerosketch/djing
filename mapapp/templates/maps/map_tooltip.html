@@ -1,7 +1,7 @@
 <h4>{{ dot.title }}</h4>
 <div class="list-group">
     {% for dev in devs %}
-        <a class="list-group-item" href="{% url 'devapp:view' dev.id %}" target="_blank">
+        <a class="list-group-item" href="{% url 'devapp:view' dev.user_group.pk dev.pk %}" target="_blank">
             {{ dev.comment }}
         </a>
     {% empty %}
