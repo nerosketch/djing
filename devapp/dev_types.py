@@ -62,9 +62,10 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         macs = self.get_list(oids['get_ports']['macs'])
         speeds = self.get_list(oids['get_ports']['speeds'])
         res = []
-        ln = len(macs)
+        ln = len(speeds)
         for n in range(ln):
             status = True if int(stats[n]) == 1 else False
+            print(len(nams), len(speeds), len(macs))
             res.append(DLinkPort(
                 n+1,
                 nams[n] if len(nams) > 0 else _('does not fetch the name'),
