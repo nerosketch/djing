@@ -1,11 +1,11 @@
 [Unit]
-Description=A job for djing
+Description=Djing telegram bot
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/python3 ./telebot.py > /dev/null
 PIDFile=/run/telebot.py.pid
-WorkingDirectory=/srv/http/djing
+WorkingDirectory=/var/www/djing
 TimeoutSec=9
 Restart=always
 User=http
