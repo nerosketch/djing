@@ -1,39 +1,17 @@
 import importlib
-import warnings
-
-from django.conf import settings
 from netaddr import mac_unix, mac_eui48
 
 
-MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
 class mac_linux(mac_unix):
     """MAC format with zero-padded all upper-case hex and colon separated"""
-    word_fmt = '%.2X'
+    word_fmt = '%x'
+
 
 def default_dialect(eui_obj=None):
-    # Check to see if a default dialect class has been specified in settings,
-    # using 'module.dialect_cls' string and use importlib and getattr to retrieve dialect class. 'module' is the module and
-    # 'dialect_cls' is the class name of the custom dialect. The dialect must either be defined or imported by the module's
-    # __init__.py if the module is a package.
-    from .fields import MACAddressField # Remove import at v1.4
-    if hasattr(settings, 'MACADDRESS_DEFAULT_DIALECT') and not MACAddressField.dialect:
-        module, dialect_cls = settings.MACADDRESS_DEFAULT_DIALECT.split('.')
-        dialect = getattr(importlib.import_module(module), dialect_cls, mac_linux)
-        return dialect
-    else:
-        if MACAddressField.dialect: # Remove this "if" statement at v1.4
-            warnings.warn(
-                "The set_dialect class method on MACAddressField has been deprecated, in favor of the default_dialect "
-                "utility function and settings.MACADDRESS_DEFAULT_DIALECT. See macaddress.__init__.py source or the "
-                "project README for more information.",
-                DeprecationWarning,
-            )
-            return MACAddressField.dialect
-        if eui_obj:
-            return eui_obj.dialect
-        else:
-            return mac_linux
+    return mac_linux
+
 
 def format_mac(eui_obj, dialect):
     # Format a EUI instance as a string using the supplied dialect class, allowing custom string classes by

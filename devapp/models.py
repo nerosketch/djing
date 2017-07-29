@@ -6,6 +6,8 @@ from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
 from .dev_types import DLinkDevice, OLTDevice, OnuDevice
 from mapapp.models import Dot
+from subprocess import call
+from django.conf import settings
 
 
 DEVICE_TYPES = (
@@ -66,3 +68,36 @@ class Port(models.Model):
     class Meta:
         db_table = 'dev_port'
         unique_together = (('device', 'num'))
+
+
+def dev_post_save_signal(sender, instance, **kwargs):
+    if instance.devtype != 'On':
+        return
+    grp = instance.user_group.pk
+    if grp == 87:
+        code = 'chk'
+    elif grp == 85:
+        code = 'drf'
+    elif grp == 86:
+        code = 'eme'
+    elif grp == 84:
+        code = 'kunc'
+    elif grp == 47:
+        code = 'mtr'
+    elif grp == 60:
+        code = 'nvg'
+    elif grp == 65:
+        code = 'ohot'
+    elif grp == 89:
+        code = 'psh'
+    elif grp == 92:
+        code = 'str'
+    elif grp == 80:
+        code = 'uy'
+    elif grp == 79 or grp == 91:
+        code = 'zrk'
+    newmac = str(instance.mac_addr)
+    call(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
+
+
+models.signals.post_save.connect(dev_post_save_signal, sender=Device)
