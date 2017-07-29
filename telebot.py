@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
+from pid.decorator import pidfile
 import django
 from telepot import DelegatorBot
 from telepot.delegate import per_chat_id, create_open, pave_event_space
 
 
-if __name__ == '__main__':
+@pidfile()
+def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
     django.setup()
     from chatbot.telebot import token, DjingTelebot
@@ -16,3 +18,7 @@ if __name__ == '__main__':
         ),
     ])
     bot.message_loop(run_forever='Listening ...')
+
+
+if __name__ == '__main__':
+    main()
