@@ -7,6 +7,12 @@ from mydefs import MyGenericIPAddressField
 from .fields import UnixDateTimeField
 
 
+def get_dates():
+    tables = connection.introspection.table_names()
+    tables = [t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_')]
+    return [datetime.strptime(t, '%d%m%Y').date() for t in tables]
+
+
 class StatManager(models.Manager):
 
     def chart(self, ip_addr, count_of_parts=12, want_date=date.today()):
@@ -41,11 +47,6 @@ class StatManager(models.Manager):
         else:
             return
 
-    def get_dates(self):
-        tables = connection.introspection.table_names()
-        tables = [t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_')]
-        return [datetime.strptime(t, '%d%m%Y').date() for t in tables]
-
 
 class StatElem(models.Model):
     cur_time = UnixDateTimeField(primary_key=True)
@@ -55,11 +56,19 @@ class StatElem(models.Model):
 
     objects = StatManager()
 
+    # ReadOnly
     def save(self, *args, **kwargs):
-        return
+        pass
 
+    # ReadOnly
     def delete(self, *args, **kwargs):
-        return
+        pass
+
+    def delete_month(self):
+        cursor = connection.cursor()
+        table_name = self._meta.db_table
+        sql = "DROP TABLE %s;" % table_name
+        cursor.execute(sql)
 
     @staticmethod
     def percentile(N, percent, key=lambda x:x):
