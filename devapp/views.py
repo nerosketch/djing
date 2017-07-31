@@ -75,6 +75,7 @@ def devdel(request, did):
 def dev(request, grp, devid=0):
     devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
     user_group = get_object_or_404(AbonGroup, pk=grp)
+    already_dev = None
 
     if request.method == 'POST':
         if devid == 0:
@@ -85,10 +86,14 @@ def dev(request, grp, devid=0):
                 raise PermissionDenied
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
-            frm.save()
+            ndev = frm.save()
             messages.success(request, _('Device info has been saved'))
-            return redirect('devapp:devs', grp)
+            return redirect('devapp:edit', grp, ndev.pk)
         else:
+            try:
+                already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
+            except Device.DoesNotExist:
+                pass
             messages.error(request, _('Form is invalid, check fields and try again'))
     else:
         if devinst is None:
@@ -106,7 +111,8 @@ def dev(request, grp, devid=0):
     if devinst is None:
         return render(request, 'devapp/add_dev.html', {
             'form': frm,
-            'group': user_group
+            'group': user_group,
+            'already_dev': already_dev
         })
     else:
         return render(request, 'devapp/dev.html', {

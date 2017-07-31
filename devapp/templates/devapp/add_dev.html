@@ -37,7 +37,15 @@
 
                     <div class="input-group{% if form.mac_addr.errors %} has-error{% endif %}">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
-                        {{ form.mac_addr }}{{ form.mac_addr.errors }}
+                        {{ form.mac_addr }}
+                        {% if already_dev %}
+                            <span class="input-group-btn">
+                                <a class="btn btn-danger" href="{% url 'devapp:view' group.pk already_dev.pk %}" title="{% trans 'View the device' %}" data-toggle="tooltip">
+                                    {% for err in form.mac_addr.errors %}{{ err }}{% endfor %}
+                                    {{ already_dev.comment }}
+                                </a>
+                            </span>
+                        {% endif %}
                     </div>
                 </div>
 
