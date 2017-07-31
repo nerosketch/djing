@@ -118,7 +118,9 @@ def dev(request, grp, devid=0):
         return render(request, 'devapp/dev.html', {
             'form': frm,
             'dev': devinst,
-            'selected_parent_dev': devinst.parent_dev or None
+            'selected_parent_dev': devinst.parent_dev or None,
+            'group': user_group,
+            'already_dev': already_dev
         })
 
 

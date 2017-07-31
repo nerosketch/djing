@@ -41,12 +41,12 @@
                         {% if already_dev %}
                             <span class="input-group-btn">
                                 <a class="btn btn-danger" href="{% url 'devapp:view' group.pk already_dev.pk %}" title="{% trans 'View the device' %}" data-toggle="tooltip">
-                                    {% for err in form.mac_addr.errors %}{{ err }}{% endfor %}
                                     {{ already_dev.comment }}
                                 </a>
                             </span>
                         {% endif %}
                     </div>
+		    {{ form.mac_addr.errors }}
                 </div>
 
                 <div class="form-group">
