@@ -294,3 +294,7 @@ msgstr "Найти устройство"
 
 msgid "Find the subscriber"
 msgstr "Найти абонента"
+
+msgid "View the device"
+msgstr "Посмотреть устройство"
+
