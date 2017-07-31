@@ -19,7 +19,7 @@ else
 fi
 
 
-DHCP_PATH='/home/bashmak/Projects/djing/macs'
+DHCP_PATH='/etc/dhcp/macs'
 PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin
 
 
@@ -29,4 +29,6 @@ if grep "${MAC}" "${DHCP_PATH}/${PART_CODE}.conf" > /dev/null; then
 else
   # add new mac
   echo "subclass \"${PART_CODE}\" \"${MAC}\";" >> "${DHCP_PATH}/${PART_CODE}.conf"
+  /usr/bin/sudo /usr/bin/systemctl restart dhcpd.service
 fi
+
