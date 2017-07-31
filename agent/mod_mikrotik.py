@@ -201,15 +201,18 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
             speedIn=parse_speed(speeds[1]),
             speedOut=parse_speed(speeds[0])
         )
-        a = AbonStruct(
-            uid=int(info['=name'][3:]),
-            # FIXME: тут в разных микротиках или =target-addresses или =target
-            ip=info['=target'][:-3],
-            tariff=t,
-            is_active=False if info['=disabled'] == 'false' else True
-        )
-        a.queue_id = info['=.id']
-        return a
+        try:
+            a = AbonStruct(
+                uid=int(info['=name'][3:]),
+                # FIXME: тут в разных микротиках или =target-addresses или =target
+                ip=info['=target'][:-3],
+                tariff=t,
+                is_active=False if info['=disabled'] == 'false' else True
+            )
+            a.queue_id = info['=.id']
+            return a
+        except ValueError:
+            pass
 
 
 class QueueManager(TransmitterManager, metaclass=ABCMeta):
