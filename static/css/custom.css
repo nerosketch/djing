@@ -138,6 +138,7 @@ td.btn-group {
     border-radius: 3px;
     padding: 6px;
     width: 79px;
+    font-size: x-small;
 }
 .port .port-img{
     background-image: url(/static/img/icon-port-64x64-grey.png);
