@@ -4,16 +4,17 @@ from django.db import models
 from djing.fields import MACAddressField
 from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
-from .dev_types import DLinkDevice, OLTDevice, OnuDevice
+from . import dev_types
 from mapapp.models import Dot
 from subprocess import call
 from django.conf import settings
 
 
 DEVICE_TYPES = (
-    ('Dl', DLinkDevice),
-    ('Pn', OLTDevice),
-    ('On', OnuDevice)
+    ('Dl', dev_types.DLinkDevice),
+    ('Pn', dev_types.OLTDevice),
+    ('On', dev_types.OnuDevice),
+    ('Ex', dev_types.EltexSwitch)
 )
 
 

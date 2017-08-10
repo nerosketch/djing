@@ -298,3 +298,5 @@ msgstr "Найти абонента"
 msgid "View the device"
 msgstr "Посмотреть устройство"
 
+msgid "Eltex switch"
+msgstr "Элтекс свич"

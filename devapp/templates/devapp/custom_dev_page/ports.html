@@ -18,10 +18,16 @@
                         {% if port.st %}
                             {% if port.sp == 10 %}
                                 <div class="port kilo text-center">
+                                    <b>10 mbps</b>
                             {% elif port.sp == 100 %}
                                 <div class="port mega text-center">
+                                    <b>100 mbps</b>
                             {% elif port.sp == 1000 %}
                                 <div class="port giga text-center">
+                                    <b>1 gbps</b>
+                            {% elif port.sp == 10000 %}
+                                <div class="port ten text-center">
+                                    <b>10 gbps</b>
                             {% else %}
                                 <div class="port text-center">
                             {% endif %}
