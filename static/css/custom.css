@@ -155,6 +155,9 @@ a.port-img{
     text-decoration: none;
 }
 
+/* 10GBit/s */
+.port.ten{background-color: #a4fff7;}
+
 /* 1GBit/s */
 .port.giga{background-color: #caccfb;}
 
