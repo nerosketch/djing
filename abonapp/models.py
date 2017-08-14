@@ -76,7 +76,7 @@ class AbonTariff(models.Model):
     class Meta:
         db_table = 'abonent_tariff'
         permissions = (
-            ('can_complete_service', _('finish service perm'))
+            ('can_complete_service', _('finish service perm')),
         )
 
 
