@@ -6,8 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
-from .handle import handle as task_handle, TaskException
-from mydefs import MultipleException
+from .handle import handle as task_handle
 
 
 TASK_PRIORITIES = (
@@ -121,17 +120,10 @@ def task_handler(sender, instance, **kwargs):
             act_type='e',
             who=instance.author
         )
-    errors = []
-    for recipient in instance.recipients.all():
-        try:
-            task_handle(
-                instance, instance.author,
-                recipient, group
-            )
-        except TaskException as e:
-            errors.append(e)
-    if len(errors) > 0:
-        raise MultipleException(errors)
+    task_handle(
+        instance, instance.author,
+        instance.recipients.all(), group
+    )
 
 
 #def task_delete(sender, instance, **kwargs):
