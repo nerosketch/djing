@@ -75,6 +75,7 @@ def dev_post_save_signal(sender, instance, **kwargs):
     if instance.devtype != 'On':
         return
     grp = instance.user_group.pk
+    code = ''
     if grp == 87:
         code = 'chk'
     elif grp == 85:

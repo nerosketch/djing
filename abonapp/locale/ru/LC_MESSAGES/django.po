@@ -20,10 +20,8 @@ msgstr ""
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: abonapp/formfields.py:12
-#, fuzzy
-#| msgid "Enter a valid MAC Address."
 msgid "Enter a valid integer."
-msgstr "Введите валидный mac адрес"
+msgstr "Введите верное число"
 
 #: abonapp/formfields.py:21
 msgid "Enter a valid MAC Address."
@@ -56,10 +54,6 @@ msgstr "Не хватает денег на счету"
 #: abonapp/models.py:144
 msgid "finish service perm"
 msgstr "Снятие со счёта средств"
-
-#: abonapp/models.py:145
-msgid "activate service perm"
-msgstr "Активация услуги абонента"
 
 #: abonapp/models.py:162
 msgid "Digital field"
@@ -102,7 +96,6 @@ msgstr "Услуга просрочена, отключаем, и подключ
 msgid "Ip address already exist"
 msgstr "Такой ip уже у кого-то есть"
 
-#: abonapp/templates/abonapp/activate_service.html:8
 #: abonapp/templates/abonapp/addAbon.html:7
 #: abonapp/templates/abonapp/addGroup.html:7
 #: abonapp/templates/abonapp/addInvoice.html:7
@@ -120,30 +113,10 @@ msgstr "Такой ip уже у кого-то есть"
 msgid "User groups"
 msgstr "Группы абонентов"
 
-#: abonapp/templates/abonapp/activate_service.html:11
-#: abonapp/templates/abonapp/activate_service.html:18
 #: abonapp/templates/abonapp/services.html:44
 msgid "Activate service"
 msgstr "Активировать услугу"
 
-#: abonapp/templates/abonapp/activate_service.html:26
-#, python-format
-msgid ""
-"\n"
-"Are you sure that you want activate service for the user?<br>\n"
-"Note that the account will be removed from his money and open access to the "
-"resources of the paid services.<br>\n"
-"Maintenance cost is %(amount)s. On account of %(ballance)s, will be "
-"%(diff)s<br>\n"
-"It will work until %(deadline)s"
-msgstr ""
-"\n"
-"Вы уверены что хотите активировать абоненту эту услугу?<br>Обратите внимание "
-"что с его счёта <b>снимутся деньги</b> и откроется доступ к ресурсам "
-"оплаченной услуги.<br>Стоимость услуги: %(amount)sруб. На счету %(ballance)s "
-"руб, останется %(diff)s руб.<br>Услуга будет действовать до %(deadline)s"
-
-#: abonapp/templates/abonapp/activate_service.html:34
 #: abonapp/templates/abonapp/addAbon.html:91
 #: abonapp/templates/abonapp/addGroup.html:29
 #: abonapp/templates/abonapp/addInvoice.html:46
@@ -457,20 +430,20 @@ msgstr "Сбросить option82"
 msgid "Delete"
 msgstr "Удалить"
 
-#: abonapp/templates/abonapp/editAbon.html:205
+#: abonapp/templates/abonapp/editAbon.html:178
 msgid "Extra fields"
 msgstr "Динамические записи"
 
-#: abonapp/templates/abonapp/editAbon.html:228 abonapp/views.py:835
+#: abonapp/templates/abonapp/editAbon.html:201 abonapp/views.py:824
 msgid "Extra field does not exist"
 msgstr "Поле не найдено"
 
-#: abonapp/templates/abonapp/editAbon.html:233
+#: abonapp/templates/abonapp/editAbon.html:206
 #: abonapp/templates/abonapp/modal_extra_field.html:6
 msgid "Add extra field"
 msgstr "Добавить новое динамическое поле"
 
-#: abonapp/templates/abonapp/editAbon.html:234
+#: abonapp/templates/abonapp/editAbon.html:207
 #: abonapp/templates/abonapp/modal_extra_field.html:37
 msgid "Add"
 msgstr "Добавить"
@@ -641,17 +614,14 @@ msgstr "Обновить абонентов в NAS"
 msgid "Tariffs in groups"
 msgstr "Тарифы в группах"
 
-#: abonapp/templates/abonapp/peoples.html:143
-msgid "Streets"
-msgstr "Улицы"
 
 #: abonapp/templates/abonapp/peoples.html:148
 msgid "No streets found for that group"
 msgstr "Не найдены улицы для группы"
 
 #: abonapp/templates/abonapp/services.html:5
-msgid "Services of subscriber"
-msgstr "Купленные абонентом услуги (назначенные тарифные планы)"
+msgid "Subscriber's service"
+msgstr "Текущая услуга абонента"
 
 msgid "Add street"
 msgstr "Добавить улицу"
@@ -695,18 +665,6 @@ msgstr "Исходящая скорость"
 #: abonapp/templates/abonapp/services.html:14
 msgid "Works until"
 msgstr "Действует до"
-
-#: abonapp/templates/abonapp/services.html:15
-msgid "Do"
-msgstr "Действия"
-
-#: abonapp/templates/abonapp/services.html:52
-msgid "Priority up"
-msgstr "Повысить приоритет"
-
-#: abonapp/templates/abonapp/services.html:58
-msgid "Priority down"
-msgstr "Понизить приоритет"
 
 #: abonapp/templates/abonapp/services.html:64
 msgid "Delete service"
@@ -927,13 +885,15 @@ msgstr "История задач"
 
 #: abonapp/templates/abonapp/ext.html:53
 msgid "Charts"
-msgstr "График"
+msgstr "Графики"
 
 #: abonapp/templates/abonapp/ext.html:26
 msgid "Sub information"
 msgstr "Информация абонента"
 
-#: abonapp/templates/abonapp/ext.html:58
+msgid "Streets"
+msgstr "Улицы"
+
 msgid "Dialing"
 msgstr "Звонки"
 
@@ -961,3 +921,30 @@ msgstr "Метод не POST"
 
 msgid "Call to"
 msgstr "Позвонить"
+
+msgid "That service already activated"
+msgstr "Эта услуга уже подключена"
+
+msgid "Service already activated"
+msgstr "Услуга уже подключена"
+
+msgid "We have a problem in DB: AbonTariff instance has no related to service"
+msgstr "У нас проблема с БД: экземпляр AbonTariff не имеет отношения к тарифу"
+
+msgid "Date of start"
+msgstr "Дата начала"
+
+msgid "Subscriber has no service"
+msgstr "У абонента нет услуги"
+
+msgid "This group has no services"
+msgstr "У этой группы нет услуг"
+
+msgid "Attach serices to groups"
+msgstr "Привязать услуги к группам"
+
+msgid "Attach services to group"
+msgstr "Привязать услуги к этой группе"
+
+msgid "User that is no staff can not buy admin services"
+msgstr "Пользователь, который не является персоналом не может покупать услуги для внутренних нужд"

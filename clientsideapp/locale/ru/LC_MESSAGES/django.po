@@ -68,80 +68,14 @@ msgstr "Заказать услугу"
 msgid "Are you sure you want to order the service?"
 msgstr "Вы уверены что хотите заказать услугу?"
 
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:10
-#, python-format
-msgid ""
-"Your current service <a href=\"#dv\">%(current_service.title)s</a>\n"
-"for the <b>%(amount)s</b> rub."
-msgstr ""
-"Ваша текущая услуга <a href=\"#dv\">%(current_service.title)s</a>\n"
-"за <b>%(amount)s</b> руб."
-
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:13
-msgid ""
-"You do not have an active service for the use of resources required service "
-"purchase from the selection below.<br>\n"
-"And if you have already booked then just activate the service from the list "
-"ordered."
-msgstr ""
-"У вас нет активной услуги, для использования ресурсов приобретите нужную "
-"услугу из представленных ниже.<br>\n"
-"А если уже заказали то просто активируйте услугу из списка заказанных."
-
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:21
-#, python-format
-msgid ""
-"Inbound speed: %(speedIn)s MBit/s<br>\n"
-"Outgoing speed: %(speedOut)s MBit/s<br>\n"
-"Cost: %(amount)s rubles."
-msgstr ""
-"Входящая скорость: %(speedIn)s MBit/s<br>\n"
-"Исходящая скорость: %(speedOut)s MBit/s<br>\n"
-"Стоимость: %(amount)s руб."
 
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:28
 msgid "Pick"
 msgstr "Заказать"
 
 #: clientsideapp/templates/clientsideapp/modal_service_buy.html:30
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:24
 msgid "Close"
 msgstr "Закрыть"
-
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:5
-msgid "Unsubscribe from service"
-msgstr "Отписаться от услуги"
-
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:8
-msgid "Are you sure you want to unsubscribe from the service?"
-msgstr "Вы уверены что хотите отписаться от услуги?"
-
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:14
-#, fuzzy, python-format
-#| msgid ""
-#| "Inbound speed: %(service.speedIn)s MBit/s<br>\n"
-#| "Outgoing speed: %(service.speedOut)s MBit/s<br>\n"
-#| "Cost: %(service.amount)s rubles."
-msgid ""
-"Inbound speed: %(service.speedIn)s MBit/s<br>Outgoing speed: "
-"%(service.speedOut)s MBit/s"
-msgstr ""
-"Входящая скорость: %(service.speedIn)s MBit/s<br>\n"
-"Исходящая скорость: %(service.speedOut)s MBit/s"
-
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:16
-msgid ""
-"When you unsubscribe from the service, it just will remove it from the queue "
-"inclusions your services.<br>\n"
-"Your funds will not be affected, the money will not go away."
-msgstr ""
-"Когда вы отпишитесь от услуги, это просто уберёт её из очереди включений "
-"ваших услуг.<br>\n"
-"Ваши средства не буду затронуты, деньги не уйдут."
-
-#: clientsideapp/templates/clientsideapp/modal_unsubscribe_service.html:22
-msgid "Unsubscribe"
-msgstr "Отписаться"
 
 #: clientsideapp/templates/clientsideapp/pays.html:6
 msgid "conducted payments"
@@ -168,14 +102,6 @@ msgstr "У вас нет проведённых платежей"
 msgid "Buy the service via user side, service '%s'"
 msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
 
-#: clientsideapp/views.py:55
-msgid ""
-"You are subscribed on new service. That will enable service when your "
-"current service has expired."
-msgstr ""
-"Вы подписались на новую услугу. Она встала на очередь подключений. Когда "
-"закончится ваша текущая услуга, то включится эта"
-
 #: clientsideapp/views.py:82
 #, python-format
 msgid "Service '%s' has been finished"
@@ -195,11 +121,6 @@ msgstr "Действие не подтверждено"
 msgid "Temporary network bug"
 msgstr "Временные неполадки в сети"
 
-#: clientsideapp/views.py:117
-#, python-format
-msgid "You has been successfully unsubscribed from service, '%s'"
-msgstr "Вы успешно отписались от услуги, '%s'"
-
 #: clientsideapp/views.py:126
 msgid "The service was not found"
 msgstr "Указанная подписка на услугу не найдена"
@@ -207,7 +128,7 @@ msgstr "Указанная подписка на услугу не найден�
 #: clientsideapp/views.py:145
 #, python-format
 msgid "The service '%s' wan successfully activated"
-msgstr "Услуга '%s' успешно активирована"
+msgstr "Услуга '%s' успешно подключена"
 
 #: clientsideapp/views.py:181
 msgid "Are you not sure that you want buy the service?"

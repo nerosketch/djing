@@ -38,7 +38,7 @@
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="250">{% trans 'Service title' %}</th>
+                <th width="250">{% trans 'Script' %}</th>
                 <th width="50">Do</th>
             </tr>
             </thead>
@@ -55,7 +55,7 @@
                     </td>
                     <td>{{ tar.speedIn }}</td>
                     <td>{{ tar.speedOut }}</td>
-                    <td>{{ tar.amount }} руб</td>
+                    <td>{{ tar.amount }} {% trans 'currency' %}</td>
                     <td>{{ tar.get_calc_type_display }}</td>
                     <td>
                         {% if can_del_trf %}

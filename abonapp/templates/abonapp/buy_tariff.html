@@ -22,41 +22,55 @@
             <form role="form" action="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
-                    <label for="id_tariff">{% trans 'Pick a service' %}</label>
+                    {% if tariffs %}
+                        <label for="id_tariffs">{% trans 'Pick a service' %}</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
+                            <select class="form-control" name="tariff" id="id_tariffs">
+                                {% for trf in tariffs %}
+                                    {% if trf.pk == selected_tariff %}
+                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d" }}' selected>
+                                    {% else %}
+                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d" }}'>
+                                    {% endif %}
+                                    {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %} (Вх:{{ trf.speedIn }}MBit/s. Исх:{{ trf.speedOut }} MBit/s)
+                                        </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% if not abon.active_tariff %}
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                <input type="text" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:"Y-m-d" }}">
+                                <script type="text/javascript">
+                                    $(function () {
+                                        $('#id_deadline').datetimepicker({
+                                            format: 'YYYY-MM-DD'
+                                        });
+                                        $('#id_tariffs').on('change', function(){
+                                            var a = $(this).find('option:selected');
+                                            $('#id_deadline').val(a.attr('data-deadline'));
+                                        });
+                                    });
+                                </script>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign"></span>
+                            {% trans 'This group has no services' %},
+                            <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}">
+                                {% trans 'Attach serices to groups' %}
+                            </a>
+                        </div>
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-bullhorn"></span></span>
-                        <select class="form-control" name="tariff" id="id_tariffs">
-                            {% for trf in tariffs %}
-            			    <option value="{{ trf.pk }}" data-deadline="{{ trf.calc_deadline|date:"Y-m-d" }}">
-				                {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %} (Вх:{{ trf.speedIn }}MBit/s. Исх:{{ trf.speedOut }} MBit/s)
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    {% if not abon.active_tariff %}
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                        <input type="text" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:"Y-m-d" }}">
-                        <script type="text/javascript">
-                            $(function () {
-                                $('#id_deadline').datetimepicker({
-                                    format: 'YYYY-MM-DD'
-                                });
-                                $('#id_tariffs').on('change', function(){
-                                    var a = $(this).find('option:selected');
-                                    $('#id_deadline').val(a.attr('data-deadline'));
-                                });
-                            });
-                        </script>
-                    </div>
                     {% endif %}
                 </div>
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-sm btn-primary">
+                    <button type="submit" class="btn btn-sm btn-primary"{% if not tariffs %} disabled{% endif %}>
                         <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                     </button>
-                    <button type="reset" class="btn btn-sm btn-default">
+                    <button type="reset" class="btn btn-sm btn-default"{% if not tariffs %} disabled{% endif %}>
                         <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                     </button>
                 </div>

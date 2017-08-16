@@ -71,6 +71,8 @@
                         {% endif %}
                         <td>{% if human.stat_cache and human.stat_cache.is_online %}
                                 <span class="glyphicon glyphicon-ok text-success"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>
                             {% endif %}</td>
                         <td>
                             <a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a>
@@ -91,10 +93,10 @@
                         <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                         <td>
                             {% if human.active_tariff %}
-                                {% if can_ch_trf %}
-                                    <a href="{ % url 'tarifs:edit' human.active_tariff.pk %}">{{ human.active_tariff.title }}</a>
+                                {% if perms.tariff_app.change_tariff %}
+                                    <a href="{% url 'tarifs:edit' human.active_tariff.tariff.pk %}">{{ human.active_tariff.tariff.title }}</a>
                                 {% else %}
-                                    {{ human.active_tariff.title }}
+                                    {{ human.active_tariff.tariff.title }}
                                 {% endif %}
                             {% else %}&mdash;&mdash;&mdash;
                             {% endif %}
@@ -110,7 +112,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="12">
+                            <td colspan="11">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' abon_group.pk %}">{% trans 'Add abon' %}</a>
@@ -122,7 +124,7 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="12" class="btn-group">
+                        <td colspan="11" class="btn-group">
                             {% if perms.abonapp.add_abon %}
                                 <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="Добавить">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}

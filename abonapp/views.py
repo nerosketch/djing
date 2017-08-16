@@ -245,16 +245,14 @@ def pay_history(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def abon_services(request, gid, uid):
+    grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
-    abon_tarifs = models.AbonTariff.objects.filter(abon=uid)
 
-    active_abontariff = abon_tarifs.exclude(time_start=None)
-
-    return render(request, 'abonapp/services.html', {
+    return render(request, 'abonapp/service.html', {
         'abon': abon,
-        'abon_tarifs': abon_tarifs,
-        'active_abontariff_id': active_abontariff[0].id if active_abontariff.count() > 0 else None,
-        'abon_group': abon.group
+        'abon_tariff': abon.current_tariff,
+        'abon_group': abon.group,
+        'services': grp.tariffs.all()
     })
 
 
@@ -391,30 +389,9 @@ def pick_tariff(request, gid, uid):
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
         'abon': abon,
-        'abon_group': grp
+        'abon_group': grp,
+        'selected_tariff': mydefs.safe_int(request.GET.get('selected_tariff'))
     })
-
-
-@login_required
-@mydefs.only_admins
-def chpriority(request, gid, uid):
-    t = request.GET.get('t')
-    act = request.GET.get('a')
-
-    current_abon_tariff = get_object_or_404(models.AbonTariff, pk=t)
-
-    try:
-        if act == 'up':
-            current_abon_tariff.priority_up()
-        elif act == 'down':
-            current_abon_tariff.priority_down()
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
 
 @login_required
@@ -478,45 +455,10 @@ def complete_service(request, gid, uid, srvid):
 
 
 @login_required
-@permission_required('abonapp.can_activate_service')
-@atomic
-def activate_service(request, gid, uid, srvid):
-    abtar = get_object_or_404(models.AbonTariff, pk=srvid)
-    amount = abtar.calc_amount_service()
-
-    try:
-        if request.method == 'POST':
-            if request.POST.get('finish_confirm') != 'yes':
-                return HttpResponse(_('Not confirmed'))
-
-            abtar.activate(request.user)
-            abtar.abon.save()
-            messages.success(request, _('Service has been activated successfully'))
-            return redirect('abonapp:abon_services', gid, uid)
-
-    except (NasFailedResult, mydefs.LogicError) as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
-        messages.warning(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-    calc_obj = abtar.tariff.get_calc_type()(abtar)
-    return render(request, 'abonapp/activate_service.html', {
-        'abon': abtar.abon,
-        'abon_group': abtar.abon.group,
-        'abtar': abtar,
-        'amount': amount,
-        'diff': abtar.abon.ballance - amount,
-        'deadline': calc_obj.calc_deadline()
-    })
-
-
-@login_required
 @permission_required('abonapp.delete_abontariff')
-def unsubscribe_service(request, gid, uid, srvid):
+def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
-        get_object_or_404(models.AbonTariff, pk=int(srvid)).delete()
+        get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id)).delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -525,7 +467,7 @@ def unsubscribe_service(request, gid, uid, srvid):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+    return redirect('abonapp:abon_services', gid=gid, uid=uid)
 
 
 @login_required
@@ -706,7 +648,8 @@ def charts(request, gid, uid):
 
             abontariff = abon.active_tariff()
             if abontariff is not None:
-                high = abontariff.speedIn + abontariff.speedOut
+                trf = abontariff.tariff
+                high = trf.speedIn + trf.speedOut
                 if high > 100:
                     high = 100
 
@@ -932,7 +875,7 @@ def street_del(request, gid, sid):
 def abons(request):
     ablist = [{
         'id': abn.pk,
-        'tarif_id': abn.active_tariff().pk if abn.active_tariff() else 0,
+        'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
         'ip': abn.ip_address.int_ip(),
         'is_active': abn.is_active
     } for abn in models.Abon.objects.all()]
