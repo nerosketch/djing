@@ -1,0 +1,38 @@
+{% load i18n %}
+<form role="form" action="{% url 'abonapp:street_edit' gid %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-edit"></span>{% trans 'Edit streets' %}</h4>
+    </div>
+
+    {% include 'message_block.html' %}
+
+    <div class="modal-body">
+
+        {% for street in streets %}
+            <div class="form-group">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" value="{{ street.name }}" name="sname">
+                    <input type="hidden" name="sid" value="{{ street.pk }}">
+                    <span class="input-group-btn">
+                        <a href="{% url 'abonapp:street_del' gid street.pk %}" class="btn btn-danger">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        {% empty %}
+            <h4>{% trans 'Streets has not been found' %}</h4>
+        {% endfor %}
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-primary">
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

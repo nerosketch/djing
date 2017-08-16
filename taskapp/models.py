@@ -6,8 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
-from .handle import handle as task_handle, TaskException
-from mydefs import MultipleException
+from .handle import handle as task_handle
 
 
 TASK_PRIORITIES = (
@@ -18,7 +17,7 @@ TASK_PRIORITIES = (
 
 TASK_STATES = (
     ('S', _('New')),
-    ('C', _('In fulfilling')),
+    ('C', _('Confused')),
     ('F', _('Completed'))
 )
 
@@ -44,7 +43,7 @@ class ChangeLog(models.Model):
         ('c', _('Create task')),
         ('d', _('Delete task')),
         ('f', _('Completing tasks')),
-        ('b', _('The task started'))
+        ('b', _('The task failed'))
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
@@ -89,8 +88,8 @@ class Task(models.Model):
         )
         self.save(update_fields=['state', 'out_date'])
 
-    def begin(self, current_user):
-        self.state = 'C'  # Начата
+    def do_fail(self, current_user):
+        self.state = 'C'  # Провалена
         ChangeLog.objects.create(
             task=self,
             act_type='b',
@@ -121,17 +120,10 @@ def task_handler(sender, instance, **kwargs):
             act_type='e',
             who=instance.author
         )
-    errors = []
-    for recipient in instance.recipients.all():
-        try:
-            task_handle(
-                instance, instance.author,
-                recipient, group
-            )
-        except TaskException as e:
-            errors.append(e)
-    if len(errors) > 0:
-        raise MultipleException(errors)
+    task_handle(
+        instance, instance.author,
+        instance.recipients.all(), group
+    )
 
 
 #def task_delete(sender, instance, **kwargs):

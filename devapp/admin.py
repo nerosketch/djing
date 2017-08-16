@@ -5,4 +5,3 @@ from . import models
 
 admin.site.register(models.Device)
 admin.site.register(models.Port)
-admin.site.register(models.PortStates)

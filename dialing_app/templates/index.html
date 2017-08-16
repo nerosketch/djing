@@ -1,17 +1,7 @@
-{% extends 'base.html' %}
+{% extends request.is_ajax|yesno:'nullcont.htm,ext.html' %}
 {% load i18n %}
 {% load telephone_filters %}
-{% block main %}
-
-
-    <ol class="breadcrumb">
-        <li><span class="glyphicon glyphicon-home"></span></li>
-        <li class="active">{% trans 'Dialing' %}</li>
-    </ol>
-
-    <h3>{% trans 'Last calls' %}</h3>
-
-    {% include 'message_block.html' %}
+{% block content %}
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
@@ -31,10 +21,14 @@
             <tbody>
             {% for log in logs %}
                 <tr>
-                    <td>
-                        <audio preload="metadata" controls>
-                            <source src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" type="audio/wav"/>
-                        </audio>
+                    <td class="btn-group btn-group-sm btn-group-justify">
+                        <button class="btn btn-default player-btn disabled">
+                            <span class="glyphicon glyphicon-play"></span>
+                            <audio preload="metadata" src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav"></audio>
+                        </button>
+                        <a href="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" class="btn btn-default disabled" target="_blank">
+                            <span class="glyphicon glyphicon-download-alt"></span>
+                        </a>
                     </td>
                     <td>{{ log.calldate|date:'d E Y, H:i:s' }}</td>
                     <td>{{ log.src|abon_if_telephone|safe }}</td>

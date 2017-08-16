@@ -1,6 +1,6 @@
 {% load i18n %}
 {% if perms.taskapp.add_task %}
-<a href="{% url 'taskapp:add' %}" class="btn btn-sm btn-success" title="{% trans 'Add new task' %}">
+<a href="{% url 'taskapp:add' %}" class="btn btn-sm btn-success">
     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add new task' %}
 </a>
 {% endif %}

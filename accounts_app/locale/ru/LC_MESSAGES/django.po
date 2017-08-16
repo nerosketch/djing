@@ -23,10 +23,6 @@ msgstr ""
 msgid "Users must have an telephone number"
 msgstr "У пользователей должен быть номер телефона"
 
-#: accounts_app/models.py:52
-msgid "Telephone number"
-msgstr "Номер телефона"
-
 #: accounts_app/templates/accounts/group.html:7
 #: accounts_app/templates/accounts/group_list.html:7
 msgid "Administrators"
@@ -81,7 +77,7 @@ msgstr "Добавить группу"
 #: accounts_app/templates/accounts/index.html:8
 #: accounts_app/templates/accounts/settings/ch_info.html:37
 msgid "Telephone"
-msgstr "Номер телефона"
+msgstr "Телефон"
 
 #: accounts_app/templates/accounts/index.html:12
 #: accounts_app/templates/accounts/login.html:35
@@ -140,27 +136,35 @@ msgstr "Старый пароль"
 msgid "New password"
 msgstr "Новый пароль"
 
-#: accounts_app/views.py:43
+#: accounts_app/views.py:42
 msgid "Wrong login or password, please try again"
 msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
-#: accounts_app/views.py:137
+#: accounts_app/views.py:141
+msgid "New password is empty, fill it"
+msgstr "Новый пароль пустой, придумайте себе пароль"
+
+#: accounts_app/views.py:143
 msgid "Wrong password"
 msgstr "Неправильный пароль"
 
-#: accounts_app/views.py:162
+#: accounts_app/views.py:145
+msgid "Empty password, fill it"
+msgstr "Пустой пароль, впишите что-то в пароль"
+
+#: accounts_app/views.py:168
 msgid "You forget specify a password for the new account"
 msgstr "Забыли указать пароль для нового аккаунта"
 
-#: accounts_app/views.py:165
+#: accounts_app/views.py:171
 msgid "You forget to repeat a password for the new account"
 msgstr "Забыли повторить пароль для нового аккаунта"
 
-#: accounts_app/views.py:174
+#: accounts_app/views.py:180
 msgid "Subscriber with this name already exist"
 msgstr "Пользователь с таким именем уже есть"
 
-#: accounts_app/views.py:176
+#: accounts_app/views.py:182
 msgid "Passwords does not match, try again"
 msgstr "Пароли не совпадают, попробуйте ещё раз"
 
@@ -184,3 +188,9 @@ msgstr "Редактировать"
 
 msgid "Set a task"
 msgstr "Дать задачу"
+
+msgid "Please select an image"
+msgstr "Пожалуйста выберите изображение"
+
+msgid "Avatar successfully changed"
+msgstr "Аватар успешно изменён"

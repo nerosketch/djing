@@ -8,7 +8,7 @@
         </div>
         <div class="panel-body">
 
-            <form role="form" action="{% url 'devapp:edit' dev.user_group.pk|default:0 dev.pk %}" method="post">{% csrf_token %}
+            <form role="form" action="{% url 'devapp:edit' group.pk|default:0 dev.pk %}" method="post">{% csrf_token %}
 
                 <div class="form-group">
                     <label for="id_ip_address">{% trans 'Ip address' %}</label>
@@ -18,6 +18,23 @@
                         {{ form.ip_address }}{{ form.ip_address.errors }}
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="id_mac_addr">{% trans 'Mac address' %}</label>
+
+		    <div class="input-group{% if form.mac_addr.errors %} has-error{% endif %}">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
+                        {{ form.mac_addr }}
+			{% if already_dev %}
+                            <span class="input-group-btn">
+                                <a class="btn btn-danger" href="{% url 'devapp:view' group.pk already_dev.pk %}" title="{% trans 'View the device' %}" data-toggle="tooltip">
+                                    {{ already_dev.comment }}
+                                </a>
+                            </span>
+                        {% endif %}
+                    </div>
+		    {{ form.mac_addr.errors }}
+		</div>
 
                 <div class="form-group">
                     <label for="id_comment">{% trans 'Comment' %}</label>
@@ -61,6 +78,23 @@
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-subscript"></span></span>
                         {{ form.user_group }}{{ form.user_group.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_parent_dev">{% trans 'Parent device' %}</label>
+
+                    <div class="input-group selectajax" data-dst="/dev/search_dev">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
+                        <input type="hidden" name="parent_dev" class="selectajax-hid"{% if selected_parent_dev %} value="{{ selected_parent_dev.pk }}"{% endif %}>
+                        {% if selected_parent_dev %}
+                            <button class="selectajax-btn form-control btn btn-default">{{ selected_parent_dev.comment }}</button>
+                            <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_parent_dev" placeholder="{% trans 'Find the device' %}">
+                        {% else %}
+                            <button class="selectajax-btn form-control btn btn-default hidden"></button>
+                            <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_parent_dev" placeholder="{% trans 'Find the device' %}">
+                        {% endif %}
+                        <ul class="dropdown-menu selectajax-ul"></ul>{{ form.parent_dev.errors }}
                     </div>
                 </div>
 

@@ -8,3 +8,4 @@ xmltodict
 mysqlclient
 easysnmp
 rq
+pid

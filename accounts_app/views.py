@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import NoReverseMatch
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.http import Http404
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -103,15 +102,20 @@ def chgroup(request, uid):
 @mydefs.only_admins
 def ch_ava(request):
     if request.method == 'POST':
-        user = request.user
-        if user.avatar:
-            user.avatar.delete()
-        photo = Photo()
-        photo.image = request.FILES.get('avatar')
-        photo.save()
-        user.avatar = photo
-        user.save(update_fields=['avatar'])
-        request.user = user
+        phname = request.FILES.get('avatar')
+        if phname is None:
+            messages.error(request, _('Please select an image'))
+        else:
+            user = request.user
+            if user.avatar:
+                user.avatar.delete()
+            photo = Photo()
+            photo.image = phname
+            photo.save()
+            user.avatar = photo
+            user.save(update_fields=['avatar'])
+            request.user = user
+            messages.success(request, _('Avatar successfully changed'))
 
     return render(request, 'accounts/settings/ch_info.html', {
         'user': request.user
@@ -129,14 +133,21 @@ def ch_info(request):
         user.telephone = request.POST.get('telephone')
 
         psw = request.POST.get('oldpasswd')
-        if psw != '':
+        if psw != '' and psw is not None:
             if user.check_password(psw):
                 newpasswd = request.POST.get('newpasswd')
-                user.set_password(newpasswd)
+                if newpasswd != '' and newpasswd is not None:
+                    user.set_password(newpasswd)
+                    user.save()
+                    request.user = user
+                    logout(request)
+                    return redirect('acc_app:other_profile', uid=user.pk)
+                else:
+                    messages.error(request, _('New password is empty, fill it'))
             else:
                 messages.error(request, _('Wrong password'))
-        user.save()
-        request.user = user
+        else:
+            messages.warning(request, _('Empty password, fill it'))
 
     return render(request, 'accounts/settings/ch_info.html', {
         'user': request.user

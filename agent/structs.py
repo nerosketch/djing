@@ -34,9 +34,6 @@ class IpStruct(BaseStruct):
         self.__ip = int(dt[0])
         return self
 
-    def get_str(self):
-        return int2ip(self.__ip)
-
     def get_int(self):
         return self.__ip
 
@@ -44,21 +41,31 @@ class IpStruct(BaseStruct):
         assert isinstance(other, IpStruct)
         return self.__ip == other.__ip
 
+    def __int__(self):
+        return self.__ip
+
     def __str__(self):
         return int2ip(self.__ip)
+
+    def __hash__(self):
+        return hash(self.__ip)
 
 
 # Как обслуживается абонент
 class TariffStruct(BaseStruct):
 
     def __init__(self, tariff_id=0, speedIn=None, speedOut=None):
-        self.tid = tariff_id
-        self.speedIn = speedIn if speedIn is not None else 0.001
-        self.speedOut = speedOut if speedOut is not None else 0.001
+        self.tid = int(tariff_id)
+        self.speedIn = float(speedIn if speedIn is not None else 0.001)
+        self.speedOut = float(speedOut if speedOut is not None else 0.001)
 
     def serialize(self):
         dt = pack("!Iff", int(self.tid), float(self.speedIn), float(self.speedOut))
         return dt
+
+    # Да, если все значения нулевые
+    def is_empty(self):
+        return self.tid == 0 and self.speedIn == 0.001 and self.speedOut == 0.001
 
     def deserialize(self, data, *args):
         dt = unpack("!Iff", data)
@@ -68,13 +75,17 @@ class TariffStruct(BaseStruct):
         return self
 
     def __eq__(self, other):
-        assert isinstance(other, TariffStruct)
         # не сравниваем id, т.к. тарифы с одинаковыми скоростями для NAS одинаковы
         # Да и иногда не удобно доставать из nas id тарифы из базы
         return self.speedIn == other.speedIn and self.speedOut == other.speedOut
 
     def __str__(self):
         return "Id=%d, speedIn=%.2f, speedOut=%.2f" % (self.tid, self.speedIn, self.speedOut)
+
+    # нужно чтоб хеши тарифов In10,Out20 и In20,Out10 были разными
+    # поэтому сначала float->str и потом хеш
+    def __hash__(self):
+        return hash(str(self.speedIn) + str(self.speedOut))
 
 
 # Абонент из базы
@@ -83,14 +94,15 @@ class AbonStruct(BaseStruct):
     def __init__(self, uid=None, ip=None, tariff=None, is_active=True):
         self.uid = int(uid)
         self.ip = IpStruct(ip)
-        assert isinstance(tariff, TariffStruct)
         self.tariff = tariff
         self.is_active = is_active
 
     def serialize(self):
+        if self.tariff is None:
+            return
         assert isinstance(self.tariff, TariffStruct)
         assert isinstance(self.ip, IpStruct)
-        dt = pack("!LII?", self.uid, self.ip.get_int(), self.tariff.tid, self.is_active)
+        dt = pack("!LII?", self.uid, int(self.ip), self.tariff.tid, self.is_active)
         return dt
 
     def deserialize(self, data, tariff=None):
@@ -110,7 +122,10 @@ class AbonStruct(BaseStruct):
         return r
 
     def __str__(self):
-        return "uid=%d, ip=%s, tariff=%s" % (self.uid, self.ip, self.tariff)
+        return "uid=%d, ip=%s, tariff=%s" % (self.uid, self.ip, self.tariff or '<No Service>')
+
+    def __hash__(self):
+        return hash(int(self.ip) + hash(self.tariff)) if self.tariff is not None else 0
 
 
 # Правило шейпинга в фаере, или ещё можно сказать услуга абонента на NAS

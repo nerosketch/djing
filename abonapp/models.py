@@ -7,8 +7,8 @@ from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
-from .fields import MACAddressField
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
+from djing import settings
 
 
 class AbonGroup(models.Model):
@@ -41,16 +41,6 @@ class AbonLog(models.Model):
 
 
 class AbonTariff(models.Model):
-
-    def __init__(self, deadline=None, *args, **kwargs):
-        super(AbonTariff, self).__init__(*args, **kwargs)
-        calc_obj = self.tariff.get_calc_type()(self)
-        self.time_start = timezone.now()
-        if deadline is None:
-            self.deadline = calc_obj.calc_deadline()
-        else:
-            self.deadline = deadline
-
     tariff = models.ForeignKey(Tariff, related_name='linkto_tariff')
 
     # время начала действия услуги
@@ -68,9 +58,9 @@ class AbonTariff(models.Model):
         return False if self.time_start is None else True
 
     def __str__(self):
-        return "'%s' - '%s'" % (
-            self.tariff.title,
-            self.abon.get_short_name()
+        return "%d: %s" % (
+            self.pk or 0,
+            self.tariff.title
         )
 
     class Meta:
@@ -133,18 +123,6 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
-class Opt82(models.Model):
-    mac = MACAddressField()
-    port = models.PositiveSmallIntegerField(default=0)
-
-    def __str__(self):
-        return "%s-%d" % (self.mac, self.port)
-
-    class Meta:
-        db_table = 'opt_82'
-        unique_together = (('mac', 'port'),)
-
-
 class Abon(UserProfile):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
@@ -154,7 +132,9 @@ class Abon(UserProfile):
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
     extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
-    opt82 = models.ForeignKey(Opt82, null=True, blank=True, on_delete=models.SET_NULL)
+    device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
+    dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
+    is_dynamic_ip = models.BooleanField(default=False)
 
     # возвращает связь с текущим тарифом для абонента
     def active_tariff(self):
@@ -187,6 +167,9 @@ class Abon(UserProfile):
         assert isinstance(tariff, Tariff)
 
         amount = round(tariff.amount, 2)
+
+        if not author.is_staff and tariff.is_admin:
+            raise LogicError(_('User that is no staff can not buy admin services'))
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
@@ -254,18 +237,6 @@ class Abon(UserProfile):
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
-
-
-class AbonDevice(models.Model):
-    abon = models.ForeignKey(Abon)
-    device = models.ForeignKey('devapp.Device')
-
-    def __str__(self):
-        return "%s - %s" % (self.abon, self.device)
-
-    class Meta:
-        db_table = 'abon_device'
-        unique_together = ('abon', 'device')
 
 
 class PassportInfo(models.Model):
@@ -346,7 +317,7 @@ class AbonRawPassword(models.Model):
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
     if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = 14400
+        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
@@ -377,5 +348,14 @@ def abon_del_signal(sender, instance, **kwargs):
         return True
 
 
-#models.signals.post_save.connect(abon_post_save, sender=Abon)
-#models.signals.post_delete.connect(abon_del_signal, sender=Abon)
+def abon_tariff_post_init(sender, instance, **kwargs):
+    if getattr(instance, 'time_start') is None:
+        instance.time_start = timezone.now()
+    calc_obj = instance.tariff.get_calc_type()(instance)
+    if getattr(instance, 'deadline') is None:
+        instance.deadline = calc_obj.calc_deadline()
+
+
+models.signals.post_save.connect(abon_post_save, sender=Abon)
+models.signals.post_delete.connect(abon_del_signal, sender=Abon)
+models.signals.post_init.connect(abon_tariff_post_init, sender=AbonTariff)

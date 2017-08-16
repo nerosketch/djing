@@ -11,10 +11,12 @@ from .models import AsteriskCDR
 @login_required
 @only_admins
 def home(request):
-    logs = AsteriskCDR.objects.all()
+    logs = AsteriskCDR.objects.exclude(userfield='request').order_by('-calldate')
     logs = pag_mn(request, logs)
+    title = _('Last calls')
     return render(request, 'index.html', {
-        'logs': logs
+        'logs': logs,
+        'title': title
     })
 
 
@@ -34,3 +36,14 @@ def to_abon(request, tel):
     else:
         return redirect('abonapp:group_list')
 
+
+@login_required
+@only_admins
+def vmail(request):
+    title = _('Voice mail')
+    cdr = AsteriskCDR.objects.filter(userfield='request').order_by('-calldate')
+    cdr = pag_mn(request, cdr)
+    return render(request, 'vmail.html', {
+        'title': title,
+        'vmessages': cdr
+    })

@@ -2,6 +2,7 @@
 import os
 import sys
 from rq import Connection, Worker
+from pid.decorator import pidfile
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 from agent import NasFailedResult, NasNetworkError
@@ -11,7 +12,8 @@ from django.core.exceptions import ValidationError
 """
   Заустить этот скрипт как демон, он соединяет redis и django
 """
-if __name__ == '__main__':
+@pidfile()
+def main():
     try:
         django.setup()
         with Connection():
@@ -22,3 +24,7 @@ if __name__ == '__main__':
         print('NAS:', e)
     except (ValidationError, ValueError) as e:
         print('ERROR:', e)
+
+
+if __name__ == "__main__":
+    main()

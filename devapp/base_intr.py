@@ -28,6 +28,16 @@ class DevBase(object, metaclass=ABCMeta):
     def get_template_name(self):
         """Получаем путь к html шаблону отображения устройства"""
 
+    @staticmethod
+    @abstractmethod
+    def has_attachable_to_subscriber():
+        """Можно-ли подключать устройство к абоненту"""
+
+    @staticmethod
+    @abstractmethod
+    def is_use_device_port():
+        """True если при авторизации по opt82 используется порт"""
+
 
 class BasePort(object, metaclass=ABCMeta):
     def __init__(self, num, name, status, mac, speed):

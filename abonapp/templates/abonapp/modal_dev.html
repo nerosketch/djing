@@ -10,12 +10,14 @@
 
     <div class="modal-body">
         <div class="form-group-sm">
-            <label for="id_dev">{% trans 'Select a device' %}</label>
+            <label for="id_dev">{% trans 'Select the device' %}</label>
 
             <div class="input-group">
                 <select name="dev" id="id_dev" class="form-control">
                     {% for device in devices %}
-                        <option value="{{ device.pk }}">{{ device }}</option>
+                        {% if device.has_attachable_to_subscriber %}
+                            <option value="{{ device.pk }}">{{ device }}</option>
+                        {% endif %}
                     {% empty %}
                         <option value="0">---</option>
                     {% endfor %}

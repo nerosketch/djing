@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 from .base_intr import TariffBase
 from calendar import monthrange
 
@@ -44,7 +45,7 @@ class TariffDefault(TariffBase):
 
     @staticmethod
     def description():
-        return 'Базовый расчётный функционал'
+        return _('Base calculate functionality')
 
 
 class TariffDp(TariffDefault):
@@ -71,7 +72,7 @@ class TariffCp(TariffDp):
 
     @staticmethod
     def description():
-        return 'Для внутреннего пользования'
+        return _('Private service')
 
 
 # Первый - всегда по умолчанию

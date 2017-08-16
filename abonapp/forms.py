@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.http import QueryDict
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
@@ -7,7 +6,6 @@ from django.contrib.auth.hashers import make_password
 from random import choice
 from string import digits, ascii_lowercase
 from . import models
-from .formfields import MACAddressField
 
 
 def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
@@ -88,19 +86,6 @@ class AbonForm(forms.ModelForm):
         return acc
 
 
-class Opt82Form(forms.ModelForm):
-    mac = MACAddressField(widget=forms.TextInput(attrs={'class': 'form-control', 'pattern': r'^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$', 'required': ''}))
-    class Meta:
-        model = models.Opt82
-        fields = '__all__'
-        widgets = {
-            'port': forms.NumberInput(attrs={'class': 'form-control', 'required': ''})
-        }
-
-    #def save(self, commit=True):
-    #    super().save(commit=commit)
-
-
 class AbonGroupForm(forms.ModelForm):
     class Meta:
         model = models.AbonGroup
@@ -135,4 +120,14 @@ class ExtraFieldForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'field_type': forms.Select(attrs={'class': 'form-control'}),
             'data': forms.TextInput(attrs={'class': 'form-control'})
+        }
+
+
+class AbonStreetForm(forms.ModelForm):
+    class Meta:
+        model = models.AbonStreet
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'required':'', 'autofocus':''}),
+            'group': forms.Select(attrs={'class': 'form-control'})
         }

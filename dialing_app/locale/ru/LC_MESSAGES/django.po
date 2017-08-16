@@ -19,75 +19,90 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: dialing_app/models.py:8
+#: dialing_app/models.py:8 dialing_app/models.py:43
 msgid "No answer"
 msgstr "Не отвечен"
 
-#: dialing_app/models.py:9
+#: dialing_app/models.py:9 dialing_app/models.py:45
 msgid "Failed"
 msgstr "С ошибкой"
 
-#: dialing_app/models.py:10
+#: dialing_app/models.py:10 dialing_app/models.py:47
 msgid "Busy"
 msgstr "Занято"
 
-#: dialing_app/models.py:11
+#: dialing_app/models.py:11 dialing_app/models.py:49
 msgid "Answered"
 msgstr "Отвечен"
 
-#: dialing_app/models.py:12
+#: dialing_app/models.py:12 dialing_app/models.py:51
 msgid "Unknown"
 msgstr "Не определён"
 
-#: dialing_app/templates/index.html:8
+#: dialing_app/templates/index.html:9
 msgid "Dialing"
 msgstr "Звонки"
 
-#: dialing_app/templates/index.html:11
+#: dialing_app/templates/index.html:12
 msgid "Last calls"
 msgstr "Последние звонки"
 
-#: dialing_app/templates/index.html:19
-msgid "calldate"
-msgstr "дата звонка"
-
 #: dialing_app/templates/index.html:20
-msgid "src"
-msgstr "кто"
-
-#: dialing_app/templates/index.html:21
-msgid "dst"
-msgstr "куда"
-
-#: dialing_app/templates/index.html:26
-msgid "duration"
-msgstr "продолжительность"
-
-#: dialing_app/templates/index.html:28
-msgid "start"
-msgstr "начало"
-
-#: dialing_app/templates/index.html:29
-msgid "answer"
-msgstr "ответ"
-
-#: dialing_app/templates/index.html:30
-msgid "end"
-msgstr "конец"
-
-#: dialing_app/templates/index.html:31
-msgid "disposition"
-msgstr "состояние"
-
-#: dialing_app/templates/index.html:57
-msgid "Calls was not found"
-msgstr "Звонки не найдены"
-
 msgid "Play"
 msgstr "Слушать"
 
+#: dialing_app/templates/index.html:21
+msgid "calldate"
+msgstr "дата звонка"
+
+#: dialing_app/templates/index.html:22
+msgid "src"
+msgstr "кто"
+
+#: dialing_app/templates/index.html:23
+msgid "dst"
+msgstr "куда"
+
+#: dialing_app/templates/index.html:24
+msgid "duration"
+msgstr "продолжительность"
+
+#: dialing_app/templates/index.html:25
+msgid "start"
+msgstr "начало"
+
+#: dialing_app/templates/index.html:26
+msgid "answer"
+msgstr "ответ"
+
+#: dialing_app/templates/index.html:27
+msgid "end"
+msgstr "конец"
+
+#: dialing_app/templates/index.html:28
+msgid "disposition"
+msgstr "состояние"
+
+#: dialing_app/templates/index.html:50
+msgid "Calls was not found"
+msgstr "Звонки не найдены"
+
+#: dialing_app/views.py:27
+msgid "Multiple users with the telephone number"
+msgstr "Несколько абонентов с указанным номером телефона"
+
+#: dialing_app/views.py:29
 msgid "User with the telephone number not found"
 msgstr "Абонент с таким номером телефона не найден"
 
-msgid "Multiple users with the telephone number"
-msgstr "Несколько абонентов с указанным номером телефона"
+msgid "Voice mail"
+msgstr "Оставленные сообщения"
+
+msgid "Type"
+msgstr "Тип"
+
+msgid "Request"
+msgstr "Заявка"
+
+msgid "Report"
+msgstr "Поломка"
