@@ -44,6 +44,6 @@ fi
 
 FULLTEXT="$text: $ABON_FIO. $ABON_ADDR $ABON_TEL. $ABON_GRP. $FAIL_MODE. $DESCR"
 
-echo "TO $RECIPIENT_TEL: $FULLTEXT" >> /tmp/task_sms.log
+echo "TO $RECIPIENT_TEL: $FULLTEXT"
 
 /usr/bin/gammu-smsd-inject EMS $RECIPIENT_TEL -text "$FULLTEXT" -unicode

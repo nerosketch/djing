@@ -3,10 +3,10 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-10">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">График использования</h3>
+                    <h3 class="panel-title">{% trans 'Graph of use' %}</h3>
                 </div>
                 <div class="panel-body">
                     {% if charts_data %}
@@ -16,7 +16,6 @@
                                 new Chartist.Line('#chrt', {
                                     series: [
                                         {
-                                            name: 'График траффика',
                                             data: [
                                                 {{ charts_data }}
                                             ]
@@ -34,13 +33,28 @@
                                         labelInterpolationFnc: function (value) {
                                             return moment(value).format('HH:mm:ss');
                                         }
-                                    }
+                                    },
+                                    lineSmooth: Chartist.Interpolation.cardinal({
+                                        tension: 0
+                                    })
                                 });
                             });
                         </script>
                     {% else %}
-                        <h2>Траффик не найден</h2>
+                        <h2>{% trans 'Static info was Not found' %}</h2>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">{% trans 'Graphs by dates' %}</div>
+                <div class="list-group">
+                    {% for dat in dates %}
+                        <a href="{% url 'abonapp:charts' abon_group.pk abon.pk %}?wantdate={{ dat|date:'dmY' }}" class="list-group-item{% if dat == now %} active{% endif %}">{{ dat|date:'j E' }}</a>
+                    {% empty %}
+                        {% trans 'Static info was Not found' %}
+                    {% endfor %}
                 </div>
             </div>
         </div>

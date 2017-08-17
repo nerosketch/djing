@@ -33,10 +33,10 @@
                     {% endif %}
                 {% endif %}
 
-                <td><a href="{% url 'taskapp:view' task.id %}" target="_blank">{{ task.id }}</a></td>
+                <td><a href="{% url 'taskapp:view' task.pk %}" target="_blank">{{ task.pk }}</a></td>
 
                 {% if task.abon and task.abon.group %}
-                    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank">{{ task.abon.get_full_name }}</a></td>
+		    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank" title="{{ task.abon.description|default:'' }}" data-toggle="tooltip">{{ task.abon.get_full_name }}</a></td>
 		    <td>{{ task.abon.group.title }}, {{ task.abon.street|default:_('Not assigned') }} {{ task.abon.house|default:_('Not assigned') }}</td>
                 {% else %}
                     <td>{% trans 'User does not exist' %}</td>
@@ -45,19 +45,19 @@
 
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.descr }}</td>
-                <td><a href="{% url 'acc_app:other_profile' task.author.pk %}"
+                <td><a href="{% url 'acc_app:other_profile' task.author.pk %}" data-toggle="tooltip"
                        title="{{ task.author.get_full_name }}">{{ task.author.username }}</a></td>
-                <td>{{ task.time_of_create|date:'d N Y H:i:s' }}</td>
+                <td>{{ task.time_of_create|date:'d E H:i' }}</td>
 
-                <td class="btn-group btn-group-justified">
-                    <a href="{% url 'taskapp:begin' task.id %}" class="btn btn-primary btn-xs" title="{% trans 'Begin' %}">
-                        <span class="glyphicon glyphicon-cog"></span>
-                    </a>
-                    <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success btn-xs" title="{% trans 'Complete' %}">
+                <td class="btn-group btn-group-xs btn-group-justified">
+                    <a href="{% url 'taskapp:finish' task.pk %}" class="btn btn-success" data-toggle="tooltip" title="{% trans 'Complete' %}">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
+                    <a href="{% url 'taskapp:fail' task.pk %}" class="btn btn-danger" data-toggle="tooltip" title="{% trans 'Mark as unsuccessful' %}">
+                        <span class="glyphicon glyphicon-fire"></span>
+                    </a>
                     {% if perms.taskapp.change_task %}
-                    <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-default btn-xs" title="{% trans 'Edit' %}">
+                    <a href="{% url 'taskapp:edit' task.pk %}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Edit' %}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
                     {% endif %}

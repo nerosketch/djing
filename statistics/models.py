@@ -1,26 +1,51 @@
 import math
-from datetime import datetime, timedelta
-from django.db import models, ProgrammingError
-from django.utils import timezone
+from datetime import datetime, timedelta, date, time
+from django.db import models, connection
+from django.utils.timezone import now
+
 from mydefs import MyGenericIPAddressField
 from .fields import UnixDateTimeField
-from mydefs import LogicError
+
+
+def get_dates():
+    tables = connection.introspection.table_names()
+    tables = [t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_')]
+    return [datetime.strptime(t, '%d%m%Y').date() for t in tables]
 
 
 class StatManager(models.Manager):
 
-    def traffic_by_ip(self, ip):
-        try:
-            traf = self.order_by('-cur_time').filter(ip=ip, octets__gt=524288)[0]
-            now = datetime.now()
-            if traf.cur_time < now - timedelta(minutes=55):
-                return False, traf
-            else:
-                return True, traf
-        except IndexError:
-            return False, None
-        except ProgrammingError as e:
-            raise LogicError(e)
+    def chart(self, ip_addr, count_of_parts=12, want_date=date.today()):
+        def byte_to_mbit(x):
+            return ((x/60)*8)/2**20
+
+        def split_list(lst, chunk_count):
+            chunk_size = len(lst) // chunk_count
+            if chunk_size == 0:
+                chunk_size = 1
+            return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
+
+        def avarage(elements):
+            return sum(elements) / len(elements)
+
+        charts_data = self.filter(ip=ip_addr)
+        charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
+        charts_octets = [cd.octets for cd in charts_data]
+        if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
+            charts_octets = split_list(charts_octets, count_of_parts)
+            charts_octets = [byte_to_mbit(avarage(c)) for c in charts_octets]
+
+            charts_times = split_list(charts_times, count_of_parts)
+            charts_times = [avarage(t) for t in charts_times]
+
+            charts_data = zip(charts_times, charts_octets)
+            charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+            midnight = datetime.combine(want_date, time.min)
+            charts_data.append("{x:new Date(%d),y:0}" % (int(charts_times[-1:][0]) + 1))
+            charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+            return charts_data
+        else:
+            return
 
 
 class StatElem(models.Model):
@@ -30,6 +55,20 @@ class StatElem(models.Model):
     packets = models.PositiveIntegerField(default=0)
 
     objects = StatManager()
+
+    # ReadOnly
+    def save(self, *args, **kwargs):
+        pass
+
+    # ReadOnly
+    def delete(self, *args, **kwargs):
+        pass
+
+    def delete_month(self):
+        cursor = connection.cursor()
+        table_name = self._meta.db_table
+        sql = "DROP TABLE %s;" % table_name
+        cursor.execute(sql)
 
     @staticmethod
     def percentile(N, percent, key=lambda x:x):
@@ -57,10 +96,27 @@ class StatElem(models.Model):
         abstract = True
 
 
-def getModel():
+def getModel(want_date=now()):
 
     class DynamicStatElem(StatElem):
         class Meta:
-            db_table = 'flowstat_%s' % timezone.now().strftime("%d%m%Y")
+            db_table = 'flowstat_%s' % want_date.strftime("%d%m%Y")
             abstract = False
     return DynamicStatElem
+
+
+class StatCache(models.Model):
+    last_time = UnixDateTimeField()
+    ip = MyGenericIPAddressField(primary_key=True)
+    octets = models.PositiveIntegerField(default=0)
+    packets = models.PositiveIntegerField(default=0)
+
+    def is_online(self):
+        return self.last_time > now() - timedelta(minutes=55)
+
+    def is_today(self):
+        return date.today() == self.last_time.date()
+
+
+    class Meta:
+        db_table = 'flowcache'

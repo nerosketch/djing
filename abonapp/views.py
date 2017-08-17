@@ -3,7 +3,8 @@ from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.db.transaction import atomic
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
@@ -11,14 +12,17 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
-from statistics.models import getModel
+from statistics.models import StatCache
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
 import mydefs
-from devapp.models import Device
-from datetime import datetime
+from devapp.models import Device, Port as DevPort
+from datetime import datetime, date
+from taskapp.models import Task
+from dialing_app.models import AsteriskCDR
+from statistics.models import getModel, get_dates
 
 
 @login_required
@@ -31,8 +35,6 @@ def peoples(request, gid):
     else:
         peoples_list = peoples_list.filter(group=gid)
 
-    StatModel = getModel()
-
     # фильтр
     dr, field = mydefs.order_helper(request)
     if field:
@@ -42,10 +44,10 @@ def peoples(request, gid):
         peoples_list = mydefs.pag_mn(request, peoples_list)
         for abon in peoples_list:
             if abon.ip_address is not None:
-                traf = StatModel.objects.traffic_by_ip(abon.ip_address)
-                if traf[1] is not None:
-                    abon.traf = traf[1]
-                    abon.is_online =traf[0]
+                try:
+                    abon.stat_cache = StatCache.objects.get(ip=abon.ip_address)
+                except StatCache.DoesNotExist:
+                    pass
 
     except mydefs.LogicError as e:
         messages.warning(request, e)
@@ -189,6 +191,7 @@ def delentity(request):
 
 @login_required
 @permission_required('abonapp.can_add_ballance')
+@atomic
 def abonamount(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
@@ -242,16 +245,14 @@ def pay_history(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def abon_services(request, gid, uid):
+    grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
-    abon_tarifs = models.AbonTariff.objects.filter(abon=uid)
 
-    active_abontariff = abon_tarifs.exclude(time_start=None)
-
-    return render(request, 'abonapp/services.html', {
+    return render(request, 'abonapp/service.html', {
         'abon': abon,
-        'abon_tarifs': abon_tarifs,
-        'active_abontariff_id': active_abontariff[0].id if active_abontariff.count() > 0 else None,
-        'abon_group': abon.group
+        'abon_tariff': abon.current_tariff,
+        'abon_group': abon.group,
+        'services': grp.tariffs.all()
     })
 
 
@@ -262,20 +263,13 @@ def abonhome(request, gid, uid):
     abon_group = get_object_or_404(models.AbonGroup, pk=gid)
     frm = None
     passw = None
-    abon_device = None
     try:
         if request.method == 'POST':
             if not request.user.has_perm('abonapp.change_abon'):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                # если нет option82, т.е. динамический ip то не сохраняем изменения ip
-                if abon.opt82 is None:
-                    ip_str = request.POST.get('ip')
-                    if ip_str:
-                        abon.ip_address = ip_str
-                    else:
-                        abon.ip_address = None
+                abon.ip_address = request.POST.get('ip')
                 frm.save()
                 messages.success(request, _('edit abon success msg'))
             else:
@@ -283,7 +277,8 @@ def abonhome(request, gid, uid):
         else:
             passw = models.AbonRawPassword.objects.get(account=abon).passw_text
             frm = forms.AbonForm(instance=abon, initial={'password': passw})
-            abon_device = models.AbonDevice.objects.get(abon=abon)
+            if abon.device is None:
+                messages.warning(request, _('User device was not found'))
     except mydefs.LogicError as e:
         messages.error(request, e)
         passw = models.AbonRawPassword.objects.get(account=abon).passw_text
@@ -293,8 +288,6 @@ def abonhome(request, gid, uid):
         messages.error(request, e)
     except models.AbonRawPassword.DoesNotExist:
         messages.warning(request, _('User has not have password, and cannot login'))
-    except models.AbonDevice.DoesNotExist:
-        messages.warning(request, _('User device was not found'))
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
@@ -306,8 +299,8 @@ def abonhome(request, gid, uid):
             'abon_group': abon_group,
             'ip': abon.ip_address,
             'is_bad_ip': getattr(abon, 'is_bad_ip', False),
-            'tech_form': forms.Opt82Form(instance=abon.opt82),
-            'device': abon_device.device if abon_device is not None else None
+            'device': abon.device,
+            'dev_ports': DevPort.objects.filter(device=abon.device) if abon.device else None
         })
     else:
         return render(request, 'abonapp/viewAbon.html', {
@@ -318,40 +311,7 @@ def abonhome(request, gid, uid):
         })
 
 
-@login_required
-@mydefs.only_admins
-def opt82(request, gid, uid):
-    try:
-        abon = models.Abon.objects.get(pk=uid)
-        if request.method == 'POST':
-            try:
-                opt82_instance = models.Opt82.objects.get(
-                    mac=request.POST.get('mac'),
-                    port=request.POST.get('port')
-                )
-            except models.Opt82.DoesNotExist:
-                frm = forms.Opt82Form(request.POST)
-                if frm.is_valid():
-                    opt82_instance = frm.save()
-                else:
-                    messages.error(request, _('fix form errors'))
-                    return redirect('abonapp:abon_home', gid=gid, uid=uid)
-
-            abon.opt82 = opt82_instance
-        else:
-            act = request.GET.get('act')
-            if act is not None and act == 'release':
-                if abon.opt82 is not None:
-                    abon.opt82.delete()
-                    abon.opt82 = None
-
-        abon.save(update_fields=['opt82'])
-    except models.Abon.DoesNotExist:
-        messages.error(request, _('User does not exist'))
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
-
-
-@mydefs.require_ssl
+@atomic
 def terminal_pay(request):
     from .pay_systems import allpay
     ret_text = allpay(request)
@@ -397,6 +357,7 @@ def add_invoice(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.can_buy_tariff')
+@atomic
 def pick_tariff(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
@@ -428,34 +389,14 @@ def pick_tariff(request, gid, uid):
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
         'abon': abon,
-        'abon_group': grp
+        'abon_group': grp,
+        'selected_tariff': mydefs.safe_int(request.GET.get('selected_tariff'))
     })
 
 
 @login_required
-@mydefs.only_admins
-def chpriority(request, gid, uid):
-    t = request.GET.get('t')
-    act = request.GET.get('a')
-
-    current_abon_tariff = get_object_or_404(models.AbonTariff, pk=t)
-
-    try:
-        if act == 'up':
-            current_abon_tariff.priority_up()
-        elif act == 'down':
-            current_abon_tariff.priority_down()
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
-
-
-@login_required
 @permission_required('abonapp.can_complete_service')
+@atomic
 def complete_service(request, gid, uid, srvid):
     abtar = get_object_or_404(models.AbonTariff, pk=srvid)
     abon = abtar.abon
@@ -514,43 +455,10 @@ def complete_service(request, gid, uid, srvid):
 
 
 @login_required
-@permission_required('abonapp.can_activate_service')
-def activate_service(request, gid, uid, srvid):
-    abtar = get_object_or_404(models.AbonTariff, pk=srvid)
-    amount = abtar.calc_amount_service()
-
-    try:
-        if request.method == 'POST':
-            if request.POST.get('finish_confirm') != 'yes':
-                return HttpResponse(_('Not confirmed'))
-
-            abtar.activate(request.user)
-            messages.success(request, _('Service has been activated successfully'))
-            return redirect('abonapp:abon_services', gid, uid)
-
-    except (NasFailedResult, mydefs.LogicError) as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
-        messages.warning(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-    calc_obj = abtar.tariff.get_calc_type()(abtar)
-    return render(request, 'abonapp/activate_service.html', {
-        'abon': abtar.abon,
-        'abon_group': abtar.abon.group,
-        'abtar': abtar,
-        'amount': amount,
-        'diff': abtar.abon.ballance - amount,
-        'deadline': calc_obj.calc_deadline()
-    })
-
-
-@login_required
 @permission_required('abonapp.delete_abontariff')
-def unsubscribe_service(request, gid, uid, srvid):
+def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
-        get_object_or_404(models.AbonTariff, pk=int(srvid)).delete()
+        get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id)).delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -559,7 +467,7 @@ def unsubscribe_service(request, gid, uid, srvid):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+    return redirect('abonapp:abon_services', gid=gid, uid=uid)
 
 
 @login_required
@@ -610,7 +518,6 @@ def update_nas(request, group_id):
 @login_required
 @mydefs.only_admins
 def task_log(request, gid, uid):
-    from taskapp.models import Task
     abon = get_object_or_404(models.Abon, pk=uid)
     tasks = Task.objects.filter(abon=abon)
     return render(request, 'abonapp/task_log.html', {
@@ -626,11 +533,15 @@ def passport_view(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
-            frm = forms.PassportForm(request.POST)
+            try:
+                passport_instance = models.PassportInfo.objects.get(abon=abon)
+            except models.PassportInfo.DoesNotExist:
+                passport_instance = None
+            frm = forms.PassportForm(request.POST, instance=passport_instance)
             if frm.is_valid():
-                passp_instance = frm.save(commit=False)
-                passp_instance.abon = abon
-                passp_instance.save()
+                pi = frm.save(commit=False)
+                pi.abon = abon
+                pi.save()
                 messages.success(request, _('Passport information has been saved'))
                 return redirect('abonapp:passport_view', gid=gid, uid=uid)
             else:
@@ -672,24 +583,20 @@ def chgroup_tariff(request, gid):
 def dev(request, gid, uid):
     abon_dev = None
     try:
+        abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
             dev = Device.objects.get(pk=request.POST.get('dev'))
-            abon = models.Abon.objects.get(pk=uid)
-            try:
-                models.AbonDevice.objects.get(device=dev, abon=abon)
-            except models.AbonDevice.DoesNotExist:
-                models.AbonDevice.objects.create(abon=abon, device=dev)
-                messages.success(request, _('Device has successfully attached'))
+            abon.device = dev
+            abon.save(update_fields=['device'])
+            messages.success(request, _('Device has successfully attached'))
             return redirect('abonapp:abon_home', gid=gid, uid=uid)
         else:
-            abon_dev = models.AbonDevice.objects.get(abon=uid).device
+            abon_dev = abon.device
     except Device.DoesNotExist:
         messages.warning(request, _('Device your selected already does not exist'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
-    except models.AbonDevice.DoesNotExist:
-        messages.warning(request, _('User device was not found'))
     return render(request, 'abonapp/modal_dev.html', {
         'devices': Device.objects.filter(user_group=gid),
         'dev': abon_dev,
@@ -702,8 +609,8 @@ def dev(request, gid, uid):
 def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
-        abdev = models.AbonDevice.objects.get(abon=abon)
-        abdev.delete()
+        abon.device = None
+        abon.save(update_fields=['device'])
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -714,14 +621,16 @@ def clear_dev(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def charts(request, gid, uid):
-    from statistics.models import getModel
-    from datetime import datetime, date, time, timedelta
     high = 100
 
-    def byte_to_mbit(x):
-        return ((x/60)*8)/2**20
+    wandate = request.GET.get('wantdate')
+    if wandate:
+        wandate = datetime.strptime(wandate, '%d%m%Y').date()
+    else:
+        wandate = date.today()
+
     try:
-        StatElem = getModel()
+        StatElem = getModel(wandate)
         abon = models.Abon.objects.get(pk=uid)
         if abon.group is None:
             abon.group = models.AbonGroup.objects.get(pk=gid)
@@ -731,20 +640,18 @@ def charts(request, gid, uid):
         if abon.ip_address is None:
             charts_data = None
         else:
-            charts_data = StatElem.objects.filter(ip=abon.ip_address)
-            #oct_limit = StatElem.percentile([cd.octets for cd in charts_data], 0.05)
-            # ниже возвращаем пары значений трафика который переведён в mByte, и unix timestamp
-            midnight = datetime.combine(date.today(), time.min)
-            charts_data = [(cd.cur_time.timestamp()*1000, byte_to_mbit(cd.octets)) for cd in charts_data]
-            if len(charts_data) > 0:
-                charts_data.append( (charts_data[-1:][0][0], 0.0) )
-                charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
-                charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+            charts_data = StatElem.objects.chart(
+                abon.ip_address,
+                count_of_parts=30,
+                want_date=wandate
+            )
 
             abontariff = abon.active_tariff()
-            high = abontariff.speedIn + abontariff.speedOut
-            if high > 100:
-                high = 100
+            if abontariff is not None:
+                trf = abontariff.tariff
+                high = trf.speedIn + trf.speedOut
+                if high > 100:
+                    high = 100
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -760,7 +667,8 @@ def charts(request, gid, uid):
         'abon_group': abongroup,
         'abon': abon,
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
-        'high': high
+        'high': high,
+        'dates': get_dates()
     })
 
 
@@ -799,7 +707,6 @@ def make_extra_field(request, gid, uid):
 @permission_required('abonapp.change_extra_fields_model')
 def extra_field_change(request, gid, uid):
     extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
-    print(extras)
     try:
         for ex in extras:
             extra_field = models.ExtraFieldsModel.objects.get(pk=ex[0])
@@ -860,12 +767,115 @@ def abon_ping(request):
     }))
 
 
+@login_required
+@mydefs.only_admins
+def dials(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    if hasattr(abon.group, 'pk') and abon.group.pk != int(gid):
+        return redirect('abonapp:dials', abon.group.pk, abon.pk)
+    if abon.telephone is not None and abon.telephone != '':
+        tel = abon.telephone.replace('+', '')
+        logs = AsteriskCDR.objects.filter(
+            Q(src__contains=tel) | Q(dst__contains=tel)
+        )
+        logs = mydefs.pag_mn(request, logs)
+    else:
+        logs = None
+    return render(request, 'abonapp/dial_log.html', {
+        'logs': logs,
+        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
+        'abon': abon
+    })
+
+
+@login_required
+@mydefs.only_admins
+def save_user_dev_port(request, gid, uid):
+    if request.method != 'POST':
+        messages.error(request, _('Method is not POST'))
+        return redirect('abonapp:abon_home', gid, uid)
+    user_port = mydefs.safe_int(request.POST.get('user_port'))
+    is_dynamic_ip = request.POST.get('is_dynamic_ip')
+    try:
+        if user_port == 0:
+            port = None
+        else:
+            port = DevPort.objects.get(pk=user_port)
+        abon = models.Abon.objects.get(pk=uid)
+        abon.dev_port = port
+        if abon.is_dynamic_ip != is_dynamic_ip:
+            abon.is_dynamic_ip = is_dynamic_ip
+            abon.save(update_fields=['dev_port', 'is_dynamic_ip'])
+        else:
+            abon.save(update_fields=['dev_port'])
+        messages.success(request, _('User port has been saved'))
+    except DevPort.DoesNotExist:
+        messages.error(request, _('Selected port does not exist'))
+    except models.Abon.DoesNotExist:
+        messages.error(request, _('User does not exist'))
+    return redirect('abonapp:abon_home', gid, uid)
+
+
+@login_required
+@permission_required('abonapp.add_abonstreet')
+def street_add(request, gid):
+    if request.method == 'POST':
+        frm = forms.AbonStreetForm(request.POST)
+        if frm.is_valid():
+            frm.save()
+            messages.success(request, _('Street successfully saved'))
+            return redirect('abonapp:people_list', gid)
+        else:
+            messages.error(request, _('fix form errors'))
+    else:
+        frm = forms.AbonStreetForm(initial={'group': gid})
+    return render_to_text('abonapp/modal_addstreet.html', {
+        'form': frm,
+        'gid': gid
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_abonstreet')
+def street_edit(request, gid):
+    try:
+        if request.method == 'POST':
+            streets_pairs = [(int(sid), sname) for sid, sname in zip(request.POST.getlist('sid'), request.POST.getlist('sname'))]
+            for sid, sname in streets_pairs:
+                street = models.AbonStreet.objects.get(pk=sid)
+                street.name = sname
+                street.save()
+            messages.success(request, _('Streets has been saved'))
+        else:
+            return render_to_text('abonapp/modal_editstreet.html', {
+                'gid': gid,
+                'streets': models.AbonStreet.objects.filter(group=gid)
+            }, request=request)
+
+    except models.AbonStreet.DoesNotExist:
+        messages.error(request, _('One of these streets has not been found'))
+
+    return redirect('abonapp:people_list', gid)
+
+
+@login_required
+@permission_required('abonapp.delete_abonstreet')
+def street_del(request, gid, sid):
+    try:
+        models.AbonStreet.objects.get(pk=sid, group=gid).delete()
+        messages.success(request, _('The street successfully deleted'))
+    except models.AbonStreet.DoesNotExist:
+        messages.error(request, _('The street has not been found'))
+    return redirect('abonapp:people_list', gid)
+
+
+
 # API's
 
 def abons(request):
     ablist = [{
         'id': abn.pk,
-        'tarif_id': abn.active_tariff().pk if abn.active_tariff() else 0,
+        'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
         'ip': abn.ip_address.int_ip(),
         'is_active': abn.is_active
     } for abn in models.Abon.objects.all()]
@@ -887,5 +897,5 @@ def abons(request):
 def search_abon(request):
     word = request.GET.get('s')
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = [{'id': usr.pk, 'name': usr.username, 'fio': usr.fio} for usr in results]
+    results = [{'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results]
     return HttpResponse(dumps(results, ensure_ascii=False))

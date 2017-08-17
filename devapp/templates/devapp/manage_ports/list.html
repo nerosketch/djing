@@ -1,0 +1,60 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="50">{% trans 'Number' %}</th>
+                        <th>{% trans 'Description' %}</th>
+                        <th width="100">#</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% with gid=dev.user_group.pk did=dev.pk can_del_port=perms.devapp.delete_port can_edit_port=perms.devapp.change_port %}
+                    {% for port in ports %}
+                        <tr>
+                            <td>{{ port.num }}</td>
+                            <td>{{ port.descr }}</td>
+                            <td class="btn-group btn-group-sm">
+                                {% if can_del_port %}
+                                    <a href="{% url 'devapp:del_port' gid did port.pk %}" class="btn btn-danger btn-modal" title="{% trans 'Delete' %}">
+                                        <span class="glyphicon glyphicon-remove-circle"></span>
+                                    </a>
+                                {% endif %}
+                                {% if can_edit_port %}
+                                    <a href="{% url 'devapp:edit_port' gid did port.pk %}" class="btn btn-primary btn-modal" title="{% trans 'Edit' %}">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3">{% trans 'Ports not found' %}</td>
+                        </tr>
+                    {% endfor %}
+                    {% endwith %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3" class="btn-group">
+                            {% if perms.devapp.add_port %}
+                                <a href="{% url 'devapp:add_ports' dev.user_group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
+                                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

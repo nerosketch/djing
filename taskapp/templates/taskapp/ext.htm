@@ -23,13 +23,6 @@
             </a>
         </li>
 
-        {% url 'taskapp:active_tasks' as taskactive %}
-        <li{% if taskactive == request.path %} class="active"{% endif %}>
-            <a href="{{ taskactive }}">
-                {% trans 'Active tasks' %}
-            </a>
-        </li>
-
         {% url 'taskapp:finished_tasks' as taskfin %}
         <li{% if taskfin == request.path %} class="active"{% endif %}>
             <a href="{{ taskfin }}">
@@ -41,6 +34,13 @@
         <li{% if taskown == request.path %} class="active"{% endif %}>
             <a href="{{ taskown }}">
                 {% trans 'Scheduled tasks me' %}
+            </a>
+        </li>
+
+        {% url 'taskapp:failed_tasks' as taskfailed %}
+        <li{% if taskfailed == request.path %} class="active"{% endif %}>
+            <a href="{{ taskfailed }}">
+                {% trans 'Failed tasks' %}
             </a>
         </li>
 

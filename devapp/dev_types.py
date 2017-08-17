@@ -5,22 +5,6 @@ from datetime import timedelta
 from .base_intr import DevBase, SNMPBaseWorker, BasePort
 
 
-
-oids = {
-    'reboot': '.1.3.6.1.4.1.2021.8.1.101.1',
-    'get_ports': {
-        'names': '.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3',
-        'stats': '.1.3.6.1.2.1.2.2.1.7',
-        'macs': '.1.3.6.1.2.1.2.2.1.6',
-        'speeds': '.1.3.6.1.2.1.31.1.1.1.15'
-    },
-    'name': '.1.3.6.1.2.1.1.1.0',
-    'position': '.1.3.6.1.2.1.1.5.0',
-    'toggle_port': '.1.3.6.1.2.1.2.2.1.7',
-    'uptime': '.1.3.6.1.2.1.1.8.0'
-}
-
-
 class DLinkPort(BasePort):
 
     def __init__(self, num, name, status, mac, speed, snmpWorker):
@@ -31,15 +15,13 @@ class DLinkPort(BasePort):
     # выключаем этот порт
     def disable(self):
         self.snmp_worker.set_int_value(
-            "%s.%d" % (oids['toggle_port'], self.num),
-            2
+            "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num), 2
         )
 
     # включаем этот порт
     def enable(self):
         self.snmp_worker.set_int_value(
-            "%s.%d" % (oids['toggle_port'], self.num),
-            1
+            "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num), 1
         )
 
 
@@ -54,15 +36,15 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return _('DLink switch')
 
     def reboot(self):
-        pass
+        return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
 
     def get_ports(self):
-        nams = self.get_list(oids['get_ports']['names'])
-        stats = self.get_list(oids['get_ports']['stats'])
-        macs = self.get_list(oids['get_ports']['macs'])
-        speeds = self.get_list(oids['get_ports']['speeds'])
+        nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
+        stats = self.get_list('.1.3.6.1.2.1.2.2.1.7')
+        macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
+        speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
         res = []
-        ln = len(macs)
+        ln = len(speeds)
         for n in range(ln):
             status = True if int(stats[n]) == 1 else False
             res.append(DLinkPort(
@@ -75,21 +57,29 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return res
 
     def get_device_name(self):
-        return self.get_item(oids['name'])
+        return self.get_item('.1.3.6.1.2.1.1.1.0')
 
     def uptime(self):
-        uptimestamp = safe_int(self.get_item(oids['uptime']))
+        uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.8.0'))
         tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
         return tm
 
     def get_template_name(self):
-        return 'devapp/ports.html'
+        return 'ports.html'
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return True
+
+    @staticmethod
+    def is_use_device_port():
+        return True
 
 
 class ONUdev(BasePort):
     def __init__(self, num, name, status, mac, speed, signal, snmpWorker):
-        BasePort.__init__(self, num, name, status, mac, speed)
-        assert issubclass(snmpWorker.__class__ , SNMPBaseWorker)
+        super(ONUdev, self).__init__(num, name, status, mac, speed)
+        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
         self.snmp_worker = snmpWorker
         self.signal = signal
 
@@ -113,7 +103,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
     @staticmethod
     def description():
-        return _('PON ONU')
+        return _('PON OLT')
 
     def reboot(self):
         pass
@@ -146,10 +136,104 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         return tm
 
     def get_template_name(self):
-        return 'devapp/olt.html'
+        return 'olt.html'
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return False
+
+    @staticmethod
+    def is_use_device_port():
+        return False
 
 
-DEVICE_TYPES = (
-    ('Dl', DLinkDevice),
-    ('Pn', OLTDevice)
-)
+class OnuDevice(DevBase, SNMPBaseWorker):
+
+    @staticmethod
+    def description():
+        return _('PON ONU')
+
+    def reboot(self):
+        pass
+
+    def get_ports(self):
+        pass
+
+    def get_device_name(self):
+        pass
+
+    def uptime(self):
+        pass
+
+    def get_template_name(self):
+        return "onu.html"
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return True
+
+    @staticmethod
+    def is_use_device_port():
+        return False
+
+
+class EltexPort(BasePort):
+
+    def __init__(self, num, name, status, mac, speed, snmpWorker):
+        BasePort.__init__(self, num, name, status, mac, speed)
+        assert issubclass(snmpWorker.__class__ , SNMPBaseWorker)
+        self.snmp_worker = snmpWorker
+
+    # выключаем этот порт
+    def disable(self):
+        self.snmp_worker.set_int_value(
+            "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num),
+            2
+        )
+
+    # включаем этот порт
+    def enable(self):
+        self.snmp_worker.set_int_value(
+            "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num),
+            1
+        )
+
+
+class EltexSwitch(DLinkDevice):
+
+    @staticmethod
+    def description():
+        return _('Eltex switch')
+
+    def get_ports(self):
+        #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
+        stats = self.get_list('.1.3.6.1.2.1.2.2.1.7')
+        oper_stats = self.get_list('.1.3.6.1.2.1.2.2.1.8')
+        #macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
+        speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
+        res = []
+        for n in range(28):
+            res.append(EltexPort(
+                n+1,
+                '',#nams[n] if len(nams) > 0 else _('does not fetch the name'),
+                True if int(stats[n]) == 1 else False,
+                '',#macs[n] if len(macs) > 0 else _('does not fetch the mac'),
+                int(speeds[n]) if len(speeds) > 0 and int(oper_stats[n]) == 1 else 0,
+            self))
+        return res
+
+    def get_device_name(self):
+        return self.get_item('.1.3.6.1.2.1.1.5.0')
+
+    def uptime(self):
+        uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
+        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
+        return tm
+
+    @staticmethod
+    def has_attachable_to_subscriber():
+        return False
+
+    @staticmethod
+    def is_use_device_port():
+        return False

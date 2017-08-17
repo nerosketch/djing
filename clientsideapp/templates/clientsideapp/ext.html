@@ -11,7 +11,7 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/clientside/my_clientside.js"></script>
     <link rel="shortcut icon" href="/static/img/favicon_m.ico">
-/head>
+</head>
 <body>
 <!-- Modal -->
 <div class="modal fade" id="modFrm" tabindex="-1" role="dialog" aria-hidden="true">
@@ -71,13 +71,11 @@
                 </li>
             </ul>
             <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance }}</b> руб.</span>
-        </div>
-        <!--/.nav-collapse -->
+        </div><!--/.nav-collapse -->
     </div>
 </div>
 
 
-<!-- Begin page content -->
 <div class="container">
 
     {% if request.user.is_staff %}

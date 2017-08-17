@@ -113,7 +113,7 @@ class DjingTelebot(helper.ChatHandler):
     # пингуем адрес
     def ping(self, ip=None):
         if ip is None:
-            self._question("Let's ping, write ip. It will be necessary to wait 10 seconds", self.ping)
+            self._question(_("Let's ping, write ip. It will be necessary to wait 10 seconds"), self.ping)
             return
         try:
             socket.inet_aton(ip)

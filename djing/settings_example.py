@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'taskapp',
     'clientsideapp',
     'chatbot',
-    'django_messages'
+    'django_messages',
+    'dialing_app'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -123,7 +124,7 @@ USE_I18N = True
 
 USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
 DEFAULT_FROM_EMAIL = 'nerosketch@gmail.com'
 
@@ -159,3 +160,9 @@ PAGINATION_ITEMS_PER_PAGE=10
 
 pay_SERV_ID = '<service id>'
 pay_SECRET = '<secret>'
+
+DIALING_MEDIA = 'path/to/asterisk_records'
+
+DHCP_TIMEOUT = 14400
+
+DEFAULT_SNMP_PASSWORD = 'public'

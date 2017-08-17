@@ -1,0 +1,15 @@
+[Unit]
+Description=Djing telegram bot
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 ./telebot.py > /dev/null
+PIDFile=/run/telebot.py.pid
+WorkingDirectory=/var/www/djing
+TimeoutSec=9
+Restart=always
+User=http
+Group=http
+
+[Install]
+WantedBy=multi-user.target

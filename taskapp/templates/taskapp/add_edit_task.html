@@ -58,15 +58,15 @@
             <div class="form-group">
 		        <label for="id_abon">{% trans 'Subscriber' %}</label>
 
-                <div class="input-group selectajax">
+                <div class="input-group selectajax" data-dst="/abons/api/abon_filter">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                    <input type="hidden" name="abon" class="selectajax-hid"{% if selected_abon %} value="{{ selected_abon.id }}"{% endif %}>
+                    <input type="hidden" name="abon" class="selectajax-hid"{% if selected_abon %} value="{{ selected_abon.pk }}"{% endif %}>
                 {% if selected_abon %}
                     <button class="selectajax-btn form-control btn btn-default">{{ selected_abon.fio }}</button>
-                    <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_abon" placeholder="Найти абонента">
+                    <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
                 {% else %}
                     <button class="selectajax-btn form-control btn btn-default hidden"></button>
-                    <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_abon" placeholder="Найти абонента">
+                    <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
                 {% endif %}
                     <ul class="dropdown-menu selectajax-ul"></ul>{{ form.abon.errors }}
                 </div>

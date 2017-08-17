@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^tasks/', include('taskapp.urls', namespace='taskapp')),
     url(r'^client/', include('clientsideapp.urls', namespace='client_side')),
     url(r'^msg/', include('django_messages.urls', namespace='django_messages')),
+    url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
     url(r'^admin/', admin.site.urls)
 ]
 

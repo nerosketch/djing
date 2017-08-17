@@ -27,7 +27,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 	$.fn.selectajax = function (opt) {
 
 		var settings = $.extend( {
-			url		 : '/api'
+			url		 : this.attr('data-dst')
 		}, opt);
 
 		var selectbtn = this.children('button.selectajax-btn');
@@ -40,7 +40,6 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 			var hr = a.attr('href');
 			var tx = a.text();
 			selecthid.val(hr.substr(1));
-			console.debug(tx);
 			selectbtn.text(tx).removeClass('hidden');
 			selectinp.addClass('hidden').val(tx);
 		};
@@ -49,7 +48,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 			$.getJSON(settings.url, {'s': this.value}, function (r) {
 				selectul.empty();
 				r.forEach(function (o) {
-					var li = $('<li><a href="#' + o.id + '">' + o.name + ": " + o.fio + '</a></li>');
+					var li = $('<li><a href="#' + o.id + '">' + o.text + '</a></li>');
 					selectul.append(li);
 					li.on('click', selectajax_click)
 				});
@@ -70,16 +69,55 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 })(jQuery);
 
 
-$(document).ready(function () {
+// AudioPlayer
+(function ($) {
+	$.fn.aplayer = function(){
 
-	// ajax tabs
-	$('.nav-tabs a').on('show.bs.tab', function (e) {
-		var ct = $(e.target).attr('href');
-		var remoteUrl = $(this).attr('data-tab-remote');
-		if (remoteUrl !== '') {
-			$(ct).load(remoteUrl);
-		}
-	});
+		var def_play = function(e){
+			var audiotag = e.data['audiotag'][0];
+
+			if(audiotag.readyState == 0){
+				$(this).prop('disabled', true);
+				return;
+			}else
+				$(this).prop('disabled', false);
+
+			if(audiotag.paused)
+                audiotag.play();
+            else
+                audiotag.pause();
+		};
+
+		var def_canplay = function(){
+			var els = $(this).parent();
+			els.prop('disabled', false).removeClass('disabled');
+			els.siblings().prop('disabled', false).removeClass('disabled');
+		};
+
+		var def_on_play = function(){
+			$(this).siblings('span.glyphicon').attr('class', 'glyphicon glyphicon-pause');
+        };
+
+		var def_on_pause = function(){
+			$(this).siblings('span.glyphicon').attr('class', 'glyphicon glyphicon-play');
+        };
+
+		this.each(function(){
+			var i = $(this);
+			var audiotag = i.children('audio');
+			var icon = i.children('span.glyphicon');
+			i.on('click', {'audiotag': audiotag}, def_play);
+			audiotag.on('canplay', def_canplay);
+			audiotag.on('play', def_on_play);
+			audiotag.on('pause', def_on_pause);
+		});
+
+	};
+})(jQuery);
+
+
+
+$(document).ready(function () {
 
 	// Live html5 image preview
 	if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -114,9 +152,7 @@ $(document).ready(function () {
 	});
 
 
-	$('div.selectajax').selectajax({
-		url: '/abons/api/abon_filter'
-	});
+	$('div.selectajax').selectajax();
 
 	$('[data-toggle=offcanvas]').click(function () {
 		$('.row-offcanvas').toggleClass('active');
@@ -147,6 +183,10 @@ $(document).ready(function () {
             self.html(r.dat);
 		});
 		return false;
-	})
+	});
+
+	$('button.player-btn').aplayer();
+
+	$('[data-toggle="tooltip"]').tooltip({container:'body'});
 
 });

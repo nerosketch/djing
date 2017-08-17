@@ -28,14 +28,21 @@
                         <div class="form-group-sm">
                             <label for="id_telephone" class="col-sm-4 control-label">{% trans 'Telephone' %}</label>
                             <div class="col-sm-8">
-                                {{ form.telephone }}{{ form.telephone.errors }}
+                                <div class="input-group input-group-sm">
+                                    {{ form.telephone }}{{ form.telephone.errors }}
+                                    <span class="input-group-btn">
+                                        <a href="sip:{{ form.telephone.value }}" class="btn btn-default" title="{% trans 'Call to' %}">
+                                            <span class="glyphicon glyphicon-earphone"></span>
+                                        </a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group-sm{% if is_bad_ip %} has-error{% endif %}">
                             <label for="id_ip" class="col-sm-4 control-label">{% trans 'Ip Address' %}</label>
                             <div class="col-sm-8">
-                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="{% trans 'Not assigned' %}" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"{% if abon.opt82 %} disabled{% endif %}/>
+                                <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="{% trans 'Not assigned' %}" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"{% if abon.is_dynamic_ip %} disabled{% endif %}/>
                             </div>
                         </div>
 
@@ -106,23 +113,6 @@
                             </div>
                         </div>
 
-                        <div class="form-group-sm">
-                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                {% if device %}
-                                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{{ device.ip_address }}">
-                                        <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
-                                    </a>
-                                    <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
-                                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove clutch' %}
-                                    </a>
-                                {% else %}
-                                    <a href="{% url 'abonapp:dev' abon_group.pk abon.pk %}" class="btn btn-success btn-sm btn-modal">
-                                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add clutch' %}
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-
                         {% if ip %}
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
@@ -140,36 +130,66 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'DHCP information' %}</h3>
+                    <h3 class="panel-title">{% trans 'Select the device' %}</h3>
                 </div>
+
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="{% url 'abonapp:opt82' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form role="form" class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
                         <div class="form-group-sm">
-                            <label for="id_ip" class="col-sm-2 control-label">{% trans 'Mac Address' %}</label>
-                            <div class="col-sm-10">
-                                {{ tech_form.mac }}{{ tech_form.mac.errors }}
+                        <label for="id_method" class="col-sm-2 control-label">{% trans 'Device' %}</label>
+                            <div class="col-sm-10 btn-group btn-group-sm">
+                                {% if device %}
+				    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %} {{ device.mac_addr }}">
+                                        <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
+                                    </a>
+                                    <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
+                                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove clutch' %}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'abonapp:dev' abon_group.pk abon.pk %}" class="btn btn-success btn-sm btn-modal">
+                                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add clutch' %}
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
 
+                        {% if device %}
                         <div class="form-group-sm">
-                            <label for="id_port" class="col-sm-2 control-label">{% trans 'Port' %}</label>
+                            <label for="id_dev_port" class="col-sm-2 control-label">{% trans 'Device port' %}</label>
                             <div class="col-sm-10">
-                                {{ tech_form.port }}{{ tech_form.port.errors }}
+                                <select id="id_dev_port" class="form-control" name="user_port">
+                                    <option value="0">{% trans 'Not assigned' %}</option>
+                                    {% for port in dev_ports %}
+                                        {% if port == abon.dev_port %}
+					    <option value="{{ port.pk }}" selected>{{ port.num }}: {{ port.descr }}</option>
+                                        {% else %}
+					    <option value="{{ port.pk }}">{{ port.num }}: {{ port.descr }}</option>
+                                        {% endif %}
+                                    {% empty %}
+                                        <option value="0">{% trans 'Ports does not exist' %}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
-
+                        <div class="form-group-sm">
+                            <div class="col-sm-offset-2 col-sm-10 checkbox">
+                                <label>
+                                    <input type="checkbox" name="is_dynamic_ip"{% if abon.is_dynamic_ip %} checked{% endif %}> {% trans 'Is dynamic network settings' %}
+                                </label>
+                            </div>
+                        </div>
                         <div class="form-group-sm">
                             <div class="col-sm-offset-2 col-sm-10 btn-group btn-group-sm">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
                                 </button>
-                                <a href="{% url 'abonapp:opt82' abon_group.pk abon.pk %}?act=release" class="btn btn-danger btn-sm" title="{% trans 'Reset option82' %}">
-                                    <span class="glyphicon glyphicon-trash"></span> {% trans 'Delete' %}
-                                </a>
+                                <button class="btn btn-default" type="reset" title="Reset">
+                                    <span class="glyphicon glyphicon-repeat"></span>
+                                </button>
                             </div>
                         </div>
-
+                        {% endif %}
                     </form>
                 </div>
             </div>

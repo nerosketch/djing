@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<form role="form" action="{% url 'tarifs:del' tid %}" method="post"> {% csrf_token %}
+    <div class="modal-header warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{% trans 'Delete service' %}</h4>
+    </div>
+
+    {% include 'message_block.html' %}
+
+    <div class="modal-body">
+        <div class="form-group-sm">
+            <label for="id_dev">{% trans 'Attention' %}</label>
+            <p>{% blocktrans %}after delete the tariff, subscribers who use that tariff will be disconnected from it.{% endblocktrans %}</p>
+
+            <input type="hidden" name="confirm" value="yes">
+
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-danger">
+                <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-retweet"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

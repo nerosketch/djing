@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
@@ -8,8 +7,8 @@ from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
-from .fields import MACAddressField
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
+from djing import settings
 
 
 class AbonGroup(models.Model):
@@ -42,107 +41,32 @@ class AbonLog(models.Model):
 
 
 class AbonTariff(models.Model):
-    abon = models.ForeignKey('Abon')
     tariff = models.ForeignKey(Tariff, related_name='linkto_tariff')
-    tariff_priority = models.PositiveSmallIntegerField(default=0)
 
-    # время начала действия, остальные что не начали действие - NULL
+    # время начала действия услуги
     time_start = models.DateTimeField(null=True, blank=True, default=None)
 
     # время завершения услуги
     deadline = models.DateTimeField(null=True, blank=True, default=None)
 
-    def priority_up(self):
-        # ищем услугу с большим приоритетом(число приоритета меньше)
-        target_abtar = AbonTariff.objects.filter(
-            abon=self.abon,
-            tariff_priority__lt=self.tariff_priority
-        ).order_by('-tariff_priority')[:1]
-        if target_abtar.count() > 0:
-            target_abtar = target_abtar[0]
-        else:
-            return
-
-        # Ищем текущий тариф абонента
-        active_abtar = AbonTariff.objects.filter(
-            abon=self.abon
-        )[:1]
-        if active_abtar.count() > 0:
-            active_abtar = active_abtar[0]
-        else:
-            return
-
-        # Если услуга с которой хотим поменяться приоритетом является текущей то нельзя меняться
-        if active_abtar == target_abtar:
-            return
-
-        # Swap приоритетов у текущего и найденного с меньшим tariff_priority (большим приоритетом)
-        tmp_prior = target_abtar.tariff_priority
-        target_abtar.tariff_priority = self.tariff_priority
-        target_abtar.save(update_fields=['tariff_priority'])
-        self.tariff_priority = tmp_prior
-        self.save(update_fields=['tariff_priority'])
-
-    def priority_down(self):
-        # ищем услугу с меньшим приоритетом
-        target_abtar = AbonTariff.objects.filter(
-            abon=self.abon,
-            tariff_priority__gt=self.tariff_priority
-        )[:1]
-        if target_abtar.count() > 0:
-            target_abtar = target_abtar[0]
-        else:
-            # меньше нет, это самая последняя услуга
-            return
-
-        # Swap приоритетов у текущего и найденного с большим tariff_priority (меньшим приоритетом)
-        tmp_pr = self.tariff_priority
-        self.tariff_priority = target_abtar.tariff_priority
-        target_abtar.tariff_priority = tmp_pr
-        target_abtar.save(update_fields=['tariff_priority'])
-        self.save(update_fields=['tariff_priority'])
-
-    # Считает текущую стоимость услуг согласно выбранной для тарифа логики оплаты (см. в документации)
     def calc_amount_service(self):
         amount = self.tariff.amount
         return round(amount, 2)
 
-    # Активируем тариф
-    def activate(self, current_user, deadline=None):
-        calc_obj = self.tariff.get_calc_type()(self)
-        amnt = self.tariff.amount
-        # если не хватает денег
-        if self.abon.ballance < amnt:
-            raise LogicError(_('not enough money'))
-        # считаем дату активации услуги
-        self.time_start = timezone.now()
-        # считаем дату завершения услуги
-        if deadline is None:
-            self.deadline = calc_obj.calc_deadline()
-        else:
-            self.deadline = deadline
-        # снимаем деньги за услугу
-        self.abon.make_pay(current_user, amnt)
-        self.save()
-
     # Используется-ли услуга сейчас, если время старта есть то он активирован
     def is_started(self):
-        return True if self.time_start is not None else False
+        return False if self.time_start is None else True
 
     def __str__(self):
-        return "%d: '%s' - '%s'" % (
-            self.tariff_priority,
-            self.tariff.title,
-            self.abon.get_short_name()
+        return "%d: %s" % (
+            self.pk or 0,
+            self.tariff.title
         )
 
     class Meta:
-        ordering = ('tariff_priority',)
         db_table = 'abonent_tariff'
-        unique_together = (('abon', 'tariff', 'tariff_priority'),)
         permissions = (
             ('can_complete_service', _('finish service perm')),
-            ('can_activate_service', _('activate service perm'))
         )
 
 
@@ -199,20 +123,8 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
-class Opt82(models.Model):
-    mac = MACAddressField()
-    port = models.PositiveSmallIntegerField(default=0)
-
-    def __str__(self):
-        return "%s-%d" % (self.mac, self.port)
-
-    class Meta:
-        db_table = 'opt_82'
-        unique_together = (('mac', 'port'),)
-
-
 class Abon(UserProfile):
-    current_tariffs = models.ManyToManyField(Tariff, through=AbonTariff)
+    current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
     ballance = models.FloatField(default=0.0)
     ip_address = MyGenericIPAddressField(blank=True, null=True)
@@ -220,22 +132,13 @@ class Abon(UserProfile):
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
     house = models.CharField(max_length=12, null=True, blank=True)
     extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
-    opt82 = models.ForeignKey(Opt82, null=True, blank=True, on_delete=models.SET_NULL)
+    device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
+    dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
+    is_dynamic_ip = models.BooleanField(default=False)
 
-    _act_tar_cache = None
-
-    # возвращает текущий тариф для абонента
-    def active_tariff(self, use_cache=True):
-        if self._act_tar_cache and use_cache:
-            return self._act_tar_cache
-
-        ats = AbonTariff.objects.filter(abon=self).exclude(time_start=None)
-
-        if ats.count() > 0:
-            self._act_tar_cache = ats[0].tariff
-            return ats[0].tariff
-        else:
-            self._act_tar_cache = None
+    # возвращает связь с текущим тарифом для абонента
+    def active_tariff(self):
+        return self.current_tariff
 
     class Meta:
         db_table = 'abonent'
@@ -263,23 +166,31 @@ class Abon(UserProfile):
     def pick_tariff(self, tariff, author, comment=None, deadline=None):
         assert isinstance(tariff, Tariff)
 
-        # выбераем связь ТарифАбонент с самым низким приоритетом
-        abtrf = AbonTariff.objects.filter(abon=self).order_by('-tariff_priority')[:1]
-        abtrf = abtrf[0] if abtrf.count() > 0 else None
+        amount = round(tariff.amount, 2)
 
-        # создаём новую связь с приоритетом ещё ниже
-        new_abtar = AbonTariff(
-            abon=self,
-            tariff=tariff,
-            tariff_priority=abtrf.tariff_priority + 1 if abtrf else -1
-        )
+        if not author.is_staff and tariff.is_admin:
+            raise LogicError(_('User that is no staff can not buy admin services'))
 
-        # Если это первая услуга в списке (фильтр по приоритету ничего не вернул)
-        if not abtrf:
-            # значит пробуем её активировать
-            new_abtar.activate(author, deadline)
-        else:
-            new_abtar.save()
+        if self.current_tariff is not None:
+            if self.current_tariff.tariff == tariff:
+                # Эта услуга уже подключена
+                raise LogicError(_('That service already activated'))
+            else:
+                # Не надо молча заменять услугу если какая-то уже есть
+                raise LogicError(_('Service already activated'))
+
+        # если не хватает денег
+        if self.ballance < amount:
+            raise LogicError(_('not enough money'))
+
+        new_abtar = AbonTariff(deadline=deadline, tariff=tariff)
+        new_abtar.save()
+        self.current_tariff = new_abtar
+
+        # снимаем деньги за услугу
+        self.ballance -= amount
+
+        self.save()
 
         # Запись об этом в лог
         AbonLog.objects.create(
@@ -288,43 +199,23 @@ class Abon(UserProfile):
             comment=comment or _('Buy service default log')
         )
 
-    # Пробует подключить новую услугу если пришло время
-    def activate_next_tariff(self, author):
-        ats = AbonTariff.objects.filter(abon=self).order_by('tariff_priority')
-
-        nw = timezone.make_aware(datetime.now())
-
-        for at in ats:
-            # услуга не активна, продолжаем
-            if at.deadline is None:
-                continue
-            # если услуга просрочена
-            if nw > at.deadline:
-                print(_('service overdue log'))
-                # выберем следующую по приоритету
-                # next_tarifs = AbonTariff.objects.filter(tariff_priority__gt = self.tariff_priority, abon=self.abon)
-                next_tarifs = [tr for tr in ats if tr.tariff_priority > at.tariff_priority][:2]
-                #next_tarifs = filter(lambda tr: tr.tariff_priority > at.tariff_priority, ats)[:2]
-
-                # и если что-нибудь из списка следующих услуг вернулось - то активируем
-                if len(next_tarifs) > 0:
-                    next_tarifs[0].activate(author)
-
-                # удаляем запись о текущей услугу.
-                at.delete()
-                return
+    # Производим расчёт услуги абонента, т.е. завершаем если пришло время
+    def bill_service(self, author):
+        abon_tariff = self.active_tariff()
+        nw = timezone.now()
+        # если услуга просрочена
+        if nw > abon_tariff.deadline:
+            print("Service %s for user %s is overdued, end service" % (abon_tariff.tariff, self))
+            abon_tariff.delete()
 
     # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
-        ats = AbonTariff.objects.filter(abon=self).exclude(time_start=None)
-        if not ats or ats.count() < 1:
+        abon_tariff = self.active_tariff()
+        if abon_tariff is None:
             return False
-        trf = ats[0].tariff
-        ct = trf.get_calc_type()(ats[0])
-        if ct.manage_access(self):
-            return True
-        else:
-            return False
+        trf = abon_tariff.tariff
+        ct = trf.get_calc_type()(abon_tariff)
+        return ct.manage_access(self)
 
     # создаём абонента из структуры агента
     def build_agent_struct(self):
@@ -332,31 +223,20 @@ class Abon(UserProfile):
             user_ip = ip2int(self.ip_address)
         else:
             return
-        inst_tariff = self.active_tariff()
-        if inst_tariff:
-            agent_trf = TariffStruct(inst_tariff.id, inst_tariff.speedIn, inst_tariff.speedOut)
-        else:
+        abon_tariff = self.active_tariff()
+        if abon_tariff is None:
             agent_trf = TariffStruct()
+        else:
+            trf = abon_tariff.tariff
+            agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
     def save(self, *args, **kwargs):
         # проверяем не-ли у кого такого-же ip
-        if Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
+        if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
-
-
-class AbonDevice(models.Model):
-    abon = models.ForeignKey(Abon)
-    device = models.ForeignKey('devapp.Device')
-
-    def __str__(self):
-        return "%s - %s" % (self.abon, self.device)
-
-    class Meta:
-        db_table = 'abon_device'
-        unique_together = ('abon', 'device')
 
 
 class PassportInfo(models.Model):
@@ -437,7 +317,7 @@ class AbonRawPassword(models.Model):
 def abon_post_save(sender, instance, **kwargs):
     timeout = None
     if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = 14400
+        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
     agent_abon = instance.build_agent_struct()
     if agent_abon is None:
         return True
@@ -468,40 +348,14 @@ def abon_del_signal(sender, instance, **kwargs):
         return True
 
 
-def abontariff_post_save(sender, instance, **kwargs):
-    # Тут или подключение абону услуги, или изменение приоритета
-    if not kwargs['created']:
-        # если изменение приоритета то не говорим об этом NAS'у
-        return
-    if instance.abon.ip_address is None:
-        return
-    try:
-        agent_abon = instance.abon.build_agent_struct()
-        if agent_abon is None:
-            return True
-        tm = Transmitter()
-        tm.update_user(agent_abon)
-    except (NasFailedResult, NasNetworkError):
-        return True
-
-
-def abontariff_del_signal(sender, instance, **kwargs):
-    if not instance.is_started():
-        # если удаляем не активную услугу то говорить об этом NAS'у не обязательно
-        return
-    if instance.abon.ip_address is None:
-        # если у абонента нет ip то и создавать правило не на кого
-        return
-    try:
-        agent_abon = instance.abon.build_agent_struct()
-        tm = Transmitter()
-        tm.pause_user(agent_abon)
-    except (NasFailedResult, NasNetworkError):
-        return True
+def abon_tariff_post_init(sender, instance, **kwargs):
+    if getattr(instance, 'time_start') is None:
+        instance.time_start = timezone.now()
+    calc_obj = instance.tariff.get_calc_type()(instance)
+    if getattr(instance, 'deadline') is None:
+        instance.deadline = calc_obj.calc_deadline()
 
 
 models.signals.post_save.connect(abon_post_save, sender=Abon)
 models.signals.post_delete.connect(abon_del_signal, sender=Abon)
-
-models.signals.post_save.connect(abontariff_post_save, sender=AbonTariff)
-models.signals.post_delete.connect(abontariff_del_signal, sender=AbonTariff)
+models.signals.post_init.connect(abon_tariff_post_init, sender=AbonTariff)

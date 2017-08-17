@@ -62,13 +62,15 @@ def allpay(request):
             pays = AllTimePayLog.objects.filter(pay_id=pay_id)
             if pays.count() > 0:
                 return bad_ret(-100)
+
+            # тут в author передаём учётку абонента, т.к. это он сам через терминал пополняет
+            abon.add_ballance(abon, pay_amount, comment='AllPay %.2f' % pay_amount)
+            abon.save(update_fields=['ballance'])
+
             AllTimePayLog.objects.create(
                 pay_id=pay_id,
                 summ=pay_amount
             )
-            # тут в author передаём учётку абонента, т.к. это он сам через терминал пополняет
-            abon.add_ballance(abon, pay_amount, comment='AllPay %.2f' % pay_amount)
-            abon.save(update_fields=['ballance'])
             current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
             return "<?xml version='1.0' encoding='UTF-8'?>" \
                    "<pay-response>\n" +\

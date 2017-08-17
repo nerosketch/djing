@@ -6,6 +6,8 @@ from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
 from datetime import date
+
+from .handle import TaskException
 from .models import Task
 from mydefs import pag_mn, only_admins, safe_int, MultipleException, RuTimedelta
 from .forms import TaskFrm
@@ -23,10 +25,10 @@ def home(request):
 
 @login_required
 @only_admins
-def active_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user, state='C')  # На выполнении
+def failed_tasks(request):
+    tasks = Task.objects.filter(recipients=request.user, state='C')  # Проваленные
     tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_active.html', {
+    return render(request, 'taskapp/tasklist_failed.html', {
         'tasks': tasks
     })
 
@@ -152,6 +154,8 @@ def task_add_edit(request, task_id=0):
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except TaskException as e:
+        messages.error(request, e)
 
     return render(request, 'taskapp/add_edit_task.html', {
         'form': frm,
@@ -169,14 +173,16 @@ def task_finish(request, task_id):
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except TaskException as e:
+        messages.error(request, e)
     return redirect('taskapp:home')
 
 
 @login_required
 @only_admins
-def task_begin(request, task_id):
+def task_failed(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    task.begin(request.user)
+    task.do_fail(request.user)
     return redirect('taskapp:home')
 
 
@@ -189,4 +195,6 @@ def remind(request, task_id):
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except TaskException as e:
+        messages.error(request, e)
     return redirect('taskapp:home')
