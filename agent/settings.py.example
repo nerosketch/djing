@@ -10,6 +10,7 @@ KEYFILE = "/etc/ssl/server.key"
 # Использовать-ли при передаче инфы между NAS и основным сервером SSL
 IS_USE_SSL = False
 
+# Адрес, порт, логин и пароль сервера NAS
 NAS_IP = '<NAS IP>'
 NAS_LOGIN = 'admin'
 NAS_PASSW = '<PASSWORD>'
