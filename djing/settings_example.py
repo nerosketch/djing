@@ -166,3 +166,5 @@ DIALING_MEDIA = 'path/to/asterisk_records'
 DHCP_TIMEOUT = 14400
 
 DEFAULT_SNMP_PASSWORD = 'public'
+
+TELEGRAM_BOT_TOKEN = 'bot token'

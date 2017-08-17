@@ -8,8 +8,9 @@ from urllib3.exceptions import ProtocolError
 from .models import TelegramBot, ChatException
 from chatbot.models import MessageHistory
 from accounts_app.models import UserProfile
+from django.conf import settings
 
-token = '285129725:AAF9Si5_b1n1_cN3vJtwXt0gkgsqKBptut4'
+token = getattr(settings, 'TELEGRAM_BOT_TOKEN')
 
 
 class DjingTelebot(helper.ChatHandler):
