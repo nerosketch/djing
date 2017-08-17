@@ -4,7 +4,11 @@
 
 На ArchLinux нужые пакеты можно установить так:
 ```
-# pacman -Sy mariadb-clients python3 python-pip nginx uwsgi
+# pacman -Sy mariadb-clients python3 python-pip nginx uwsgi redis
+```
+На Fedora нужые пакеты можно установить так:
+```
+# dnf install 
 ```
 Дальше ставим всё для python через pip:
 ```
@@ -77,4 +81,6 @@
 
 ### Настраиваем системные утилиты
 Если ваша система работает с поддержкой *systemd* то в каталоге *systemd_units* проекта вы найдёте юниты для systemd.
-Скопируйте их в каталог юнитов systemd
+Скопируйте их в каталог юнитов systemd, у меня это путь */etc/systemd/system*.
+
+А теперь запустим 
