@@ -97,7 +97,7 @@ class BaseTransmitter(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
+    @check_input_type(str)
     def ping(self, host, count=10):
         """
         :param host: ip адрес в текстовом виде, например '192.168.0.1'
