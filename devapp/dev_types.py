@@ -179,9 +179,9 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
 class EltexPort(BasePort):
 
-    def __init__(self, num, name, status, mac, speed, snmpWorker):
-        BasePort.__init__(self, num, name, status, mac, speed)
-        assert issubclass(snmpWorker.__class__ , SNMPBaseWorker)
+    def __init__(self, snmpWorker, *args, **kwargs):
+        BasePort.__init__(self, *args, **kwargs)
+        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
         self.snmp_worker = snmpWorker
 
     # выключаем этот порт
@@ -213,13 +213,13 @@ class EltexSwitch(DLinkDevice):
         speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
         res = []
         for n in range(28):
-            res.append(EltexPort(
+            res.append(EltexPort(self,
                 n+1,
                 '',#nams[n] if len(nams) > 0 else _('does not fetch the name'),
                 True if int(stats[n]) == 1 else False,
                 '',#macs[n] if len(macs) > 0 else _('does not fetch the mac'),
                 int(speeds[n]) if len(speeds) > 0 and int(oper_stats[n]) == 1 else 0,
-            self))
+            ))
         return res
 
     def get_device_name(self):

@@ -13,18 +13,18 @@ class NasNetworkError(Exception):
     pass
 
 
-# Проверяет входной тип на принадлежность классу.
-# Можно передать объект или коллекцию объектов
+# Проверяет входной объект на принадлежность типу.
+# Можно передать несколько типов в соответствии количеству параметров
 # В общем желание организовать строгую типизацию :)
-def check_input_type(class_or_type):
+def check_input_type(*types):
     def real_check(fn):
-        def wrapped(self, user):
-            try:
-                for usr in user:
-                    assert isinstance(usr, class_or_type)
-            except TypeError:
-                assert isinstance(user, class_or_type)
-            return fn(self, user)
+        def wrapped(self, *args):
+            if len(types) != len(args):
+                raise AttributeError("length of @types must be equivalent for length of @args")
+            for param_type, param in zip(types, args):
+                if not isinstance(param, param_type):
+                    raise TypeError("%s must be %s, but is %s" % (str(param), str(param_type), type(param)))
+            return fn(self, *args)
         return wrapped
     return real_check
 
@@ -57,39 +57,44 @@ class BaseTransmitter(metaclass=ABCMeta):
         """чтоб обновить абонента можно изменить всё кроме его uid, по uid абонент будет найден"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def pause_user(self, user):
-        """Приостановить обслуживание абонента"""
-
-    @abstractmethod
-    @check_input_type(AbonStruct)
-    def start_user(self, user):
-        """Продолжить обслуживание абонента"""
-
-    @abstractmethod
     @check_input_type(TariffStruct)
     def add_tariff_range(self, tariff_list):
-        """добавляем список тарифов в NAS"""
+        """
+        Пока не используется, зарезервировано.
+        Добавляет список тарифов в NAS
+        """
 
     @abstractmethod
     @check_input_type(TariffStruct)
     def remove_tariff_range(self, tariff_list):
-        """удаляем список тарифов по уникальным идентификаторам"""
+        """
+        Пока не используется, зарезервировано.
+        Удаляем список тарифов по уникальным идентификаторам
+        """
 
     @abstractmethod
     @check_input_type(TariffStruct)
     def add_tariff(self, tariff):
-        """добавляем тариф"""
+        """
+        Пока не используется, зарезервировано.
+        Добавляет тариф
+        """
 
     @abstractmethod
     @check_input_type(TariffStruct)
     def update_tariff(self, tariff):
-        """чтоб обновить тариф надо изменить всё кроме его tid, по tid тариф будет найден"""
+        """
+        Пока не используется, зарезервировано.
+        Чтоб обновить тариф надо изменить всё кроме его tid, по tid тариф будет найден
+        """
 
     @abstractmethod
     @check_input_type(TariffStruct)
     def remove_tariff(self, tid):
-        """удаляем тариф"""
+        """
+        :param tid: id тарифа в среде NAS сервера чтоб удалить по этому номеру
+        Пока не используется, зарезервировано.
+        """
 
     @abstractmethod
     @check_input_type(TariffStruct)
@@ -129,4 +134,3 @@ class BaseTransmitter(metaclass=ABCMeta):
             print(la)
         self.remove_user_range( list_for_del )
         self.add_user_range( list_for_add )
-

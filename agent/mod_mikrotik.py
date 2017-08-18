@@ -162,7 +162,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
     def _exec_cmd(self, cmd):
         assert isinstance(cmd, list)
-        result_iter = self.ar.talk_iter(cmd)
+        result_iter = '<not request>'#self.ar.talk_iter(cmd)
         res = []
         for rt in result_iter:
             if rt[0] == '!trap':
@@ -172,7 +172,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
     def _exec_cmd_iter(self, cmd):
         assert isinstance(cmd, list)
-        result_iter = self.ar.talk_iter(cmd)
+        result_iter = '<not request>'#self.ar.talk_iter(cmd)
         for rt in result_iter:
             if len(rt) < 2:
                 continue
@@ -377,10 +377,12 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
 class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def add_user_range(self, user_list):
+        super(MikrotikTransmitter, self).add_user_range(user_list)
         for usr in user_list:
             self.add_user(usr)
 
     def remove_user_range(self, users):
+        super(MikrotikTransmitter, self).remove_user_range(users)
         queue_ids = [usr.queue_id for usr in users if usr is not None]
         QueueManager.remove_range(self, queue_ids)
         ips = [user.ip for user in users if isinstance(user, AbonStruct)]
@@ -390,6 +392,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
     def add_user(self, user, ip_timeout=None):
+        super(MikrotikTransmitter, self).add_user(user)
         assert isinstance(user.ip, IpStruct)
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
@@ -401,6 +404,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     def remove_user(self, user):
+        super(MikrotikTransmitter, self).remove_user(user)
         QueueManager.remove(self, user)
         firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
         if firewall_ip_list_obj is not None and len(firewall_ip_list_obj) > 1:
@@ -408,6 +412,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     # обновляем основную инфу абонента
     def update_user(self, user, ip_timeout=None):
+        super(MikrotikTransmitter, self).update_user(user)
         assert isinstance(user.ip, IpStruct)
 
         # ищем ip абонента в списке ip
@@ -446,6 +451,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             QueueManager.update(self, user)
 
     def ping(self, host, count=10):
+        super(MikrotikTransmitter, self).ping(host)
         r = self._exec_cmd([
             '/ip/arp/print',
             '?address=%s' % host
@@ -459,14 +465,6 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         ])
         received, sent = int(r[-2:][0]['=received']), int(r[-2:][0]['=sent'])
         return received, sent
-
-    # приостановливаем обслуживание абонента
-    def pause_user(self, user):
-        self.remove_user(user)
-
-    # продолжаем обслуживание абонента
-    def start_user(self, user):
-        pass
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
     def add_tariff_range(self, tariff_list):
