@@ -738,6 +738,8 @@ def abon_ping(request):
     status = False
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
     try:
+        if ip is None:
+            raise mydefs.LogicError(_('Ip not passed'))
         tm = Transmitter()
         ping_result = tm.ping(ip)
         if ping_result is None:
@@ -756,7 +758,7 @@ def abon_ping(request):
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
 
-    except NasFailedResult as e:
+    except (NasFailedResult, mydefs.LogicError) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)

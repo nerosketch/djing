@@ -162,7 +162,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
     def _exec_cmd(self, cmd):
         assert isinstance(cmd, list)
-        result_iter = '<not request>'#self.ar.talk_iter(cmd)
+        result_iter = self.ar.talk_iter(cmd)
         res = []
         for rt in result_iter:
             if rt[0] == '!trap':
@@ -172,7 +172,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
     def _exec_cmd_iter(self, cmd):
         assert isinstance(cmd, list)
-        result_iter = '<not request>'#self.ar.talk_iter(cmd)
+        result_iter = self.ar.talk_iter(cmd)
         for rt in result_iter:
             if len(rt) < 2:
                 continue
