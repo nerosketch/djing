@@ -948,3 +948,6 @@ msgstr "Привязать услуги к этой группе"
 
 msgid "User that is no staff can not buy admin services"
 msgstr "Пользователь, который не является персоналом не может покупать услуги для внутренних нужд"
+
+msgid "Ip not passed"
+msgstr "Ip адрес не передан"
