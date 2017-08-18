@@ -5,7 +5,7 @@ telepot
 netaddr
 # for testing required xmltodict
 xmltodict
-mysqlclient
+PyMySQL
 easysnmp
 rq
 pid

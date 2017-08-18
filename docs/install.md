@@ -1,19 +1,49 @@
-## Установка(не завершил описание):
+## Установка:
 Работа предполагается на python3.
 Я предпочитаю запускать wsgi сервер на связке uWSGI + Nginx, так что ставить будем соответствующие пакеты.
 
-На ArchLinux нужые пакеты можно установить так:
+#####На Fedora25 нужные пакеты можно установить так:
+
+Для начала подготовим систему, очистим и обновим пакеты. Процесс обновления долгий, так что можно пойти заварить себе чай :)
 ```
-# pacman -Sy mariadb-clients python3 python-pip nginx uwsgi
+# dnf clean all
+# dnf -y update
 ```
-Дальше ставим всё для python через pip:
+
+Затем установим зависимости
 ```
-# pip install git+https://github.com/nerosketch/djing.git
+# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb uwsgi nginx redis net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config
+```
+
+Условимся что путь к папке с проектом находится по адресу: */var/www/djing*.
+Дальше создадим каталок для web, затем обновляем pip и ставим проект через pip:
+```
+# mkdir /vaw/www
+# cd /var/www
+# pip3 install --upgrade pip
+# git clone https://github.com/nerosketch/djing.git
+# pip3 install -r djing/requirements.txt
+```
+
+Скопируем конфиги из примеров в реальные:
+```
+cd /var/www/djing
+cp djing/settings_example.py djing/settings.py
+cp agent/settings.py.example agent/settings.py
+```
+
+Затем отредактируйте конфиги для своих нужд.
+
+Для удобства я создаю пользователя и группу http:http, и всё что связано с web-сервером запускаю от имени http.
+```
+groupadd -r http
+useradd -l -M -r -d /dev/null -g http -s /sbin/nologin http
+chown -R http:http /var/www
+chown -R http:http /etc/nginx
+chown -R http:http /etc/uwsgi.*
 ```
 
 ### Настройка WEB Сервера
-Условимся что путь к папке с проектом находится по адресу: </var/www/djing>
-
 Конфиг Nginx на моём рабочем сервере выглядит так:
 
     user http;
@@ -75,6 +105,20 @@
 У меня конфиг лежит по адресу /etc/uwsgi.ini
 
 
-### Настраиваем системные утилиты
+### Настраиваем демоны
 Если ваша система работает с поддержкой *systemd* то в каталоге *systemd_units* проекта вы найдёте юниты для systemd.
-Скопируйте их в каталог юнитов systemd
+Скопируйте их в каталог юнитов systemd, у меня это путь */etc/systemd/system*.
+__Настоятельно рекомендую заглянуть внутрь этих юнитов__. Проверте пути исполняемых файлов, права и прочее.
+
+А теперь включим и запустим нужные демоны
+```
+# systemctl daemon-reload
+# systemctl enable djing_queue.service
+# systemctl start djing_queue.service
+# systemctl enable djing_rotate.timer
+# systemctl start djing_rotate.timer
+# systemctl enable djing_telebot.service
+# systemctl start djing_telebot.service
+```
+Перед включением юнита *djing_telebot.service* создайте Telegram бота и впишите в файл *djing/settings.py* в переменную *TELEGRAM_BOT_TOKEN* токен вашего бота.
+С помощью этого бота вы будете получать различные сообщения из биллинга. Подробнее в инструкции к [модулю оповещений](./docs/bot.md).
