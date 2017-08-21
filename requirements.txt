@@ -1,11 +1,16 @@
 Django==1.9
 Pillow
 telepot
+
 # for mac address field
 netaddr
+
 # for testing required xmltodict
 xmltodict
-PyMySQL
+
+# Django recommended mysql client
+mysqlclient
+
 easysnmp
 rq
 pid
