@@ -103,7 +103,7 @@ def dev(request, grp, devid=0):
                 'mac_addr': request.GET.get('mac'),
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
-                'man_passw': DEFAULT_SNMP_PASSWORD
+                'man_passw': DEFAULT_SNMP_PASSWORD or ''
             })
         else:
             frm = DeviceForm(instance=devinst)
