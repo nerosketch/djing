@@ -14,7 +14,8 @@ class DevTest(TestCase):
         ports = dev.get_ports()
         print('gports')
         for port in ports:
-            assert issubclass(port.__class__, dev_types.BasePort)
+            if not issubclass(port.__class__, dev_types.BasePort):
+                raise TypeError
             print(('\tPort:', port.nm, port.st, port.mac(), port.sp))
         # Disable 2 port
         print((ports[1].disable()))

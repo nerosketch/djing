@@ -83,8 +83,8 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
         value = super(MyGenericIPAddressField, self).get_prep_value(value)
         return ip2int(value)
 
-    def to_python(self, addr):
-        return addr
+    def to_python(self, value):
+        return value
 
     def get_internal_type(self):
         return 'PositiveIntegerField'

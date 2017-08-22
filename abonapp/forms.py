@@ -70,7 +70,7 @@ class AbonForm(forms.ModelForm):
 
     def save(self, commit=True):
         raw_password = self.cleaned_data['password']
-        acc = super().save(commit=False)
+        acc = super(AbonForm, self).save(commit=False)
         acc.password = make_password(raw_password)
         if commit:
             acc.save()

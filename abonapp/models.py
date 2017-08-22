@@ -164,7 +164,8 @@ class Abon(UserProfile):
 
     # покупаем тариф
     def pick_tariff(self, tariff, author, comment=None, deadline=None):
-        assert isinstance(tariff, Tariff)
+        if not isinstance(tariff, Tariff):
+            raise TypeError
 
         amount = round(tariff.amount, 2)
 

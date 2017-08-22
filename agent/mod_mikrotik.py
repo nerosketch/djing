@@ -161,7 +161,8 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
             self.s.close()
 
     def _exec_cmd(self, cmd):
-        assert isinstance(cmd, list)
+        if not isinstance(cmd, list):
+            raise TypeError
         result_iter = self.ar.talk_iter(cmd)
         res = []
         for rt in result_iter:
@@ -171,7 +172,8 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
         return res
 
     def _exec_cmd_iter(self, cmd):
-        assert isinstance(cmd, list)
+        if not isinstance(cmd, list):
+            raise TypeError
         result_iter = self.ar.talk_iter(cmd)
         for rt in result_iter:
             if len(rt) < 2:
@@ -223,7 +225,8 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._build_shape_obj(ret[0])
 
     def add(self, user):
-        assert isinstance(user, AbonStruct)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
         return self._exec_cmd(['/queue/simple/add',
@@ -236,7 +239,8 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
                                ])
 
     def remove(self, user):
-        assert isinstance(user, AbonStruct)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         q = self.find('uid%d' % user.uid)
         if q is not None:
             return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
@@ -246,7 +250,8 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._exec_cmd(['/queue/simple/remove', '=numbers=' + ','.join(q_ids)])
 
     def update(self, user):
-        assert isinstance(user, AbonStruct)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
         queue = self.find('uid%d' % user.uid)
@@ -282,7 +287,8 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             yield int(queue[1]['=.id'].replace('*', ''), base=16)
 
     def disable(self, user):
-        assert isinstance(user, AbonStruct)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         q = self.find('uid%d' % user.uid)
         if q is None:
             self.add(user)
@@ -291,7 +297,8 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._exec_cmd(['/queue/simple/disable', '=.id=*' + getattr(q, 'queue_id', '')])
 
     def enable(self, user):
-        assert isinstance(user, AbonStruct)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         q = self.find('uid%d' % user.uid)
         if q is None:
             self.add(user)
@@ -309,7 +316,8 @@ class IpAddressListObj(IpStruct):
 class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
 
     def add(self, list_name, ip, timeout=None):
-        assert isinstance(ip, IpStruct)
+        if not isinstance(ip, IpStruct):
+            raise TypeError
         commands = [
             '/ip/firewall/address-list/add',
             '=list=%s' % list_name,
@@ -342,7 +350,8 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             ])
 
     def find(self, ip, list_name):
-        assert isinstance(ip, IpStruct)
+        if not isinstance(ip, IpStruct):
+            raise TypeError
         return self._exec_cmd([
             '/ip/firewall/address-list/print', 'where',
             '?list=%s' % list_name,
@@ -392,8 +401,9 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
     def add_user(self, user, ip_timeout=None):
-        super(MikrotikTransmitter, self).add_user(user)
-        assert isinstance(user.ip, IpStruct)
+        super(MikrotikTransmitter, self).add_user(user, ip_timeout)
+        if not isinstance(user.ip, IpStruct):
+            raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
         QueueManager.add(self, user)
@@ -412,8 +422,9 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     # обновляем основную инфу абонента
     def update_user(self, user, ip_timeout=None):
-        super(MikrotikTransmitter, self).update_user(user)
-        assert isinstance(user.ip, IpStruct)
+        super(MikrotikTransmitter, self).update_user(user, ip_timeout)
+        if not isinstance(user.ip, IpStruct):
+            raise TypeError
 
         # ищем ip абонента в списке ip
         find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)

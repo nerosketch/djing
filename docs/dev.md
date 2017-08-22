@@ -12,7 +12,8 @@ class EltexPort(BasePort):
 
     def __init__(self, snmpWorker, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
-        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
+        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+            raise TypeError
         self.snmp_worker = snmpWorker
 
     # выключаем этот порт

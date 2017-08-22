@@ -31,7 +31,8 @@ class DjingTelebot(helper.ChatHandler):
 
     # задаём вопрос пользователю, и ожидаем ответ в fn
     def _question(self, text, fn):
-        assert isinstance(fn, collections.Callable)
+        if not isinstance(fn, collections.Callable):
+            raise TypeError
         self._dialog_fn = fn
         if text is not None:
             self._sent_reply(text)
@@ -75,7 +76,8 @@ class DjingTelebot(helper.ChatHandler):
         if text in list(self.cmds.keys()):
             self.cmds[text]()
         elif self._dialog_fn is not None:
-            assert callable(self._dialog_fn)
+            if not callable(self._dialog_fn):
+                raise TypeError
             self._dialog_fn(text)
             self._dialog_fn = None
         else:
@@ -92,7 +94,8 @@ class DjingTelebot(helper.ChatHandler):
             try:
                 TelegramBot.objects.get(user=profile)
             except TelegramBot.DoesNotExist:
-                assert self._chat_id != 0
+                if self._chat_id == 0:
+                    raise ChatException('telebot.py. def question_name: Chat id is empty')
                 TelegramBot.objects.create(
                     user=profile,
                     chat_id=self._chat_id
