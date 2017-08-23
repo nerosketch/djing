@@ -15,7 +15,7 @@ def main():
     users = Abon.objects.all()
     for user in users:
         try:
-            # бдим за услугами абонента: просроченные отключить, заказанные подключить
+            # бдим за услугами абонента
             user.bill_service(user)
 
             # если нет ip то и нет смысла лезть в NAS
