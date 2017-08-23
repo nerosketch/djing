@@ -14,7 +14,7 @@ from .models import Device, Port, DeviceDBException
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm, PortForm
 from abonapp.models import AbonGroup, Abon
-from djing.settings import DEFAULT_SNMP_PASSWORD
+from django.conf import settings
 
 
 @login_required
@@ -103,7 +103,7 @@ def dev(request, grp, devid=0):
                 'mac_addr': request.GET.get('mac'),
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
-                'man_passw': DEFAULT_SNMP_PASSWORD or ''
+                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', '')
             })
         else:
             frm = DeviceForm(instance=devinst)
