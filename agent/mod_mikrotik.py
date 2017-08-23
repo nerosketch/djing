@@ -7,11 +7,11 @@ from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct
 from . import settings
-from djing.settings import DEBUG
+from django.conf import settings
 import re
 
 
-#DEBUG=True
+DEBUG = getattr(settings, 'DEBUG', False)
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'

@@ -133,6 +133,8 @@ class DjingTelebot(helper.ChatHandler):
 # Просто отправляем текст оповещения указанному админу
 def send_notify(msg_text, account):
     try:
+        if token is None:
+            raise ChatException(_('Telegram bot token not found'))
         tb = TelegramBot.objects.get(user=account)
         tbot = Bot(token)
         tbot.sendMessage(tb.chat_id, msg_text)
