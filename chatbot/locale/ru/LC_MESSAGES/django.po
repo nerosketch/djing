@@ -55,3 +55,6 @@ msgstr "Давай пинганём, напиши ip. Нужно будет по
 
 msgid "Yes, it's nice to meet% s, I will notify you about events in billing. Successful work;)"
 msgstr "Да, приятно познакомиться %s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)"
+
+msgid "Telegram bot token not found"
+msgstr "Токен для бота Telegram не найден"
