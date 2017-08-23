@@ -23,7 +23,7 @@
 Условимся что путь к папке с проектом находится по адресу: */var/www/djing*.
 Дальше создадим каталок для web, затем обновляем pip и ставим проект через pip:
 ```
-# mkdir /vaw/www
+# mkdir /var/www
 # cd /var/www
 # pip3 install --upgrade pip
 # git clone https://github.com/nerosketch/djing.git
