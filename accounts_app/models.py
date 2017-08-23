@@ -3,9 +3,12 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext as _
-
-from djing.settings import DEFAULT_PICTURE
+from django.conf import settings
 from photo_app.models import Photo
+
+
+DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/images/default-avatar.png')
+TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
 class MyUserManager(BaseUserManager):
@@ -51,7 +54,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         max_length=16,
         verbose_name=_('Telephone'),
         #unique=True,
-        validators=[RegexValidator('^\+[7,8,9,3]\d{10,11}$')]
+        validators=[RegexValidator(TELEPHONE_REGEXP)]
     )
     avatar = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
     email = models.EmailField(default='admin@example.ru')
@@ -65,13 +68,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username or self.telephone
 
-
     # Use UserManager to get the create_user method, etc.
     objects = MyUserManager()
 
     @property
     def is_staff(self):
-        "Is the user a member of staff?"
+        " Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
 

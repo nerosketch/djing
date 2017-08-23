@@ -3,9 +3,11 @@ from django.utils import timezone
 from mydefs import safe_int, safe_float
 from .models import Abon, AllTimePayLog
 from django.db import DatabaseError
+from django.conf import settings
 
 
-from djing.settings import pay_SECRET as SECRET, pay_SERV_ID as SERV_ID
+SECRET = getattr(settings, 'pay_SECRET')
+SERV_ID = getattr(settings, 'pay_SERV_ID')
 
 
 #?ACT=1&PAY_ACCOUNT=960849&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=377&SIGN=32e533a72389fe4e93746509f9d672f8
