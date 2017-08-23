@@ -5,8 +5,9 @@ import hashlib
 
 from django.db import models
 from PIL import Image
+from django.conf import settings
 
-from djing.settings import BASE_DIR
+BASE_DIR = getattr(settings, 'BASE_DIR', '.')
 
 
 class Photo(models.Model):
