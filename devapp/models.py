@@ -6,7 +6,7 @@ from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter
 from . import dev_types
 from mapapp.models import Dot
-from subprocess import call
+from subprocess import run
 from django.conf import settings
 
 
@@ -99,7 +99,7 @@ def dev_post_save_signal(sender, instance, **kwargs):
     elif grp == 79 or grp == 91:
         code = 'zrk'
     newmac = str(instance.mac_addr)
-    call(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
+    run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
 
 
 models.signals.post_save.connect(dev_post_save_signal, sender=Device)
