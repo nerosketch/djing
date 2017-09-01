@@ -10,8 +10,6 @@ from mydefs import LogicError
 
 
 def main():
-    tm = None
-
     users = Abon.objects.all()
     for user in users:
         try:
@@ -34,15 +32,17 @@ def main():
                 continue
 
             # обновляем абонента если он статический. Иначе его обновит dhcp
-            if user.opt82 is None:
-                if tm is None:
-                    tm = Transmitter()
-                tm.update_user(ab)
+            #if tm is None:
+            #    tm = Transmitter()
+            #tm.update_user(ab)
 
         except (NasNetworkError, NasFailedResult) as er:
             print("Error:", er)
         except LogicError as er:
             print("Notice:", er)
+    tm = Transmitter()
+    users = Abon.objects.filter(is_dynamic_ip=False)
+    tm.sync_nas(users)
 
 
 if __name__ == "__main__":

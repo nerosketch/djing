@@ -32,12 +32,12 @@ def check_input_type(*types):
 # Общается с NAS'ом
 class BaseTransmitter(metaclass=ABCMeta):
     @abstractmethod
-    @check_input_type(AbonStruct)
+    @check_input_type(set)
     def add_user_range(self, user_list):
         """добавляем список абонентов в NAS"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
+    @check_input_type(set)
     def remove_user_range(self, users):
         """удаляем список абонентов"""
 
