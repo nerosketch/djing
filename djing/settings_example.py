@@ -158,8 +158,8 @@ LOGOUT_URL = reverse_lazy('acc_app:logout_link')
 
 PAGINATION_ITEMS_PER_PAGE=10
 
-pay_SERV_ID = '<service id>'
-pay_SECRET = '<secret>'
+PAY_SERV_ID = '<service id>'
+PAY_SECRET = '<secret>'
 
 DIALING_MEDIA = 'path/to/asterisk_records'
 
