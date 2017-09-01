@@ -6,7 +6,7 @@ from hashlib import md5
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct
-from . import settings
+from . import settings as local_settings
 from django.conf import settings
 import re
 
@@ -144,15 +144,17 @@ class ApiRos:
 
 class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
     def __init__(self, login=None, password=None, ip=None, port=None):
-        ip = ip or settings.NAS_IP
+        ip = ip or getattr(local_settings, 'NAS_IP')
+        if ip is None:
+            raise NasNetworkError('Не передан ip адрес NAS')
         if not ping(ip):
             raise NasNetworkError('NAS %s не пингуется' % ip)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((ip, port or settings.NAS_PORT))
+            s.connect((ip, port or getattr(local_settings, 'NAS_PORT', 8728)))
             self.s = s
             self.ar = ApiRos(s)
-            self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
+            self.ar.login(login or getattr(local_settings, 'NAS_LOGIN'), password or getattr(local_settings, 'NAS_PASSW'))
         except ConnectionRefusedError:
             raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
 
