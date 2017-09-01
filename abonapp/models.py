@@ -164,7 +164,8 @@ class Abon(UserProfile):
 
     # покупаем тариф
     def pick_tariff(self, tariff, author, comment=None, deadline=None):
-        assert isinstance(tariff, Tariff)
+        if not isinstance(tariff, Tariff):
+            raise TypeError
 
         amount = round(tariff.amount, 2)
 
@@ -246,7 +247,7 @@ class PassportInfo(models.Model):
     date_of_acceptance = models.DateField()
     abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s %s" % (self.series, self.number)
 
 
@@ -330,7 +331,7 @@ def abon_post_save(sender, instance, **kwargs):
             # обновляем абонента на NAS
             tm.update_user(agent_abon, ip_timeout=timeout)
 
-    except (NasFailedResult, NasNetworkError) as e:
+    except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
         print('ERROR:', e)
         return True
 
@@ -356,6 +357,22 @@ def abon_tariff_post_init(sender, instance, **kwargs):
         instance.deadline = calc_obj.calc_deadline()
 
 
+def abontariff_pre_delete(sender, instance, **kwargs):
+    try:
+        abon = Abon.objects.get(current_tariff=instance)
+        ab = abon.build_agent_struct()
+        if ab is None:
+            return True
+        tm = Transmitter()
+        tm.remove_user(ab)
+    except Abon.DoesNotExist:
+        print('ERROR: Abon.DoesNotExist')
+    except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+        print('NetErr:', e)
+        return True
+
+
 models.signals.post_save.connect(abon_post_save, sender=Abon)
 models.signals.post_delete.connect(abon_del_signal, sender=Abon)
 models.signals.post_init.connect(abon_tariff_post_init, sender=AbonTariff)
+models.signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)

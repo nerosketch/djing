@@ -19,7 +19,8 @@ class Tariff(models.Model):
         ob = [TC for TC in TARIFF_CHOICES if TC[0] == self.calc_type]
         if len(ob) > 0:
             res_type = ob[0][1]
-            assert issubclass(res_type, TariffBase)
+            if not issubclass(res_type, TariffBase):
+                raise TypeError
             return res_type
 
     def calc_deadline(self):

@@ -38,7 +38,8 @@ class IpStruct(BaseStruct):
         return self.__ip
 
     def __eq__(self, other):
-        assert isinstance(other, IpStruct)
+        if not isinstance(other, IpStruct):
+            raise TypeError('Instance must be IpStruct')
         return self.__ip == other.__ip
 
     def __int__(self):
@@ -100,8 +101,10 @@ class AbonStruct(BaseStruct):
     def serialize(self):
         if self.tariff is None:
             return
-        assert isinstance(self.tariff, TariffStruct)
-        assert isinstance(self.ip, IpStruct)
+        if not isinstance(self.tariff, TariffStruct):
+            raise TypeError('Instance must be TariffStruct')
+        if not isinstance(self.ip, IpStruct):
+            raise TypeError('Instance must be IpStruct')
         dt = pack("!LII?", self.uid, int(self.ip), self.tariff.tid, self.is_active)
         return dt
 
@@ -110,13 +113,15 @@ class AbonStruct(BaseStruct):
         self.uid = dt[0]
         self.ip = IpStruct(dt[1])
         if tariff is not None:
-            assert isinstance(tariff, TariffStruct)
+            if not isinstance(tariff, TariffStruct):
+                raise TypeError
             self.tariff = tariff
         self.is_active = dt['3']
         return self
 
     def __eq__(self, other):
-        assert isinstance(other, AbonStruct)
+        if not isinstance(other, AbonStruct):
+            raise TypeError
         r = self.uid == other.uid and self.ip == other.ip
         r = r and self.tariff == other.tariff
         return r
@@ -147,5 +152,6 @@ class ShapeItem(BaseStruct):
         return self
 
     def __eq__(self, other):
-        assert isinstance(other, ShapeItem)
+        if not isinstance(other, ShapeItem):
+            raise TypeError
         return self.sid == other.sid and self.abon == other.abon

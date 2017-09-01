@@ -19,8 +19,6 @@ class NasNetworkError(Exception):
 def check_input_type(*types):
     def real_check(fn):
         def wrapped(self, *args):
-            if len(types) != len(args):
-                raise AttributeError("length of @types must be equivalent for length of @args")
             for param_type, param in zip(types, args):
                 if not isinstance(param, param_type):
                     raise TypeError("%s must be %s, but is %s" % (str(param), str(param_type), type(param)))
@@ -97,7 +95,7 @@ class BaseTransmitter(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    @check_input_type(str)
+    @check_input_type(str, int)
     def ping(self, host, count=10):
         """
         :param host: ip адрес в текстовом виде, например '192.168.0.1'

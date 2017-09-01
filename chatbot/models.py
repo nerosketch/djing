@@ -1,5 +1,7 @@
 from django.db import models
-from djing.settings import AUTH_USER_MODEL
+from django.conf import settings
+
+AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL')
 
 
 class ChatException(Exception):

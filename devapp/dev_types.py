@@ -9,7 +9,8 @@ class DLinkPort(BasePort):
 
     def __init__(self, num, name, status, mac, speed, snmpWorker):
         BasePort.__init__(self, num, name, status, mac, speed)
-        assert issubclass(snmpWorker.__class__ , SNMPBaseWorker)
+        if not issubclass(snmpWorker.__class__ , SNMPBaseWorker):
+            raise TypeError
         self.snmp_worker = snmpWorker
 
     # выключаем этот порт
@@ -79,7 +80,8 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 class ONUdev(BasePort):
     def __init__(self, num, name, status, mac, speed, signal, snmpWorker):
         super(ONUdev, self).__init__(num, name, status, mac, speed)
-        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
+        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+            raise TypeError
         self.snmp_worker = snmpWorker
         self.signal = signal
 
@@ -181,7 +183,8 @@ class EltexPort(BasePort):
 
     def __init__(self, snmpWorker, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
-        assert issubclass(snmpWorker.__class__, SNMPBaseWorker)
+        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+            raise TypeError
         self.snmp_worker = snmpWorker
 
     # выключаем этот порт

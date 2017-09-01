@@ -10,8 +10,11 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import models
-from djing.settings import PAGINATION_ITEMS_PER_PAGE, DEBUG
+from django.conf import settings
 
+
+PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+DEBUG = getattr(settings, 'DEBUG', False)
 
 ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
@@ -83,8 +86,8 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
         value = super(MyGenericIPAddressField, self).get_prep_value(value)
         return ip2int(value)
 
-    def to_python(self, addr):
-        return addr
+    def to_python(self, value):
+        return value
 
     def get_internal_type(self):
         return 'PositiveIntegerField'
