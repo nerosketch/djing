@@ -8,7 +8,7 @@ from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNet
 from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
-from djing import settings
+from django.conf import settings
 
 
 class AbonGroup(models.Model):
@@ -226,7 +226,7 @@ class Abon(UserProfile):
             return
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
-            agent_trf = TariffStruct()
+            agent_trf = None
         else:
             trf = abon_tariff.tariff
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
