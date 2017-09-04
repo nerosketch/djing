@@ -203,6 +203,8 @@ class Abon(UserProfile):
     # Производим расчёт услуги абонента, т.е. завершаем если пришло время
     def bill_service(self, author):
         abon_tariff = self.active_tariff()
+        if abon_tariff is None:
+            return
         nw = timezone.now()
         # если услуга просрочена
         if nw > abon_tariff.deadline:
