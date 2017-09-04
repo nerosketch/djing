@@ -124,11 +124,13 @@ class BaseTransmitter(metaclass=ABCMeta):
 
     def sync_nas(self, users_from_db):
         list_for_add, list_for_del = self._diff_users(users_from_db)
-        print('FOR DELETE')
-        for ld in list_for_del:
-            print(ld)
-        print('FOR ADD')
-        for la in list_for_add:
-            print(la)
-        self.remove_user_range( list_for_del )
-        self.add_user_range( list_for_add )
+        if len(list_for_del) > 0:
+            print('FOR DELETE')
+            for ld in list_for_del:
+                print(ld)
+            self.remove_user_range(list_for_del)
+        if len(list_for_add) > 0:
+            print('FOR ADD')
+            for la in list_for_add:
+                print(la)
+            self.add_user_range(list_for_add)
