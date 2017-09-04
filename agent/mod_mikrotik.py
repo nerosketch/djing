@@ -274,8 +274,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
 
     # читаем шейпер, возващаем записи о шейпере
     def read_queue_iter(self):
-        queues = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
-        for queue in queues:
+        for queue in self._exec_cmd_iter(['/queue/simple/print', '=detail']):
             if queue[0] == '!done': return
             sobj = self._build_shape_obj(queue[1])
             if sobj is not None:
@@ -348,7 +347,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         if len(ids) > 0:
             return self._exec_cmd([
                 '/ip/firewall/address-list/remove',
-                'numbers=' + ','.join(ids)
+                '=numbers=*%s' % ',*'.join(ids)
             ])
 
     def find(self, ip, list_name):
@@ -361,10 +360,14 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         ])
 
     def read_ips_iter(self, list_name):
-        return self._exec_cmd([
+        ips = self._exec_cmd_iter([
             '/ip/firewall/address-list/print', 'where',
-            '?list=%s' % list_name
+            '?list=%s' % list_name,
+            '?dynamic=no'
         ])
+        for code, dat in ips:
+            if dat != {}:
+                yield IpAddressListObj(dat['=address'], dat['=.id'])
 
     def disable(self, user):
         r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
@@ -500,6 +503,15 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def read_users(self):
         # shapes is ShapeItem
-        # allowed_ips = IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED)
-        queues = QueueManager.read_queue_iter(self)
+        allowed_ips = set(IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED))
+        queues = set(q for q in QueueManager.read_queue_iter(self) if q.ip in allowed_ips)
+
+        ips_from_queues = set([q.ip for q in queues])
+        allowed_ips = set(allowed_ips)
+
+        # удаляем ip адреса которые есть в firewall/address-list и нет соответствующих в queues
+        diff = list(allowed_ips - ips_from_queues)
+        if len(diff) > 0:
+            IpAddressListManager.remove_range(self, diff)
+
         return queues
