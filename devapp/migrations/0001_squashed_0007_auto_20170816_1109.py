@@ -10,8 +10,6 @@ import mydefs
 
 class Migration(migrations.Migration):
 
-    replaces = [('devapp', '0001_initial'), ('devapp', '0002_auto_20160909_1018'), ('devapp', '0003_device_map_dot'), ('devapp', '0004_device_user_group'), ('devapp', '0005_auto_20170502_2232'), ('devapp', '0006_auto_20170705_1403'), ('devapp', '0007_auto_20170816_1109')]
-
     initial = True
 
     dependencies = [

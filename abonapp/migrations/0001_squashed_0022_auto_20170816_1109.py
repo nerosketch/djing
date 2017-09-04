@@ -12,8 +12,6 @@ import re
 
 class Migration(migrations.Migration):
 
-    replaces = [('abonapp', '0001_initial'), ('abonapp', '0002_auto_20161206_2135'), ('abonapp', '0003_abongroup_profiles'), ('abonapp', '0004_auto_20161220_0102'), ('abonapp', '0005_auto_20161226_0054'), ('abonapp', '0006_auto_20170128_1626'), ('abonapp', '0007_auto_20170131_1650'), ('abonapp', '0008_auto_20170209_0002'), ('abonapp', '0009_abontariff_death_line'), ('abonapp', '0010_auto_20170220_1630'), ('abonapp', '0011_auto_20170222_2224'), ('abonapp', '0012_auto_20170227_1718'), ('abonapp', '0013_abongroup_tariffs'), ('abonapp', '0014_auto_20170330_1452'), ('abonapp', '0015_passportinfo'), ('abonapp', '0016_auto_20170415_1311'), ('abonapp', '0017_auto_20170416_1029'), ('abonapp', '0018_auto_20170418_1236'), ('abonapp', '0019_abon_ip_address'), ('abonapp', '0020_auto_20170517_1655'), ('abonapp', '0021_auto_20170705_1403'), ('abonapp', '0022_auto_20170816_1109')]
-
     initial = True
 
     dependencies = [
