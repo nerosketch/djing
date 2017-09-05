@@ -871,6 +871,53 @@ def street_del(request, gid, sid):
     return redirect('abonapp:people_list', gid)
 
 
+@login_required
+@mydefs.only_admins
+def tels(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    telephones = abon.additional_telephones.all()
+    return render_to_text('abonapp/modal_additional_telephones.html', {
+        'telephones': telephones,
+        'gid': gid,
+        'uid': uid
+    }, request=request)
+
+
+@login_required
+@permission_required('abnapp.add_additionaltelephone')
+def tel_add(request, gid, uid):
+    if request.method == 'POST':
+        frm = forms.AdditionalTelephoneForm(request.POST)
+        if frm.is_valid():
+            new_tel = frm.save(commit=False)
+            abon = get_object_or_404(models.Abon, pk=uid)
+            new_tel.abon = abon
+            new_tel.save()
+            messages.success(request, _('New telephone has been saved'))
+            return redirect('abonapp:abon_home', gid, uid)
+        else:
+            messages.error(request, _('fix form errors'))
+    else:
+        frm = forms.AdditionalTelephoneForm()
+    return render_to_text('abonapp/modal_add_phone.html', {
+        'form': frm,
+        'gid': gid,
+        'uid': uid
+    }, request=request)
+
+
+@login_required
+@permission_required('abnapp.delete_additionaltelephone')
+def tel_del(request, gid, uid):
+    try:
+        tid = mydefs.safe_int(request.GET.get('tid'))
+        tel = models.AdditionalTelephone.objects.get(pk=tid)
+        tel.delete()
+        messages.success(request, _('Additional telephone successfully deleted'))
+    except models.AdditionalTelephone.DoesNotExist:
+        messages.error(request, _('Telephone not found'))
+    return redirect('abonapp:abon_home', gid, uid)
+
 
 # API's
 

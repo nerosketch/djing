@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.db import models
 from django.core import validators
@@ -9,6 +10,9 @@ from tariff_app.models import Tariff
 from accounts_app.models import UserProfile
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from django.conf import settings
+
+
+TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
 class AbonGroup(models.Model):
@@ -21,6 +25,8 @@ class AbonGroup(models.Model):
         permissions = (
             ('can_add_ballance', _('fill account')),
         )
+        verbose_name = _('Abon group')
+        verbose_name_plural = _('Abon groups')
 
     def __str__(self):
         return self.title
@@ -68,6 +74,8 @@ class AbonTariff(models.Model):
         permissions = (
             ('can_complete_service', _('finish service perm')),
         )
+        verbose_name = _('Abon service')
+        verbose_name_plural = _('Abon services')
 
 
 class AbonStreet(models.Model):
@@ -79,6 +87,8 @@ class AbonStreet(models.Model):
 
     class Meta:
         db_table = 'abon_street'
+        verbose_name = _('Street')
+        verbose_name_plural = _('Streets')
 
 
 class ExtraFieldsModel(models.Model):
@@ -146,6 +156,8 @@ class Abon(UserProfile):
             ('can_buy_tariff', _('Buy service perm')),
             ('can_view_passport', _('Can view passport'))
         )
+        verbose_name = _('Abon')
+        verbose_name_plural = _('Abons')
 
     # Платим за что-то
     def make_pay(self, curuser, how_match_to_pay=0.0):
@@ -315,6 +327,26 @@ class AbonRawPassword(models.Model):
 
     class Meta:
         db_table = 'abon_raw_password'
+
+
+class AdditionalTelephone(models.Model):
+    abon = models.ForeignKey(Abon, related_name='additional_telephones')
+    telephone = models.CharField(
+        max_length=16,
+        verbose_name=_('Telephone'),
+        # unique=True,
+        validators=[RegexValidator(TELEPHONE_REGEXP)]
+    )
+    owner_name = models.CharField(max_length=127)
+
+    def __str__(self):
+        return "%s - (%s)" % (self.owner_name, self.telephone)
+
+    class Meta:
+        db_table = 'additional_telephones'
+        ordering = ('owner_name',)
+        verbose_name = _('Additional telephone')
+        verbose_name_plural = _('Additional telephones')
 
 
 def abon_post_save(sender, instance, **kwargs):

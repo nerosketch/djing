@@ -31,8 +31,14 @@
                                 <div class="input-group input-group-sm">
                                     {{ form.telephone }}{{ form.telephone.errors }}
                                     <span class="input-group-btn">
-                                        <a href="sip:{{ form.telephone.value }}" class="btn btn-default" title="{% trans 'Call to' %}">
+                                        <a href="sip:{{ form.telephone.value }}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Call to' %}">
                                             <span class="glyphicon glyphicon-earphone"></span>
+                                        </a>
+                                        <a href="{% url 'abonapp:telephones' abon_group.pk abon.pk %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Additional telephones' %}">
+                                            <span class="glyphicon glyphicon-list"></span>
+                                        </a>
+                                        <a href="{% url 'abonapp:telephone_new' abon_group.pk abon.pk %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Add telephone' %}">
+                                            <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     </span>
                                 </div>

@@ -951,3 +951,45 @@ msgstr "Пользователь, который не является перс�
 
 msgid "Ip not passed"
 msgstr "Ip адрес не передан"
+
+msgid "Additional telephone"
+msgstr "Дополнительный телефон"
+
+msgid "Additional telephones"
+msgstr "Дополнительные телефоны"
+
+msgid "Abon group"
+msgstr "Группа абонентов"
+
+msgid "Abon groups"
+msgstr "Группы абонентов"
+
+msgid "Abon service"
+msgstr "Услуга абонента"
+
+msgid "Abon services"
+msgstr "Услуги абонентов"
+
+msgid "Abon"
+msgstr "Абонент"
+
+msgid "Abons"
+msgstr "Абоненты"
+
+msgid "New telephone has been saved"
+msgstr "Новый телефон сохранен"
+
+msgid "Add telephone"
+msgstr "Добавить номер телефона"
+
+msgid "Telephone owner"
+msgstr "Владелец телефона"
+
+msgid "Additional telephones not found"
+msgstr "Дополнительные телефоны не найдены"
+
+msgid "Additional telephone successfully deleted"
+msgstr "Номер телефона успешно удалён"
+
+msgid "Telephone not found"
+msgstr "Телефон не найден"
