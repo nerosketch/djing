@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('abonapp', '0001_initial'),
+        ('abonapp', '0001_squashed_0022_auto_20170816_1109'),
         ('taskapp', '0004_auto_20161202_1230'),
     ]
 
