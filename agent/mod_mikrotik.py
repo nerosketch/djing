@@ -248,8 +248,11 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
 
     def remove_range(self, q_ids):
-        if q_ids is not None and len(q_ids) > 0:
+        try:
+            q_ids = [q.queue_id for q in q_ids]
             return self._exec_cmd(['/queue/simple/remove', '=numbers=' + ','.join(q_ids)])
+        except TypeError as e:
+            print(e)
 
     def update(self, user):
         if not isinstance(user, AbonStruct):
@@ -274,9 +277,10 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
 
     # читаем шейпер, возващаем записи о шейпере
     def read_queue_iter(self):
-        for queue in self._exec_cmd_iter(['/queue/simple/print', '=detail']):
-            if queue[0] == '!done': return
-            sobj = self._build_shape_obj(queue[1])
+        for code, dat in self._exec_cmd_iter(['/queue/simple/print', '=detail']):
+            if code == '!done':
+                return
+            sobj = self._build_shape_obj(dat)
             if sobj is not None:
                 yield sobj
 
