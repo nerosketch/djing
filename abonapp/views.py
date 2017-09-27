@@ -201,13 +201,12 @@ def del_abon(request):
 
 
 @login_required
+@permission_required('abonapp.can_add_ballance')
 @atomic
 def abonamount(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
         if request.method == 'POST':
-            if not request.user.has_perm('abonapp.can_add_ballance', abon):
-                raise PermissionDenied
             abonid = mydefs.safe_int(request.POST.get('abonid'))
             if abonid == int(uid):
                 amnt = mydefs.safe_float(request.POST.get('amount'))
@@ -277,11 +276,13 @@ def abon_services(request, gid, uid):
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     abon_group = get_object_or_404(models.AbonGroup, pk=gid)
+    if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+        raise PermissionDenied
     frm = None
     passw = None
     try:
         if request.method == 'POST':
-            if not request.user.has_perm('abonapp.change_abon', abon):
+            if not request.user.has_perm('abonapp.change_abon'):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
@@ -319,8 +320,6 @@ def abonhome(request, gid, uid):
             'dev_ports': DevPort.objects.filter(device=abon.device) if abon.device else None
         })
     else:
-        if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
-            raise PermissionDenied
         return render(request, 'abonapp/viewAbon.html', {
             'abon': abon,
             'abon_group': abon_group,
@@ -374,12 +373,11 @@ def add_invoice(request, gid, uid):
 
 
 @login_required
+@permission_required('abonapp.can_buy_tariff')
 @atomic
 def pick_tariff(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
-    if not request.user.has_perm('abonapp.can_buy_tariff', abon):
-        raise PermissionDenied
     tariffs = grp.tariffs.all()
     try:
         if request.method == 'POST':
@@ -414,12 +412,11 @@ def pick_tariff(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.delete_abontariff')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
-        if not request.user.has_perm('abonapp.delete_abontariff', abon_tariff):
-            raise PermissionDenied
         abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
@@ -465,12 +462,10 @@ def task_log(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_passport')
 def passport_view(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
-        if not request.user.has_perm('abonapp.can_view_passport', abon):
-            raise PermissionDenied
         if request.method == 'POST':
             try:
                 passport_instance = models.PassportInfo.objects.get(abon=abon)
@@ -546,12 +541,11 @@ def dev(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.change_abon')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
-        if not request.user.has_perm('abonapp.change_abon', abon):
-            raise PermissionDenied
         abon.device = None
         abon.save(update_fields=['device'])
         messages.success(request, _('Device has successfully unattached'))
@@ -738,7 +732,7 @@ def dials(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.change_abon')
 def save_user_dev_port(request, gid, uid):
     if request.method != 'POST':
         messages.error(request, _('Method is not POST'))
@@ -751,8 +745,6 @@ def save_user_dev_port(request, gid, uid):
         else:
             port = DevPort.objects.get(pk=user_port)
         abon = models.Abon.objects.get(pk=uid)
-        if not request.user.has_perm('abonapp.change_abon', abon):
-            raise PermissionDenied
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
             abon.is_dynamic_ip = is_dynamic_ip
@@ -769,6 +761,7 @@ def save_user_dev_port(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.add_abonstreet')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def street_add(request, gid):
     if request.method == 'POST':
         frm = forms.AbonStreetForm(request.POST)
@@ -788,6 +781,7 @@ def street_add(request, gid):
 
 @login_required
 @permission_required('abonapp.change_abonstreet')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def street_edit(request, gid):
     try:
         if request.method == 'POST':
@@ -812,6 +806,7 @@ def street_edit(request, gid):
 
 @login_required
 @permission_required('abonapp.delete_abonstreet')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def street_del(request, gid, sid):
     try:
         models.AbonStreet.objects.get(pk=sid, group=gid).delete()
@@ -823,6 +818,7 @@ def street_del(request, gid, sid):
 
 @login_required
 @permission_required('abonapp.can_view_additionaltelephones')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def tels(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     telephones = abon.additional_telephones.all()

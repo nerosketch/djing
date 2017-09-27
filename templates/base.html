@@ -63,11 +63,13 @@
                     <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
 		</a></li>-->
 
+            {% if perms.dialing_app.change_asteriskcdr %}
             {% url 'dialapp:home' as dialhome %}
             <li{% if dialhome in request.path %} class="active"{% endif %}>
                 <a href="{{ dialhome }}">
                     <span class="glyphicon glyphicon-phone-alt"></span> Телефония
                 </a></li>
+            {% endif %}
 
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>

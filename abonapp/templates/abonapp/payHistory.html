@@ -31,8 +31,7 @@
         <tfoot>
         <tr>
             <td colspan="5" class="btn-group btn-group-sm">
-                {% get_obj_perms request.user for abon as 'fill_perm' %}
-                {% if 'abonapp.can_add_ballance' in fill_perm %}
+                {% if perms.abonapp.can_add_ballance %}
                     <a href="{% url 'abonapp:abon_amount' abon_group.pk abon.pk %}" class="btn btn-default btn-modal">
                         <span class="glyphicon glyphicon-credit-card"></span> {% trans 'Fill account' %}
                     </a>
