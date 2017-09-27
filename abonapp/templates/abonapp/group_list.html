@@ -38,7 +38,7 @@
                     <td class="btn-group">
                         {% if perms.abonapp.delete_abongroup %}
                             {% if gr.usercount == 0 %}
-                                <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.pk }}" class="btn btn-sm btn-danger">
+                                <a href="{% url 'abonapp:del_group' %}?id={{ gr.pk }}" class="btn btn-sm btn-danger">
                                     <span class="glyphicon glyphicon-remove-circle"></span>
                                 </a>
                             {% endif %}

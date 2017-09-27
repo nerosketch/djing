@@ -19,7 +19,6 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/addinvoice$', views.add_invoice, name='add_invoice'),
     url(r'^(?P<uid>\d+)/pick$', views.pick_tariff, name='pick_tariff'),
     url(r'^(?P<uid>\d+)/passport_view$', views.passport_view, name='passport_view'),
-    url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='compl_srv'),
     url(r'^(?P<uid>\d+)/chart$', views.charts, name='charts'),
     url(r'^(?P<uid>\d+)/dials$', views.dials, name='dials'),
     url(r'^(?P<uid>\d+)/extra_field$', views.make_extra_field, name='extra_field'),

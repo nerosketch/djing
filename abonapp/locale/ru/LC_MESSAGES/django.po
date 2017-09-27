@@ -389,10 +389,6 @@ msgstr "Дом"
 msgid "Is active"
 msgstr "Активен"
 
-#: abonapp/templates/abonapp/editAbon.html:106
-msgid "Send account info to user"
-msgstr "Отправить данные абоненту"
-
 #: abonapp/templates/abonapp/editAbon.html:109
 #: abonapp/templates/abonapp/editAbon.html:110
 #, fuzzy
@@ -473,7 +469,7 @@ msgstr "Принадлежность услуг к группам"
 #: abonapp/templates/abonapp/invoiceForPayment.html:10
 #: abonapp/templates/abonapp/payHistory.html:39
 msgid "Debts"
-msgstr "Долги"
+msgstr "Квитанции (долги)"
 
 #: abonapp/templates/abonapp/invoiceForPayment.html:15
 msgid "Debtor"
@@ -606,10 +602,6 @@ msgstr "Балланс"
 msgid "Subscribers not found"
 msgstr "Абоненты не найдены"
 
-#: abonapp/templates/abonapp/peoples.html:130
-msgid "Refresh subscribers on NAS"
-msgstr "Обновить абонентов в NAS"
-
 #: abonapp/templates/abonapp/peoples.html:133
 msgid "Tariffs in groups"
 msgstr "Тарифы в группах"
@@ -735,10 +727,6 @@ msgstr "Адрес"
 #: abonapp/views.py:171
 msgid "delete abon success msg"
 msgstr "Абонент успешно удалён"
-
-#: abonapp/views.py:180
-msgid "I not know what to delete"
-msgstr "Не понятно что удалять"
 
 #: abonapp/views.py:184
 #, python-format
@@ -993,3 +981,27 @@ msgstr "Номер телефона успешно удалён"
 
 msgid "Telephone not found"
 msgstr "Телефон не найден"
+
+msgid "Can view subscriber group"
+msgstr "Может просматривать группу абонентов"
+
+msgid "Permission denied"
+msgstr "Доступ запрещён"
+
+msgid "Can view subscriber logs"
+msgstr "Может видеть логи абонента"
+
+msgid "Can view invoice for payment"
+msgstr "Может видеть назначенные платежи"
+
+msgid "Debt"
+msgstr "Квитанция (долг)"
+
+msgid "Passport Info"
+msgstr "Паспортные данные"
+
+msgid "Can ping"
+msgstr "Может пинговать"
+
+msgid "Can view additional telephones"
+msgstr "Может видеть дополнительные телефоны"

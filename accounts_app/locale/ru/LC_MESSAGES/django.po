@@ -33,18 +33,6 @@ msgstr "Администраторы"
 msgid "Groups"
 msgstr "Группы"
 
-#: accounts_app/templates/accounts/group.html:16
-msgid "The current distribution of rights for groups"
-msgstr "Действующее распределение прав для группы"
-
-#: accounts_app/templates/accounts/group.html:22
-msgid "Available rights"
-msgstr "Доступные права"
-
-#: accounts_app/templates/accounts/group.html:36
-msgid "Rights for the group"
-msgstr "Права группы"
-
 #: accounts_app/templates/accounts/group.html:44
 #: accounts_app/templates/accounts/profile_chgroup.html:20
 #: accounts_app/templates/accounts/settings/ch_info.html:66
@@ -57,22 +45,6 @@ msgstr "Сохранить"
 #: accounts_app/templates/accounts/settings/ch_info.html:69
 msgid "Reset"
 msgstr "Сбросить"
-
-#: accounts_app/templates/accounts/group_list.html:11
-msgid "Admin groups list"
-msgstr "Список групп администраторов"
-
-#: accounts_app/templates/accounts/group_list.html:20
-msgid "Group"
-msgstr "Группа"
-
-#: accounts_app/templates/accounts/group_list.html:40
-msgid "Groups does not found"
-msgstr "Нет групп"
-
-#: accounts_app/templates/accounts/group_list.html:47
-msgid "Add group"
-msgstr "Добавить группу"
 
 #: accounts_app/templates/accounts/index.html:8
 #: accounts_app/templates/accounts/settings/ch_info.html:37
@@ -186,11 +158,47 @@ msgstr "Настройка прав"
 msgid "Edit"
 msgstr "Редактировать"
 
-msgid "Set a task"
-msgstr "Дать задачу"
-
 msgid "Please select an image"
 msgstr "Пожалуйста выберите изображение"
 
 msgid "Avatar successfully changed"
 msgstr "Аватар успешно изменён"
+
+msgid "Access to groups"
+msgstr "Доступ к группам"
+
+msgid "The list of user groups to which the account has access"
+msgstr "Список групп абонентов, к которым учётка имеет доступ"
+
+msgid "The responsibility of the staff of the group of subscribers"
+msgstr "Ответственность работника за группы абонентов"
+
+msgid "Not set"
+msgstr "Не найдено"
+
+msgid "Change permission for that object"
+msgstr "Изменение прав доступа для выбранного объекта"
+
+msgid "Permissions has successfully updated"
+msgstr "Права успешно обновлены"
+
+msgid "Profile is superuser, permissions to change it makes no sense"
+msgstr "Учётная запись является суперпользователем, разрешения менять нет смысла"
+
+msgid "Staff account profile"
+msgstr "Учётная запись работника"
+
+msgid "Staff account profiles"
+msgstr "Учётные записи работников"
+
+msgid "Can view staff profile"
+msgstr "Может просматривать учётку сотрудника"
+
+msgid "Pick object for edit permissions"
+msgstr "Выберите объект для редактирования прав доступа"
+
+msgid "Pick the type of object"
+msgstr "Выберите тип объекта"
+
+msgid "Profile has been deleted"
+msgstr "Учётная запись удалена"

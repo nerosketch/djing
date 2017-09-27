@@ -104,7 +104,7 @@
                         <td>{{ human.ballance }}</td>
                         <td>
                             {% if can_del_trf %}
-                                <a href="{% url 'abonapp:del_abon' %}?t=a&id={{ human.pk }}" class="btn btn-danger btn-sm">
+                                <a href="{% url 'abonapp:del_abon' %}?id={{ human.pk }}" class="btn btn-danger btn-sm">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </a>
                             {% endif %}
@@ -126,14 +126,11 @@
                     <tr>
                         <td colspan="11" class="btn-group">
                             {% if perms.abonapp.add_abon %}
-                                <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="Добавить">
+                                <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}" data-toggle="tooltip">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
                                 </a>
                             {% endif %}
-                            <a href="{% url 'abonapp:update_nas' abon_group.pk %}" class="btn btn-sm btn-default">
-                                <span class="glyphicon glyphicon-refresh"></span> {% trans 'Refresh subscribers on NAS' %}
-                            </a>
-                            <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}">
+                            <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}" data-toggle="tooltip">
                                 <span class="glyphicon glyphicon-subscript"></span> {% trans 'Tariffs in groups' %}
                             </a>
                         </td>

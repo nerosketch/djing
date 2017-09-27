@@ -1,5 +1,6 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
 {% load i18n %}
+{% load guardian_tags %}
 {% block content %}
 
     <div class="row">
@@ -108,9 +109,6 @@
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
                                 </button>
-                                <!--<a href="#" class="btn btn-default btn-sm" onclick="showPrimary('<h3>Надо ещё придумать чем будем абонентам отправлять оповещения</h3> Ну кроме смс');">
-                                    <span class="glyphicon glyphicon-send"></span> {% trans 'Send account info to user' %}
-                                </a>-->
                                 {% if perms.taskapp.add_task %}
                                     <a href="{% url 'taskapp:add' %}?uid={{ abon.username }}" class="btn btn-sm btn-success" title="{% trans 'Add new task' %}">
                                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Add new task' %}
@@ -119,7 +117,7 @@
                             </div>
                         </div>
 
-                        {% if ip %}
+                        {% if ip and perms.abonapp.can_ping %}
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
                                 <a href="{% url 'abonapp:ping' %}" class="btn btn-sm btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
@@ -134,6 +132,7 @@
             </div>
         </div>
         <div class="col-sm-6">
+            {% if perms.abonapp.change_abon %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Select the device' %}</h3>
@@ -146,7 +145,7 @@
                         <label for="id_method" class="col-sm-2 control-label">{% trans 'Device' %}</label>
                             <div class="col-sm-10 btn-group btn-group-sm">
                                 {% if device %}
-				    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %} {{ device.mac_addr }}">
+				                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %} {{ device.mac_addr }}">
                                         <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
                                     </a>
                                     <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
@@ -199,6 +198,8 @@
                     </form>
                 </div>
             </div>
+            {% endif %}
+            {% if perms.abonapp.add_extrafieldsmodel %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Extra fields' %}</h3>
@@ -242,6 +243,7 @@
                     </form>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 

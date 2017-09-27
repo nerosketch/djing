@@ -6,8 +6,7 @@ from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count, Q
 from django.db.transaction import atomic
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.contrib.auth.decorators import login_required, permission_required
-from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
@@ -23,17 +22,22 @@ from datetime import datetime, date
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel, get_dates
+from guardian.shortcuts import get_objects_for_user, assign_perm
+from guardian.decorators import permission_required_or_403 as permission_required
 
 
 @login_required
 @mydefs.only_admins
 def peoples(request, gid):
+    abon_group = get_object_or_404(models.AbonGroup, pk=gid)
+    if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+        raise PermissionDenied
     street_id = mydefs.safe_int(request.GET.get('street'))
     peoples_list = models.Abon.objects.select_related('group', 'street')
     if street_id > 0:
-        peoples_list = peoples_list.filter(group=gid, street=street_id)
+        peoples_list = peoples_list.filter(group=abon_group, street=street_id)
     else:
-        peoples_list = peoples_list.filter(group=gid)
+        peoples_list = peoples_list.filter(group=abon_group)
 
     # фильтр
     dr, field = mydefs.order_helper(request)
@@ -72,7 +76,10 @@ def addgroup(request):
         if request.method == 'POST':
             frm = forms.AbonGroupForm(request.POST)
             if frm.is_valid():
-                frm.save()
+                grp = frm.save()
+                assign_perm('abonapp.can_view_abongroup', request.user, grp)
+                assign_perm('abonapp.delete_abongroup', request.user, grp)
+                assign_perm('abonapp.change_abongroup', request.user, grp)
                 messages.success(request, _('create group success msg'))
                 return redirect('abonapp:group_list')
             else:
@@ -91,6 +98,7 @@ def addgroup(request):
 @mydefs.only_admins
 def grouplist(request):
     groups = models.AbonGroup.objects.annotate(usercount=Count('abon')).order_by('title')
+    groups = get_objects_for_user(request.user, 'abonapp.can_view_abongroup', klass=groups, accept_global_perms=False)
 
     # фильтр
     directory, field = mydefs.order_helper(request)
@@ -107,11 +115,13 @@ def grouplist(request):
 
 
 @login_required
-@permission_required('abonapp.delete_abongroup')
 def delgroup(request):
     try:
         agd = mydefs.safe_int(request.GET.get('id'))
-        get_object_or_404(models.AbonGroup, pk=agd).delete()
+        abon_group = models.AbonGroup.objects.get(pk=agd)
+        if not request.user.has_perm('abonapp.delete_abongroup', abon_group):
+            raise PermissionDenied
+        abon_group.delete()
         messages.success(request, _('delete group success msg'))
         return mydefs.res_success(request, 'abonapp:group_list')
     except (NasFailedResult, NasNetworkError) as e:
@@ -119,6 +129,8 @@ def delgroup(request):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
+    except models.AbonGroup.DoesNotExist:
+        return mydefs.res_error(request, 'Group with id=%d does not exist' % agd)
     return mydefs.res_error(request, 'abonapp:group_list')
 
 
@@ -129,10 +141,17 @@ def addabon(request, gid):
     group = None
     try:
         group = get_object_or_404(models.AbonGroup, pk=gid)
+        if not request.user.has_perm('abonapp.can_view_abongroup', group):
+            raise PermissionDenied
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST, initial={'group': group})
             if frm.is_valid():
                 abon = frm.save()
+                assign_perm("abonapp.change_abon", request.user, abon)
+                assign_perm("abonapp.delete_abon", request.user, abon)
+                assign_perm("abonapp.can_buy_tariff", request.user, abon)
+                assign_perm("abonapp.can_view_passport", request.user, abon)
+                assign_perm('abonapp.can_add_ballance', request.user, abon)
                 messages.success(request, _('create abon success msg'))
                 return redirect('abonapp:abon_home', group.id, abon.pk)
             else:
@@ -159,26 +178,18 @@ def addabon(request, gid):
 
 @login_required
 @mydefs.only_admins
-def delentity(request):
-    typ = request.GET.get('t')
+def del_abon(request):
     uid = request.GET.get('id')
     try:
-        if typ == 'a':
-            if not request.user.has_perm('abonapp.delete_abon'):
-                raise PermissionDenied
-            abon = get_object_or_404(models.Abon, pk=uid)
-            gid = abon.group.id
-            abon.delete()
-            messages.success(request, _('delete abon success msg'))
-            return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
-        elif typ == 'g':
-            if not request.user.has_perm('abonapp.delete_abongroup'):
-                raise PermissionDenied
-            get_object_or_404(models.AbonGroup, pk=uid).delete()
-            messages.success(request, _('delete group success msg'))
-            return mydefs.res_success(request, 'abonapp:group_list')
-        else:
-            messages.warning(request, _('I not know what to delete'))
+        abon = get_object_or_404(models.Abon, pk=uid)
+        if not request.user.has_perm('abonapp.delete_abon') or not request.user.has_perm(
+                'abonapp.can_view_abongroup', abon.group):
+            raise PermissionDenied
+        gid = abon.group.id
+        abon.delete()
+        messages.success(request, _('delete abon success msg'))
+        return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
+
     except NasNetworkError as e:
         messages.error(request, e)
     except NasFailedResult as e:
@@ -190,12 +201,13 @@ def delentity(request):
 
 
 @login_required
-@permission_required('abonapp.can_add_ballance')
 @atomic
 def abonamount(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
         if request.method == 'POST':
+            if not request.user.has_perm('abonapp.can_add_ballance', abon):
+                raise PermissionDenied
             abonid = mydefs.safe_int(request.POST.get('abonid'))
             if abonid == int(uid):
                 amnt = mydefs.safe_float(request.POST.get('amount'))
@@ -218,6 +230,7 @@ def abonamount(request, gid, uid):
 
 @login_required
 @mydefs.only_admins
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def invoice_for_payment(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     invoices = models.InvoiceForPayment.objects.filter(abon=abon)
@@ -231,6 +244,7 @@ def invoice_for_payment(request, gid, uid):
 
 @login_required
 @mydefs.only_admins
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def pay_history(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
@@ -246,6 +260,8 @@ def pay_history(request, gid, uid):
 @mydefs.only_admins
 def abon_services(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
+    if not request.user.has_perm('abonapp.can_view_abongroup', grp):
+        raise PermissionDenied
     abon = get_object_or_404(models.Abon, pk=uid)
 
     return render(request, 'abonapp/service.html', {
@@ -265,7 +281,7 @@ def abonhome(request, gid, uid):
     passw = None
     try:
         if request.method == 'POST':
-            if not request.user.has_perm('abonapp.change_abon'):
+            if not request.user.has_perm('abonapp.change_abon', abon):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
@@ -303,6 +319,8 @@ def abonhome(request, gid, uid):
             'dev_ports': DevPort.objects.filter(device=abon.device) if abon.device else None
         })
     else:
+        if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+            raise PermissionDenied
         return render(request, 'abonapp/viewAbon.html', {
             'abon': abon,
             'abon_group': abon_group,
@@ -356,11 +374,12 @@ def add_invoice(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.can_buy_tariff')
 @atomic
 def pick_tariff(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
+    if not request.user.has_perm('abonapp.can_buy_tariff', abon):
+        raise PermissionDenied
     tariffs = grp.tariffs.all()
     try:
         if request.method == 'POST':
@@ -395,70 +414,13 @@ def pick_tariff(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.can_complete_service')
-@atomic
-def complete_service(request, gid, uid, srvid):
-    abtar = get_object_or_404(models.AbonTariff, pk=srvid)
-    abon = abtar.abon
-    # считаем не использованные ресурсы
-    calc_obj = abtar.tariff.get_calc_type()(abtar)
-    # получаем сколько использовано
-    res_amount = calc_obj.calc_amount()
-    cashback = abtar.tariff.amount - res_amount
-
-    if abtar.abon.group is None:
-        abon.group = get_object_or_404(models.AbonGroup, pk=gid)
-        abon.save(update_fields=['group'])
-    if int(abtar.abon.pk) != int(uid) or int(abtar.abon.group.pk) != int(gid):
-        # если что-то написали в урле вручную, то вернём на путь истинный
-        return redirect('abonapp:compl_srv', gid=abtar.abon.group.pk, uid=abtar.abon.pk, srvid=srvid)
-    time_use = None
-    try:
-        if request.method == 'POST':
-            # досрочно завершаем услугу
-            if request.POST.get('finish_confirm') == 'yes':
-                if cashback > 0.5:
-                    # возвращаем деньги, которые абонент не использовал
-                    abon.add_ballance(
-                        request.user,
-                        cashback,
-                        _('Refunds for unused resources')
-                    )
-                    abon.save(update_fields=['ballance'])
-
-                # удаляем запись о текущей услуге.
-                abtar.delete()
-                messages.success(request, _('Service has been finished successfully'))
-                return redirect('abonapp:abon_services', gid, uid)
-            else:
-                raise mydefs.LogicError(_('Not confirmed'))
-
-        time_use = mydefs.RuTimedelta(timezone.now() - abtar.time_start)
-
-    except (mydefs.LogicError, NasFailedResult) as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
-        messages.warning(request, e)
-        return redirect('abonapp:abon_home', gid, uid)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-
-    return render(request, 'abonapp/complete_service.html', {
-        'abtar': abtar,
-        'abon': abon,
-        'time_use': time_use,
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
-        'tcost': round(res_amount, 4),
-        'cashback': round(cashback, 4)
-    })
-
-
-@login_required
-@permission_required('abonapp.delete_abontariff')
+@mydefs.only_admins
 def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
-        get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id)).delete()
+        abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
+        if not request.user.has_perm('abonapp.delete_abontariff', abon_tariff):
+            raise PermissionDenied
+        abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -471,7 +433,7 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_abonlog')
 def log_page(request):
     logs = models.AbonLog.objects.all()
     logs = mydefs.pag_mn(request, logs)
@@ -481,42 +443,17 @@ def log_page(request):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_invoiceforpayment')
 def debtors(request):
-    # peoples_list = models.Abon.objects.filter(invoiceforpayment__status=True)
-    # peoples_list = mydefs.pag_mn(request, peoples_list)
     invs = models.InvoiceForPayment.objects.filter(status=True)
     invs = mydefs.pag_mn(request, invs)
     return render(request, 'abonapp/debtors.html', {
-        # 'peoples': peoples_list
         'invoices': invs
     })
 
 
 @login_required
-@mydefs.only_admins
-def update_nas(request, group_id):
-    users = models.Abon.objects.filter(group=group_id)
-    try:
-        tm = Transmitter()
-        for usr in users:
-            if not usr.ip_address:
-                continue
-            agent_abon = usr.build_agent_struct()
-            if agent_abon is not None:
-                tm.update_user(agent_abon)
-    except NasFailedResult as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
-        messages.warning(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-    return redirect('abonapp:people_list', gid=group_id)
-
-
-@login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def task_log(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     tasks = Task.objects.filter(abon=abon)
@@ -532,6 +469,8 @@ def task_log(request, gid, uid):
 def passport_view(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
+        if not request.user.has_perm('abonapp.can_view_passport', abon):
+            raise PermissionDenied
         if request.method == 'POST':
             try:
                 passport_instance = models.PassportInfo.objects.get(abon=abon)
@@ -566,6 +505,8 @@ def passport_view(request, gid, uid):
 @mydefs.only_admins
 def chgroup_tariff(request, gid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
+    if not request.user.has_perm('abonapp.change_abongroup', grp):
+        raise PermissionDenied
     if request.method == 'POST':
         tr = request.POST.getlist('tr')
         grp.tariffs.clear()
@@ -579,7 +520,7 @@ def chgroup_tariff(request, gid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.change_abon')
 def dev(request, gid, uid):
     abon_dev = None
     try:
@@ -609,6 +550,8 @@ def dev(request, gid, uid):
 def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
+        if not request.user.has_perm('abonapp.change_abon', abon):
+            raise PermissionDenied
         abon.device = None
         abon.save(update_fields=['device'])
         messages.success(request, _('Device has successfully unattached'))
@@ -619,7 +562,7 @@ def clear_dev(request, gid, uid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def charts(request, gid, uid):
     high = 100
 
@@ -673,7 +616,7 @@ def charts(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.add_extra_fields_model')
+@permission_required('abonapp.add_extrafieldsmodel')
 def make_extra_field(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
@@ -733,6 +676,7 @@ def extra_field_delete(request, gid, uid, fid):
 
 
 @login_required
+@permission_required('abonapp.can_ping')
 def abon_ping(request):
     ip = request.GET.get('cmd_param')
     status = False
@@ -753,7 +697,8 @@ def abon_ping(request):
                     text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
                     status = True
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
+                        'no ping, %d/%d loses') % ping_result
             else:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
@@ -773,6 +718,8 @@ def abon_ping(request):
 @mydefs.only_admins
 def dials(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
+    if not request.user.has_perm('abonapp.can_view_abongroup', abon.group):
+        raise PermissionDenied
     if hasattr(abon.group, 'pk') and abon.group.pk != int(gid):
         return redirect('abonapp:dials', abon.group.pk, abon.pk)
     if abon.telephone is not None and abon.telephone != '':
@@ -804,6 +751,8 @@ def save_user_dev_port(request, gid, uid):
         else:
             port = DevPort.objects.get(pk=user_port)
         abon = models.Abon.objects.get(pk=uid)
+        if not request.user.has_perm('abonapp.change_abon', abon):
+            raise PermissionDenied
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
             abon.is_dynamic_ip = is_dynamic_ip
@@ -842,7 +791,8 @@ def street_add(request, gid):
 def street_edit(request, gid):
     try:
         if request.method == 'POST':
-            streets_pairs = [(int(sid), sname) for sid, sname in zip(request.POST.getlist('sid'), request.POST.getlist('sname'))]
+            streets_pairs = [(int(sid), sname) for sid, sname in
+                             zip(request.POST.getlist('sid'), request.POST.getlist('sname'))]
             for sid, sname in streets_pairs:
                 street = models.AbonStreet.objects.get(pk=sid)
                 street.name = sname
@@ -872,7 +822,7 @@ def street_del(request, gid, sid):
 
 
 @login_required
-@mydefs.only_admins
+@permission_required('abonapp.can_view_additionaltelephones')
 def tels(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     telephones = abon.additional_telephones.all()
@@ -923,17 +873,17 @@ def tel_del(request, gid, uid):
 
 def abons(request):
     ablist = [{
-        'id': abn.pk,
-        'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
-        'ip': abn.ip_address.int_ip(),
-        'is_active': abn.is_active
-    } for abn in models.Abon.objects.all()]
+                  'id': abn.pk,
+                  'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
+                  'ip': abn.ip_address.int_ip(),
+                  'is_active': abn.is_active
+              } for abn in models.Abon.objects.all()]
 
     tarlist = [{
-        'id': trf.pk,
-        'speedIn': trf.speedIn,
-        'speedOut': trf.speedOut
-    } for trf in Tariff.objects.all()]
+                   'id': trf.pk,
+                   'speedIn': trf.speedIn,
+                   'speedOut': trf.speedOut
+               } for trf in Tariff.objects.all()]
 
     data = {
         'subscribers': ablist,

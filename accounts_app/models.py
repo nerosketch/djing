@@ -43,6 +43,9 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def get_queryset(self):
+        return super(MyUserManager, self).get_queryset().filter(is_admin=True)
+
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=127, unique=True)
@@ -91,3 +94,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.get_full_name()
+
+    class Meta:
+        permissions = (
+            ('can_view_userprofile', _('Can view staff profile')),
+        )
+        verbose_name = _('Staff account profile')
+        verbose_name_plural = _('Staff account profiles')

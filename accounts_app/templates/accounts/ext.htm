@@ -22,11 +22,24 @@
                 {% endif %}
                 <div class="caption btn-group btn-group-sm">
                     {% if userprofile == request.user %}
-                    <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary btn-sm" role="button">
-                        <span class="glyphicon glyphicon-edit"></span> {% trans 'Edit' %}</a>
+                        <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary btn-sm" role="button">
+                            <span class="glyphicon glyphicon-edit"></span>
+                            {% trans 'Edit' %}
+                        </a>
                     {% endif %}
-                    <a href="#" class="btn btn-default btn-sm disabled" role="button">
-                        <span class="glyphicon glyphicon-star-empty"></span> {% trans 'Set a task' %}</a>
+                    {% if request.user.is_superuser %}
+                        {% if userprofile.is_superuser %}
+                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default btn-sm" title="{% trans 'Profile is superuser, permissions to change it makes no sense' %}" data-toggle="tooltip">
+                                <span class="glyphicon glyphicon-lock"></span>
+                                {% trans 'Permission options' %}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-lock"></span>
+                                {% trans 'Permission options' %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -46,6 +59,15 @@
                         {% trans 'Groups' %}
                     </a>
                 </li>
+                {% if request.user.is_superuser %}
+                {% url 'acc_app:set_abon_groups_permission' uid as set_ag_perm %}
+                <li{% if set_ag_perm == request.path %} class="active"{% endif %}>
+                    <a href="{{ set_ag_perm }}">
+                        <span class="glyphicon glyphicon-lock"></span>
+                        {% trans 'Access to groups' %}
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active">

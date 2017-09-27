@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.db.models.signals import post_save, post_delete, pre_delete, post_init
+from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from tariff_app.models import Tariff
-from accounts_app.models import UserProfile
+from accounts_app.models import UserProfile, MyUserManager
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from django.conf import settings
 
@@ -23,7 +25,7 @@ class AbonGroup(models.Model):
     class Meta:
         db_table = 'abonent_groups'
         permissions = (
-            ('can_add_ballance', _('fill account')),
+            ('can_view_abongroup', _('Can view subscriber group')),
         )
         verbose_name = _('Abon group')
         verbose_name_plural = _('Abon groups')
@@ -41,6 +43,9 @@ class AbonLog(models.Model):
 
     class Meta:
         db_table = 'abonent_log'
+        permissions = (
+            ('can_view_abonlog', _('Can view subscriber logs')),
+        )
 
     def __str__(self):
         return self.comment
@@ -133,6 +138,13 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
+
+class AbonManager(MyUserManager):
+
+    def get_queryset(self):
+        return super(MyUserManager, self).get_queryset().filter(is_admin=False)
+
+
 class Abon(UserProfile):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
@@ -150,11 +162,15 @@ class Abon(UserProfile):
     def active_tariff(self):
         return self.current_tariff
 
+    objects = AbonManager()
+
     class Meta:
         db_table = 'abonent'
         permissions = (
             ('can_buy_tariff', _('Buy service perm')),
-            ('can_view_passport', _('Can view passport'))
+            ('can_view_passport', _('Can view passport')),
+            ('can_add_ballance', _('fill account')),
+            ('can_ping', _('Can ping'))
         )
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
@@ -261,6 +277,11 @@ class PassportInfo(models.Model):
     date_of_acceptance = models.DateField()
     abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
 
+    class Meta:
+        db_table = 'passport_info'
+        verbose_name = _('Passport Info')
+        verbose_name_plural = _('Passport Info')
+
     def __str__(self):
         return "%s %s" % (self.series, self.number)
 
@@ -287,6 +308,11 @@ class InvoiceForPayment(models.Model):
     class Meta:
         ordering = ('date_create',)
         db_table = 'abonent_inv_pay'
+        permissions = (
+            ('can_view_invoiceforpayment', _('Can view invoice for payment')),
+        )
+        verbose_name = _('Debt')
+        verbose_name_plural = _('Debts')
 
 
 # Log for pay system "AllTime"
@@ -345,11 +371,16 @@ class AdditionalTelephone(models.Model):
     class Meta:
         db_table = 'additional_telephones'
         ordering = ('owner_name',)
+        permissions = (
+            ('can_view_additionaltelephones', _('Can view additional telephones')),
+        )
         verbose_name = _('Additional telephone')
         verbose_name_plural = _('Additional telephones')
 
 
-def abon_post_save(sender, instance, **kwargs):
+@receiver(post_save, sender=Abon)
+def abon_post_save(sender, **kwargs):
+    instance, created = kwargs["instance"], kwargs["created"]
     timeout = None
     if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
         timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
@@ -358,7 +389,7 @@ def abon_post_save(sender, instance, **kwargs):
         return True
     try:
         tm = Transmitter()
-        if kwargs['created']:
+        if created:
             # создаём абонента
             tm.add_user(agent_abon, ip_timeout=timeout)
         else:
@@ -370,9 +401,11 @@ def abon_post_save(sender, instance, **kwargs):
         return True
 
 
-def abon_del_signal(sender, instance, **kwargs):
+@receiver(post_delete, sender=Abon)
+def abon_del_signal(sender, **kwargs):
+    abon = kwargs["instance"]
     try:
-        ab = instance.build_agent_struct()
+        ab = abon.build_agent_struct()
         if ab is None:
             return True
         # подключаемся к NAS'у
@@ -383,17 +416,21 @@ def abon_del_signal(sender, instance, **kwargs):
         return True
 
 
-def abon_tariff_post_init(sender, instance, **kwargs):
-    if getattr(instance, 'time_start') is None:
-        instance.time_start = timezone.now()
-    calc_obj = instance.tariff.get_calc_type()(instance)
-    if getattr(instance, 'deadline') is None:
-        instance.deadline = calc_obj.calc_deadline()
+@receiver(post_init, sender=AbonTariff)
+def abon_tariff_post_init(sender, **kwargs):
+    abon_tariff = kwargs["instance"]
+    if getattr(abon_tariff, 'time_start') is None:
+        abon_tariff.time_start = timezone.now()
+    calc_obj = abon_tariff.tariff.get_calc_type()(abon_tariff)
+    if getattr(abon_tariff, 'deadline') is None:
+        abon_tariff.deadline = calc_obj.calc_deadline()
 
 
-def abontariff_pre_delete(sender, instance, **kwargs):
+@receiver(pre_delete, sender=AbonTariff)
+def abontariff_pre_delete(sender, **kwargs):
+    abon_tariff = kwargs["instance"]
     try:
-        abon = Abon.objects.get(current_tariff=instance)
+        abon = Abon.objects.get(current_tariff=abon_tariff)
         ab = abon.build_agent_struct()
         if ab is None:
             return True
@@ -404,9 +441,3 @@ def abontariff_pre_delete(sender, instance, **kwargs):
     except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
         print('NetErr:', e)
         return True
-
-
-models.signals.post_save.connect(abon_post_save, sender=Abon)
-models.signals.post_delete.connect(abon_del_signal, sender=Abon)
-models.signals.post_init.connect(abon_tariff_post_init, sender=AbonTariff)
-models.signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)

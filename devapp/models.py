@@ -8,6 +8,7 @@ from . import dev_types
 from mapapp.models import Dot
 from subprocess import call
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 
 DEVICE_TYPES = (
@@ -34,6 +35,11 @@ class Device(models.Model):
 
     class Meta:
         db_table = 'dev'
+        permissions = (
+            ('can_view_device', _('Can view device')),
+        )
+        verbose_name = _('Device')
+        verbose_name_plural = _('Devices')
 
     def get_abons(self):
         pass
@@ -69,6 +75,11 @@ class Port(models.Model):
     class Meta:
         db_table = 'dev_port'
         unique_together = (('device', 'num'))
+        permissions = (
+            ('can_toggle_ports', _('Can toggle ports')),
+        )
+        verbose_name = _('Port')
+        verbose_name_plural = _('Ports')
 
 
 def dev_post_save_signal(sender, instance, **kwargs):

@@ -36,13 +36,6 @@
                         {% trans 'Change self onfo' %}
                     </a>
                 </li>
-                {% if user.is_superuser %}
-                <li>
-                    <a href="#livetab_content" data-tab-remote="{% url 'acc_app:setup_perms' user.id %}">
-                        {% trans 'Permission options' %}
-                    </a>
-                </li>
-                {% endif %}
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active">

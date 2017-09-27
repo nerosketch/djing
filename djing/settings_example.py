@@ -16,6 +16,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# required for django-guardian
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # default
+    'guardian.backends.ObjectPermissionBackend'
+)
 
 # Application definition
 
@@ -38,7 +43,8 @@ INSTALLED_APPS = [
     'clientsideapp',
     'chatbot',
     'django_messages',
-    'dialing_app'
+    'dialing_app',
+    'guardian'
 ]
 
 MIDDLEWARE_CLASSES = [

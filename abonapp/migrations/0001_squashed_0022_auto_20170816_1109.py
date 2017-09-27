@@ -231,11 +231,6 @@ class Migration(migrations.Migration):
             name='tariffs',
             field=models.ManyToManyField(blank=True, related_name='tariff_groups', to='tariff_app.Tariff'),
         ),
-        migrations.AddField(
-            model_name='abon',
-            name='opt82',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='abonapp.Opt82'),
-        ),
         migrations.CreateModel(
             name='PassportInfo',
             fields=[
@@ -246,11 +241,6 @@ class Migration(migrations.Migration):
                 ('date_of_acceptance', models.DateField()),
                 ('abon', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.Abon')),
             ],
-        ),
-        migrations.AlterField(
-            model_name='abon',
-            name='opt82',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.Opt82'),
         ),
         migrations.CreateModel(
             name='AbonDevice',
@@ -281,10 +271,6 @@ class Migration(migrations.Migration):
             model_name='abon',
             name='ip_address',
             field=mydefs.MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4'),
-        ),
-        migrations.RemoveField(
-            model_name='abon',
-            name='opt82',
         ),
         migrations.AddField(
             model_name='abon',

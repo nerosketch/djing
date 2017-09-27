@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -9,6 +9,7 @@ from .models import Dot
 from .forms import DotForm
 from mydefs import pag_mn
 from devapp.models import Device
+from guardian.decorators import permission_required_or_403 as permission_required
 
 
 @login_required
