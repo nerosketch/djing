@@ -182,8 +182,11 @@ def task_finish(request, task_id):
 @login_required
 @only_admins
 def task_failed(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    task.do_fail(request.user)
+    try:
+        task = get_object_or_404(Task, id=task_id)
+        task.do_fail(request.user)
+    except TaskException as e:
+        messages.error(request, e)
     return redirect('taskapp:home')
 
 
