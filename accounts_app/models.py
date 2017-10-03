@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import os
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
@@ -7,7 +8,7 @@ from django.conf import settings
 from photo_app.models import Photo
 
 
-DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/images/default-avatar.png')
+DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
@@ -42,9 +43,6 @@ class MyUserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-
-    def get_queryset(self):
-        return super(MyUserManager, self).get_queryset().filter(is_admin=True)
 
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
@@ -82,13 +80,21 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def get_big_ava(self):
         if self.avatar:
-            return self.avatar.big()
+            path = self.avatar.big()
+            if os.path.exists(path):
+                return path
+            else:
+                return DEFAULT_PICTURE
         else:
             return DEFAULT_PICTURE
 
     def get_min_ava(self):
         if self.avatar:
-            return self.avatar.min()
+            path = self.avatar.min()
+            if os.path.exists(path):
+                return path
+            else:
+                return DEFAULT_PICTURE
         else:
             return DEFAULT_PICTURE
 

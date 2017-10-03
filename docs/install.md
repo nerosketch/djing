@@ -222,7 +222,7 @@ plugin=python3
 ```
 $ ./manage.py migrate
 Operations to perform:
-  Apply all migrations: mapapp, contenttypes, dialing_app, django_messages, taskapp, photo_app, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
+  Apply all migrations: mapapp, contenttypes, dialing_app, msg_app, taskapp, photo_app, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
 Running migrations:
   Rendering model states... DONE
   Applying mapapp.0001_initial... OK

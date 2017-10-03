@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'taskapp',
     'clientsideapp',
     'chatbot',
-    'django_messages',
+    'msg_app',
     'dialing_app',
     'guardian'
 ]
@@ -72,7 +72,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'taskapp.context_proc.get_active_tasks_count',
-                'global_context_processors.context_processor_additional_profile'
+                'global_context_processors.context_processor_additional_profile',
+                'msg_app.context_processors.get_new_messages_count'
             ],
         },
     },
@@ -155,7 +156,7 @@ DATE_FORMAT = 'd E Y'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-DEFAULT_PICTURE = '/static/images/default-avatar.png'
+DEFAULT_PICTURE = '/static/img/user_ava.gif'
 AUTH_USER_MODEL = 'accounts_app.UserProfile'
 
 LOGIN_URL = reverse_lazy('acc_app:login')

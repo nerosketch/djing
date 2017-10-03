@@ -25,7 +25,7 @@
             {% for usr in users %}
                 <tr>
                     <td><a href="{% url 'acc_app:other_profile' usr.id %}">
-                        <img width="50" src="{{ usr.avatar.min|default:"/static/img/user_ava.gif" }}"
+                        <img width="50" src="{{ usr.get_min_ava }}"
                              alt="{{ usr.username }}"/>
                     </a></td>
                     <td><a href="{% url 'acc_app:other_profile' usr.id %}">{{ usr.username }}</a></td>
@@ -39,7 +39,7 @@
                            title="Дать задание">
                             <span class="glyphicon glyphicon-tasks"></span>
                         </a>
-                        <a href="{% url 'django_messages:messages_compose' %}?a={{ usr.id }}" class="btn btn-sm btn-info"
+                        <a href="{ % url 'django_messages:messages_compose' % }?a={{ usr.id }}" class="btn btn-sm btn-info"
                            title="Отправить сообщение">
                             <span class="glyphicon glyphicon-envelope"></span>
                         </a>
