@@ -16,9 +16,7 @@
             <form action="{% url 'acc_app:setup_avatar' %}" method="post" class="thumbnail"
                   enctype="multipart/form-data">{% csrf_token %}
 
-                {% if user.avatar %}<img alt="ava" src="{{ user.avatar.min }}"/>
-                    {% else %}<img alt="ava" src="/static/img/user_ava.gif"/>
-                {% endif %}
+                <img alt="ava" src="{{ user.get_min_ava }}"/>
 
                 <div class="caption">
                     <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
@@ -36,13 +34,6 @@
                         {% trans 'Change self onfo' %}
                     </a>
                 </li>
-                {% if user.is_superuser %}
-                <li>
-                    <a href="#livetab_content" data-tab-remote="{% url 'acc_app:setup_perms' user.id %}">
-                        {% trans 'Permission options' %}
-                    </a>
-                </li>
-                {% endif %}
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active">

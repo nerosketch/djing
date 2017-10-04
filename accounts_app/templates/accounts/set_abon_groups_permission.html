@@ -1,0 +1,25 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <legend>{% trans 'The list of user groups to which the account has access' %}</legend>
+    <form action="{% url 'acc_app:set_abon_groups_permission' userprofile.pk %}" method="post" role="form">{% csrf_token %}
+        {% for ag in abongroups %}
+            <div class="checkbox">
+                <label>
+                    {% if ag.pk in picked_groups_ids %}
+                        <input name="ag" type="checkbox" value="{{ ag.pk }}" checked/>
+                    {% else %}
+                        <input name="ag" type="checkbox" value="{{ ag.pk }}"/>
+                    {% endif %}
+                    {{ ag.title }}
+                </label>
+            </div>
+        {% endfor %}
+        <div class="btn-group">
+            <input type="submit" class="btn btn-primary" value="{% trans 'Save' %}">
+            <input type="reset" class="btn btn-default" value="{% trans 'Reset' %}">
+        </div>
+    </form>
+
+{% endblock %}

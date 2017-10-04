@@ -6,7 +6,7 @@ from hashlib import md5
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping
 from .structs import TariffStruct, AbonStruct, IpStruct
-from . import settings
+from . import settings as local_settings
 from django.conf import settings
 import re
 
@@ -144,15 +144,17 @@ class ApiRos:
 
 class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
     def __init__(self, login=None, password=None, ip=None, port=None):
-        ip = ip or settings.NAS_IP
+        ip = ip or getattr(local_settings, 'NAS_IP')
+        if ip is None:
+            raise NasNetworkError('Не передан ip адрес NAS')
         if not ping(ip):
             raise NasNetworkError('NAS %s не пингуется' % ip)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((ip, port or settings.NAS_PORT))
+            s.connect((ip, port or getattr(local_settings, 'NAS_PORT', 8728)))
             self.s = s
             self.ar = ApiRos(s)
-            self.ar.login(login or settings.NAS_LOGIN, password or settings.NAS_PASSW)
+            self.ar.login(login or getattr(local_settings, 'NAS_LOGIN'), password or getattr(local_settings, 'NAS_PASSW'))
         except ConnectionRefusedError:
             raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
 
@@ -246,8 +248,11 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
 
     def remove_range(self, q_ids):
-        if q_ids is not None and len(q_ids) > 0:
+        try:
+            #q_ids = [q.queue_id for q in q_ids]
             return self._exec_cmd(['/queue/simple/remove', '=numbers=' + ','.join(q_ids)])
+        except TypeError as e:
+            print(e)
 
     def update(self, user):
         if not isinstance(user, AbonStruct):
@@ -272,10 +277,10 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
 
     # читаем шейпер, возващаем записи о шейпере
     def read_queue_iter(self):
-        queues = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
-        for queue in queues:
-            if queue[0] == '!done': return
-            sobj = self._build_shape_obj(queue[1])
+        for code, dat in self._exec_cmd_iter(['/queue/simple/print', '=detail']):
+            if code == '!done':
+                return
+            sobj = self._build_shape_obj(dat)
             if sobj is not None:
                 yield sobj
 
@@ -346,7 +351,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         if len(ids) > 0:
             return self._exec_cmd([
                 '/ip/firewall/address-list/remove',
-                'numbers=' + ','.join(ids)
+                '=numbers=*%s' % ',*'.join(ids)
             ])
 
     def find(self, ip, list_name):
@@ -359,10 +364,14 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         ])
 
     def read_ips_iter(self, list_name):
-        return self._exec_cmd([
+        ips = self._exec_cmd_iter([
             '/ip/firewall/address-list/print', 'where',
-            '?list=%s' % list_name
+            '?list=%s' % list_name,
+            '?dynamic=no'
         ])
+        for code, dat in ips:
+            if dat != {}:
+                yield IpAddressListObj(dat['=address'], dat['=.id'])
 
     def disable(self, user):
         r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
@@ -498,6 +507,15 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
 
     def read_users(self):
         # shapes is ShapeItem
-        # allowed_ips = IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED)
-        queues = QueueManager.read_queue_iter(self)
+        allowed_ips = set(IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED))
+        queues = set(q for q in QueueManager.read_queue_iter(self) if q.ip in allowed_ips)
+
+        ips_from_queues = set([q.ip for q in queues])
+        allowed_ips = set(allowed_ips)
+
+        # удаляем ip адреса которые есть в firewall/address-list и нет соответствующих в queues
+        diff = list(allowed_ips - ips_from_queues)
+        if len(diff) > 0:
+            IpAddressListManager.remove_range(self, diff)
+
         return queues

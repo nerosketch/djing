@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load acc_tags %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
+        <li class="active">{% trans 'Permission options' %}</li>
+    </ol>
+
+    <h3>{% trans 'Pick the type of object' %}</h3>
+
+    {% include 'message_block.html' %}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>{% trans 'Group' %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for klass in klasses %}
+                <tr>
+                    <td>
+                        <a href="{% url 'acc_app:perms_klasses' userprofile.pk klass %}">&lt;{{ klass }}&gt; {% klass_name klass %}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

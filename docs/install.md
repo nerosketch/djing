@@ -198,7 +198,7 @@ plugin=python3
 **PAGINATION_ITEMS_PER_PAGE** &mdash; Количество выводимых элементов списка на странце с таблицей. Например, если поставить 30,
 то на странице абонентов на одной странице будет выведено 30 строк абонентов.
 
-**pay_SERV_ID** &mdash; Эта опция, так же как и **pay_SECRET** опции для платёжной системы *AllTime24*, если вы используете любую
+**PAY_SERV_ID** &mdash; Эта опция, так же как и **PAY_SECRET** опции для платёжной системы *AllTime24*, если вы используете любую
 другую платёжную систему то можете удалить эти опции.
 
 **DIALING_MEDIA** &mdash; Путь, где биллинг сможет найти файлы записей asterisk чтоб вывести статистику звонков.
@@ -222,7 +222,7 @@ plugin=python3
 ```
 $ ./manage.py migrate
 Operations to perform:
-  Apply all migrations: mapapp, contenttypes, dialing_app, django_messages, taskapp, photo_app, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
+  Apply all migrations: mapapp, contenttypes, dialing_app, msg_app, taskapp, photo_app, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
 Running migrations:
   Rendering model states... DONE
   Applying mapapp.0001_initial... OK

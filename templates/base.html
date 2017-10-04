@@ -8,11 +8,7 @@
             <div class="col-sm-5">
 
                 <a href="{% url 'acc_app:profile' %}">
-                    {% if user.avatar %}
-                        <img alt="авка" class="img-circle img-responsive" src="{{ user.avatar.min }}"/>
-                    {% else %}
-                        <img src="/static/img/user_ava_min.gif" class="img-circle img-responsive" alt="авка"/>
-                    {% endif %}
+                    <img alt="авка" class="img-circle img-responsive" src="{{ user.get_min_ava }}"/>
                 </a>
 
             </div>
@@ -57,17 +53,22 @@
                     <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
                 </a></li>
 
-            <!--{ % url 'django_messages:messages_inbox' as privmsg_home % }
-            <li{ % if privmsg_home in request.path %} class="active"{ % endif % }>
-                <a href="{ { privmsg_home } }">
-                    <span class="glyphicon glyphicon-envelope"></span> внутренняя переписка
-		</a></li>-->
+            {% url 'msg_app:home' as privmsg_home %}
+            <li{% if privmsg_home in request.path %} class="active"{% endif %}>
+                <a href="{{ privmsg_home }}">
+                    <span class="glyphicon glyphicon-envelope"></span> Сообщения
+                    {% if new_messages_count > 0 %}
+                        <span class="badge">{{ new_messages_count }}</span>
+                    {% endif %}
+    		</a></li>
 
+            {% if perms.dialing_app.change_asteriskcdr %}
             {% url 'dialapp:home' as dialhome %}
             <li{% if dialhome in request.path %} class="active"{% endif %}>
                 <a href="{{ dialhome }}">
                     <span class="glyphicon glyphicon-phone-alt"></span> Телефония
                 </a></li>
+            {% endif %}
 
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>

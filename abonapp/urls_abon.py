@@ -19,7 +19,6 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/addinvoice$', views.add_invoice, name='add_invoice'),
     url(r'^(?P<uid>\d+)/pick$', views.pick_tariff, name='pick_tariff'),
     url(r'^(?P<uid>\d+)/passport_view$', views.passport_view, name='passport_view'),
-    url(r'^(?P<uid>\d+)/complete_service(?P<srvid>\d+)$', views.complete_service, name='compl_srv'),
     url(r'^(?P<uid>\d+)/chart$', views.charts, name='charts'),
     url(r'^(?P<uid>\d+)/dials$', views.dials, name='dials'),
     url(r'^(?P<uid>\d+)/extra_field$', views.make_extra_field, name='extra_field'),
@@ -33,5 +32,9 @@ urlpatterns = [
     url(r'^(?P<uid>\d+)/clear_dev/$', views.clear_dev, name='clear_dev'),
 
     url(r'^(?P<uid>\d+)/task_log$', views.task_log, name='task_log'),
-    url(r'^(?P<uid>\d+)/user_dev$', views.save_user_dev_port, name='save_user_dev_port')
+    url(r'^(?P<uid>\d+)/user_dev$', views.save_user_dev_port, name='save_user_dev_port'),
+
+    url(r'^(?P<uid>\d+)/tel$', views.tels, name='telephones'),
+    url(r'^(?P<uid>\d+)/tel/add$', views.tel_add, name='telephone_new'),
+    url(r'^(?P<uid>\d+)/tel/del$', views.tel_del, name='telephone_del')
 ]

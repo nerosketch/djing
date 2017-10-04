@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.utils.translation import ugettext as _
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from guardian.decorators import permission_required_or_403 as permission_required
 
 from .models import Tariff
 import mydefs

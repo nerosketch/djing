@@ -300,3 +300,12 @@ msgstr "Посмотреть устройство"
 
 msgid "Eltex switch"
 msgstr "Элтекс свич"
+
+msgid "Can view device"
+msgstr "Может видеть устройство"
+
+msgid "Device"
+msgstr "Устройство"
+
+msgid "Can toggle ports"
+msgstr "Может переключать порты"

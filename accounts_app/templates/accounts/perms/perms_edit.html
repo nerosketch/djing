@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load guardian_tags %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
+        <li><a href="{% url 'acc_app:setup_perms' userprofile.pk %}">{% trans 'Permission options' %}</a></li>
+        <li><a href="{% url 'acc_app:perms_klasses' userprofile.pk klass %}">&lt;{{ klass }}&gt; {{ klass_name }}</a>
+        </li>
+        <li class="active">{{ obj }}</li>
+    </ol>
+
+    <h3>{% trans 'Pick object for edit permissions' %}</h3>
+
+    {% include 'message_block.html' %}
+
+    {% if userprofile.is_superuser %}
+        <div class="alert alert-info alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <span class="glyphicon glyphicon-info-sign"></span>
+            {% trans 'Profile is superuser, permissions to change it makes no sense' %}
+        </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Change permission for that object' %}</h3>
+        </div>
+        <div class="panel-body">
+
+            <form role="form" action="{% url 'acc_app:perms_edit' userprofile.pk klass obj.pk %}" method="post">{% csrf_token %}
+
+            {% get_obj_perms userprofile for obj as 'obj_perms' %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="col-sm-3 control-label">{{ field.label }}</label>
+
+                    <div class="col-sm-9">
+                        <select multiple="multiple" id="{{ field.id_for_label }}" name="{{ field.html_name }}"
+                                class="form-control">
+                            {% for perm_value, perm_name in field.field.choices %}
+                                {% if perm_value in obj_perms %}
+                                    <option value="{{ perm_value }}" selected>{{ perm_name }}</option>
+                                {% else %}
+                                    <option value="{{ perm_value }}">{{ perm_name }}</option>
+                                {% endif %}
+                            {% empty %}
+                                <option value="0">{% trans 'Not set' %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                </button>
+                <button type="reset" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

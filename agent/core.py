@@ -19,8 +19,6 @@ class NasNetworkError(Exception):
 def check_input_type(*types):
     def real_check(fn):
         def wrapped(self, *args):
-            if len(types) != len(args):
-                raise AttributeError("length of @types must be equivalent for length of @args")
             for param_type, param in zip(types, args):
                 if not isinstance(param, param_type):
                     raise TypeError("%s must be %s, but is %s" % (str(param), str(param_type), type(param)))
@@ -32,12 +30,12 @@ def check_input_type(*types):
 # Общается с NAS'ом
 class BaseTransmitter(metaclass=ABCMeta):
     @abstractmethod
-    @check_input_type(AbonStruct)
+    @check_input_type(set)
     def add_user_range(self, user_list):
         """добавляем список абонентов в NAS"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
+    @check_input_type(set)
     def remove_user_range(self, users):
         """удаляем список абонентов"""
 
@@ -97,7 +95,7 @@ class BaseTransmitter(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    @check_input_type(str)
+    @check_input_type(str, int)
     def ping(self, host, count=10):
         """
         :param host: ip адрес в текстовом виде, например '192.168.0.1'
@@ -126,11 +124,13 @@ class BaseTransmitter(metaclass=ABCMeta):
 
     def sync_nas(self, users_from_db):
         list_for_add, list_for_del = self._diff_users(users_from_db)
-        print('FOR DELETE')
-        for ld in list_for_del:
-            print(ld)
-        print('FOR ADD')
-        for la in list_for_add:
-            print(la)
-        self.remove_user_range( list_for_del )
-        self.add_user_range( list_for_add )
+        if len(list_for_del) > 0:
+            print('FOR DELETE')
+            for ld in list_for_del:
+                print(ld)
+            self.remove_user_range(list_for_del)
+        if len(list_for_add) > 0:
+            print('FOR ADD')
+            for la in list_for_add:
+                print(la)
+            self.add_user_range(list_for_add)

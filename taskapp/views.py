@@ -1,11 +1,12 @@
 # coding=utf-8
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
 from datetime import date
+from guardian.decorators import permission_required_or_403 as permission_required
 
 from .handle import TaskException
 from .models import Task
@@ -181,8 +182,11 @@ def task_finish(request, task_id):
 @login_required
 @only_admins
 def task_failed(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    task.do_fail(request.user)
+    try:
+        task = get_object_or_404(Task, id=task_id)
+        task.do_fail(request.user)
+    except TaskException as e:
+        messages.error(request, e)
     return redirect('taskapp:home')
 
 

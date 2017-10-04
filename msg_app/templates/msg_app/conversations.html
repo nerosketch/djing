@@ -1,0 +1,62 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Private messages' %}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Conversations' %}</h3>
+        </div>
+        <div class="list-group">
+            {% for conv in conversations %}
+                {% with last_msg=conv.last_message %}
+                <a href="{% url 'msg_app:to_conversation' conv.pk %}" class="list-group-item">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <img src="{{ conv.author.get_min_ava }}" class="img-thumbnail">
+                        </div>
+                        <div class="col-sm-11">
+
+                            {% if last_msg %}
+                            <div class="pull-right">
+                                <small>{{ last_msg.sent_at|date:'d M, H:i:s' }}</small>
+                            </div>
+                            {% endif %}
+                            <h4>{{ conv.title }}
+                                <small>{% blocktrans with participants_count=conv.participants.count msg_count=conv.msg_count %}{{ participants_count }} participants, {{ msg_count }} messages{% endblocktrans %}</small>
+                            </h4>
+
+                            {% if last_msg %}
+                                <p>{{ last_msg.text }}</p>
+                                {% else %}
+                                <p>{% trans 'No messages found' %}</p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </a>
+                {% endwith %}
+            {% empty %}
+                <a href="#" class="list-group-item">
+                    <p class="list-group-item-text">{% trans 'Any conversations not found' %}</p>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                <a href="{% url 'msg_app:new_conversation' %}" class="btn btn-default btn-modal">
+                    <span class="glyphicon glyphicon-plus"></span> {% trans 'New' %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=conversations %}
+
+{% endblock %}

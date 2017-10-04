@@ -13,15 +13,13 @@ urlpatterns = [
 
     url(r'^log$', views.log_page, name='log'),
 
-    url(r'^del$', views.delentity, name='del_abon'),
+    url(r'^del$', views.del_abon, name='del_abon'),
 
     url(r'^pay$', views.terminal_pay, name='terminal_pay'),
 
     url(r'^debtors$', views.debtors, name='debtors'),
 
     url(r'^ping$', views.abon_ping, name='ping'),
-
-    url(r'^refresh_group_nas(?P<group_id>\d+)$', views.update_nas, name='update_nas'),
 
     # Api's
     url(r'^api/abons$', views.abons),

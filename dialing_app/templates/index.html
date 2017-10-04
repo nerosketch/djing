@@ -21,22 +21,22 @@
             <tbody>
             {% for log in logs %}
                 <tr>
-                    <td class="btn-group btn-group-sm btn-group-justify">
+                    <td class="btn-group btn-group-xs btn-group-justify">
                         <button class="btn btn-default player-btn disabled">
                             <span class="glyphicon glyphicon-play"></span>
-                            <audio preload="metadata" src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav"></audio>
+                            <audio preload="metadata" src="{{ log.path_to_media }}/{{ log.calldate|date:"Y/m/d/H_i" }}-{{ log.src }}-{{ log.dst }}.wav"></audio>
                         </button>
-                        <a href="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" class="btn btn-default disabled" target="_blank">
+			<a href="{{ log.path_to_media }}/{{ log.calldate|date:"Y/m/d/H_i" }}-{{ log.src }}-{{ log.dst }}.wav" class="btn btn-default disabled" target="_blank" title="{% trans 'Download' %}">
                             <span class="glyphicon glyphicon-download-alt"></span>
                         </a>
                     </td>
-                    <td>{{ log.calldate|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ log.calldate|date:'d M, H:i:s' }}</td>
                     <td>{{ log.src|abon_if_telephone|safe }}</td>
                     <td>{{ log.dst|abon_if_telephone|safe }}</td>
                     <td>{{ log.duration }}</td>
-                    <td>{{ log.start|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.answer|date:'d E Y, H:i:s' }}</td>
-                    <td>{{ log.end|date:'d E Y, H:i:s' }}</td>
+                    <td>{{ log.start|date:'d M, H:i:s' }}</td>
+                    <td>{{ log.answer|date:'d M, H:i:s' }}</td>
+                    <td>{{ log.end|date:'d M, H:i:s' }}</td>
                     <td>{{ log.locate_disposition }}</td>
                 </tr>
             {% empty %}

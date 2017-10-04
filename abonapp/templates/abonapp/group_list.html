@@ -38,7 +38,7 @@
                     <td class="btn-group">
                         {% if perms.abonapp.delete_abongroup %}
                             {% if gr.usercount == 0 %}
-                                <a href="{% url 'abonapp:del_group' %}?t=a&id={{ gr.pk }}" class="btn btn-sm btn-danger">
+                                <a href="{% url 'abonapp:del_group' %}?id={{ gr.pk }}" class="btn btn-sm btn-danger">
                                     <span class="glyphicon glyphicon-remove-circle"></span>
                                 </a>
                             {% endif %}
@@ -63,12 +63,16 @@
                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Add group' %}
                     </a>
                     {% endif %}
+		    {% if perms.abonapp.can_view_abonlog %}
                     <a href="{% url 'abonapp:log' %}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-record"></span> {% trans 'Subscribers actions' %}
                     </a>
+		    {% endif %}
+		    {% if perms.abonapp.can_view_invoiceforpayment %}
                     <a href="{% url 'abonapp:debtors' %}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-exclamation-sign"></span> {% trans 'List of debtors' %}
                     </a>
+		    {% endif %}
                 </td>
             </tr>
             </tfoot>

@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import os
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
@@ -7,7 +8,7 @@ from django.conf import settings
 from photo_app.models import Photo
 
 
-DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/images/default-avatar.png')
+DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
@@ -79,15 +80,31 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def get_big_ava(self):
         if self.avatar:
-            return self.avatar.big()
+            path = self.avatar.big()
+            if os.path.exists(path):
+                return path
+            else:
+                return DEFAULT_PICTURE
         else:
             return DEFAULT_PICTURE
 
     def get_min_ava(self):
         if self.avatar:
-            return self.avatar.min()
+            url_path = self.avatar.min()
+            real_path = url_path[1:]
+            if os.path.exists(real_path):
+                return url_path
+            else:
+                return DEFAULT_PICTURE
         else:
             return DEFAULT_PICTURE
 
     def __str__(self):
         return self.get_full_name()
+
+    class Meta:
+        permissions = (
+            ('can_view_userprofile', _('Can view staff profile')),
+        )
+        verbose_name = _('Staff account profile')
+        verbose_name_plural = _('Staff account profiles')

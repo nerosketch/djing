@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
+from guardian.decorators import permission_required_or_403 as permission_required
 
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
@@ -9,6 +10,7 @@ from .models import AsteriskCDR
 
 
 @login_required
+@permission_required('dialing_app.change_asteriskcdr')
 @only_admins
 def home(request):
     logs = AsteriskCDR.objects.exclude(userfield='request').order_by('-calldate')

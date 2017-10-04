@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -15,13 +15,18 @@ from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_help
 from .forms import DeviceForm, PortForm
 from abonapp.models import AbonGroup, Abon
 from django.conf import settings
+from guardian.decorators import permission_required_or_403 as permission_required
+from guardian.shortcuts import get_objects_for_user
 
 
 @login_required
 @only_admins
 def devices(request, grp):
     group = get_object_or_404(AbonGroup, pk=grp)
-    devs = Device.objects.filter(user_group=grp)
+    if not request.user.has_perm('abonapp.can_view_abongroup', group):
+        raise PermissionDenied
+    devs = Device.objects.filter(user_group=grp).only('comment', 'mac_addr', 'devtype', 'user_group', 'pk',
+                                                      'ip_address')
 
     # фильтр
     dr, field = order_helper(request)
@@ -41,7 +46,7 @@ def devices(request, grp):
 @login_required
 @only_admins
 def devices_null_group(request):
-    devs = Device.objects.filter(user_group=None)
+    devs = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
     # фильтр
     dr, field = order_helper(request)
     if field:
@@ -71,10 +76,12 @@ def devdel(request, did):
 
 
 @login_required
-@only_admins
+@permission_required('devapp.can_view_device')
 def dev(request, grp, devid=0):
-    devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
     user_group = get_object_or_404(AbonGroup, pk=grp)
+    if not request.user.has_perm('abonapp.can_view_abongroup', user_group):
+        raise PermissionDenied
+    devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
     already_dev = None
 
     if request.method == 'POST':
@@ -294,7 +301,7 @@ def add_single_port(request, grp, did):
 
 
 @login_required
-@only_admins
+@permission_required('devapp.can_view_device')
 def devview(request, did):
     ports = None
     uptime = 0
@@ -318,7 +325,7 @@ def devview(request, did):
     except DeviceDBException as e:
         messages.error(request, e)
 
-    return render(request, 'devapp/custom_dev_page/'+template_name, {
+    return render(request, 'devapp/custom_dev_page/' + template_name, {
         'dev': dev,
         'ports': ports,
         'uptime': uptime,
@@ -327,7 +334,7 @@ def devview(request, did):
 
 
 @login_required
-@only_admins
+@permission_required('devapp.can_toggle_ports')
 def toggle_port(request, did, portid, status=0):
     portid = int(portid)
     status = int(status)
@@ -338,9 +345,9 @@ def toggle_port(request, did, portid, status=0):
                 manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
                 ports = manager.get_ports()
                 if status:
-                    ports[portid-1].enable()
+                    ports[portid - 1].enable()
                 else:
-                    ports[portid-1].disable()
+                    ports[portid - 1].disable()
             else:
                 messages.warning(request, _('Not Set snmp device password'))
         else:
@@ -353,7 +360,8 @@ def toggle_port(request, did, portid, status=0):
 @login_required
 @only_admins
 def group_list(request):
-    groups = AbonGroup.objects.all()
+    groups = AbonGroup.objects.all().order_by('title')
+    groups = get_objects_for_user(request.user, 'abonapp.can_view_abongroup', klass=groups, accept_global_perms=False)
     return render(request, 'devapp/group_list.html', {
         'groups': groups
     })
@@ -365,6 +373,8 @@ def search_dev(request):
     if word is None:
         results = [{'id': 0, 'text': ''}]
     else:
-        results = Device.objects.filter(Q(comment__icontains=word) | Q(ip_address=word))[:16]
+        results = Device.objects.filter(
+            Q(comment__icontains=word) | Q(ip_address=word)
+        ).only('pk', 'ip_address', 'comment')[:16]
         results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
     return HttpResponse(dumps(results, ensure_ascii=False))

@@ -20,13 +20,11 @@ urlpatterns = [
 
     url(r'^(?P<uid>\d+)$', views.profile_show, name='other_profile'),
     url(r'^(?P<uid>\d+)/perms$', views.perms, name='setup_perms'),
+    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)$', views.perms_klasses, name='perms_klasses'),
+    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)$', views.perms_edit, name='perms_edit'),
     url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_setup_group'),
     url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile'),
 
-    # назначить задание
-    url(r'^(?P<uid>\d+)/appoint_task$', views.appoint_task, name='appoint_task'),
-
-    url(r'^group/$', views.groups, name='groups_list'),
-    url(r'^group/(?P<uid>\d+)$', views.group, name='group_link')
+    url(r'^(?P<uid>\d+)/user_group_access$', views.set_abon_groups_permission, name='set_abon_groups_permission')
 
 ]
