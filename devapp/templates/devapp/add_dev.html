@@ -101,7 +101,7 @@
                         <span class="input-group-addon"><span class="glyphicon glyphicon-hdd"></span></span>
                         <input type="hidden" name="parent_dev" class="selectajax-hid"{% if selected_parent_dev %} value="{{ selected_parent_dev.pk }}"{% endif %}>
                             <button class="selectajax-btn form-control btn btn-default hidden"></button>
-                            <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_parent_dev" placeholder="{% trans 'Find the device' %}" required>
+                            <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_parent_dev" placeholder="{% trans 'Find the device' %}">
                         <ul class="dropdown-menu selectajax-ul"></ul>{{ form.parent_dev.errors }}
                     </div>
                 </div>
