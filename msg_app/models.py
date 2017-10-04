@@ -8,7 +8,7 @@ class MessageError(Exception):
 
 
 class MessageStatus(models.Model):
-    msg = models.ForeignKey('Message')
+    msg = models.ForeignKey('Message', related_name='msg_statuses')
     user = models.ForeignKey(UserProfile, related_name='usr_msg_status')
     MESSAGE_STATES = (
         ('new', _('New')),
@@ -16,6 +16,9 @@ class MessageStatus(models.Model):
         ('del', _('Deleted'))
     )
     state = models.CharField(max_length=3, choices=MESSAGE_STATES, default='new')
+
+    def __str__(self):
+        return "%s for %s (%s)" % (self.get_state_display(), self.user, self.msg)
 
     class Meta:
         db_table = 'message_status'
@@ -30,12 +33,12 @@ class Message(models.Model):
     text = models.TextField(_("Body"))
     sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
     author = models.ForeignKey(UserProfile, related_name='messages')
-    conversation = models.ForeignKey('Conversation', verbose_name=_('Dialog'))
+    conversation = models.ForeignKey('Conversation', verbose_name=_('Conversation'))
     attachment = models.FileField(upload_to='messages_attachments/%Y_%m_%d', blank=True, null=True)
     account_status = models.ManyToManyField(UserProfile, through=MessageStatus, through_fields=('msg', 'user'))
 
     def __str__(self):
-        return self.text[9:]
+        return self.text[:9]
 
     def _set_status(self, account, code):
         try:
@@ -107,7 +110,7 @@ class ConversationManager(models.Manager):
                 title = _('No name')
             else:
                 title = ', '.join(usernames)
-        conversation = self.create(title=title)
+        conversation = self.create(title=title, author=author)
         for acc in other_participants:
             ConversationMembership.objects.create(
                 account=acc, conversation=conversation, status='adm', who_invite_that_user=author
@@ -122,12 +125,19 @@ class ConversationManager(models.Manager):
         ms_count = MessageStatus.objects.filter(user=account, state='new').count()
         return ms_count
 
+    def fetch(self, account):
+        conversations = self.filter(models.Q(author=account) | models.Q(participants__in=[account])).annotate(
+            msg_count=models.Count('message', distinct=True)
+        )
+        return conversations
+
 
 class Conversation(models.Model):
     title = models.CharField(max_length=32)
     participants = models.ManyToManyField(UserProfile, related_name='conversations',
                                           through='ConversationMembership',
                                           through_fields=('conversation', 'account'))
+    author = models.ForeignKey(UserProfile)
     date_create = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -157,13 +167,6 @@ class Conversation(models.Model):
                     continue
                 MessageStatus.objects.create(msg=msg, user=participant)
         return msg
-
-    def get_author(self):
-        try:
-            accs = ConversationMembership.objects.filter(status='inv', conversation=self)
-            return accs[0].account
-        except IndexError:
-            pass
 
     def remove_message(self, msg):
         if isinstance(msg, Message):
@@ -212,6 +215,18 @@ class Conversation(models.Model):
 
     def find_messages_by_text(self, text):
         return Message.objects.filter(text__icontains=text, conversation=self)
+
+    def _make_messages_status(self, account, status):
+        qs = MessageStatus.objects.filter(msg__conversation=self, user=account).exclude(state='del')
+        if status != 'del':
+            qs = qs.exclude(state=status)
+        return qs.update(state=status)
+
+    def make_messages_status_new(self, account):
+        return self._make_messages_status(account, 'new')
+
+    def make_messages_status_old(self, account):
+        return self._make_messages_status(account, 'old')
 
     class Meta:
         db_table = 'conversations'

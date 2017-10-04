@@ -13,7 +13,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{{ conv.title }}
-                <small>2 {% trans 'peoples' %}</small>
+                <small>{{ conv.participants.count }} {% trans 'peoples' %}</small>
             </h3>
         </div>
         <div class="list-group">
@@ -21,7 +21,12 @@
         {% with can_view_profile=perms.accounts_app.can_view_userprofile %}
             {% for msg in msg_list %}
                 {% with author=msg.author %}
-                <div class="list-group-item">
+                <div class="list-group-item clearfix">
+                    {% if msg.author == request.user %}
+                        <a href="{% url 'msg_app:remove_msg' conv.pk msg.pk %}" class="btn btn-link pull-right" title="{% trans 'Delete' %}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    {% endif %}
                     <div class="row">
                         <div class="col-sm-1">
                             {% if can_view_profile %}
@@ -66,12 +71,12 @@
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn btn-default">
+                    <button class="btn btn-default" type="submit">
                         <span class="glyphicon glyphicon-send"></span> {% trans 'Send' %}
                     </button>
-                    <button class="btn btn-default">
-                        <span class="glyphicon glyphicon-tag"></span> {% trans 'Attach' %}
-                    </button>
+                    <!--<button class="btn btn-default" type="button">
+                        <span class="glyphicon glyphicon-tag"></span> { % trans 'Attach' % }
+                    </button>-->
                 </div>
 
                 <small>Если кто-то будет пользоваться то усовершенствую личные сообщения</small>

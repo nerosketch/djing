@@ -90,9 +90,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def get_min_ava(self):
         if self.avatar:
-            path = self.avatar.min()
-            if os.path.exists(path):
-                return path
+            url_path = self.avatar.min()
+            real_path = url_path[1:]
+            if os.path.exists(real_path):
+                return url_path
             else:
                 return DEFAULT_PICTURE
         else:

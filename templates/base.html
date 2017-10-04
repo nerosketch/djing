@@ -8,11 +8,7 @@
             <div class="col-sm-5">
 
                 <a href="{% url 'acc_app:profile' %}">
-                    {% if user.avatar %}
-                        <img alt="авка" class="img-circle img-responsive" src="{{ user.avatar.min }}"/>
-                    {% else %}
-                        <img src="/static/img/user_ava_min.gif" class="img-circle img-responsive" alt="авка"/>
-                    {% endif %}
+                    <img alt="авка" class="img-circle img-responsive" src="{{ user.get_min_ava }}"/>
                 </a>
 
             </div>

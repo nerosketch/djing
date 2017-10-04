@@ -15,11 +15,11 @@
         </div>
         <div class="list-group">
             {% for conv in conversations %}
-                {% with author=conv.get_author new_count=conv.get_messages_new_count last_msg=conv.last_message %}
+                {% with last_msg=conv.last_message %}
                 <a href="{% url 'msg_app:to_conversation' conv.pk %}" class="list-group-item">
                     <div class="row">
                         <div class="col-sm-1">
-                            <img src="{{ author.get_min_ava }}" class="img-thumbnail">
+                            <img src="{{ conv.author.get_min_ava }}" class="img-thumbnail">
                         </div>
                         <div class="col-sm-11">
 
@@ -29,7 +29,7 @@
                             </div>
                             {% endif %}
                             <h4>{{ conv.title }}
-                                <small>{{ conv.participants.count }} participants{% if new_count > 0 %}, <span class="label label-primary">{{ new_count }} new</span>{% endif %}</small>
+                                <small>{% blocktrans with participants_count=conv.participants.count msg_count=conv.msg_count %}{{ participants_count }} participants, {{ msg_count }} messages{% endblocktrans %}</small>
                             </h4>
 
                             {% if last_msg %}
@@ -56,5 +56,7 @@
             </div>
         </div>
     </div>
+
+    {% include 'toolbar_page.html' with pag=conversations %}
 
 {% endblock %}

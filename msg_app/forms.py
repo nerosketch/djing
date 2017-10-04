@@ -17,7 +17,7 @@ class ConversationForm(forms.ModelForm):
 
     class Meta:
         model = Conversation
-        exclude = ['date_create']
+        exclude = ['date_create', 'author']
 
     def create(self, author):
         participants = self.cleaned_data['participants']
