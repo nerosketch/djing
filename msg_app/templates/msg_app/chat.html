@@ -1,0 +1,87 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'msg_app:home' %}">{% trans 'Private messages' %}</a></li>
+        <li class="active">{{ conv.title }}</li>
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ conv.title }}
+                <small>{{ conv.participants.count }} {% trans 'peoples' %}</small>
+            </h3>
+        </div>
+        <div class="list-group">
+
+        {% with can_view_profile=perms.accounts_app.can_view_userprofile %}
+            {% for msg in msg_list %}
+                {% with author=msg.author %}
+                <div class="list-group-item clearfix">
+                    {% if msg.author == request.user %}
+                        <a href="{% url 'msg_app:remove_msg' conv.pk msg.pk %}" class="btn btn-link pull-right" title="{% trans 'Delete' %}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-sm-1">
+                            {% if can_view_profile %}
+                                <a href="{% url 'acc_app:other_profile' author.pk %}" class="thumbnail" target="_blank" title="{{ author.get_full_name }}" data-toggle="tooltip">
+                                    <img src="{{ author.get_min_ava }}" alt="ava">
+                                </a>
+                            {% else %}
+                                <img src="{{ author.get_min_ava }}" class="img-thumbnail" alt="ava">
+                            {% endif %}
+                        </div>
+                        <div class="col-sm-11">
+                            <h5>{{ author.get_short_name }}
+                                <small>{{ msg.sent_at|date:'d M, H:i:s' }}</small>
+                            </h5>
+
+                            <p>{{ msg.text }}</p>
+                            {% if msg.attachment %}
+                                <a href="{{ msg.attachment }}" class="btn btn-default btn-sm" target="_blank">
+                                    <span class="glyphicon glyphicon-gift"></span> {{ msg.attachment }}
+                                </a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% empty %}
+                <div class="list-group-item">
+                    <h4 class="list-group-item-heading">{% trans 'Message history is empty' %}</h4>
+                </div>
+            {% endfor %}
+        {% endwith %}
+        </div>
+        <form action="{% url 'msg_app:to_conversation' conv.pk %}" method="post"
+              enctype="multipart/form-data">{% csrf_token %}
+            <div class="panel-footer">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
+                        <textarea name="text" required class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-default" type="submit">
+                        <span class="glyphicon glyphicon-send"></span> {% trans 'Send' %}
+                    </button>
+                    <!--<button class="btn btn-default" type="button">
+                        <span class="glyphicon glyphicon-tag"></span> { % trans 'Attach' % }
+                    </button>-->
+                </div>
+
+                <small>Если кто-то будет пользоваться то усовершенствую личные сообщения</small>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

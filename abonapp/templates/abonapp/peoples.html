@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load dpagination %}
 {% block main %}
 
 
@@ -20,32 +21,32 @@
                     <tr>
                         <th>#</th>
                         <th>
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=username&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=username dir=dir|default:"down" %}">
                                 {% trans 'Sub' %}
                             </a>
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th>{% trans 'Last traffic' %}</th>
                         <th>
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ip_address dir=dir|default:"down" %}">
                                 {% trans 'Ip address' %}
                             </a>
                             {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th>
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=fio&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=fio dir=dir|default:"down" %}">
                                 {% trans 'fio' %}
                             </a>
                             {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th>
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=street&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=street dir=dir|default:"down" %}">
                                 {% trans 'Street' %}
                             </a>
                             {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th width="100">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=house&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=house dir=dir|default:"down" %}">
                                 {% trans 'Apartment' %}
                             </a>
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -53,7 +54,7 @@
                         <th width="150">{% trans 'Telephone' %}</th>
                         <th width="150">{% trans 'Service' %}</th>
                         <th width="50">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?order_by=ballance&dir={{ dir|default:"down" }}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ballance dir=dir|default:"down" %}">
                                 {% trans 'Ballance' %}
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -144,7 +145,7 @@
                 <div class="panel-heading">{% trans 'Streets' %}</div>
                 <div class="list-group">
                     {% for street in streets %}
-                        <a href="{% url 'abonapp:people_list' abon_group.pk  %}?street={{ street.pk }}" class="list-group-item{% if street_id == street.pk %} active{% endif %}">{{ street.name }}</a>
+                        <a href="{% url 'abonapp:people_list' abon_group.pk  %}?{% url_page_replace request 'street' street.pk %}" class="list-group-item{% if street_id == street.pk %} active{% endif %}">{{ street.name }}</a>
                     {% empty %}
                         <a href="#" class="list-group-item">{% trans 'No streets found for that group' %}</a>
                     {% endfor %}

@@ -15,4 +15,3 @@ easysnmp
 rq
 pid
 django-guardian
-jsonfield

@@ -14,22 +14,22 @@
         <div class="col-sm-3">
             <div class="thumbnail">
                 {% if userprofile.avatar %}
-                    <a href="{{ userprofile.avatar.big }}" class="thumbnail" target="_blank">
-                        <img alt="ava" src="{{ userprofile.avatar.min }}"/>
+                    <a href="{{ userprofile.get_big_ava }}" class="thumbnail" target="_blank">
+                        <img alt="ava" src="{{ userprofile.get_min_ava }}"/>
                     </a>
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
                 <div class="caption btn-group btn-group-sm">
                     {% if userprofile == request.user %}
-                        <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary btn-sm" role="button">
+                        <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary" role="button">
                             <span class="glyphicon glyphicon-edit"></span>
                             {% trans 'Edit' %}
                         </a>
                     {% endif %}
                     {% if request.user.is_superuser %}
                         {% if userprofile.is_superuser %}
-                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default btn-sm" title="{% trans 'Profile is superuser, permissions to change it makes no sense' %}" data-toggle="tooltip">
+                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default" title="{% trans 'Profile is superuser, permissions to change it makes no sense' %}" data-toggle="tooltip">
                                 <span class="glyphicon glyphicon-lock"></span>
                                 {% trans 'Permission options' %}
                             </a>
