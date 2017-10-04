@@ -249,7 +249,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
 
     def remove_range(self, q_ids):
         try:
-            q_ids = [q.queue_id for q in q_ids]
+            #q_ids = [q.queue_id for q in q_ids]
             return self._exec_cmd(['/queue/simple/remove', '=numbers=' + ','.join(q_ids)])
         except TypeError as e:
             print(e)

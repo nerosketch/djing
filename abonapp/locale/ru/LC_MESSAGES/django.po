@@ -339,7 +339,7 @@ msgstr "куда"
 
 #: abonapp/templates/abonapp/dial_log.html:12
 msgid "duration"
-msgstr "продолжительность"
+msgstr "прод."
 
 #: abonapp/templates/abonapp/dial_log.html:13
 msgid "start"
