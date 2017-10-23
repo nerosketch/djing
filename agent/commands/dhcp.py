@@ -20,12 +20,12 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
             print('D:', _('User settings is not dynamic'))
             return
         if not abon.is_access():
-            print('D:', _('User is not access to service'))
+            print('D:', 'User %s is not access to service' % abon.username)
             return
         abon.ip_address = client_ip
         abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
-        print('S:', _("Ip address:'%s' update for '%s' successfull, on port: %s") % (client_ip, abon.get_short_name(), port))
+        #print('S:', _("Ip address:'%s' update for '%s' successfull, on port: %s") % (client_ip, abon.get_short_name(), port))
     except Abon.DoesNotExist:
         print('N:', _("User with device '%s' does not exist") % dev)
     except Device.DoesNotExist:

@@ -14,52 +14,52 @@
 
     <h3>{% trans 'The people in the selected group' %}</h3>
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-lg-10 col-md-8">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>
+                        <th class="hidden-xs">#</th>
+                        <th class="col-xs-1">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=username dir=dir|default:"down" %}">
                                 {% trans 'Sub' %}
                             </a>
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th>{% trans 'Last traffic' %}</th>
-                        <th>
+                        <th class="hidden-xs">{% trans 'Last traffic' %}</th>
+                        <th class="col-xs-1 hidden-md">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ip_address dir=dir|default:"down" %}">
                                 {% trans 'Ip address' %}
                             </a>
                             {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th>
+                        <th class="col-xs-2">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=fio dir=dir|default:"down" %}">
                                 {% trans 'fio' %}
                             </a>
                             {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th>
+                        <th class="col-xs-2">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=street dir=dir|default:"down" %}">
                                 {% trans 'Street' %}
                             </a>
                             {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th width="100">
+                        <th class="col-xs-1">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=house dir=dir|default:"down" %}">
                                 {% trans 'Apartment' %}
                             </a>
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th width="150">{% trans 'Telephone' %}</th>
-                        <th width="150">{% trans 'Service' %}</th>
-                        <th width="50">
+                        <th class="col-xs-2">{% trans 'Telephone' %}</th>
+                        <th class="col-xs-2">{% trans 'Service' %}</th>
+                        <th class="hidden-xs col-sm-1">
                             <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ballance dir=dir|default:"down" %}">
                                 {% trans 'Ballance' %}
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th width="10">#</th>
+                        <th class="col-xs-1">#</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -70,7 +70,7 @@
                             {% else %}
                             <tr class="danger">
                         {% endif %}
-                        <td>{% if human.stat_cache and human.stat_cache.is_online %}
+                        <td class="hidden-xs">{% if human.stat_cache and human.stat_cache.is_online %}
                                 <span class="glyphicon glyphicon-ok text-success"></span>
                             {% else %}
                                 <span class="glyphicon glyphicon-remove-sign text-muted"></span>
@@ -78,7 +78,7 @@
                         <td>
                             <a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a>
                         </td>
-                        <td>
+                        <td class="hidden-xs">
                             {% if human.stat_cache %}
                                 {% if human.stat_cache.is_today %}
                                     {{ human.stat_cache.last_time|date:"H:i" }}
@@ -87,7 +87,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td>{{ human.ip_address|default:_('Not assigned') }}</td>
+                        <td class="hidden-md">{{ human.ip_address|default:_('Not assigned') }}</td>
                         <td>{{ human.fio }}</td>
                         <td>{{ human.street|default:_('Not assigned') }}</td>
                         <td>{{ human.house|default:'-' }}</td>
@@ -102,7 +102,7 @@
                             {% else %}&mdash;&mdash;&mdash;
                             {% endif %}
                         </td>
-                        <td>{{ human.ballance }}</td>
+                        <td class="hidden-xs">{{ human.ballance }}</td>
                         <td>
                             {% if can_del_trf %}
                                 <a href="{% url 'abonapp:del_abon' %}?id={{ human.pk }}" class="btn btn-danger btn-sm">
@@ -140,7 +140,7 @@
                 </table>
             </div>
         </div>
-        <div class="col-lg-2 sidebar-offcanvas">
+        <div class="col-lg-2 col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">{% trans 'Streets' %}</div>
                 <div class="list-group">

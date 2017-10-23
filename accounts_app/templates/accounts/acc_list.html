@@ -14,11 +14,11 @@
             <thead>
             <tr>
                 <th class="col-sm-1">Фото</th>
-                <th>Ник</th>
-                <th>ФИО (или ник если нет)</th>
-                <th class="col-sm-2">Телефон</th>
-                <th class="col-sm-2">Email</th>
-                <th width="150">&mdash;</th>
+                <th class="col-sm-2">Ник</th>
+                <th class="col-sm-4">ФИО (или ник если нет)</th>
+                <th class="col-sm-2 hidden-xs">Телефон</th>
+                <th class="col-sm-2 hidden-xs">Email</th>
+                <th class="col-sm-1 hidden-xs">&mdash;</th>
             </tr>
             </thead>
             <tbody>
@@ -30,11 +30,11 @@
                     </a></td>
                     <td><a href="{% url 'acc_app:other_profile' usr.id %}">{{ usr.username }}</a></td>
                     <td>{{ usr.get_full_name }}</td>
-                    <td>{% if usr.telephone %}<a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>{% else %}
+                    <td class="hidden-xs">{% if usr.telephone %}<a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>{% else %}
                         Нету{% endif %}</td>
-                    <td>{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
+                    <td class="hidden-xs">{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
                         Нету{% endif %}</a></td>
-                    <td class="btn-group">
+                    <td class="btn-group hidden-xs">
                         <a href="#" class="btn btn-sm btn-default disabled"
                            title="Дать задание">
                             <span class="glyphicon glyphicon-tasks"></span>

@@ -4,7 +4,7 @@ import binascii
 from abc import ABCMeta
 from hashlib import md5
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
-from mydefs import ping
+from mydefs import ping, singleton
 from .structs import TariffStruct, AbonStruct, IpStruct
 from . import settings as local_settings
 from django.conf import settings
@@ -17,14 +17,23 @@ LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 LIST_USERS_BLOCKED = 'DjingUsersBlocked'
 
 
+@singleton
 class ApiRos:
     "Routeros api"
+    sk = None
+    is_login = False
 
-    def __init__(self, sk):
-        self.sk = sk
+    def __init__(self, ip, port):
+        if self.sk is None:
+            sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sk.connect((ip, port or getattr(local_settings, 'NAS_PORT', 8728)))
+            self.sk = sk
+
         self.currenttag = 0
 
     def login(self, username, pwd):
+        if self.is_login:
+            return
         chal = None
         for repl, attrs in self.talk_iter(["/login"]):
             chal = binascii.unhexlify(attrs['=ret'])
@@ -34,6 +43,7 @@ class ApiRos:
         md.update(chal)
         for r in self.talk_iter(["/login", "=name=" + username,
                                  "=response=00" + binascii.hexlify(md.digest()).decode('utf-8')]): pass
+        self.is_login = True
 
     def talk_iter(self, words):
         if self.writeSentence(words) == 0: return
@@ -143,6 +153,7 @@ class ApiRos:
 
 
 class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
+
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or getattr(local_settings, 'NAS_IP')
         if ip is None:
@@ -150,10 +161,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
         if not ping(ip):
             raise NasNetworkError('NAS %s не пингуется' % ip)
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((ip, port or getattr(local_settings, 'NAS_PORT', 8728)))
-            self.s = s
-            self.ar = ApiRos(s)
+            self.ar = ApiRos(ip, port)
             self.ar.login(login or getattr(local_settings, 'NAS_LOGIN'), password or getattr(local_settings, 'NAS_PASSW'))
         except ConnectionRefusedError:
             raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
