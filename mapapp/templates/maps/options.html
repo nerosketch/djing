@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
-
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li class="active">Настройки карты</li>
+        <li class="active">{% trans 'Map settings' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>Точки топологии</h3>
+    {% with can_change_dot=perms.mapapp.change_dot can_delete_dot=perms.mapapp.delete_dot %}
+    <h3>{% trans 'Map point' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>Название</th>
-                <th>Longitude</th>
-                <th>latitude</th>
-                <th width="50">Ред.</th>
-                <th width="50">Уд.</th>
+                <th>{% trans 'Title' %}</th>
+                <th>{% trans 'Longitude' %}</th>
+                <th>{% trans 'Latitude' %}</th>
+                {% if can_change_dot or can_delete_dot %}<th width="90">#</th>{% endif %}
             </tr>
             </thead>
             <tbody>
@@ -27,33 +27,38 @@
                     <td>{{ dot.title }}</td>
                     <td>{{ dot.longitude }}</td>
                     <td>{{ dot.latitude }}</td>
-                    <td colspan="2" class="btn-group-xs">
+                    {% if can_change_dot or can_delete_dot %}
+                    <td colspan="2" class="btn-group btn-group-xs">
 
-                        {% if perms.mapapp.change_dot %}
-                        <a href="{% url 'mapapp:edit_dot' dot.id %}"
+                        {% if can_change_dot %}
+                        <a href="{% url 'mapapp:edit_dot' dot.id %}" title="{% trans 'Edit' %}" data-toggle="tooltip"
                            class="btn btn-primary">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                         {% endif %}
 
-                        {% if perms.mapapp.delete_dot %}
-                        <a href="{% url 'mapapp:remove_dot' dot.id %}"
+                        {% if can_delete_dot %}
+                        <a href="{% url 'mapapp:remove_dot' dot.id %}" title="{% trans 'Delete' %}" data-toggle="tooltip"
                            class="btn btn-danger">
-                            <span class="glyphicon glyphicon-remove-circle"></span>
+                            <span class="glyphicon glyphicon-remove"></span>
                         </a>
                         {% endif %}
 
                     </td>
+                    {% endif %}
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">Вы ещё не создавали точки топологии. <a href="{% url 'mapapp:add_dot' %}">Создать</a></td>
+                    <td colspan="{% if can_change_dot or can_delete_dot %}4{% else %}3{% endif %}">
+                        {% trans 'You have not created map points yet' %}
+                        <a href="{% url 'mapapp:add_dot' %}">{% trans 'Create' %}</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="5">
+                <td colspan="{% if can_change_dot or can_delete_dot %}4{% else %}3{% endif %}">
                     <a href="{% url 'mapapp:add_dot' %}" class="btn btn-sm btn-success">
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>
@@ -62,6 +67,7 @@
             </tfoot>
         </table>
     </div>
+    {% endwith %}
 
     {% include 'toolbar_page.html' with pag=dots %}
 {% endblock %}

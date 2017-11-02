@@ -25,8 +25,7 @@ def devices(request, grp):
     group = get_object_or_404(AbonGroup, pk=grp)
     if not request.user.has_perm('abonapp.can_view_abongroup', group):
         raise PermissionDenied
-    devs = Device.objects.filter(user_group=grp).only('comment', 'mac_addr', 'devtype', 'user_group', 'pk',
-                                                      'ip_address')
+    devs = Device.objects.filter(user_group=grp).select_related('user_group').only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
 
     # фильтр
     dr, field = order_helper(request)
@@ -36,7 +35,7 @@ def devices(request, grp):
     devs = pag_mn(request, devs)
 
     return render(request, 'devapp/devices.html', {
-        'devices': devs,
+        'devices': Device.objects.wrap_monitoring_info(devs),
         'dir': dr,
         'order_by': request.GET.get('order_by'),
         'group': group
@@ -95,10 +94,16 @@ def dev(request, grp, devid=0):
         if frm.is_valid():
             ndev = frm.save()
             messages.success(request, _('Device info has been saved'))
-            return redirect('devapp:edit', grp, ndev.pk)
+            return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
         else:
             try:
                 already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
+                if already_dev.user_group:
+                    messages.warning(request, _('You have redirected to existing device'))
+                    return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
+                else:
+                    messages.warning(request, _('Please attach user group for device'))
+                    return redirect('devapp:fix_device_group', already_dev.pk)
             except Device.DoesNotExist:
                 pass
             messages.error(request, _('Form is invalid, check fields and try again'))
@@ -125,7 +130,7 @@ def dev(request, grp, devid=0):
         return render(request, 'devapp/dev.html', {
             'form': frm,
             'dev': devinst,
-            'selected_parent_dev': devinst.parent_dev or None,
+            'selected_parent_dev': devinst.parent_dev,
             'group': user_group,
             'already_dev': already_dev
         })
@@ -138,7 +143,7 @@ def manage_ports(request, devid):
         dev = Device.objects.get(pk=devid)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
-            return redirect('devapp:group_list')
+            return redirect('devapp:fix_device_group', dev.pk)
         ports = Port.objects.filter(device=dev)
 
     except Device.DoesNotExist:
@@ -177,7 +182,7 @@ def add_ports(request, devid):
         dev = Device.objects.get(pk=devid)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
-            return redirect('devapp:group_list')
+            return redirect('devapp:fix_device_group', dev.pk)
         if request.method == 'POST':
             ports = zip(
                 request.POST.getlist('p_text'),
@@ -306,6 +311,11 @@ def devview(request, did):
     ports = None
     uptime = 0
     dev = get_object_or_404(Device, id=did)
+
+    if not dev.user_group:
+        messages.warning(request, _('Please attach user group for device'))
+        return redirect('devapp:fix_device_group', dev.pk)
+
     template_name = 'ports.html'
     try:
         if ping(dev.ip_address):
@@ -354,6 +364,8 @@ def toggle_port(request, did, portid, status=0):
             messages.error(request, _('Dot was not pinged'))
     except EasySNMPTimeoutError:
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
+    except EasySNMPError as e:
+        messages.error(request, e)
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, did)
 
 
@@ -378,3 +390,29 @@ def search_dev(request):
         ).only('pk', 'ip_address', 'comment')[:16]
         results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
     return HttpResponse(dumps(results, ensure_ascii=False))
+
+
+@login_required
+def fix_device_group(request, did):
+    dev = get_object_or_404(Device, pk=did)
+    try:
+        if request.method == 'POST':
+            frm = DeviceForm(request.POST, instance=dev)
+            if frm.is_valid():
+                ch_dev = frm.save()
+                if ch_dev.user_group:
+                    messages.success(request, _('Device fixed'))
+                    return redirect('devapp:devs', ch_dev.user_group.pk)
+                else:
+                    messages.error(request, _('Please attach user group for device'))
+            else:
+                messages.error(request, _('Form is invalid, check fields and try again'))
+        else:
+            frm = DeviceForm(instance=dev)
+    except ValueError:
+        return HttpResponse('ValueError')
+    return render(request, 'devapp/fix_dev_group.html', {
+        'form': frm,
+        'dev': dev,
+        'selected_parent_dev': dev.parent_dev
+    })

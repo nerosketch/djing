@@ -1,0 +1,12 @@
+{% load i18n %}
+<div class="modal-header warning">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title"><span class="glyphicon glyphicon-lock"></span>{% trans '403 - Permission denied' %}</h4>
+</div>
+<div class="modal-body">
+    <div align="center"><h1>{% trans '403 - Permission denied' %}</h1></div>
+    <div align="center"><p>{% trans 'You have no permissions for that page' %}</p></div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>
+</div>

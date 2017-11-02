@@ -47,11 +47,13 @@
                     <span class="glyphicon glyphicon-usd"></span> тарифы
                 </a></li>
 
-            {% url 'mapapp:options' as mapapp_ops %}
-            <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
-                <a href="{{ mapapp_ops }}">
-                    <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
-                </a></li>
+            {% if request.user.is_superuser %}
+                {% url 'mapapp:options' as mapapp_ops %}
+                <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
+                    <a href="{{ mapapp_ops }}">
+                        <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
+                    </a></li>
+            {% endif %}
 
             {% url 'msg_app:home' as privmsg_home %}
             <li{% if privmsg_home in request.path %} class="active"{% endif %}>

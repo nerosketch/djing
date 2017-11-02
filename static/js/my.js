@@ -2,6 +2,7 @@ function show_ModalMyContent(content){
     $('#modContent').html(content);
 	$('#modFrm').modal();
 }
+function hide_ModalMyContent(){$('#modFrm').modal('hide');}
 function show_Modal(title, content, type_class){
 var cnt='<div class="modal-header '+type_class+'">' +
             '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
@@ -10,6 +11,7 @@ var cnt='<div class="modal-header '+type_class+'">' +
         '<div class="modal-body">'+content+'</div>' +
         '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button></div>';
 	show_ModalMyContent(cnt);
+	$('#loading').hide();
 }
 
 function showErr(errContent) {show_Modal('Ошибка', errContent, 'warning');}
@@ -17,7 +19,6 @@ function showSuccess(errContent) {show_Modal('Успешно', errContent, 'succ
 function showPrimary(errContent) {show_Modal('Внимание!', errContent, 'primary');}
 
 $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
-	//loaderShow(false);
 	showErr(jqXHR.status + ': ' + jqXHR.statusText);
 });
 
@@ -116,6 +117,61 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 })(jQuery);
 
 
+// Ajax Loader
+(function ($){
+    $.fn.ajloader = function(opt){
+        var settings = $.extend({
+			dst_block	:'id_block_obj'
+		}, opt);
+
+		var fill_block_fn = function(){
+		    $('#loading').show();
+		    var url = $(this).attr('data-href');
+		    $.get(url, function(r){
+		        $(settings.dst_block).html(r);
+		        $('#loading').hide();
+		    });
+		};
+
+        this.each(function(){
+			$(this).on('click', fill_block_fn);
+		});
+    };
+})(jQuery);
+
+
+// Ajax form
+(function ($){
+    $.fn.ajform = function(opt){
+        var settings = $.extend({
+			on_response	: on_response_default
+		}, opt);
+
+        var on_response_default = function(r){
+            alert('You must assign callback function for response');
+        };
+
+        var on_submit = function(e){
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                async: true,
+                success: settings.on_response,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        };
+
+        this.each(function(){
+			$(this).on('submit', on_submit);
+		});
+    };
+})(jQuery);
+
 
 $(document).ready(function () {
 
@@ -188,5 +244,7 @@ $(document).ready(function () {
 	$('button.player-btn').aplayer();
 
 	$('[data-toggle="tooltip"]').tooltip({container:'body'});
+
+	$('.btn_ajloader').ajloader({'dst_block': '#id_block_devices'});
 
 });

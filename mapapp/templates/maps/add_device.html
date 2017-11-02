@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block main %}
+
+<ol class="breadcrumb">
+    <li><span class="glyphicon glyphicon-home"></span></li>
+    <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
+    <li><a href="{% url 'mapapp:edit_dot' dot.pk %}">{{ dot.title }}</a></li>
+    <li class="active">{% trans 'Add devices' %}</li>
+</ol>
+
+{% include 'message_block.html' %}
+
+<script type="text/javascript">
+
+</script>
+
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{% trans 'Pick the group' %}</h3>
+            </div>
+            <div class="panel-body">
+                {% url 'mapapp:preload_devices' as prel_url %}
+                {% for group in groups %}
+                    {% if group.pk == grp %}
+                        <u><a href="#" data-href="{{ prel_url }}?dot={{ dot.pk }}&grp={{ group.pk }}" class="btn_ajloader">{{ group.title }}</a></u>
+                    {% else %}
+                        <a href="#" data-href="{{ prel_url }}?dot={{ dot.pk }}&grp={{ group.pk }}" class="btn_ajloader">{{ group.title }}</a>
+                    {% endif %}<br>
+                {% endfor %}
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(window).load(function() {
+                $('.btn_ajloader').on('click', function(e){
+                    var grp_id = $(this).attr('data-href');
+                    grp_id = grp_id.split('=');
+                    grp_id = grp_id[grp_id.length-1];
+                    $('#selected_user_group').val(grp_id);
+                    e.preventDefault();
+                });
+            });
+        </script>
+
+    </div>
+    <div class="col-sm-8">
+        <form role="form" action="{% url 'mapapp:add_dev' dot.pk %}?grp={{ grp }}" method="post">{% csrf_token %}
+            <input type="hidden" id="selected_user_group" name="selected_user_group">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'Select the devices' %}</h3>
+                </div>
+                <div class="panel-body" id="id_block_devices">
+                    {% include 'maps/preload_devices_tmpl.html' with all_devices=existing_devs dot_devices_ids=dot_devices_ids %}
+                </div>
+                <div class="panel-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base_no_lmenu.html' %}
+{% extends 'base_no_lmenu.html' %}{% load i18n %}
 {% block main %}
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
@@ -8,7 +8,7 @@
 
     function placemark_click(e){
         var plcmrk = e.get('target');
-        plcmrk.properties.set('balloonContent', "Получаю инфу..");
+        plcmrk.properties.set('balloonContent', "{% trans 'Loading..' %}");
         var html = $.ajax({
           url: "{% url 'mapapp:dot_tooltip' %}",
           data: {'d': plcmrk.properties._data.dot_id},
@@ -18,23 +18,48 @@
     }
 
     function load_dots(r){
-        for(var n=0; n< r.length; n++){
-            var dot = new ymaps.Placemark(
-                    [r[n].fields.latitude, r[n].fields.longitude],
-                    {
-                        hintContent: r[n].fields.title,
-                        dot_id: r[n].pk
-                    }
-            );
-            dot.events.add('click', placemark_click);
-            myMap.geoObjects.add(dot);
+        for(let e of r){
+            var iconname='flag_black.png';
+            if(e.devcount > 0)
+                iconname='dev_ok.png';
+            dot_place([e.latitude, e.longitude], {
+                hintContent: e.title,
+                dot_id: e.pk
+            }, iconname);
         }
+    }
+
+    function dot_place(pos, opts, icon_name='dev_ok.png'){
+        var dot = new ymaps.Placemark(pos, opts, {
+            iconLayout: 'default#image',
+            iconImageHref: '/static/img/gmarkers/'+icon_name,
+            iconImageSize: [32, 48],
+            iconImageOffset: [-16, -48]
+        });
+        dot.events.add('click', placemark_click);
+        myMap.geoObjects.add(dot);
+    }
+
+    function on_success_add_dot(r){
+        hide_ModalMyContent();
+        var d = $.parseJSON(r);
+
+        if(d.error){
+            alert(d.error);
+            return false;
+        }
+
+        dot_place([d.latitude, d.longitude], {
+            hintContent: d.title,
+            dot_id: d.pk
+        });
     }
 
     function add_dot(e){
         var coords = e.get('coords');
         $.get('{% url 'mapapp:modal_add_dot' %}', {'coords': coords.join(',')}, function(r){
             show_ModalMyContent(r);
+            $('.form-ajax').ajform({'on_response': on_success_add_dot});
         });
         e.preventDefault();
     }
@@ -42,29 +67,92 @@
     function init(){
 
         var win = $(window);
-        $('#yamap')
-                .css('width', win.width()-5+'px')
-                .css('height', win.height()+'px');
-
 
         myMap = new ymaps.Map("yamap", {
             center: [45.449160, 34.735454],
-            zoom: 12
+            zoom: 12,
+            controls: ['zoomControl', 'geolocationControl']
         });
+        myMap.controls.add('typeSelector', {position: {left: 45, top: 10}});
 
         $.getJSON("{% url 'mapapp:get_dots' %}", load_dots);
 
         myMap.events.add('dblclick', add_dot);
 
+        $('.mapbtns').on('click', function(){
+            $.getJSON($(this).attr('data-href'), function(dot_ids){
+                var it = myMap.geoObjects.getIterator(), obj;
+                var points = [];
+                while(obj = it.getNext()){
+                    if(obj.geometry == undefined) break;
+                    if(obj.geometry.getType() == "Point"){
+                        var dot_id = obj.properties.get('dot_id');
+                        var is_dot_contains = dot_ids.includes(dot_id);
+                        obj.options.set('visible', is_dot_contains);
+                        if(is_dot_contains)
+                            points.push(obj);
+                    }
+                }
+                var bnds = ymaps.geoQuery(points).getBounds();
+                if(bnds){
+                    if(points.length > 1)
+                        myMap.setBounds(bnds, {duration: 400, checkZoomRange: true, useMapMargin: true, zoomMargin: 30});
+                    else
+                        myMap.panTo([points[0].geometry.getCoordinates()]);
+                }
+            });
+            $('.mapbtns').removeClass('active');
+            $(this).addClass('active');
+        });
+
+    }
+    function showAll(){
+        var it = myMap.geoObjects.getIterator(), obj;
+        while(obj = it.getNext()){
+            if(obj.geometry == undefined) break;
+            if(obj.geometry.getType() == "Point"){
+                obj.options.set('visible', true);
+            }
+        }
+        myMap.setBounds(myMap.geoObjects.getBounds(), {duration: 400});
+        $('.mapbtns').removeClass('active');
     }
     </script>
 
 
-    <div id="yamap"></div>
+    <div id="yamap" class="col-sm-12"></div>
     <style>
     #yamap{
         margin-left: -15px;
         margin-top: -9px;
+        padding: 0;
+        position: fixed;
+        height: 95vh;
+    }
+    #yapanel{
+        position: absolute;
+        right: 12px;
+        top: 5px;
+    }
+    .list-group-item{
+        padding: 3px 15px;
     }
     </style>
+
+    <div class="panel panel-default hidden-sm hidden-xs" id="yapanel">
+        <div class="panel-heading">
+            <h4 class="modal-title">{% trans 'Layers' %}</h4>
+        </div>
+        <div class="list-group">
+            {% for grp in abon_groups %}
+            <button type="button" data-href="{% url 'mapapp:resolve_dots_by_group' grp.pk %}" class="list-group-item mapbtns">{{ grp.title }}</button>
+            {% endfor %}
+        </div>
+        <div class="panel-footer">
+            <a href="#" onclick="showAll();" class="btn btn-default">
+                <span class="glyphicon glyphicon-eye-open"></span> {% trans 'Show all' %}
+            </a>
+        </div>
+    </div>
+
 {% endblock %}

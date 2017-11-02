@@ -1,0 +1,7 @@
+{% load i18n %}
+{% for dev in all_devices %}<div class="checkbox">
+    <label>
+        <input name="dv" type="checkbox"{% if dev.pk in dot_devices_ids %} checked{% endif %} value="{{ dev.pk }}"/> {{ dev.comment }}
+    </label>
+</div>
+{% empty %}{% trans 'no devices found' %}{% endfor %}

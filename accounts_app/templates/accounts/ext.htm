@@ -20,23 +20,23 @@
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
-                <div class="caption btn-group btn-group-sm">
+                <div class="caption btn-group btn-group-sm btn-group-justified">
                     {% if userprofile == request.user %}
-                        <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary" role="button">
+                        <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary">
                             <span class="glyphicon glyphicon-edit"></span>
-                            {% trans 'Edit' %}
+                            <span class="hidden-sm hidden-md">{% trans 'Edit' %}</span>
                         </a>
                     {% endif %}
                     {% if request.user.is_superuser %}
                         {% if userprofile.is_superuser %}
                             <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default" title="{% trans 'Profile is superuser, permissions to change it makes no sense' %}" data-toggle="tooltip">
                                 <span class="glyphicon glyphicon-lock"></span>
-                                {% trans 'Permission options' %}
+                                <span class="hidden-sm hidden-md">{% trans 'Permission options' %}</span>
                             </a>
                         {% else %}
-                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default btn-sm">
+                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default">
                                 <span class="glyphicon glyphicon-lock"></span>
-                                {% trans 'Permission options' %}
+                                <span class="hidden-sm hidden-md">{% trans 'Permission options' %}</span>
                             </a>
                         {% endif %}
                     {% endif %}

@@ -6,9 +6,8 @@ from .models import Dot
 class DotForm(forms.ModelForm):
     class Meta:
         model = Dot
-        fields = '__all__'
+        exclude = ['devices']
+
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'autofocus':''}),
-            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'required': ''}),
-            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'required': ''})
+            'title': forms.TextInput(attrs={'required': '', 'autofocus': ''}),
         }

@@ -21,7 +21,7 @@
             {% else %}
                 <form role="form" action="{% url 'taskapp:add' %}" method="post" enctype="multipart/form-data">
             {% endif %}
-            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="409600"/>
+            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
 
             <div class="form-group">
 		    <label for="id_descr">{% trans 'Description' %}</label>

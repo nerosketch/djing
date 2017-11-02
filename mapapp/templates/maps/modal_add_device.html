@@ -1,0 +1,20 @@
+{% load i18n %}{% load bootstrap3 %}
+<form action="{% url 'mapapp:add_dev' dot_id %}" method="post">{% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>{% trans 'Add device' %}</h4>
+    </div>
+    <div class="modal-body">
+
+        {% bootstrap_form form %}
+
+    </div>
+    <div class="modal-footer">
+        <div class="btn-group btn-grup-sm">
+            <button type="submit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Close' %}</button>
+        </div>
+    </div>
+</form>
