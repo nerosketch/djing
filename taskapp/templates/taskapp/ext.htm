@@ -14,7 +14,7 @@
         <h2>{% trans 'Tasks to be performed' %}</h2>
     </div>
 
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs nav-justified">
 
         {% url 'taskapp:home' as taskhome %}
         <li{% if taskhome == request.path %} class="active"{% endif %}>

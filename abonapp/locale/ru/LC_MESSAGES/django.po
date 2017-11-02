@@ -877,7 +877,7 @@ msgstr "Графики"
 
 #: abonapp/templates/abonapp/ext.html:26
 msgid "Sub information"
-msgstr "Информация абонента"
+msgstr "Инфо."
 
 msgid "Streets"
 msgstr "Улицы"

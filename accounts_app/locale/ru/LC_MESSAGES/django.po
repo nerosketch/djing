@@ -26,7 +26,7 @@ msgstr "У пользователей должен быть номер теле�
 #: accounts_app/templates/accounts/group.html:7
 #: accounts_app/templates/accounts/group_list.html:7
 msgid "Administrators"
-msgstr "Администраторы"
+msgstr "Сотрудники"
 
 #: accounts_app/templates/accounts/group.html:8
 #: accounts_app/templates/accounts/group_list.html:8

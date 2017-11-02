@@ -250,3 +250,11 @@ a.navbar-brand {
     padding-left: 88px;
 }
 
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified > li {
+    float: left;
+    width: 50%;
+  }
+}
+
