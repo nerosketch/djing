@@ -130,6 +130,8 @@ def dev_post_save_signal(sender, instance, **kwargs):
         code = 'uy'
     elif grp == 79 or grp == 91:
         code = 'zrk'
+    elif grp == 95:
+        code = 'yst'
     newmac = str(instance.mac_addr)
     run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
 

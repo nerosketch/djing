@@ -146,7 +146,7 @@ msgstr "Создать беседу"
 
 #: templates/msg_app/modal_new_conversation.html:19
 msgid "for select multiple press ctrl and click on field"
-msgstr "Для выбора нескольких ывриантов зажмите ctrl и кликните вариант"
+msgstr "Для выбора нескольких вариантов зажмите ctrl и кликните нужный вариант"
 
 #: templates/msg_app/modal_new_conversation.html:28
 msgid "Add"

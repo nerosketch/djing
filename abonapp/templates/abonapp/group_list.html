@@ -23,7 +23,7 @@
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="100">
+                <th width="100" class="hidden-xs">
                     {% trans 'Number of subscribers' %}
                 </th>
                 <th width="100">#</th>
@@ -34,7 +34,7 @@
                 <tr>
                     <td>{{ gr.pk }}</td>
                     <td><a href="{% url 'abonapp:people_list' gr.pk %}">{{ gr.title }}</a></td>
-                    <td>{{ gr.usercount }}</td>
+                    <td class="hidden-xs">{{ gr.usercount }}</td>
                     <td class="btn-group">
                         {% if perms.abonapp.delete_abongroup %}
                             {% if gr.usercount == 0 %}

@@ -266,3 +266,11 @@ div#loading>div.gif {
     border-radius: 13px;
     border-style: ridge;
 }
+
+@media (max-width: 767px) {
+  .nav-tabs.nav-justified > li {
+    float: left;
+    width: 50%;
+  }
+}
+

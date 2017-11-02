@@ -1,5 +1,4 @@
 from django.conf.urls import url, include
-from django.contrib import admin
 
 from . import settings
 from .views import home
@@ -17,13 +16,14 @@ urlpatterns = [
     url(r'^tasks/', include('taskapp.urls', namespace='taskapp')),
     url(r'^client/', include('clientsideapp.urls', namespace='client_side')),
     url(r'^msg/', include('msg_app.urls', namespace='msg_app')),
-    url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
-    url(r'^admin/', admin.site.urls)
+    url(r'^dialing/', include('dialing_app.urls', namespace='dialapp'))
 ]
 
 if settings.DEBUG:
     from django.conf.urls.static import static
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from django.contrib import admin
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += [url(r'^admin/', admin.site.urls)]

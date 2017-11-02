@@ -34,7 +34,7 @@
                 <td class="btn-group">
                     {% if perms.abonapp.add_abongroup %}
                     <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
-                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add group' %}
+			    <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add group' %}</span>
                     </a>
                     {% endif %}
                     <a href="{% url 'devapp:devices_null_group' %}" class="btn btn-primary btn-sm">

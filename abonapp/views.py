@@ -286,7 +286,9 @@ def abonhome(request, gid, uid):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                abon.ip_address = request.POST.get('ip')
+                newip = request.POST.get('ip')
+                if newip:
+                    abon.ip_address = newip
                 frm.save()
                 messages.success(request, _('edit abon success msg'))
             else:
