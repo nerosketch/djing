@@ -60,17 +60,17 @@
                 <td colspan="4" class="btn-group">
                     {% if perms.abonapp.add_abongroup %}
                     <a href="{% url 'abonapp:add_group' %}" class="btn btn-success btn-sm">
-                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add group' %}
+			    <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add group' %}</span>
                     </a>
                     {% endif %}
 		    {% if perms.abonapp.can_view_abonlog %}
                     <a href="{% url 'abonapp:log' %}" class="btn btn-default btn-sm">
-                        <span class="glyphicon glyphicon-record"></span> {% trans 'Subscribers actions' %}
+			    <span class="glyphicon glyphicon-record"></span> <span class="hidden-xs">{% trans 'Subscribers actions' %}</span>
                     </a>
 		    {% endif %}
 		    {% if perms.abonapp.can_view_invoiceforpayment %}
                     <a href="{% url 'abonapp:debtors' %}" class="btn btn-default btn-sm">
-                        <span class="glyphicon glyphicon-exclamation-sign"></span> {% trans 'List of debtors' %}
+			    <span class="glyphicon glyphicon-exclamation-sign"></span> <span class="hidden-xs">{% trans 'List of debtors' %}</span>
                     </a>
 		    {% endif %}
                 </td>

@@ -16,26 +16,27 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th class="col-xs-3">
+                <th class="col-md-2">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th class="col-xs-4">
+                <th class="col-md-3">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=comment&dir={{ dir|default:"down" }}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th class="col-xs-2">{% trans 'Mac address' %}</th>
-                <th class="col-xs-2">
+                <th class="col-md-2">{% trans 'Mac address' %}</th>
+		<th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th>
+                <th class="col-md-1">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:"down" }}">
                         {% trans 'Device type' %}
                     </a>
                     {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th class="col-xs-1">Do</th>
+                <th class="col-md-1">Do</th>
             </tr>
             </thead>
 

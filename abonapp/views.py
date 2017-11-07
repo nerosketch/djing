@@ -689,12 +689,14 @@ def abon_ping(request):
         else:
             if type(ping_result) is tuple:
                 loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
-                if loses_percent > 0.5:
+                print(ping_result, loses_percent)
+                if loses_percent > 1.0:
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('IP Conflict! %d/%d results') % ping_result
+                elif loses_percent > 0.5:
                     text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
                     status = True
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
-                        'no ping, %d/%d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
             else:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
