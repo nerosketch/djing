@@ -1005,3 +1005,10 @@ msgstr "Может пинговать"
 
 msgid "Can view additional telephones"
 msgstr "Может видеть дополнительные телефоны"
+
+
+#: abonapp/views.py:694
+#, python-format
+msgid "IP Conflict! %d/%d results"
+msgstr "IP Конфликт! ping %d из %d"
+
