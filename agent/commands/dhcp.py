@@ -10,7 +10,7 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
         dev = Device.objects.get(mac_addr=switch_mac)
         mngr_class = dev.get_manager_klass()
 
-        port = _('<never mind>')
+        #port = _('<never mind>')
         if mngr_class.is_use_device_port():
             port = Port.objects.get(device=dev, num=switch_port)
             abon = Abon.objects.get(dev_port=port, device=dev)

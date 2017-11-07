@@ -28,9 +28,9 @@ class DLinkPort(BasePort):
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
 
-    def __init__(self, ip, snmp_community, ver=2):
-        DevBase.__init__(self)
-        SNMPBaseWorker.__init__(self, ip, snmp_community, ver)
+    def __init__(self, dev_instance):
+        DevBase.__init__(self, dev_instance)
+        SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
 
     @staticmethod
     def description():
@@ -99,9 +99,9 @@ class ONUdev(BasePort):
 
 class OLTDevice(DevBase, SNMPBaseWorker):
 
-    def __init__(self, ip, snmp_community, ver=2):
-        DevBase.__init__(self)
-        SNMPBaseWorker.__init__(self, ip, snmp_community, ver)
+    def __init__(self, dev_instance):
+        DevBase.__init__(self, dev_instance)
+        SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
 
     @staticmethod
     def description():
@@ -151,6 +151,10 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 class OnuDevice(DevBase, SNMPBaseWorker):
 
+    def __init__(self, dev_instance):
+        DevBase.__init__(self, dev_instance)
+        SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
+
     @staticmethod
     def description():
         return _('PON ONU')
@@ -177,6 +181,23 @@ class OnuDevice(DevBase, SNMPBaseWorker):
     @staticmethod
     def is_use_device_port():
         return False
+
+    def get_details(self):
+        if self.db_instance is None:
+            return
+        num = self.db_instance.snmp_item_num
+        if num == 0:
+            return
+        signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
+        distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
+        mac = ':'.join(['%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)])
+        return {
+            'status': int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % num)),
+            'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+            'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
+            'mac': mac,
+            'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
+        }
 
 
 class EltexPort(BasePort):

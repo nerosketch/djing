@@ -26,8 +26,8 @@ class DeviceDBException(Exception):
 class DeviceManager(models.Manager):
     @staticmethod
     def wrap_monitoring_info(devices_queryset):
-        nag_url = getattr(settings, 'NAGIOS_URL')
-        if nag_url:
+        nag_url = getattr(settings, 'NAGIOS_URL', None)
+        if nag_url is not None:
             addrs = ['h=%s' % hex(ip2int(dev.ip_address))[2:] for dev in devices_queryset]
             url = '%s/host/status/arr?%s' % (nag_url, '&'.join(addrs))
             try:
@@ -38,7 +38,7 @@ class DeviceManager(models.Manager):
                 inf = [x for x in res if x.get('address') == dev.ip_address]
                 if len(inf) > 0:
                     setattr(dev, 'mon', inf[0].get('current_status'))
-            return devices_queryset
+        return devices_queryset
 
 
 class Device(models.Model):
@@ -49,6 +49,8 @@ class Device(models.Model):
     man_passw = models.CharField(_('SNMP password'), max_length=16, null=True, blank=True)
     user_group = models.ForeignKey('abonapp.AbonGroup', verbose_name=_('User group'), on_delete=models.SET_NULL, null=True, blank=True)
     parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True, on_delete=models.SET_NULL)
+
+    snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0)
 
     objects = DeviceManager()
 
@@ -75,6 +77,10 @@ class Device(models.Model):
             if issubclass(res, DevBase):
                 return res
         return
+
+    def get_manager_object(self):
+        man_klass = self.get_manager_klass()
+        return man_klass(self)
 
     # Можно-ли подключать устройство к абоненту
     def has_attachable_to_subscriber(self):

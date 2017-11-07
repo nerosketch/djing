@@ -4,6 +4,10 @@ from easysnmp import Session
 
 
 class DevBase(object, metaclass=ABCMeta):
+
+    def __init__(self, dev_instance=None):
+        self.db_instance = dev_instance
+
     @staticmethod
     def description():
         """Возвращает текстовое описание"""

@@ -205,7 +205,7 @@ def add_ports(request, devid):
         db_ports = Port.objects.filter(device=dev)
         db_ports = [TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports]
 
-        manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+        manager = dev.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
             ports = [TempPort(p.num, p.nm, p.st, False) for p in ports]
@@ -308,8 +308,7 @@ def add_single_port(request, grp, did):
 @login_required
 @permission_required('devapp.can_view_device')
 def devview(request, did):
-    ports = None
-    uptime = 0
+    ports, manager = None, None
     dev = get_object_or_404(Device, id=did)
 
     if not dev.user_group:
@@ -320,8 +319,7 @@ def devview(request, did):
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
-                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
-                uptime = manager.uptime()
+                manager = dev.get_manager_object()
                 ports = manager.get_ports()
                 template_name = manager.get_template_name()
             else:
@@ -338,8 +336,8 @@ def devview(request, did):
     return render(request, 'devapp/custom_dev_page/' + template_name, {
         'dev': dev,
         'ports': ports,
-        'uptime': uptime,
-        'dev_accs': Abon.objects.filter(device=dev)
+        'dev_accs': Abon.objects.filter(device=dev),
+        'dev_manager': manager
     })
 
 

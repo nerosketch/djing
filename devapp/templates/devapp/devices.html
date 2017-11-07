@@ -22,13 +22,14 @@
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th class="col-xs-4">
+                <th class="col-xs-3">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=comment&dir={{ dir|default:"down" }}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-xs-2">{% trans 'Mac address' %}</th>
+                <th class="col-xs-1">{% trans 'Plugin output' %}</th>
                 <th class="col-xs-2">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:"down" }}">
                         {% trans 'Device type' %}
@@ -44,16 +45,18 @@
             {% for dev in devices %}
                 <tr>
                     <td>
-                        {% if dev.mon.current_state == '0' %}
-                            <span class="glyphicon glyphicon-ok-circle text-success"></span>
-                        {% else %}
-                            <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
-                        {% endif %}
+                        {% if dev.mon %}
+                            {% if dev.mon.current_state == '0' %}
+                                <span class="glyphicon glyphicon-ok-circle text-success"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                            {% endif %}
+                        {% else %}&ndash;{% endif %}
                     </td>
                     <td><a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
-                    <td>{{ dev.mon.plugin_output }}</td>
+                    <td>{{ dev.mon.plugin_output|default:'&ndash;' }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}

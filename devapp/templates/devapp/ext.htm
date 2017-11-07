@@ -19,7 +19,7 @@
         <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
     </div>
 
-    <ul class="nav nav-tabs nav-justified">
+    <ul class="nav nav-tabs">
 
         {% url 'devapp:view' dev.user_group.pk|default:0 dev.pk as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>

@@ -5,6 +5,7 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">
+                {% with uptime=dev_manager.uptime %}
                 <div class="panel-heading">
                     <div class="panel-title">{{ dev.get_devtype_display|default:_('Title of the type of switch') }}.
                         {% if uptime %}
@@ -12,6 +13,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endwith %}
                 <div class="panel-body">
 
                     {% for port in ports %}
