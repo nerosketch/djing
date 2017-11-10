@@ -313,3 +313,11 @@ msgstr "Может переключать порты"
 msgid "Plugin output"
 msgstr "Вывод мониторинга"
 
+msgid "Create device"
+msgstr "Создать устройство"
+
+msgid "ONU error"
+msgstr "ONU ошибка"
+
+msgid "ONU not connected"
+msgstr "ONU не в сети"

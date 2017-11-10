@@ -115,7 +115,8 @@ def dev(request, grp, devid=0):
                 'mac_addr': request.GET.get('mac'),
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
-                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', '')
+                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
+                'snmp_item_num': request.GET.get('n')
             })
         else:
             frm = DeviceForm(instance=devinst)
@@ -326,18 +327,18 @@ def devview(request, did):
                 messages.warning(request, _('Not Set snmp device password'))
         else:
             messages.error(request, _('Dot was not pinged'))
-    except EasySNMPTimeoutError:
-        messages.error(request, _('wait for a reply from the SNMP Timeout'))
+        return render(request, 'devapp/custom_dev_page/' + template_name, {
+            'dev': dev,
+            'ports': ports,
+            'dev_accs': Abon.objects.filter(device=dev),
+            'dev_manager': manager
+        })
     except EasySNMPError:
         messages.error(request, _('SNMP error on device'))
     except DeviceDBException as e:
         messages.error(request, e)
-
     return render(request, 'devapp/custom_dev_page/' + template_name, {
-        'dev': dev,
-        'ports': ports,
-        'dev_accs': Abon.objects.filter(device=dev),
-        'dev_manager': manager
+        'dev': dev
     })
 
 

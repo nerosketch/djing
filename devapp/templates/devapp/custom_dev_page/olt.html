@@ -13,12 +13,11 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th width="10">#</th>
-                        <th>{% trans 'Mac' %}</th>
-                        <th>{% trans 'Name' %}</th>
-                        <th>{% trans 'Distance(m)' %}</th>
-                        <th width="250">{% trans 'Signal' %}</th>
-                        <th width="10">#</th>
+                        <th class="col-xs-1">#</th>
+                        <th class="col-xs-4">{% trans 'Name' %}</th>
+                        <th class="col-xs-4">{% trans 'Mac' %}</th>
+                        <th class="col-xs-2">{% trans 'Signal' %}</th>
+                        <th class="col-xs-1">#</th>
                     </tr>
                     </thead>
 
@@ -30,12 +29,11 @@
                                 {% else %}<span class="glyphicon glyphicon-warning-sign text-danger"></span>
                                 {% endif %}
                             </td>
-                            <td>{{ port.mac }}</td>
                             <td>{{ port.nm }}</td>
-                            <td>{{ port.sp }}</td>
+                            <td>{{ port.mac }}</td>
                             <td>{{ port.signal }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}&ip={{ dip }}" title="Создать устройство">
+                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}&ip={{ dip }}&n={{ port.num }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>

@@ -2,6 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from mydefs import RuTimedelta, safe_int
 from datetime import timedelta
+from easysnmp import EasySNMPTimeoutError
 from .base_intr import DevBase, SNMPBaseWorker, BasePort
 
 
@@ -115,17 +116,17 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
         res = []
         for nm in nms:
-            nm = int(nm)
-            status = int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % nm))
-            signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % nm)
+            n = int(nm)
+            status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % n)
+            signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % n)
             onu = ONUdev(
-                nm,
-                self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % nm),
-                True if status == 1 else False,
-                self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % nm),
-                self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % nm),
-                int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-            self)
+                num=n,
+                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
+                status=True if status == '3' else False,
+                mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
+                speed=0,
+                signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+            snmpWorker=self)
             res.append(onu)
         return res
 
@@ -188,16 +189,24 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         num = self.db_instance.snmp_item_num
         if num == 0:
             return
-        signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
-        distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
-        mac = ':'.join(['%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)])
-        return {
-            'status': int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % num)),
-            'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-            'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
-            'mac': mac,
-            'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
-        }
+        try:
+            status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % num)
+            print('Status', status)
+            signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
+            print(signal)
+            distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
+            mac = ':'.join(['%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)])
+            return {
+                'status': status,
+                'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+                'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
+                'mac': mac,
+                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0,
+                'uptime': RuTimedelta(timedelta(seconds=int(self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)) / 100))
+            }
+        except EasySNMPTimeoutError:
+            return {'err': _('ONU not connected')}
+
 
 
 class EltexPort(BasePort):

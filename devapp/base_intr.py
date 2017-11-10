@@ -60,8 +60,7 @@ class BasePort(object, metaclass=ABCMeta):
         pass
 
     def mac(self):
-        m = self._mac
-        return "%x:%x:%x:%x:%x:%x" % (ord(m[0]), ord(m[1]), ord(m[2]), ord(m[3]), ord(m[4]), ord(m[5]))
+        return ':'.join(['%x' % ord(i) for i in self._mac])
 
 
 class SNMPBaseWorker(object, metaclass=ABCMeta):

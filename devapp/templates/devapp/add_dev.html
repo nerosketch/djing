@@ -54,6 +54,9 @@
                     </div>
                 </div>
 
+                 {% bootstrap_icon 'list-alt' as ic %}
+                 {% bootstrap_field form.snmp_item_num addon_before=ic %}
+
                 <div class="btn-group btn-group-sm">
                     <button type="submit" class="btn btn-primary">
                         <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}

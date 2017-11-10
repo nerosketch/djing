@@ -49,32 +49,42 @@
 
                 <div class="panel-body">
                     {% if onu_details %}
-                    <div class="media">
-                        <div class="media-left">
-                            {% if onu_details.status == 1 %}
-                                <span class="media-object glyphicon glyphicon-ok-sign text-success" style="font-size: 75px;"></span>
-                            {% elif onu_details.status == 2 %}
-                                <span class="media-object glyphicon glyphicon-remove-sign text-danger" style="font-size: 75px;"></span>
-                            {% else %}
-                                <span class="media-object glyphicon glyphicon-question-sign" style="font-size: 75px;"></span>
-                            {% endif %}
-                        </div>
-                        <div class="media-body">
-                            <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
-                            <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
-                            <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
+                        {% if onu_details.err %}
+                            <div class="media">
+                                <div class="media-left"><span class="media-object glyphicon glyphicon-remove-sign text-danger" style="font-size: 75px;"></span></div>
+                            </div>
+                            <div class="media-body">
+                                <b>{% trans 'ONU error' %}</b>: {{ onu_details.err }}<br>
+                            </div>
+                        {% else %}
+                            <div class="media">
+                                <div class="media-left">
+                                    {% if onu_details.status == '3' %}
+                                        <span class="media-object glyphicon glyphicon-ok-sign text-success" style="font-size: 75px;"></span>
+                                    {% elif onu_details.status == '2' %}
+                                        <span class="media-object glyphicon glyphicon-remove-sign text-danger" style="font-size: 75px;"></span>
+                                    {% else %}
+                                        <span class="media-object glyphicon glyphicon-question-sign" style="font-size: 75px;"></span>
+                                    {% endif %}
+                                </div>
+                                <div class="media-body">
+                                    <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
+                                    <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
+                                    <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
+                                    <b>{% trans 'Uptime' %}</b>: {{ onu_details.uptime }}<br>
 
-                            {% if dev.mac_addr != onu_details.mac %}
-                                <span class="text-danger">
-                                    <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}
-                                    <h4 class="glyphicon glyphicon-exclamation-sign" title="{% trans 'Mac-addresses does not match' %}" data-toggle="tooltip"></h4>
-                                </span>
-                            {% else %}
-                                <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}
-                            {% endif %}<br>
+                                    {% if dev.mac_addr != onu_details.mac %}
+                                        <span class="text-danger">
+                                            <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}
+                                            <h4 class="glyphicon glyphicon-exclamation-sign" title="{% trans 'Mac-addresses does not match' %}" data-toggle="tooltip"></h4>
+                                        </span>
+                                    {% else %}
+                                        <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}
+                                    {% endif %}<br>
 
-                        </div>
-                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     {% else %}
                     <h3>{% trans 'Info does not fetch' %}</h3>
                     {% endif %}
