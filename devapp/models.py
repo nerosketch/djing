@@ -90,6 +90,40 @@ class Device(models.Model):
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address, self.mac_addr or '')
 
+    def update_dhcp(self):
+        if self.devtype != 'On':
+            return
+        grp = self.user_group.pk
+        code = ''
+        if grp == 87:
+            code = 'chk'
+        elif grp == 85:
+            code = 'drf'
+        elif grp == 86:
+            code = 'eme'
+        elif grp == 84:
+            code = 'kunc'
+        elif grp == 47:
+            code = 'mtr'
+        elif grp == 60:
+            code = 'nvg'
+        elif grp == 65:
+            code = 'ohot'
+        elif grp == 89:
+            code = 'psh'
+        elif grp == 92:
+            code = 'str'
+        elif grp == 80:
+            code = 'uy'
+        elif grp == 79 or grp == 91:
+            code = 'zrk'
+        elif grp == 95:
+            code = 'yst'
+        elif grp == 96:
+            code = 'lzk'
+        newmac = str(self.mac_addr)
+        run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
+
 
 class Port(models.Model):
     device = models.ForeignKey(Device, verbose_name=_('Device'))
@@ -109,37 +143,4 @@ class Port(models.Model):
         verbose_name_plural = _('Ports')
 
 
-def dev_post_save_signal(sender, instance, **kwargs):
-    if instance.devtype != 'On':
-        return
-    grp = instance.user_group.pk
-    code = ''
-    if grp == 87:
-        code = 'chk'
-    elif grp == 85:
-        code = 'drf'
-    elif grp == 86:
-        code = 'eme'
-    elif grp == 84:
-        code = 'kunc'
-    elif grp == 47:
-        code = 'mtr'
-    elif grp == 60:
-        code = 'nvg'
-    elif grp == 65:
-        code = 'ohot'
-    elif grp == 89:
-        code = 'psh'
-    elif grp == 92:
-        code = 'str'
-    elif grp == 80:
-        code = 'uy'
-    elif grp == 79 or grp == 91:
-        code = 'zrk'
-    elif grp == 95:
-        code = 'yst'
-    newmac = str(instance.mac_addr)
-    run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
 
-
-models.signals.post_save.connect(dev_post_save_signal, sender=Device)

@@ -191,18 +191,17 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             return
         try:
             status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % num)
-            print('Status', status)
             signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
-            print(signal)
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = ':'.join(['%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)])
+            uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
             return {
                 'status': status,
                 'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
                 'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                 'mac': mac,
                 'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0,
-                'uptime': RuTimedelta(timedelta(seconds=int(self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)) / 100))
+                'uptime': RuTimedelta(timedelta(seconds=int(uptime) / 100)) if uptime != 'NOSUCHINSTANCE' else 0
             }
         except EasySNMPTimeoutError:
             return {'err': _('ONU not connected')}

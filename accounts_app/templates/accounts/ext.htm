@@ -20,7 +20,7 @@
                 {% else %}
                     <img alt="ava" src="/static/img/user_ava.gif"/>
                 {% endif %}
-                <div class="caption btn-group btn-group-sm btn-group-justified">
+                <div class="caption btn-group btn-group-sm">
                     {% if userprofile == request.user %}
                         <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary">
                             <span class="glyphicon glyphicon-edit"></span>

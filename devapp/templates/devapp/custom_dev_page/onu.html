@@ -77,6 +77,10 @@
                                         <span class="text-danger">
                                             <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}
                                             <h4 class="glyphicon glyphicon-exclamation-sign" title="{% trans 'Mac-addresses does not match' %}" data-toggle="tooltip"></h4>
+					    <a href="{% url 'devapp:fix_onu' %}" data-param="{{ dev.mac_addr }}" class="btn btn-default btn-xs btn-cmd" title="{% trans 'Fix it' %}" data-toggle="tooltip">
+                                                <span class="glyphicon glyphicon-fire"></span>
+                                                <span class="hidden-xs">{% trans 'Fix it' %}</span>
+                                            </a>
                                         </span>
                                     {% else %}
                                         <b>{% trans 'Mac on OLT' %}</b>: {{ onu_details.mac }}

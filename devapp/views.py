@@ -93,6 +93,7 @@ def dev(request, grp, devid=0):
         frm = DeviceForm(request.POST, instance=devinst)
         if frm.is_valid():
             ndev = frm.save()
+            ndev.update_dhcp()
             messages.success(request, _('Device info has been saved'))
             return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
         else:
@@ -415,3 +416,33 @@ def fix_device_group(request, did):
         'dev': dev,
         'selected_parent_dev': dev.parent_dev
     })
+
+
+@login_required
+def fix_onu(request):
+    mac = request.GET.get('cmd_param')
+    status = 1
+    text = '<span class="glyphicon glyphicon-exclamation-sign"></span>'
+    try:
+        onu = Device.objects.get(mac_addr=mac, devtype='On')
+        parent = onu.parent_dev
+        if parent is not None:
+            manobj = parent.get_manager_object()
+            ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
+            for srcmac, snmpnum in ports:
+                real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
+                if mac == real_mac:
+                    onu.snmp_item_num = snmpnum
+                    onu.save(update_fields=['snmp_item_num'])
+                    status = 0
+                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
+                    break
+        else:
+            text = text + ' %s' % _('Parent device not found')
+    except Device.DoesNotExist:
+        pass
+    return HttpResponse(dumps({
+        'status': status,
+        'dat': text
+    }))
+

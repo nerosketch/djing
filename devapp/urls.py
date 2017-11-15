@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.group_list, name='group_list'),
     url(r'^devices_without_groups$', views.devices_null_group, name='devices_null_group'),
+    url(r'^fix_onu/$', views.fix_onu, name='fix_onu'),
     url(r'^(?P<grp>\d+)$', views.devices, name='devs'),
     url(r'^(?P<grp>\d+)/add$', views.dev, name='add'),
     url(r'^(\d+)/(?P<did>\d+)$', views.devview, name='view'),

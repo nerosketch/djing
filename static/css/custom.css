@@ -75,7 +75,7 @@ body {
 
 .main {
     margin-top: 10px;
-    display: table;
+    /*display: table;*/
 }
 
 .table-responsive thead {
@@ -265,12 +265,5 @@ div#loading>div.gif {
     background-color: white;
     border-radius: 13px;
     border-style: ridge;
-}
-
-@media (max-width: 767px) {
-  .nav-tabs.nav-justified > li {
-    float: left;
-    width: 50%;
-  }
 }
 

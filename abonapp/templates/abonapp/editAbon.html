@@ -142,11 +142,11 @@
                     <form role="form" class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
                         <div class="form-group-sm">
-                        <label for="id_method" class="col-sm-2 control-label">{% trans 'Device' %}</label>
-                            <div class="col-sm-10 btn-group btn-group-sm">
+                        <label for="id_method" class="col-sm-4 control-label">{% trans 'Device' %}</label>
+                            <div class="col-sm-8 btn-group btn-group-sm">
                                 {% if device %}
-				                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %}: {{ device.mac_addr|default:_('Not assigned') }}">
-                                        <span class="glyphicon glyphicon-hdd"></span> {{ device.comment|truncatechars:11 }} {{ device.ip_address }}
+                                    <a href="{% url 'devapp:view' abon_group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %}: {{ device.mac_addr|default:_('Not assigned') }}">
+                                        <span class="glyphicon glyphicon-hdd"></span> <span class="hidden-md">{{ device.comment|truncatechars:11 }} {{ device.ip_address }}</span>
                                     </a>
                                     <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
 					    <span class="glyphicon glyphicon-remove-circle"></span> <span class="hidden-xs hidden-md hidden-sm">{% trans 'Remove clutch' %}</span>
@@ -161,8 +161,8 @@
 
                         {% if device %}
                         <div class="form-group-sm">
-                            <label for="id_dev_port" class="col-sm-2 control-label">{% trans 'Device port' %}</label>
-                            <div class="col-sm-10">
+                            <label for="id_dev_port" class="col-sm-4 control-label">{% trans 'Device port' %}</label>
+                            <div class="col-sm-8">
                                 <select id="id_dev_port" class="form-control" name="user_port">
                                     <option value="0">{% trans 'Not assigned' %}</option>
                                     {% for port in dev_ports %}
@@ -178,14 +178,14 @@
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <div class="col-sm-offset-2 col-sm-10 checkbox">
+                            <div class="col-sm-offset-4 col-sm-8 checkbox">
                                 <label>
                                     <input type="checkbox" name="is_dynamic_ip"{% if abon.is_dynamic_ip %} checked{% endif %}> {% trans 'Is dynamic network settings' %}
                                 </label>
                             </div>
                         </div>
                         <div class="form-group-sm">
-                            <div class="col-sm-10 col-sm-offset-2">
+                            <div class="col-sm-8 col-sm-offset-4">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
 			        </button>
@@ -206,8 +206,8 @@
 
                         {% for ef in abon.extra_fields.all %}
                         <div class="form-group-sm">
-                            <label class="col-sm-2 control-label">{{ ef.title }}</label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-4 control-label">{{ ef.title }}</label>
+                            <div class="col-sm-8">
 
                                 <div class="input-group input-group-sm">
                                     <input type="text" value="{{ ef.data|default:_('Not assigned') }}" class="form-control" pattern="{{ ef.get_regexp }}" name="ex">
@@ -226,7 +226,7 @@
                         {% endfor %}
 
                         <div class="form-group-sm">
-                            <div class="col-sm-offset-2 col-sm-10 btn-group btn-group-sm">
+                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
                                 <a href="{% url 'abonapp:extra_field' abon_group.pk abon.pk %}" class="btn btn-success btn-modal" title="{% trans 'Add extra field' %}">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
                                 </a>

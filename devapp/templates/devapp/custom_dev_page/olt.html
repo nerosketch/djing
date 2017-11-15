@@ -14,8 +14,9 @@
                     <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
+			<th class="col-xs-1">{% trans 'SNMP Num' %}</th>
                         <th class="col-xs-4">{% trans 'Name' %}</th>
-                        <th class="col-xs-4">{% trans 'Mac' %}</th>
+                        <th class="col-xs-3">{% trans 'Mac' %}</th>
                         <th class="col-xs-2">{% trans 'Signal' %}</th>
                         <th class="col-xs-1">#</th>
                     </tr>
@@ -29,6 +30,7 @@
                                 {% else %}<span class="glyphicon glyphicon-warning-sign text-danger"></span>
                                 {% endif %}
                             </td>
+			    <td>{{ port.num }}</td>
                             <td>{{ port.nm }}</td>
                             <td>{{ port.mac }}</td>
                             <td>{{ port.signal }}</td>
@@ -40,7 +42,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6">{% trans 'Ports not found' %}</td>
+                            <td colspan="7">{% trans 'Ports not found' %}</td>
                         </tr>
                     {% endfor %}
                     {% endwith %}

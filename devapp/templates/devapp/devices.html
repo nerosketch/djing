@@ -12,7 +12,7 @@
 
     <h3>{% trans 'Devices' %}</h3>
     <div class="table-responsive">
-        <table class="table table-striped table-bordered">
+        <table class="table table-bordered">
             <thead>
             <tr>
                 <th>#</th>
@@ -56,7 +56,7 @@
                     <td><a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
-                    <td>{{ dev.mon.plugin_output|default:'&ndash;' }}</td>
+                    <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}

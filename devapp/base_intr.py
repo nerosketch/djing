@@ -73,8 +73,12 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
         return self.ses.set(oid, value)
 
     def get_list(self, oid):
-        l = self.ses.walk(oid)
-        return [e.value for e in l]
+        return self.ses.walk(oid)
+
+    def get_list_keyval(self, oid):
+        for v in self.ses.walk(oid):
+            snmpnum = v.oid.split('.')[-1:]
+            yield v.value, snmpnum[0] if len(snmpnum) > 0 else None
 
     def get_item(self, oid):
         return self.ses.get(oid).value

@@ -153,7 +153,7 @@ msgid "Change self onfo"
 msgstr "Изменить инфу о себе"
 
 msgid "Permission options"
-msgstr "Настройка прав"
+msgstr "Права"
 
 msgid "Edit"
 msgstr "Редактировать"
