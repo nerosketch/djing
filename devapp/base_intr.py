@@ -73,7 +73,8 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
         return self.ses.set(oid, value)
 
     def get_list(self, oid):
-        return self.ses.walk(oid)
+        for v in self.ses.walk(oid):
+            yield v.value
 
     def get_list_keyval(self, oid):
         for v in self.ses.walk(oid):
