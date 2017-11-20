@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 from guardian.decorators import permission_required_or_403 as permission_required
+from django.db.models import Q
 
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
@@ -49,3 +50,17 @@ def vmail(request):
         'title': title,
         'vmessages': cdr
     })
+
+
+@login_required
+@only_admins
+def vfilter(request):
+    s = request.GET.get('s')
+    cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
+    cdr = AsteriskCDR.objects.filter(cdr_q)
+    return render(request, 'index.html', {
+        'logs': cdr,
+        'title': _('Find dials'),
+        's': s
+    })
+

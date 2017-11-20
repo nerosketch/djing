@@ -41,20 +41,19 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
 
     def get_ports(self):
-        nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
-        stats = self.get_list('.1.3.6.1.2.1.2.2.1.7')
-        macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
+        nams = list(self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3'))
+        stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
+        macs = list(self.get_list('.1.3.6.1.2.1.2.2.1.6'))
         speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
         res = []
-        ln = len(speeds)
-        for n in range(ln):
+        for n, speed in enumerate(speeds):
             status = True if int(stats[n]) == 1 else False
             res.append(DLinkPort(
                 n+1,
                 nams[n] if len(nams) > 0 else _('does not fetch the name'),
                 status,
                 macs[n] if len(macs) > 0 else _('does not fetch the mac'),
-                int(speeds[n]) if len(speeds) > 0 else 0,
+                int(speed or 0),
             self))
         return res
 
@@ -200,11 +199,10 @@ class OnuDevice(DevBase, SNMPBaseWorker):
                 'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
                 'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                 'mac': mac,
-                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0,
-                'uptime': RuTimedelta(timedelta(seconds=int(uptime) / 100)) if uptime != 'NOSUCHINSTANCE' else 0
+                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
             }
-        except EasySNMPTimeoutError:
-            return {'err': _('ONU not connected')}
+        except EasySNMPTimeoutError as e:
+            return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
 
 

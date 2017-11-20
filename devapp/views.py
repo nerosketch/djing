@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from json import dumps
 
-from .models import Device, Port, DeviceDBException
+from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm, PortForm
 from abonapp.models import AbonGroup, Abon
@@ -25,17 +25,22 @@ def devices(request, grp):
     group = get_object_or_404(AbonGroup, pk=grp)
     if not request.user.has_perm('abonapp.can_view_abongroup', group):
         raise PermissionDenied
-    devs = Device.objects.filter(user_group=grp).select_related('user_group').only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
+    try:
+        devs = Device.objects.filter(user_group=group).select_related('user_group').only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
 
-    # фильтр
-    dr, field = order_helper(request)
-    if field:
-        devs = devs.order_by(field)
+        # фильтр
+        dr, field = order_helper(request)
+        if field:
+            devs = devs.order_by(field)
 
-    devs = pag_mn(request, devs)
+        devs = pag_mn(request, devs)
+        devs = Device.objects.wrap_monitoring_info(devs)
+
+    except (DeviceDBException, DeviceMonitoringException) as e:
+        messages.error(request, e)
 
     return render(request, 'devapp/devices.html', {
-        'devices': Device.objects.wrap_monitoring_info(devs),
+        'devices': devs,
         'dir': dr,
         'order_by': request.GET.get('order_by'),
         'group': group

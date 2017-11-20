@@ -23,6 +23,10 @@ class DeviceDBException(Exception):
     pass
 
 
+class DeviceMonitoringException(Exception):
+    pass
+
+
 class DeviceManager(models.Manager):
     @staticmethod
     def wrap_monitoring_info(devices_queryset):
@@ -32,8 +36,8 @@ class DeviceManager(models.Manager):
             url = '%s/host/status/arr?%s' % (nag_url, '&'.join(addrs))
             try:
                 res = requests.get(url).json()
-            except (requests.exceptions.ConnectionError, JSONDecodeError):
-                return
+            except (requests.exceptions.ConnectionError, JSONDecodeError) as e:
+                raise DeviceMonitoringException(e)
             for dev in devices_queryset:
                 inf = [x for x in res if x.get('address') == dev.ip_address]
                 if len(inf) > 0:
@@ -113,7 +117,7 @@ class Device(models.Model):
             code = 'psh'
         elif grp == 92:
             code = 'str'
-        elif grp == 80:
+        elif grp == 80 or grp == 94:
             code = 'uy'
         elif grp == 79 or grp == 91:
             code = 'zrk'

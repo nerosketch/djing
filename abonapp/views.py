@@ -18,7 +18,7 @@ from . import forms
 from . import models
 import mydefs
 from devapp.models import Device, Port as DevPort
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel, get_dates
@@ -389,6 +389,7 @@ def pick_tariff(request, gid, uid):
                 abon.pick_tariff(trf, request.user)
             else:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d')
+                deadline += timedelta(hours=23, minutes=59, seconds=59)
                 abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
