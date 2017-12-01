@@ -357,7 +357,7 @@ def toggle_port(request, did, portid, status=0):
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
-                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+                manager = dev.get_manager_object()
                 ports = manager.get_ports()
                 if status:
                     ports[portid - 1].enable()

@@ -35,8 +35,6 @@ def handle(task, author, recipients, abon_group):
             fulltext += _('Task type - %s.') % task.get_mode_display() + '\n'
             fulltext += task.descr if task.descr else ''
 
-            print('task.state:', task.state)
-
             if task.state == 'F' or task.state == 'C':
                 # Если задача завершена или провалена то отправляем одно оповещение автору
                 try:

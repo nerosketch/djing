@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from telepot import helper, glance, Bot
+from telepot.exception import TelegramError
 import os
 import socket
 import collections
@@ -142,4 +143,6 @@ def send_notify(msg_text, account):
         raise ChatException(_("Recipient '%s' does not subscribed on notifications") % account.get_full_name())
     except ProtocolError as e:
         raise ChatException(e)
+    except TelegramError as e:
+        raise ChatException("%s - %s" % (e, tb.user.get_full_name()))
 

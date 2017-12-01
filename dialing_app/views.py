@@ -42,9 +42,20 @@ def to_abon(request, tel):
 
 @login_required
 @only_admins
-def vmail(request):
-    title = _('Voice mail')
+def vmail_request(request):
+    title = _('Voice mail request')
     cdr = AsteriskCDR.objects.filter(userfield='request').order_by('-calldate')
+    cdr = pag_mn(request, cdr)
+    return render(request, 'vmail.html', {
+        'title': title,
+        'vmessages': cdr
+    })
+
+@login_required
+@only_admins
+def vmail_report(request):
+    title = _('Voice mail report')
+    cdr = AsteriskCDR.objects.filter(userfield='report').order_by('-calldate')
     cdr = pag_mn(request, cdr)
     return render(request, 'vmail.html', {
         'title': title,

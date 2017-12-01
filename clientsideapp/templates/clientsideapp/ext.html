@@ -49,6 +49,7 @@
                     <a href="{{ client_side_services }}">Услуги</a>
                 </li>
 
+
                 <!--<li>
                     <a href="#">
                         Сообщения из администрации
@@ -70,7 +71,7 @@
                     </ul>
                 </li>
             </ul>
-            <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance }}</b> руб.</span>
+            <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance|floatformat:2 }}</b> руб.</span>
         </div><!--/.nav-collapse -->
     </div>
 </div>
