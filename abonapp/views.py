@@ -3,7 +3,7 @@ from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
-from django.db.models import Count, Q
+from django.db.models import Count, Q, signals
 from django.db.transaction import atomic
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
@@ -868,6 +868,43 @@ def tel_del(request, gid, uid):
     except models.AdditionalTelephone.DoesNotExist:
         messages.error(request, _('Telephone not found'))
     return redirect('abonapp:abon_home', gid, uid)
+
+
+@login_required
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def phonebook(request, gid):
+    res_format = request.GET.get('f')
+    t1 = models.Abon.objects.filter(group__id=int(gid)).only('telephone', 'fio').values_list('telephone', 'fio')
+    t2 = models.AdditionalTelephone.objects.filter(abon__group__id=gid).only('telephone', 'owner_name').values_list('telephone', 'owner_name')
+    tels = list(t1) + list(t2)
+    if res_format == 'csv':
+        import csv
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="phones.csv"'
+        writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
+        for row in tels:
+            writer.writerow(row)
+        return response
+    return render_to_text('abonapp/modal_phonebook.html', {
+        'tels': tels,
+        'gid': gid
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_abon')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def reset_ip(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    signals.post_save.disconnect(models.abon_post_save, sender=models.Abon)
+    abon.ip_address = None
+    abon.save(update_fields=['ip_address'])
+    signals.post_save.connect(models.abon_post_save, sender=models.Abon)
+    return HttpResponse(dumps({
+        'status': 0,
+        'dat': "<span class='glyphicon glyphicon-refresh'></span>"
+    }))
+
 
 
 # API's

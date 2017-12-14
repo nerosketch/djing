@@ -95,14 +95,9 @@ msgstr "Несколько абонентов с указанным номеро
 msgid "User with the telephone number not found"
 msgstr "Абонент с таким номером телефона не найден"
 
-msgid "Voice mail"
-msgstr "Оставленные сообщения"
+msgid "Voice mail request"
+msgstr "Заявки на подключение"
 
-msgid "Type"
-msgstr "Тип"
+msgid "Voice mail report"
+msgstr "Заявки на поломки"
 
-msgid "Request"
-msgstr "Заявка"
-
-msgid "Report"
-msgstr "Поломка"

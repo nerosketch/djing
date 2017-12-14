@@ -378,3 +378,9 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "locality %s. Task type - %s. "
 msgstr "с. %s. Тип задачи - %s. "
+
+msgid "ip conflict"
+msgstr "Ip конфликт"
+
+msgid "Internet crash"
+msgstr "Нет интернета"

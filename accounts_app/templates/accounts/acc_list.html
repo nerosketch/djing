@@ -34,27 +34,20 @@
                         Нету{% endif %}</td>
                     <td class="hidden-xs">{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
                         Нету{% endif %}</a></td>
-                    <td class="btn-group hidden-xs">
-                        <a href="#" class="btn btn-sm btn-default disabled"
-                           title="Дать задание">
-                            <span class="glyphicon glyphicon-tasks"></span>
-                        </a>
-                        <a href="{ % url 'django_messages:messages_compose' % }?a={{ usr.id }}" class="btn btn-sm btn-info"
-                           title="Отправить сообщение">
-                            <span class="glyphicon glyphicon-envelope"></span>
-                        </a>
-
-                        {% if usr.id == request.user.id or perms.acc_app.delete_userprofile %}
+                    {% if usr.id == request.user.id or perms.acc_app.delete_userprofile %}
+                        <td class="btn-group hidden-xs">
                             <a href="{% url 'acc_app:delete_profile' usr.id %}" class="btn btn-sm btn-danger">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
-                        {% else %}
+                        </td>
+                    {% else %}
+                        <td class="btn-group hidden-xs">
                             <a href="#" class="btn btn-sm btn-danger disabled" title="Не прав на удаление">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
-                        {% endif %}
+                        </td>
+                    {% endif %}
 
-                    </td>
                 </tr>
             {% empty %}
                 <tr>

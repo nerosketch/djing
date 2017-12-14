@@ -28,12 +28,16 @@ def pays(request):
 
 @login_required
 def services(request):
-    abon = Abon.objects.get(pk=request.user.pk)
-    all_tarifs = abon.group.tariffs.filter(is_admin=False)
-
+    try:
+        abon = Abon.objects.get(pk=request.user.pk)
+        all_tarifs = abon.group.tariffs.filter(is_admin=False)
+        current_service = abon.active_tariff()
+    except:
+        all_tarifs = None
+        current_service = None
     return render(request, 'clientsideapp/services.html', {
         'tarifs': all_tarifs,
-        'current_service': abon.active_tariff()
+        'current_service': current_service
     })
 
 

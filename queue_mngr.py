@@ -18,7 +18,6 @@ obj = {
 
 
 def on_new_data(client_sock, ip):
-    from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
     data = client_sock.recv(16384)
     data = loads(data)
     action = data['cmd']
@@ -51,5 +50,6 @@ def serve(addr='127.0.0.1', port=5436):
 if __name__ == '__main__':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
     django.setup()
+    from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
     serve()
 

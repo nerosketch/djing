@@ -1012,3 +1012,11 @@ msgstr "Может видеть дополнительные телефоны"
 msgid "IP Conflict! %d/%d results"
 msgstr "IP Конфликт! ping %d из %d"
 
+msgid "Phonebook"
+msgstr "Телефонная книга"
+
+msgid "Reset ip"
+msgstr "Сбросить ip"
+
+msgid "Export to csv"
+msgstr "Сохранить в csv"

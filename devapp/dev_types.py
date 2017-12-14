@@ -237,10 +237,10 @@ class EltexSwitch(DLinkDevice):
 
     def get_ports(self):
         #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
-        stats = self.get_list('.1.3.6.1.2.1.2.2.1.7')
-        oper_stats = self.get_list('.1.3.6.1.2.1.2.2.1.8')
+        stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
+        oper_stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.8'))
         #macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
-        speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
+        speeds = list(self.get_list('.1.3.6.1.2.1.31.1.1.1.15'))
         res = []
         for n in range(28):
             res.append(EltexPort(self,
@@ -262,7 +262,7 @@ class EltexSwitch(DLinkDevice):
 
     @staticmethod
     def has_attachable_to_subscriber():
-        return False
+        return True
 
     @staticmethod
     def is_use_device_port():
