@@ -64,3 +64,4 @@ class AsteriskCDR(models.Model):
 
     class Meta:
         db_table = 'cdr'
+        managed = False

@@ -173,6 +173,52 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 })(jQuery);
 
 
+(function($){
+    $.fn.notifys = function(opt){
+        var settings = $.extend({
+			news_url: null,
+			check_interval: 60
+		}, opt);
+
+        var notifShow = function(title, content){
+            var perm = Notification.permission.toLowerCase();
+            if(perm == "granted"){
+                curnotify = new Notification(title, {
+                    tag: 'djing-notify',
+                    body: content,
+                    icon: '/static/img/noticon.png'}
+                );
+            }else if(perm == "default"){
+                Notification.requestPermission(on_ask_perm);
+            }
+        }
+
+        var on_ask_perm = function(r){
+            notifShow("Thanks for letting notify you");
+        }
+
+        var check_news = function(){
+            var perm = Notification.permission.toLowerCase();
+            if(perm == "granted" && settings.news_url){
+                $.getJSON(settings.news_url, function(r){
+                    if(r.exist){
+                        notifShow(r.title, r.content);
+                    }/*else console.log('No news from '+settings.news_url);*/
+                });
+            }
+        }
+
+        if(settings.news_url){
+            // прверяем новости раз в минуту
+            var tiid = setInterval(check_news, settings.check_interval*1000);
+
+            Notification.requestPermission(on_ask_perm);
+        }
+    }
+})(jQuery);
+
+
+
 $(document).ready(function () {
 
 	// Live html5 image preview
@@ -246,5 +292,8 @@ $(document).ready(function () {
 	$('[data-toggle="tooltip"]').tooltip({container:'body'});
 
 	$('.btn_ajloader').ajloader({'dst_block': '#id_block_devices'});
+
+	$(document).notifys({news_url: '/tasks/check_news', check_interval: 10});
+	$(document).notifys({news_url: '/msg/check_news', check_interval: 55});
 
 });

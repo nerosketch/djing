@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^finished$', views.finished_tasks, name='finished_tasks'),
     url(r'^own$', views.own_tasks, name='own_tasks'),
     url(r'^my$', views.my_tasks, name='my_tasks'),
-    url(r'^all$', views.all_tasks, name='all_tasks')
+    url(r'^all$', views.all_tasks, name='all_tasks'),
+    url(r'^check_news$', views.check_news, name='check_news')
 ]

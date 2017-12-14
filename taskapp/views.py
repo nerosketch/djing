@@ -1,12 +1,15 @@
 # coding=utf-8
+from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
 from datetime import date
 from guardian.decorators import permission_required_or_403 as permission_required
+from chatbot.models import MessageQueue
 
 from .handle import TaskException
 from .models import Task
@@ -202,3 +205,18 @@ def remind(request, task_id):
     except TaskException as e:
         messages.error(request, e)
     return redirect('taskapp:home')
+
+
+@login_required
+@only_admins
+def check_news(request):
+    msg = MessageQueue.objects.pop(user=request.user, tag='taskap')
+    if msg is not None:
+        r = {
+            'exist': True,
+            'content': msg,
+            'title': _('Task')
+        }
+    else:
+        r = {'exist': False}
+    return HttpResponse(dumps(r))

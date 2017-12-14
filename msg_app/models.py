@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from accounts_app.models import UserProfile
+from chatbot.telebot import send_notify
 
 
 class MessageError(Exception):
@@ -166,6 +167,7 @@ class Conversation(models.Model):
                 if participant == author:
                     continue
                 MessageStatus.objects.create(msg=msg, user=participant)
+        send_notify(msg_text=text,account=author, tag='msgapp')
         return msg
 
     def remove_message(self, msg):
