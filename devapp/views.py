@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -95,24 +96,30 @@ def dev(request, grp, devid=0):
         else:
             if not request.user.has_perm('devapp.change_device'):
                 raise PermissionDenied
-        frm = DeviceForm(request.POST, instance=devinst)
-        if frm.is_valid():
-            ndev = frm.save()
-            ndev.update_dhcp()
-            messages.success(request, _('Device info has been saved'))
-            return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
-        else:
-            try:
-                already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
-                if already_dev.user_group:
-                    messages.warning(request, _('You have redirected to existing device'))
-                    return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
-                else:
-                    messages.warning(request, _('Please attach user group for device'))
-                    return redirect('devapp:fix_device_group', already_dev.pk)
-            except Device.DoesNotExist:
-                pass
-            messages.error(request, _('Form is invalid, check fields and try again'))
+        try:
+            frm = DeviceForm(request.POST, instance=devinst)
+            if frm.is_valid():
+                ndev = frm.save()
+                ndev.update_dhcp()
+                messages.success(request, _('Device info has been saved'))
+                return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
+            else:
+                try:
+                    already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
+                    if already_dev.user_group:
+                        messages.warning(request, _('You have redirected to existing device'))
+                        return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
+                    else:
+                        messages.warning(request, _('Please attach user group for device'))
+                        return redirect('devapp:fix_device_group', already_dev.pk)
+                except Device.DoesNotExist:
+                    pass
+                messages.error(request, _('Form is invalid, check fields and try again'))
+        except IntegrityError as e:
+            if 'unique constraint' in e.message:
+                messages.error(request, _('Duplicate user and port: %s') % e)
+            else:
+                messages.error(request, e)
     else:
         if devinst is None:
             frm = DeviceForm(initial={

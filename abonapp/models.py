@@ -172,6 +172,7 @@ class Abon(UserProfile):
             ('can_add_ballance', _('fill account')),
             ('can_ping', _('Can ping'))
         )
+        unique_together = ('device', 'dev_port')
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
 

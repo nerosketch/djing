@@ -95,9 +95,9 @@ class Device(models.Model):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address, self.mac_addr or '')
 
     def update_dhcp(self):
-        if self.devtype != 'On':
+        if self.devtype not in ('On','Dl'):
             return
-        grp = self.user_group.pk
+        grp = self.user_group.id
         code = ''
         if grp == 87:
             code = 'chk'
@@ -125,6 +125,8 @@ class Device(models.Model):
             code = 'yst'
         elif grp == 96:
             code = 'lzk'
+        elif grp == 51:
+            code = 'sad'
         newmac = str(self.mac_addr)
         run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
 

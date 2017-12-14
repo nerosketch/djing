@@ -334,3 +334,6 @@ msgstr "Исправлено, обновите страницу"
 msgid "Fix it"
 msgstr "Исправить"
 
+msgid "Duplicate user and port: %s"
+msgstr "Пользователь с таким портом и устройством уже есть: %s"
+
