@@ -181,6 +181,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 		}, opt);
 
         var notifShow = function(title, content){
+            if(!settings.news_url) return;
             var perm = Notification.permission.toLowerCase();
             if(perm == "granted"){
                 curnotify = new Notification(title, {
@@ -194,7 +195,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
         }
 
         var on_ask_perm = function(r){
-            notifShow("Thanks for letting notify you");
+            console.log("Thanks for letting notify you");
         }
 
         var check_news = function(){
@@ -203,6 +204,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
                 $.getJSON(settings.news_url, function(r){
                     if(r.exist){
                         notifShow(r.title, r.content);
+                        /*console.log('News from '+settings.news_url+'. '+r.content);*/
                     }/*else console.log('No news from '+settings.news_url);*/
                 });
             }
@@ -212,7 +214,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
             // прверяем новости раз в минуту
             var tiid = setInterval(check_news, settings.check_interval*1000);
 
-            Notification.requestPermission(on_ask_perm);
+            //Notification.requestPermission(on_ask_perm);
         }
     }
 })(jQuery);

@@ -82,7 +82,7 @@ def check_news(request):
         r = {
             'exist': True,
             'content': msg,
-            'title': _('Task')
+            'title': "%s" % _('Message')
         }
     else:
         r = {'exist': False}

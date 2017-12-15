@@ -267,3 +267,9 @@ div#loading>div.gif {
     border-style: ridge;
 }
 
+
+
+.scroll-area {
+    overflow-y: auto;
+    max-height: 65vh;
+}
