@@ -163,7 +163,7 @@ msgstr "Создать"
 #: taskapp/templates/taskapp/tasklist_all.html:93
 #: taskapp/templates/taskapp/tasklist_all.html:94
 msgid "Add new task"
-msgstr "Добавьте новую задачу"
+msgstr "Добавьте задачу"
 
 #: taskapp/templates/taskapp/add_edit_task.html:27
 #: taskapp/templates/taskapp/tasklist.html:13
@@ -378,3 +378,9 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "locality %s. Task type - %s. "
 msgstr "с. %s. Тип задачи - %s. "
+
+msgid "ip conflict"
+msgstr "Ip конфликт"
+
+msgid "Internet crash"
+msgstr "Нет интернета"

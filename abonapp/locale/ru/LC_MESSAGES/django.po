@@ -877,7 +877,7 @@ msgstr "Графики"
 
 #: abonapp/templates/abonapp/ext.html:26
 msgid "Sub information"
-msgstr "Информация абонента"
+msgstr "Инфо."
 
 msgid "Streets"
 msgstr "Улицы"
@@ -1005,3 +1005,18 @@ msgstr "Может пинговать"
 
 msgid "Can view additional telephones"
 msgstr "Может видеть дополнительные телефоны"
+
+
+#: abonapp/views.py:694
+#, python-format
+msgid "IP Conflict! %d/%d results"
+msgstr "IP Конфликт! ping %d из %d"
+
+msgid "Phonebook"
+msgstr "Телефонная книга"
+
+msgid "Reset ip"
+msgstr "Сбросить ip"
+
+msgid "Export to csv"
+msgstr "Сохранить в csv"

@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -10,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from json import dumps
 
-from .models import Device, Port, DeviceDBException
+from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
 from .forms import DeviceForm, PortForm
 from abonapp.models import AbonGroup, Abon
@@ -25,15 +26,19 @@ def devices(request, grp):
     group = get_object_or_404(AbonGroup, pk=grp)
     if not request.user.has_perm('abonapp.can_view_abongroup', group):
         raise PermissionDenied
-    devs = Device.objects.filter(user_group=grp).only('comment', 'mac_addr', 'devtype', 'user_group', 'pk',
-                                                      'ip_address')
+    try:
+        devs = Device.objects.filter(user_group=group).select_related('user_group').only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
 
-    # фильтр
-    dr, field = order_helper(request)
-    if field:
-        devs = devs.order_by(field)
+        # фильтр
+        dr, field = order_helper(request)
+        if field:
+            devs = devs.order_by(field)
 
-    devs = pag_mn(request, devs)
+        devs = pag_mn(request, devs)
+        devs = Device.objects.wrap_monitoring_info(devs)
+
+    except (DeviceDBException, DeviceMonitoringException) as e:
+        messages.error(request, e)
 
     return render(request, 'devapp/devices.html', {
         'devices': devs,
@@ -91,17 +96,30 @@ def dev(request, grp, devid=0):
         else:
             if not request.user.has_perm('devapp.change_device'):
                 raise PermissionDenied
-        frm = DeviceForm(request.POST, instance=devinst)
-        if frm.is_valid():
-            ndev = frm.save()
-            messages.success(request, _('Device info has been saved'))
-            return redirect('devapp:edit', grp, ndev.pk)
-        else:
-            try:
-                already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
-            except Device.DoesNotExist:
-                pass
-            messages.error(request, _('Form is invalid, check fields and try again'))
+        try:
+            frm = DeviceForm(request.POST, instance=devinst)
+            if frm.is_valid():
+                ndev = frm.save()
+                ndev.update_dhcp()
+                messages.success(request, _('Device info has been saved'))
+                return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
+            else:
+                try:
+                    already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
+                    if already_dev.user_group:
+                        messages.warning(request, _('You have redirected to existing device'))
+                        return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
+                    else:
+                        messages.warning(request, _('Please attach user group for device'))
+                        return redirect('devapp:fix_device_group', already_dev.pk)
+                except Device.DoesNotExist:
+                    pass
+                messages.error(request, _('Form is invalid, check fields and try again'))
+        except IntegrityError as e:
+            if 'unique constraint' in e.message:
+                messages.error(request, _('Duplicate user and port: %s') % e)
+            else:
+                messages.error(request, e)
     else:
         if devinst is None:
             frm = DeviceForm(initial={
@@ -110,7 +128,8 @@ def dev(request, grp, devid=0):
                 'mac_addr': request.GET.get('mac'),
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
-                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', '')
+                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
+                'snmp_item_num': request.GET.get('n')
             })
         else:
             frm = DeviceForm(instance=devinst)
@@ -125,7 +144,7 @@ def dev(request, grp, devid=0):
         return render(request, 'devapp/dev.html', {
             'form': frm,
             'dev': devinst,
-            'selected_parent_dev': devinst.parent_dev or None,
+            'selected_parent_dev': devinst.parent_dev,
             'group': user_group,
             'already_dev': already_dev
         })
@@ -138,7 +157,7 @@ def manage_ports(request, devid):
         dev = Device.objects.get(pk=devid)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
-            return redirect('devapp:group_list')
+            return redirect('devapp:fix_device_group', dev.pk)
         ports = Port.objects.filter(device=dev)
 
     except Device.DoesNotExist:
@@ -177,7 +196,7 @@ def add_ports(request, devid):
         dev = Device.objects.get(pk=devid)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
-            return redirect('devapp:group_list')
+            return redirect('devapp:fix_device_group', dev.pk)
         if request.method == 'POST':
             ports = zip(
                 request.POST.getlist('p_text'),
@@ -200,7 +219,7 @@ def add_ports(request, devid):
         db_ports = Port.objects.filter(device=dev)
         db_ports = [TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports]
 
-        manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+        manager = dev.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
             ports = [TempPort(p.num, p.nm, p.st, False) for p in ports]
@@ -303,33 +322,36 @@ def add_single_port(request, grp, did):
 @login_required
 @permission_required('devapp.can_view_device')
 def devview(request, did):
-    ports = None
-    uptime = 0
+    ports, manager = None, None
     dev = get_object_or_404(Device, id=did)
+
+    if not dev.user_group:
+        messages.warning(request, _('Please attach user group for device'))
+        return redirect('devapp:fix_device_group', dev.pk)
+
     template_name = 'ports.html'
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
-                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
-                uptime = manager.uptime()
+                manager = dev.get_manager_object()
                 ports = manager.get_ports()
                 template_name = manager.get_template_name()
             else:
                 messages.warning(request, _('Not Set snmp device password'))
         else:
             messages.error(request, _('Dot was not pinged'))
-    except EasySNMPTimeoutError:
-        messages.error(request, _('wait for a reply from the SNMP Timeout'))
+        return render(request, 'devapp/custom_dev_page/' + template_name, {
+            'dev': dev,
+            'ports': ports,
+            'dev_accs': Abon.objects.filter(device=dev),
+            'dev_manager': manager
+        })
     except EasySNMPError:
         messages.error(request, _('SNMP error on device'))
     except DeviceDBException as e:
         messages.error(request, e)
-
     return render(request, 'devapp/custom_dev_page/' + template_name, {
-        'dev': dev,
-        'ports': ports,
-        'uptime': uptime,
-        'dev_accs': Abon.objects.filter(device=dev)
+        'dev': dev
     })
 
 
@@ -342,7 +364,7 @@ def toggle_port(request, did, portid, status=0):
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
-                manager = dev.get_manager_klass()(dev.ip_address, dev.man_passw)
+                manager = dev.get_manager_object()
                 ports = manager.get_ports()
                 if status:
                     ports[portid - 1].enable()
@@ -354,6 +376,8 @@ def toggle_port(request, did, portid, status=0):
             messages.error(request, _('Dot was not pinged'))
     except EasySNMPTimeoutError:
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
+    except EasySNMPError as e:
+        messages.error(request, e)
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, did)
 
 
@@ -378,3 +402,59 @@ def search_dev(request):
         ).only('pk', 'ip_address', 'comment')[:16]
         results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
     return HttpResponse(dumps(results, ensure_ascii=False))
+
+
+@login_required
+def fix_device_group(request, did):
+    dev = get_object_or_404(Device, pk=did)
+    try:
+        if request.method == 'POST':
+            frm = DeviceForm(request.POST, instance=dev)
+            if frm.is_valid():
+                ch_dev = frm.save()
+                if ch_dev.user_group:
+                    messages.success(request, _('Device fixed'))
+                    return redirect('devapp:devs', ch_dev.user_group.pk)
+                else:
+                    messages.error(request, _('Please attach user group for device'))
+            else:
+                messages.error(request, _('Form is invalid, check fields and try again'))
+        else:
+            frm = DeviceForm(instance=dev)
+    except ValueError:
+        return HttpResponse('ValueError')
+    return render(request, 'devapp/fix_dev_group.html', {
+        'form': frm,
+        'dev': dev,
+        'selected_parent_dev': dev.parent_dev
+    })
+
+
+@login_required
+def fix_onu(request):
+    mac = request.GET.get('cmd_param')
+    status = 1
+    text = '<span class="glyphicon glyphicon-exclamation-sign"></span>'
+    try:
+        onu = Device.objects.get(mac_addr=mac, devtype='On')
+        parent = onu.parent_dev
+        if parent is not None:
+            manobj = parent.get_manager_object()
+            ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
+            for srcmac, snmpnum in ports:
+                real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
+                if mac == real_mac:
+                    onu.snmp_item_num = snmpnum
+                    onu.save(update_fields=['snmp_item_num'])
+                    status = 0
+                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
+                    break
+        else:
+            text = text + ' %s' % _('Parent device not found')
+    except Device.DoesNotExist:
+        pass
+    return HttpResponse(dumps({
+        'status': status,
+        'dat': text
+    }))
+

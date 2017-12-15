@@ -1,20 +1,28 @@
-<form action="{% url 'mapapp:modal_add_dot' %}" method="post">{% csrf_token %}
+{% load i18n %}{% load bootstrap3 %}
+<form action="{% url 'mapapp:modal_add_dot' %}" class="form-ajax" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>Добавить точку</h4>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>{% trans 'Add point' %}</h4>
     </div>
     <div class="modal-body">
-        <h4>Координаты: {{ coords }}</h4>
-        <div class="form-group">
-            <label for="id_title">Название точки</label>
-            <input type="text" class="form-control" autofocus name="title" id="id_title">
-        </div>
-        <input type="hidden" name="coords" value="{{ coords }}">
+        <h4>{% blocktrans %}Coords: {{ coords }}{% endblocktrans %}</h4>
+
+        {% bootstrap_icon 'edit' as ic %}
+        {% bootstrap_field form.title addon_before=ic %}
+
+        {% bootstrap_icon 'globe' as ic %}
+        {% bootstrap_field form.longitude addon_before=ic %}
+
+        {% bootstrap_icon 'globe' as ic %}
+        {% bootstrap_field form.latitude addon_before=ic %}
+
+        {% bootstrap_field form.attachment %}
+
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-sm btn-primary">
-            <span class="glyphicon glyphicon-save"></span> Сохранить
+            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
         </button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
     </div>
 </form>

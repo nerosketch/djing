@@ -289,3 +289,72 @@ def add_user_range(self, user_list):
 def add_tariff_range(self, tariff_list):
     pass
 ```
+
+
+## Отправляем оповещения
+Для того чтоб оправить важное сообщение работнику через все возможные настроенные системы(смс, телеграм, браузер) мы можем
+воспользоваться одной процедурой из модуля **chatbot**.
+```python
+from chatbot.telebot import send_notify
+
+send_notify(msg_text='Text message',account=employee_profile, tag='apptag')
+```
+Процедура **send_notify** принимает 3 параметра. 2 первых обязательны а последний не обязаелен.
+
+
+*msg_text* - Текст сообщения
+
+*account* - Учётка работника которому отправляем сообщение
+
+*tag* - Тэг сообщения, это поле предназначено для фильтрации ваших сообщений в вашем приложении. Каждое приложение в пределах
+своих вызовов использует один и тот жеж уникальный тэг. Для примера приложение личных сообщений видит сообщения только для себя
+с помощью тега *msgapp*, и вы не спутаете ваши сообщения с сообщениями из модуля, например, задач который использует тэг *taskap*.
+
+
+#### Получение оповещения
+```python
+from chatbot.models import MessageQueue
+
+msg = MessageQueue.objects.pop(user=employee_profile, tag='apptag')
+```
+
+Метод **pop** плучает первое сообщение и удаляет его.
+
+
+#### Отображаем оповещение в браузере
+
+Чтоб отобразить **WebNotification** добавте в файле скриптов *static/js/my.js* строку вида:
+
+```javascript
+$(document).notifys({news_url: '/url/to/your_view', check_interval: 60});
+```
+Тут *news_url* это путь к вашему представления которое возвращает новые оповещения, а *check_interval* - это интервал обращения к вашему представлению.
+
+
+Представление для Web оповещений выглядит примерно так:
+```python
+@login_required
+@only_admins
+def check_news(request):
+    msg = MessageQueue.objects.pop(user=request.user, tag='apptag')
+    if msg is not None:
+        r = {
+            'exist': True,
+            'content': msg,
+            'title': 'Message title'
+        }
+    else:
+        r = {'exist': False}
+    return HttpResponse(dumps(r))
+```
+
+Убедитесь что вашему представлению не будет доступа от абонентов, об этом позаботится декоратор *only_admins* из *mydefs*. *mydefs* лежит в корне проекта.
+
+После получения сообщения надо вернуть словарь с параметрами:
+
+*exist* - Логическое значение, обозначает есть или нет информации в ответе. Если *exist* == True тогда возвращае ещё *content* и *title*.
+
+
+*content* - Соответственно содержимое оповещения.
+
+*title* - Заголовок оповещения.

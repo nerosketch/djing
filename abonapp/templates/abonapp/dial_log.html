@@ -21,7 +21,7 @@
                 <tr>
                     <td>
                         <audio preload="metadata" controls>
-                            <source src="{{ log.path_to_media }}/{{ log.calldate|date:"YmdHi" }}-{{ log.src }}-{{ log.dst }}.wav" type="audio/wav"/>
+                            <source src="{{ log.url }}" type="audio/wav"/>
                         </audio>
                     </td>
                     <td>{{ log.calldate|date:'d E Y, H:i:s' }}</td>

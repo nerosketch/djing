@@ -12,29 +12,31 @@
 
     <h3>{% trans 'Devices' %}</h3>
     <div class="table-responsive">
-        <table class="table table-striped table-bordered">
+        <table class="table table-bordered">
             <thead>
             <tr>
-                <th>
+                <th>#</th>
+                <th class="col-md-2">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th>
+                <th class="col-md-5">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=comment&dir={{ dir|default:"down" }}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th>{% trans 'Mac address' %}</th>
-                <th width="250">
+                <th class="col-md-3">{% trans 'Mac address' %}</th>
+		<th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th>
+                <th class="col-md-1">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:"down" }}">
                         {% trans 'Device type' %}
                     </a>
                     {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
-                <th width="100">Do</th>
+                <th class="col-md-1">Do</th>
             </tr>
             </thead>
 
@@ -42,18 +44,28 @@
             {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device %}
             {% for dev in devices %}
                 <tr>
+                    <td>
+                        {% if dev.mon %}
+                            {% if dev.mon.current_state == '0' %}
+                                <span class="glyphicon glyphicon-ok-circle text-success"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                            {% endif %}
+                        {% else %}&ndash;{% endif %}
+                    </td>
                     <td><a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
-                    <td>{{ dev.mac_addr }}</td>
+                    <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
+                    <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
-                    <td class="btn-group btn-group-sm">
+                    <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}
-                            <a href="{% url 'devapp:del' dev.user_group.pk dev.pk %}" class="btn btn-default btn-sm">
+                            <a href="{% url 'devapp:del' dev.user_group.pk dev.pk %}" class="btn btn-danger">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         {% endif %}
                         {% if can_ch_dev %}
-                            <a href="{% url 'devapp:edit' dev.user_group.pk dev.id %}" class="btn btn-default btn-sm">
+                            <a href="{% url 'devapp:edit' dev.user_group.pk dev.id %}" class="btn btn-default">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
                         {% endif %}
@@ -61,7 +73,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">{% trans 'Devices does not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
+                    <td colspan="7">{% trans 'Devices does not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
                 </tr>
             {% endfor %}
             {% endwith %}
@@ -69,7 +81,7 @@
 
             <tfoot>
             <tr>
-                <td colspan="5">
+                <td colspan="7">
                     <a href="{% url 'devapp:add' group.pk %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Create' %}
                     </a>

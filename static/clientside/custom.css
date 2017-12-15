@@ -12,8 +12,27 @@ body > .container {
 .table thead {
     background-color: #ddd;
 }
+/* White background in tables */
+.table tr:nth-of-type(2n) {
+    background-color: white;
+}
+
+
 
 .modal-header{border-radius: 4px 4px 0 0;}
 .modal-header.warning {background-color: #d2322d;}
 .modal-header.success {background-color: #6ad245;}
 .modal-header.primary {background-color: #789cbb;}
+
+
+
+html{height: 100%;}
+body{
+    padding: 88px 15px 0;
+    background-image: url(../img/Transparent_snowman_PNG.png);
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    background-attachment: fixed;
+}
+
+

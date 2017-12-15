@@ -12,6 +12,9 @@ xmltodict
 mysqlclient
 
 easysnmp
-rq
 pid
 django-guardian
+pinax-theme-bootstrap
+django-bootstrap3
+requests
+webdavclient

@@ -2,7 +2,7 @@
 {% block base_content %}
 
     <!-- Left menu -->
-    <div class="col-sm-2 sidebar sidebar-offcanvas" role="navigation">
+    <div class="col-sm-3 col-md-2 sidebar sidebar-offcanvas" role="navigation">
 
         <div class="row profile_img">
             <div class="col-sm-5">
@@ -47,11 +47,13 @@
                     <span class="glyphicon glyphicon-usd"></span> тарифы
                 </a></li>
 
-            {% url 'mapapp:options' as mapapp_ops %}
-            <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
-                <a href="{{ mapapp_ops }}">
-                    <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
-                </a></li>
+            {% if request.user.is_superuser %}
+                {% url 'mapapp:options' as mapapp_ops %}
+                <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
+                    <a href="{{ mapapp_ops }}">
+                        <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
+                    </a></li>
+            {% endif %}
 
             {% url 'msg_app:home' as privmsg_home %}
             <li{% if privmsg_home in request.path %} class="active"{% endif %}>
@@ -82,7 +84,7 @@
     <!-- END Left menu -->
 
     <!-- Main content -->
-    <div class="col-sm-10 col-sm-offset-2 main">
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <p class="pull-left visible-xs">
             <button type="button" data-toggle="offcanvas"></button>
         </p>

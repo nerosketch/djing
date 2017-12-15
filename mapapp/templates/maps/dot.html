@@ -1,63 +1,103 @@
 {% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
 {% block main %}
 
+<ol class="breadcrumb">
+    <li><span class="glyphicon glyphicon-home"></span></li>
+    <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
+    {% if dot.id %}
+    <li class="active">{{ dot.title }}</li>
+    {% url 'mapapp:edit_dot' dot.id as form_url %}
+    {% else %}
+    <li class="active">{% trans 'Add new point' %}</li>
+    {% url 'mapapp:add_dot' as form_url %}
+    {% endif %}
+</ol>
 
-    <ol class="breadcrumb">
-        <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'mapapp:options' %}">Настройки карты</a></li>
-        <li class="active">{{ dot.title }}</li>
-    </ol>
+{% include 'message_block.html' %}
 
-    {% include 'message_block.html' %}
+<div class="row">
+    <div class="{% if dot.id %}col-sm-6{% else %}col-sm-12{% endif %}">
+        <form role="form" action="{{ form_url }}" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'Map point' %}</h3>
+                </div>
+                <div class="panel-body">
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Точка топологии</h3>
-        </div>
-        <div class="panel-body">
+                    {# title input #}
+                    {% bootstrap_icon 'edit' as ic %}
+                    {% bootstrap_field form.title addon_before=ic %}
 
-            {% if dot.id %}
-                <form role="form" action="{% url 'mapapp:edit_dot' dot.id %}" method="post">
-            {% else %}
-                <form role="form" action="{% url 'mapapp:add_dot' %}" method="post">
-            {% endif %}
-            {% csrf_token %}
+                    {# longitude input #}
+                    {% bootstrap_icon 'globe' as ic %}
+                    {% bootstrap_field form.longitude addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="id_title">Название точки топологии</label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-edit"></span></span>
-                        {{ form.title }}{{ form.title.errors }}
+                    {# latitude input #}
+                    {% bootstrap_icon 'globe' as ic %}
+                    {% bootstrap_field form.latitude addon_before=ic %}
+
+                    {# attachment input #}
+                    {% bootstrap_field form.attachment %}
+
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group btn-group-sm">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                        </button>
+                        <button type="reset" class="btn btn-default">
+                            <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+                        </button>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="id_longitude">Longitude</label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
-                        {{ form.longitude }}{{ form.longitude.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_latitude">Latitude</label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-globe"></span></span>
-                        {{ form.latitude }}{{ form.latitude.errors }}
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <span class="glyphicon glyphicon-save"></span> Сохранить
-                    </button>
-                    <button type="reset" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-remove-circle"></span> Сбросить
-                    </button>
-                </div>
-
-            </form>
+            </div>
+        </form>
+    </div>
+    {% if dot.id %}
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{% trans 'Devices' %}</h3>
+            </div>
+            <table class="table">
+                {% for dev in dot.devices.all %}
+                <tr>
+                    <td>
+                        {% if dev.user_group %}
+                            <a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.comment }}</a>
+                        {% else %}
+                            <a href="{% url 'devapp:view' 0 dev.pk %}">{{ dev.comment }}</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ dev.ip_address }}</td>
+                    <td>{{ dev.get_comment_display }}</td>
+                    <td>
+                        {% if dev.user_group %}
+                        <a href="{% url 'abonapp:people_list' dev.user_group.pk %}">
+                            {{ dev.user_group }}
+                        </a>
+                        {% else %}
+                        {% trans 'User group has no attached' %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">{% trans 'Devices not found' %}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="panel-footer">
+                {% trans 'Add' as trns %}
+                {% url 'mapapp:add_dev' dot.pk as url %}
+                {% bootstrap_button trns button_type="link" icon='plus' size='sm' button_class='btn-success' href=url %}
+            </div>
         </div>
     </div>
+    {% endif %}
+</div>
 
 {% endblock %}

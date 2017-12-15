@@ -18,14 +18,14 @@
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>#</th>
+                <th class="hidden-xs">#</th>
                 <th class="col-sm-3">{% trans 'Name' %}</th>
                 <th class="col-sm-1">{% trans 'Address' %}</th>
                 <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
                 <th class="col-sm-3">{% trans 'Description' %}</th>
                 <th class="col-sm-1">{% trans 'Task author' %}</th>
                 <th class="col-sm-1">{% trans 'Condition' %}</th>
-                <th class="col-sm-1">{% trans 'Date of create' %}</th>
+                <th class="col-sm-1 hidden-xs">{% trans 'Date of create' %}</th>
                 <th class="col-sm-1">{% trans 'Actions' %}</th>
             </tr>
             </thead>
@@ -46,7 +46,7 @@
                     {% endif %}
                 {% endif %}
 
-                <td><a href="{% url 'taskapp:view' task.pk %}" target="_blank">{{ task.pk }}</a></td>
+                <td class="hidden-xs"><a href="{% url 'taskapp:view' task.pk %}" target="_blank">{{ task.pk }}</a></td>
 
                 {% if task.abon and task.abon.group %}
                     <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank">{{ task.abon.get_full_name }}</a></td>
@@ -67,7 +67,7 @@
 		    {% endif %}
 		</td>
                 <td>{{ task.get_state_display }}</td>
-                <td>{{ task.time_of_create|date:'d E H:i' }}</td>
+                <td class="hidden-xs">{{ task.time_of_create|date:'d E H:i' }}</td>
 
                 <td class="btn-group btn-group-sm btn-group-justified">
                     {% if perms.taskapp.change_task %}

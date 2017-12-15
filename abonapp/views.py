@@ -3,7 +3,7 @@ from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
-from django.db.models import Count, Q
+from django.db.models import Count, Q, signals
 from django.db.transaction import atomic
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
@@ -18,7 +18,7 @@ from . import forms
 from . import models
 import mydefs
 from devapp.models import Device, Port as DevPort
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel, get_dates
@@ -286,7 +286,9 @@ def abonhome(request, gid, uid):
                 raise PermissionDenied
             frm = forms.AbonForm(request.POST, instance=abon)
             if frm.is_valid():
-                abon.ip_address = request.POST.get('ip')
+                newip = request.POST.get('ip')
+                if newip:
+                    abon.ip_address = newip
                 frm.save()
                 messages.success(request, _('edit abon success msg'))
             else:
@@ -387,6 +389,7 @@ def pick_tariff(request, gid, uid):
                 abon.pick_tariff(trf, request.user)
             else:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d')
+                deadline += timedelta(hours=23, minutes=59, seconds=59)
                 abon.pick_tariff(trf, request.user, deadline=deadline)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
@@ -687,12 +690,14 @@ def abon_ping(request):
         else:
             if type(ping_result) is tuple:
                 loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
-                if loses_percent > 0.5:
+                print(ping_result, loses_percent)
+                if loses_percent > 1.0:
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('IP Conflict! %d/%d results') % ping_result
+                elif loses_percent > 0.5:
                     text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
                     status = True
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
-                        'no ping, %d/%d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
             else:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
@@ -863,6 +868,43 @@ def tel_del(request, gid, uid):
     except models.AdditionalTelephone.DoesNotExist:
         messages.error(request, _('Telephone not found'))
     return redirect('abonapp:abon_home', gid, uid)
+
+
+@login_required
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def phonebook(request, gid):
+    res_format = request.GET.get('f')
+    t1 = models.Abon.objects.filter(group__id=int(gid)).only('telephone', 'fio').values_list('telephone', 'fio')
+    t2 = models.AdditionalTelephone.objects.filter(abon__group__id=gid).only('telephone', 'owner_name').values_list('telephone', 'owner_name')
+    tels = list(t1) + list(t2)
+    if res_format == 'csv':
+        import csv
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="phones.csv"'
+        writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
+        for row in tels:
+            writer.writerow(row)
+        return response
+    return render_to_text('abonapp/modal_phonebook.html', {
+        'tels': tels,
+        'gid': gid
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.change_abon')
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def reset_ip(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
+    signals.post_save.disconnect(models.abon_post_save, sender=models.Abon)
+    abon.ip_address = None
+    abon.save(update_fields=['ip_address'])
+    signals.post_save.connect(models.abon_post_save, sender=models.Abon)
+    return HttpResponse(dumps({
+        'status': 0,
+        'dat': "<span class='glyphicon glyphicon-refresh'></span>"
+    }))
+
 
 
 # API's

@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load i18n %}
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head lang="ru">
     <meta charset="UTF-8">
-    <title>В доступе отказано</title>
+    <title>{% trans 'Permission denied' %}</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -36,8 +36,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
-                <div align="center"><h1>403 - Нет доступа</h1></div>
-                <div align="center"><p>У вас нет прав для выполнения действий на этой странице</p></div>
+                <div align="center"><h1>{% trans '403 - Permission denied' %}</h1></div>
+                <div align="center"><p>{% trans 'You have no permissions for that page' %}</p></div>
             </div>
         </div>
     </div>

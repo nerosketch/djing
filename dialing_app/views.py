@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 from guardian.decorators import permission_required_or_403 as permission_required
+from django.db.models import Q
 
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
@@ -41,11 +42,36 @@ def to_abon(request, tel):
 
 @login_required
 @only_admins
-def vmail(request):
-    title = _('Voice mail')
+def vmail_request(request):
+    title = _('Voice mail request')
     cdr = AsteriskCDR.objects.filter(userfield='request').order_by('-calldate')
     cdr = pag_mn(request, cdr)
     return render(request, 'vmail.html', {
         'title': title,
         'vmessages': cdr
     })
+
+@login_required
+@only_admins
+def vmail_report(request):
+    title = _('Voice mail report')
+    cdr = AsteriskCDR.objects.filter(userfield='report').order_by('-calldate')
+    cdr = pag_mn(request, cdr)
+    return render(request, 'vmail.html', {
+        'title': title,
+        'vmessages': cdr
+    })
+
+
+@login_required
+@only_admins
+def vfilter(request):
+    s = request.GET.get('s')
+    cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
+    cdr = AsteriskCDR.objects.filter(cdr_q)
+    return render(request, 'index.html', {
+        'logs': cdr,
+        'title': _('Find dials'),
+        's': s
+    })
+

@@ -1,9 +1,14 @@
-{% load i18n %}
+{% load i18n %}{% load bootstrap3 %}
 
 {% if port_id %}
-<form role="form" action="{% url 'devapp:edit_port' gid did port_id %}" method="post">{% else %}
-<form role="form" action="{% url 'devapp:add_port' gid did %}" method="post">{% endif %}{% csrf_token %}
+    {% url 'devapp:edit_port' gid did port_id as frm_url %}
+{% else %}
+    {% url 'devapp:add_port' gid did as frm_url %}
+{% endif %}
+
+<form role="form" action="{{ frm_url }}" method="post">{% csrf_token %}
     <input type="hidden" value="yes" name="confirm">
+
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{% trans 'Are you sure?' %}</h4>
@@ -11,27 +16,11 @@
 
     <div class="modal-body">
 
-        <div class="form-group">
-            <label for="id_num">{% trans 'Number' %}</label>
+        {% bootstrap_form form %}
 
-            <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-bishop"></span></span>
-                {{ form.num }}{{ form.num.errors }}
-            </div>
-        </div>
+        {% trans 'Save' as btntxt %}
+        {% bootstrap_button btntxt button_type="submit" button_class="btn-primary" icon="save" size='sm' %}
 
-        <div class="form-group">
-            <label for="id_descr">{% trans 'Description' %}</label>
-
-            <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
-                {{ form.descr }}{{ form.descr.errors }}
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-sm btn-primary">
-            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
-        </button>
     </div>
 
 </form>

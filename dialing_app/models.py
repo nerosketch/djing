@@ -59,5 +59,9 @@ class AsteriskCDR(models.Model):
             return "%s/recording/bug" % path
         return "%s/monitor" % path
 
+    def url(self):
+        return "%s/%s-%s-%s.wav" % ( self.path_to_media(), self.calldate.strftime('%Y/%m/%d/%H_%M'), self.src, self.dst )
+
     class Meta:
         db_table = 'cdr'
+        managed = False

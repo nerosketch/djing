@@ -4,6 +4,10 @@ from easysnmp import Session
 
 
 class DevBase(object, metaclass=ABCMeta):
+
+    def __init__(self, dev_instance=None):
+        self.db_instance = dev_instance
+
     @staticmethod
     def description():
         """Возвращает текстовое описание"""
@@ -56,8 +60,7 @@ class BasePort(object, metaclass=ABCMeta):
         pass
 
     def mac(self):
-        m = self._mac
-        return "%x:%x:%x:%x:%x:%x" % (ord(m[0]), ord(m[1]), ord(m[2]), ord(m[3]), ord(m[4]), ord(m[5]))
+        return ':'.join(['%x' % ord(i) for i in self._mac])
 
 
 class SNMPBaseWorker(object, metaclass=ABCMeta):
@@ -70,8 +73,13 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
         return self.ses.set(oid, value)
 
     def get_list(self, oid):
-        l = self.ses.walk(oid)
-        return [e.value for e in l]
+        for v in self.ses.walk(oid):
+            yield v.value
+
+    def get_list_keyval(self, oid):
+        for v in self.ses.walk(oid):
+            snmpnum = v.oid.split('.')[-1:]
+            yield v.value, snmpnum[0] if len(snmpnum) > 0 else None
 
     def get_item(self, oid):
         return self.ses.get(oid).value

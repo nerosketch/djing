@@ -35,16 +35,14 @@ def handle(task, author, recipients, abon_group):
             fulltext += _('Task type - %s.') % task.get_mode_display() + '\n'
             fulltext += task.descr if task.descr else ''
 
-            print('task.state:', task.state)
-
             if task.state == 'F' or task.state == 'C':
                 # Если задача завершена или провалена то отправляем одно оповещение автору
                 try:
-                    send_notify(fulltext, author)
+                    send_notify(fulltext, author, tag='taskap')
                 except ChatException as e:
                     raise TaskException(e)
             else:
-                send_notify(fulltext, dst_account)
+                send_notify(fulltext, dst_account, tag='taskap')
         except ChatException as e:
             errors.append(e)
     if len(errors) > 0:

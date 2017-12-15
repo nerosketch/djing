@@ -23,6 +23,7 @@ TASK_STATES = (
 
 TASK_TYPES = (
     ('na', _('not chosen')),
+    ('ic', _('ip conflict')),
     ('yt', _('yellow triangle')),
     ('rc', _('red cross')),
     ('ls', _('weak speed')),
@@ -32,6 +33,7 @@ TASK_TYPES = (
     ('cr', _('router setup')),
     ('co', _('configure onu')),
     ('fc', _('crimp cable')),
+    ('ni', _('Internet crash')),
     ('ot', _('other'))
 )
 

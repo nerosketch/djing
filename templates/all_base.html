@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru_RU">
 <head>
     <title>InternetService - Админка</title>
     <meta charset="UTF-8">
@@ -13,6 +13,12 @@
     <meta name="author" content="Дмитрий Новиков">
 </head>
 <body>
+
+<div id="loading">
+    <div class="gif">
+        <img src="/static/img/loading.gif"/>
+    </div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="modFrm" tabindex="-1" role="dialog" aria-hidden="true">
@@ -31,7 +37,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'acc_app:other_profile' request.user.id %}">InternetService</a>
+            <a class="navbar-brand hidden-xs" href="{% url 'acc_app:other_profile' request.user.id %}">InternetService</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -39,8 +45,10 @@
                 {% url 'acc_app:other_profile' request.user.id as home_url %}
                 <li{% if home_url == request.path %} class="active"{% endif %}><a href="{{ home_url }}">Главная</a></li>
 
-                {% url 'mapapp:home' as map_url %}
-                <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">Карта</a></li>
+                {% if request.user.is_superuser %}
+                    {% url 'mapapp:home' as map_url %}
+                    <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">Карта</a></li>
+                {% endif %}
 
                 <!--<li><a href="{ % url 'statistics:home' %}" target="_blank">График траффика</a></li>--->
 

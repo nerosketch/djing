@@ -1,9 +1,12 @@
+from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from chatbot.models import MessageQueue
 
 from mydefs import pag_mn
 from .models import Conversation, MessageError, Message
@@ -70,3 +73,17 @@ def remove_msg(request, conv_id, msg_id):
     conversation_id = msg.conversation.pk
     msg.delete()
     return redirect('msg_app:to_conversation', conversation_id)
+
+
+@login_required
+def check_news(request):
+    msg = MessageQueue.objects.pop(user=request.user, tag='msgapp')
+    if msg is not None:
+        r = {
+            'exist': True,
+            'content': msg,
+            'title': "%s" % _('Message')
+        }
+    else:
+        r = {'exist': False}
+    return HttpResponse(dumps(r))

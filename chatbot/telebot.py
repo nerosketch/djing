@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from telepot import helper, glance, Bot
+from telepot.exception import TelegramError
 import os
 import socket
 import collections
 from django.utils.translation import ugettext as _
 from urllib3.exceptions import ProtocolError
-from .models import TelegramBot, ChatException
+from .models import TelegramBot, ChatException, MessageQueue
 from chatbot.models import MessageHistory
 from accounts_app.models import UserProfile
 from django.conf import settings
@@ -19,7 +20,7 @@ class DjingTelebot(helper.ChatHandler):
     _chat_id = 0
 
     def __init__(self, seed_tuple, **kwargs):
-        super().__init__(seed_tuple, **kwargs)
+        super(DjingTelebot, self).__init__(seed_tuple, **kwargs)
         self.cmds = {
             'ping': self.ping,
             'iam': self.say_me
@@ -104,8 +105,8 @@ class DjingTelebot(helper.ChatHandler):
             self._question(_("You are not found in the database, check that it correctly pointed out its LOGIN. Try again"),
                            self.question_name)
             return
-        self._sent_reply("Yes, it's nice to meet %s, I will notify you about events in billing. Successful work;)"
-                         % profile.get_full_name())
+        self._sent_reply(_("Yes, it's nice to meet %(username)s, I will notify you about events in billing. Successful work ;)")
+                         % {'username': profile.get_full_name()})
 
     # заканчивается время диалога
     # ex - время ожидания (timeout=ex в pave_event_space)
@@ -130,9 +131,10 @@ class DjingTelebot(helper.ChatHandler):
         self._sent_reply(_("You're '%s', right?") % self._current_user.get_full_name())
 
 
-# Просто отправляем текст оповещения указанному админу
-def send_notify(msg_text, account):
+# Просто отправляем текст оповещения указанной учётке
+def send_notify(msg_text, account, tag='none'):
     try:
+        MessageQueue.objects.push(msg=msg_text, user=account, tag=tag)
         if token is None:
             raise ChatException(_('Telegram bot token not found'))
         tb = TelegramBot.objects.get(user=account)
@@ -142,4 +144,5 @@ def send_notify(msg_text, account):
         raise ChatException(_("Recipient '%s' does not subscribed on notifications") % account.get_full_name())
     except ProtocolError as e:
         raise ChatException(e)
-
+    except TelegramError as e:
+        raise ChatException("%s - %s" % (e, tb.user.get_full_name()))

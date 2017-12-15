@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from accounts_app.models import UserProfile
+from chatbot.telebot import send_notify
+from chatbot.models import ChatException
 
 
 class MessageError(Exception):
@@ -146,7 +148,7 @@ class Conversation(models.Model):
     objects = ConversationManager()
 
     def get_messages(self):
-        return Message.objects.filter(conversation=self).order_by('sent_at')[:10]
+        return Message.objects.filter(conversation=self).order_by('sent_at')
 
     def get_messages_new_count(self, account):
         msgs = Message.objects.filter(conversation=self)
@@ -158,15 +160,19 @@ class Conversation(models.Model):
             return messages[0]
 
     def new_message(self, text, attachment, author, with_status=True):
-        msg = Message.objects.create(
-            text=text, conversation=self, attachment=attachment, author=author
-        )
-        if with_status:
-            for participant in self.participants.all():
-                if participant == author:
-                    continue
-                MessageStatus.objects.create(msg=msg, user=participant)
-        return msg
+        try:
+            msg = Message.objects.create(
+                text=text, conversation=self, attachment=attachment, author=author
+            )
+            if with_status:
+                for participant in self.participants.all():
+                    if participant == author:
+                        continue
+                    MessageStatus.objects.create(msg=msg, user=participant)
+                    send_notify(msg_text=text, account=participant, tag='msgapp')
+            return msg
+        except ChatException as e:
+            raise MessageError(e)
 
     def remove_message(self, msg):
         if isinstance(msg, Message):

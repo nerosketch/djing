@@ -11,8 +11,7 @@ from djing import MAC_ADDR_REGEX
 class DeviceForm(forms.ModelForm):
     mac_addr = forms.CharField(widget=forms.TextInput(attrs={
         'pattern': MAC_ADDR_REGEX,
-        'required': True,
-        'class': 'form-control'
+        'required': True
     }), error_messages={
         'required': _('Mac address is required for fill'),
         'unique': _('Device with that mac is already exist')
@@ -20,30 +19,17 @@ class DeviceForm(forms.ModelForm):
 
     class Meta:
         model = models.Device
-        fields = '__all__'
+        exclude = ['map_dot']
         widgets = {
             'ip_address': forms.TextInput(attrs={
                 'pattern': ip_addr_regex,
-                'placeholder': '192.168.0.100',
-                'class': 'form-control'
+                'placeholder': '192.168.0.100'
             }),
             'comment': forms.TextInput(attrs={
-                'required': True,
-                'class': 'form-control'
+                'required': True
             }),
-            'devtype': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'man_passw': forms.PasswordInput(attrs={
-                'class': 'form-control'
-            }, render_value=True),
-            'map_dot': forms.Select(attrs={
-                'class': 'form-control'
-            }),
+            'man_passw': forms.PasswordInput(render_value=True),
             'user_group': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'parent_dev': forms.Select(attrs={
                 'class': 'form-control'
             })
         }
@@ -55,11 +41,7 @@ class PortForm(forms.ModelForm):
         exclude = ['device']
         widgets = {
             'num': forms.NumberInput(attrs={
-                'class': 'form-control',
                 'min': '0'
-            }),
-            'descr': forms.TextInput(attrs={
-                'class': 'form-control'
             })
         }
 

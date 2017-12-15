@@ -14,12 +14,12 @@
     <div class="page-header">
         <h2>{{ abon.fio|default:_("Long name") }}
             <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
-                <b>{{ abon.ballance }}</b>
+                <b>{{ abon.ballance|floatformat:2 }}</b>
             </small>
         </h2>
     </div>
 
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs nav-justified">
 
         {% url 'abonapp:abon_home' abon_group.pk abon.pk as abon_home %}
         <li{% if abon_home == request.path %} class="active"{% endif %}>

@@ -1,10 +1,23 @@
+{% load i18n %}
 <h4>{{ dot.title }}</h4>
 <div class="list-group">
     {% for dev in devs %}
-        <a class="list-group-item" href="{% url 'devapp:view' dev.user_group.pk dev.pk %}" target="_blank">
-            {{ dev.comment }}
+        <a class="list-group-item" href="{% url 'devapp:view' dev.user_group.pk dev.pk %}" target="_blank" title="{{ dev.mon.plugin_output }}">
+            {% if dev.mon.current_state == '0' %}
+                <span class="glyphicon glyphicon-ok-circle text-success"></span>
+            {% else %}
+                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+            {% endif %}
+            <b>{{ dev.comment }}</b> {{ dev.mon.plugin_output }}
         </a>
+
     {% empty %}
-        <li class="list-group-item">нет привязанных устройств</li>
+        <li class="list-group-item">{% trans 'Pinned devices not found' %}</li>
     {% endfor %}
+
 </div>
+
+{% if dot.attachment %}
+    <span class="glyphicon glyphicon-file"></span>
+    <a href="{{ dot.attachment.url }}" class="btn btn-xs btn-dfault" target="_blank">{{ dot.attachment.name }}</a>
+{% endif %}

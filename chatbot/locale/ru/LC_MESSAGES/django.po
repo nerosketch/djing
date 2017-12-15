@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-24 23:49+0300\n"
+"POT-Creation-Date: 2017-12-14 15:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov <nerosketch@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,15 +20,59 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: chatbot/telebot.py:61
+#: models.py:13
+msgid "Employee"
+msgstr "Сотрудник"
+
+#: models.py:14
+msgid "Telegram chat id"
+msgstr "Номер чата из telegram"
+
+#: models.py:21
+msgid "Telegram bot"
+msgstr "Telegram бот"
+
+#: models.py:22
+msgid "Telegram bots"
+msgstr "Telegram боты"
+
+#: models.py:35
+msgid "Message history"
+msgstr "История собщений"
+
+#: models.py:36
+msgid "Message histories"
+msgstr "Истории собщений"
+
+#: models.py:53
+msgid "Target employee"
+msgstr "Сотрудник"
+
+#: models.py:54
+msgid "Message"
+msgstr "Сообщение"
+
+#: models.py:59
+msgid "Status of message"
+msgstr "Статус сообщения"
+
+#: models.py:61
+msgid "App tag"
+msgstr "Тэг приложения"
+
+#: models.py:70 models.py:71
+msgid "Message queue"
+msgstr "Очередь оповещений"
+
+#: telebot.py:63
 msgid "Let's get acquainted, what is your name? Write your login from billing."
 msgstr "Давай знакомиться, как тебя зовут? Напиши свой логин из биллинга."
 
-#: chatbot/telebot.py:81
+#: telebot.py:84
 msgid "I do not know the answer to this yet."
 msgstr "Я пока не знаю ответа на это"
 
-#: chatbot/telebot.py:100
+#: telebot.py:104
 msgid ""
 "You are not found in the database, check that it correctly pointed out its "
 "LOGIN. Try again"
@@ -36,25 +80,29 @@ msgstr ""
 "Ты не найден в базе, проверь что правильно указал именно свой ЛОГИН. "
 "Попробуй ещё"
 
-#: chatbot/telebot.py:123
+#: telebot.py:120
+msgid "Let's ping, write ip. It will be necessary to wait 10 seconds"
+msgstr "Давай пинганём, напиши ip. Нужно будет подождать 10 сек"
+
+#: telebot.py:127
 msgid "It's not like ip address, try again"
 msgstr "Это не похоже на ip адрес, попробуй ещё"
 
-#: chatbot/telebot.py:126
+#: telebot.py:130
 #, python-format
 msgid "You're '%s', right?"
 msgstr "Ты ведь %s ?"
 
-#: chatbot/telebot.py:136
+#: telebot.py:138
+msgid "Telegram bot token not found"
+msgstr "Токен для бота Telegram не найден"
+
+#: telebot.py:143
 #, python-format
 msgid "Recipient '%s' does not subscribed on notifications"
 msgstr "%s не подписан на оповещения"
 
-msgid "Let's ping, write ip. It will be necessary to wait 10 seconds"
-msgstr "Давай пинганём, напиши ip. Нужно будет подождать 10 сек"
-
-msgid "Yes, it's nice to meet% s, I will notify you about events in billing. Successful work;)"
-msgstr "Да, приятно познакомиться %s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)"
-
-msgid "Telegram bot token not found"
-msgstr "Токен для бота Telegram не найден"
+msgid ""
+"Yes, it's nice to meet %(username)s, I will notify you about events in billing. Successful work ;)"
+msgstr ""
+"Да, приятно познакомиться %(username)s, я буду оповещать тебя о событиях в биллинге. Удачной работы ;)"

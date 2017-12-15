@@ -22,12 +22,20 @@
             </a>
         </li>
 
-        {% url 'dialapp:vmail' as dialmail %}
+        {% url 'dialapp:vmail_request' as dialmail %}
         <li{% if dialmail == request.path %} class="active"{% endif %}>
             <a href="{{ dialmail }}">
-                {% trans 'Voice mail' %}
+                {% trans 'Voice mail request' %}
             </a>
         </li>
+
+	{% url 'dialapp:vmail_report' as dialmail %}
+        <li{% if dialmail == request.path %} class="active"{% endif %}>
+            <a href="{{ dialmail }}">
+                {% trans 'Voice mail report' %}
+            </a>
+        </li>
+
 
     </ul>
 

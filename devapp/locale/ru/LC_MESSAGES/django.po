@@ -77,6 +77,9 @@ msgstr "Тип устройства"
 msgid "SNMP password"
 msgstr "Пароль SNMP"
 
+msgid "SNMP Num"
+msgstr "SNMP Ном."
+
 #: devapp/templates/devapp/add_dev.html:62 devapp/templates/devapp/dev.html:50
 msgid "Map point"
 msgstr "Точка топологии"
@@ -309,3 +312,28 @@ msgstr "Устройство"
 
 msgid "Can toggle ports"
 msgstr "Может переключать порты"
+
+msgid "Plugin output"
+msgstr "Вывод мониторинга"
+
+msgid "Create device"
+msgstr "Создать устройство"
+
+msgid "ONU error"
+msgstr "ONU ошибка"
+
+msgid "ONU not connected"
+msgstr "ONU не в сети"
+
+msgid "Parent device not found"
+msgstr "Вышестоящее устройство не найдено"
+
+msgid "Fixed"
+msgstr "Исправлено, обновите страницу"
+
+msgid "Fix it"
+msgstr "Исправить"
+
+msgid "Duplicate user and port: %s"
+msgstr "Пользователь с таким портом и устройством уже есть: %s"
+
