@@ -31,6 +31,24 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="dialtime">{% trans 'Find by dates' %}</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="dialtime" placeholder="{% trans 'calldate' %}" name="sd"{% if sd %} value="{{ sd }}"{% endif %}>
+                                <script type="text/javascript">
+                                    $(function () {
+                                        $('#dialtime').datetimepicker({
+                                            format: 'YYYY-MM-DD'
+                                        });
+                                    });
+                                </script>
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default" type="submit">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </th>
             </tr>
@@ -42,9 +60,9 @@
                     <td class="btn-group btn-group-xs btn-group-justify">
                         <button class="btn btn-default player-btn disabled">
                             <span class="glyphicon glyphicon-play"></span>
-                            <audio preload="metadata" src="{{ lurl }}"></audio>
+                            <audio preload="metadata" src="{{ lurl|default:'#' }}"></audio>
                         </button>
-                        <a href="{{ lurl }}" class="btn btn-default disabled" target="_blank" title="{% trans 'Download' %}">
+                        <a href="{{ lurl|default:'#' }}" class="btn btn-default disabled" target="_blank" title="{% trans 'Download' %}">
                             <span class="glyphicon glyphicon-download-alt"></span>
                         </a>
                     </td>
