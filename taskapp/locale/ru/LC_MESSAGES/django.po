@@ -202,7 +202,7 @@ msgid "Subscriber"
 msgstr "Абонент"
 
 #: taskapp/templates/taskapp/add_edit_task.html:75
-msgid "Reality (the date by which you must complete the task)"
+msgid "Reality"
 msgstr "Актуальность (дата, до которой нужно завершить задачу)"
 
 #: taskapp/templates/taskapp/add_edit_task.html:90
@@ -243,7 +243,7 @@ msgstr "Адрес"
 #: taskapp/templates/taskapp/tasklist_finish.html:14
 #: taskapp/templates/taskapp/view.html:21
 msgid "Task author"
-msgstr "Кто назначил"
+msgstr "Автор задачи"
 
 #: taskapp/templates/taskapp/tasklist.html:15
 #: taskapp/templates/taskapp/tasklist_active.html:15

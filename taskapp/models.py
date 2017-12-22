@@ -60,17 +60,16 @@ def _delta_add_days():
 
 
 class Task(models.Model):
-    descr = models.CharField(max_length=128, null=True, blank=True)
+    descr = models.CharField(_('Description'), max_length=128, null=True, blank=True)
     recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='them_task')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+', on_delete=models.SET_NULL, null=True, blank=True)
-    #device = models.ForeignKey(Device, related_name='dev')
-    priority = models.CharField(max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
-    out_date = models.DateField(null=True, blank=True, default=_delta_add_days)
-    time_of_create = models.DateTimeField(auto_now_add=True)
-    state = models.CharField(max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
-    attachment = models.ImageField(upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
-    mode = models.CharField(max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
-    abon = models.ForeignKey(Abon, null=True, blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Task author'))
+    priority = models.CharField(_('A priority'), max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
+    out_date = models.DateField(_('Reality'), null=True, blank=True, default=_delta_add_days)
+    time_of_create = models.DateTimeField(_('Date of create'), auto_now_add=True)
+    state = models.CharField(_('Condition'), max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
+    attachment = models.ImageField(_('Attached image'), upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
+    mode = models.CharField(_('The nature of the damage'), max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
+    abon = models.ForeignKey(Abon, null=True, blank=True, verbose_name=_('Subscriber'))
 
     class Meta:
         db_table = 'task'
