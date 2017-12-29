@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -66,13 +67,32 @@ def vmail_report(request):
 @login_required
 @only_admins
 def vfilter(request):
+    cdr_q = None
+    sd = request.GET.get('sd')
     s = request.GET.get('s')
-    cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
-    cdr = AsteriskCDR.objects.filter(cdr_q)
+    if s:
+        cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
+
+    try:
+        if sd:
+            sd_date = datetime.strptime(sd, '%Y-%m-%d')
+            if cdr_q:
+                cdr_q |= Q(calldate__date=sd_date)
+            else:
+                cdr_q = Q(calldate__date=sd_date)
+    except ValueError:
+        messages.error(request, _('Make sure that your date format is correct'))
+
+    if cdr_q is None:
+        cdr = AsteriskCDR.objects.all()
+    else:
+        cdr = AsteriskCDR.objects.filter(cdr_q)
+    cdr = pag_mn(request, cdr)
     return render(request, 'index.html', {
         'logs': cdr,
         'title': _('Find dials'),
-        's': s
+        's': s,
+        'sd': sd
     })
 
 

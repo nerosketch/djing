@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -60,7 +61,8 @@ class AsteriskCDR(models.Model):
         return "%s/monitor" % path
 
     def url(self):
-        return "%s/%s-%s-%s.wav" % ( self.path_to_media(), self.calldate.strftime('%Y/%m/%d/%H_%M'), self.src, self.dst )
+        if type(self.calldate) is datetime:
+            return "%s/%s-%s-%s.wav" % (self.path_to_media(), self.calldate.strftime('%Y/%m/%d/%H_%M'), self.src, self.dst)
 
     class Meta:
         db_table = 'cdr'

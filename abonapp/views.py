@@ -690,14 +690,14 @@ def abon_ping(request):
         else:
             if type(ping_result) is tuple:
                 loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
-                print(ping_result, loses_percent)
+                ping_result = {'all':ping_result[0], 'return': ping_result[1]}
                 if loses_percent > 1.0:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('IP Conflict! %d/%d results') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('IP Conflict! %(all)d/%(return)d results') % ping_result
                 elif loses_percent > 0.5:
-                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %d/%d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %(all)d/%(return)d loses') % ping_result
                     status = True
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %d/%d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %(all)d/%(return)d loses') % ping_result
             else:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
@@ -905,6 +905,24 @@ def reset_ip(request, gid, uid):
         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
     }))
 
+
+
+@login_required
+@mydefs.only_admins
+def fin_report(request):
+    q = models.AllTimePayLog.objects.by_days()
+    res_format = request.GET.get('f')
+    if res_format == 'csv':
+        import csv
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="report.csv"'
+        writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
+        for row in q:
+            writer.writerow((row['summ'], row['pay_date'].strftime('%Y-%m-%d')))
+        return response
+    return render(request, 'abonapp/fin_report.html', {
+        'logs': q
+    })
 
 
 # API's

@@ -1,5 +1,6 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
+{% load bootstrap3 %}
 {% block main %}
 
     <ol class="breadcrumb">
@@ -12,7 +13,11 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-		<h3 class="panel-title">{% trans 'Add new task' %}</h3>
+        {% if task_id %}
+		    <h3 class="panel-title">{% trans 'Add new task' %}</h3>
+        {% else %}
+            <h3 class="panel-title">{% trans 'Edit task' %}</h3>
+        {% endif %}
         </div>
         <div class="panel-body">
 
@@ -23,38 +28,18 @@
             {% endif %}
             {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
 
-            <div class="form-group">
-		    <label for="id_descr">{% trans 'Description' %}</label>
+            {% bootstrap_icon 'tag' as ic %}
+            {% bootstrap_field form.descr addon_before=ic %}
 
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
-                    {{ form.descr }}{{ form.descr.errors }}
-                </div>
-            </div>
-            <div class="form-group">
-		        <label for="id_mode">{% trans 'The nature of the damage' %}</label>
+            {% bootstrap_icon 'pawn' as ic %}
+            {% bootstrap_field form.mode addon_before=ic %}
 
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-pawn"></span></span>
-                    {{ form.mode }}{{ form.mode.errors }}
-                </div>
-            </div>
-            <div class="form-group">
-		        <label for="id_priority">{% trans 'A priority' %}</label>
+            {% bootstrap_icon 'sort-by-order' as ic %}
+            {% bootstrap_field form.priority addon_before=ic %}
 
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-sort-by-order"></span></span>
-                    {{ form.priority }}{{ form.priority.errors }}
-                </div>
-            </div>
-            <div class="form-group">
-		        <label for="id_state">{% trans 'Condition' %}</label>
+            {% bootstrap_icon 'retweet' as ic %}
+            {% bootstrap_field form.state addon_before=ic %}
 
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-retweet"></span></span>
-                    {{ form.state }}{{ form.state.errors }}
-                </div>
-            </div>
             <div class="form-group">
 		        <label for="id_abon">{% trans 'Subscriber' %}</label>
 
@@ -72,7 +57,7 @@
                 </div>
             </div>
             <div class="form-group">
-		        <label for="id_out_date">{% trans 'Reality (the date by which you must complete the task)' %}</label>
+		        <label for="id_out_date">{% trans 'Reality' %}</label>
 
                 <div class="input-group">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -86,20 +71,22 @@
                     });
                 </script>
             </div>
-            <div class="form-group">
-                <label for="id_attachment">{% trans 'Attached image' %}</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-picture"></span></span>
-                    {{ form.attachment }}{{ form.attachment.errors }}
-                </div>
-            </div>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-sm btn-primary">
+
+            {% bootstrap_icon 'picture' as ic %}
+            {% bootstrap_field form.attachment addon_before=ic %}
+
+            <div class="btn-group btn-group-sm">
+                <button type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
-                <button type="reset" class="btn btn-sm btn-default">
+                <button type="reset" class="btn btn-default">
                     <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                 </button>
+                {% if task_id %}
+                    <a href="{% url 'taskapp:delete' task_id %}" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                    </a>
+                {% endif %}
             </div>
             </form>
         </div>

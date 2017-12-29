@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db.models.signals import post_save, post_delete, pre_delete, post_init
 from django.dispatch import receiver
 from django.utils import timezone
-from django.db import models
+from django.db import models, connection
 from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
@@ -316,11 +317,27 @@ class InvoiceForPayment(models.Model):
         verbose_name_plural = _('Debts')
 
 
+class AllTimePayLogManager(models.Manager):
+
+    def by_days(self):
+        cur = connection.cursor()
+        cur.execute(r'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
+                    r'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")')
+        while True:
+            r = cur.fetchone()
+            if r is None: break
+            summ, dat = r
+            print(summ, dat)
+            yield {'summ': summ, 'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
+
+
 # Log for pay system "AllTime"
 class AllTimePayLog(models.Model):
     pay_id = models.CharField(max_length=36, unique=True, primary_key=True)
     date_add = models.DateTimeField(auto_now_add=True)
     summ = models.FloatField(default=0.0)
+
+    objects = AllTimePayLogManager()
 
     def __str__(self):
         return self.pay_id

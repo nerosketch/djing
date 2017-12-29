@@ -82,7 +82,7 @@ def all_tasks(request):
 def task_delete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     # нельзя удалить назначенную мне задачу
-    if request.user not in task.recipients.all():
+    if request.user.is_superuser or request.user not in task.recipients.all():
         task.delete()
     else:
         messages.warning(request, _('You cannot delete task that assigned to you'))

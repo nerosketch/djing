@@ -9,6 +9,8 @@ urlpatterns = [
     url(r'^addgroup$', views.addgroup, name='add_group'),
     url(r'^delgroup', views.delgroup, name='del_group'),
 
+    url(r'^fin_report$', views.fin_report, name='fin_report'),
+
     url(r'^(?P<gid>\d+)/', include('abonapp.urls_abon')),
 
     url(r'^log$', views.log_page, name='log'),
