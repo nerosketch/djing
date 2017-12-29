@@ -1,0 +1,12 @@
+[Unit]
+Description=Dialing inbox sms unit
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 dialing.py
+WorkingDirectory=/srv/http/djing
+User=http
+Group=http
+
+[Install]
+WantedBy=multi-user.target

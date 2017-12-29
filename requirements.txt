@@ -18,3 +18,4 @@ pinax-theme-bootstrap
 django-bootstrap3
 requests
 webdavclient
+pyst2

@@ -7,7 +7,7 @@ from django.db.models import Q
 
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
-from .models import AsteriskCDR
+from .models import AsteriskCDR, SMSModel
 
 
 @login_required
@@ -75,3 +75,12 @@ def vfilter(request):
         's': s
     })
 
+
+@login_required
+@permission_required('dialing_app.can_view_sms')
+def inbox_sms(request):
+    msgs = SMSModel.objects.all()
+    msgs = pag_mn(request, msgs)
+    return render(request, 'inbox_sms.html', {
+        'sms_messages': msgs
+    })

@@ -1,0 +1,30 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,ext.html' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Inbox sms' %}</h3>
+        </div>
+        <div class="list-group scroll-area">
+
+            {% for msg in sms_messages %}
+
+                <div class="list-group-item">
+                    <h5>From {{ msg.who }}
+                        <small>{{ msg.when|date:'d M, H:i:s' }} via {{ msg.dev }}</small>
+                    </h5>
+
+                    <p>{{ msg.text }}</p>
+                </div>
+
+            {% empty %}
+                <div class="list-group-item">
+                    <h4 class="list-group-item-heading">{% trans 'Message history is empty' %}</h4>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}

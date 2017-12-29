@@ -29,10 +29,17 @@
             </a>
         </li>
 
-	{% url 'dialapp:vmail_report' as dialmail %}
+	    {% url 'dialapp:vmail_report' as dialmail %}
         <li{% if dialmail == request.path %} class="active"{% endif %}>
             <a href="{{ dialmail }}">
                 {% trans 'Voice mail report' %}
+            </a>
+        </li>
+
+        {% url 'dialapp:inbox_sms' as dialsmsin %}
+        <li{% if dialsmsin == request.path %} class="active"{% endif %}>
+            <a href="{{ dialsmsin }}">
+                {% trans 'Inbox sms' %}
             </a>
         </li>
 

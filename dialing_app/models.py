@@ -65,3 +65,21 @@ class AsteriskCDR(models.Model):
     class Meta:
         db_table = 'cdr'
         managed = False
+
+
+class SMSModel(models.Model):
+    when = models.DateTimeField(auto_now_add=True)
+    who = models.CharField(max_length=32)
+    dev = models.CharField(max_length=20)
+    text = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'sms'
+        permissions = (
+            ('can_view_sms', _('Can view sms')),
+        )
+        verbose_name = _('SMS')
+        verbose_name_plural = _('SMS')
+
+    def __str__(self):
+        return self.text
