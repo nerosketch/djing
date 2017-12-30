@@ -29,7 +29,7 @@
             {% trans 'A priority' %}: {{ task.get_priority_display }}<br>
             {% trans 'The task is valid until' %} {{ task.out_date|date:'d E Y' }}<br>
             {% trans 'Date of create' %} {{ task.time_of_create|date:'d E Y H:i:s' }}<br>
-            {% trans 'time left' %} {{ time_diff }}<br>
+            {{ time_diff }}<br>
             {% trans 'Task type' %}: {{ task.get_mode_display }}<br>
             {% trans 'Condition' %}: {{ task.get_state_display }}<br>
             {% trans 'Subscriber' %}
