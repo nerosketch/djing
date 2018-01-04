@@ -46,10 +46,10 @@ class MyUserManager(BaseUserManager):
 
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=127, unique=True)
-    fio = models.CharField(max_length=256)
-    birth_day = models.DateField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    username = models.CharField(_('profile username'), max_length=127, unique=True)
+    fio = models.CharField(_('fio'), max_length=256)
+    birth_day = models.DateField(_('birth day'), auto_now_add=True)
+    is_active = models.BooleanField(_('Is active'), default=True)
     is_admin = models.BooleanField(default=False)
     telephone = models.CharField(
         max_length=16,

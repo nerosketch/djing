@@ -1,6 +1,8 @@
 from datetime import datetime
+from subprocess import run
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext_lazy as _
 from guardian.decorators import permission_required_or_403 as permission_required
@@ -9,11 +11,11 @@ from django.db.models import Q
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
 from .models import AsteriskCDR, SMSModel
+from .forms import SMSOutForm
 
 
 @login_required
 @permission_required('dialing_app.change_asteriskcdr')
-@only_admins
 def home(request):
     logs = AsteriskCDR.objects.exclude(userfield='request').order_by('-calldate')
     logs = pag_mn(request, logs)
@@ -99,8 +101,39 @@ def vfilter(request):
 @login_required
 @permission_required('dialing_app.can_view_sms')
 def inbox_sms(request):
-    msgs = SMSModel.objects.all()
+    msgs = SMSModel.objects.all().order_by('-when')
     msgs = pag_mn(request, msgs)
     return render(request, 'inbox_sms.html', {
         'sms_messages': msgs
     })
+
+
+@login_required
+@permission_required('dialing_app.can_send_sms')
+def send_sms(request):
+    path = request.GET.get('path')
+    initial_dst = request.GET.get('dst')
+    if request.method == 'POST':
+        frm = SMSOutForm(request.POST)
+        if frm.is_valid():
+            frm.save()
+            messages.success(request, _('Message was enqueued for sending'))
+            try:
+                pidfile_name = '/run/dialing.py.pid'
+                with open(pidfile_name, 'r') as f:
+                    pid = int(f.read())
+                run(['/usr/bin/kill', '-SIGUSR1', str(pid)])
+            except FileNotFoundError:
+                print('Failed sending, %s not found' % pidfile_name)
+            if path:
+                return redirect(path)
+            else:
+                return redirect('dialapp:inbox_sms')
+        else:
+            messages.error(request, _('fix form errors'))
+    else:
+        frm = SMSOutForm(initial={'dst': initial_dst})
+    return render_to_text('modal_send_sms.html', {
+        'form': frm,
+        'path': path
+    }, request=request)

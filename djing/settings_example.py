@@ -182,4 +182,8 @@ TELEGRAM_BOT_TOKEN = 'bot token'
 
 TELEPHONE_REGEXP = r'^\+[7,8,9,3]\d{10,11}$'
 
-DJING_USERNAME_PASSWORD = ('username', 'secret')
+ASTERISK_MANAGER_AUTH = {
+    'username': 'admin',
+    'password': 'password',
+    'host': '127.0.0.1'
+}

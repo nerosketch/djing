@@ -148,12 +148,12 @@ class AbonManager(MyUserManager):
 
 class Abon(UserProfile):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True)
+    group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_address = MyGenericIPAddressField(blank=True, null=True)
-    description = models.TextField(null=True, blank=True)
-    street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True)
-    house = models.CharField(max_length=12, null=True, blank=True)
+    description = models.TextField(_('Comment'), null=True, blank=True)
+    street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
+    house = models.CharField(_('House'), max_length=12, null=True, blank=True)
     extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)

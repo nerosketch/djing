@@ -19,12 +19,6 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: forms.py:45 templates/abonapp/addAbon.html.py:21
-#: templates/abonapp/editAbon.html:16 templates/abonapp/viewAbon.html.py:28
-msgid "login"
-msgstr "Логин"
-
-#: forms.py:58 templates/abonapp/editAbon.html.py:23
 #: templates/abonapp/peoples.html:38 templates/abonapp/viewAbon.html.py:32
 msgid "fio"
 msgstr "ФИО"
@@ -402,10 +396,6 @@ msgstr "Сбросить ip"
 #: templates/abonapp/editAbon.html:72 templates/abonapp/viewAbon.html.py:46
 msgid "House"
 msgstr "Дом"
-
-#: templates/abonapp/editAbon.html:80 templates/abonapp/viewAbon.html.py:22
-msgid "Is active"
-msgstr "Активен"
 
 #: templates/abonapp/editAbon.html:120 templates/abonapp/editAbon.html:121
 #, fuzzy

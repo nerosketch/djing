@@ -1,6 +1,6 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
 {% load i18n %}
-{% load guardian_tags %}
+{% load bootstrap3 %}
 {% block content %}
 
     <div class="row">
@@ -10,21 +10,10 @@
                     <h3 class="panel-title">{% trans 'Change subscriber' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" autocomplete="off" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form autocomplete="off" class="form-horizontal" action="{% url 'abonapp:abon_home' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
-                        <div class="form-group-sm">
-                            <label for="id_username" class="col-sm-4 control-label">{% trans 'login' %}</label>
-                            <div class="col-sm-8">
-                                {{ form.username }}{{ form.username.errors }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <label for="id_fio" class="col-sm-4 control-label">{% trans 'fio' %}</label>
-                            <div class="col-sm-8">
-                                {{ form.fio }}{{ form.fio.errors }}
-                            </div>
-                        </div>
+                        {% bootstrap_field form.username label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.fio label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
                             <label for="id_telephone" class="col-sm-4 control-label">{% trans 'Telephone' %}</label>
@@ -60,35 +49,10 @@
                             </div>
                         </div>
 
-                        <div class="form-group-sm">
-                            <label for="id_street" class="col-sm-4 control-label">{% trans 'Street' %}</label>
-
-                            <div class="col-sm-8">
-                                {{ form.street }}{{ form.street.errors }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <label for="id_house" class="col-sm-4 control-label">{% trans 'House' %}</label>
-
-                            <div class="col-sm-8">
-                                {{ form.house }}{{ form.house.errors }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <label for="id_is_active" class="col-sm-4 control-label">{% trans 'Is active' %}</label>
-                            <div class="col-sm-8">
-                                {{ form.is_active }}
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm">
-                            <label for="id_group" class="col-sm-4 control-label">{% trans 'User group' %}</label>
-                            <div class="col-sm-8">
-                                {{ form.group }}{{ form.group.errors }}
-                            </div>
-                        </div>
+                        {% bootstrap_field form.street label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.house label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.is_active label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.group label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
                             <label for="id_password" class="col-sm-4 control-label">{% trans 'Password' %}</label>
@@ -104,35 +68,37 @@
                             </div>
                         </div>
 
-                        <div class="form-group-sm">
-                            <label for="id_description" class="col-sm-4 control-label">{% trans 'Comment' %}</label>
-                            <div class="col-sm-8">
-                                {{ form.description }}{{ form.description.errors }}
-                            </div>
-                        </div>
+                        {% bootstrap_field form.description label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
-                                </button>
+
+                                {% trans 'Save' as tx %}
+                                {% bootstrap_button tx button_type='submit' icon='floppy-disk' button_class='btn-primary' %}
+
                                 {% if perms.taskapp.add_task %}
-                                    <a href="{% url 'taskapp:add' %}?uid={{ abon.username }}" class="btn btn-sm btn-success" title="{% trans 'Add new task' %}">
-					    <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add new task' %}</span>
+                                    <a href="{% url 'taskapp:add' %}?uid={{ abon.username }}" class="btn btn-success" title="{% trans 'Add new task' %}">
+					                    <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add new task' %}</span>
                                     </a>
                                 {% endif %}
                             </div>
                         </div>
 
-                        {% if ip and perms.abonapp.can_ping %}
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                <a href="{% url 'abonapp:ping' %}" class="btn btn-sm btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
-                                    <span class="glyphicon glyphicon-check"></span> Ping
-                                </a>
+                                {% if ip and perms.abonapp.can_ping %}
+                                    <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
+                                        <span class="glyphicon glyphicon-check"></span> Ping
+                                    </a>
+                                {% endif %}
+
+                                {% if perms.dialing_app.can_send_sms %}
+                                    <a href="{% url 'dialapp:send_sms' %}?path={{ request.path|urlencode }}&dst={{ form.telephone.value|urlencode }}" class="btn btn-default btn-modal">
+                                        <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endif %}
 
                     </form>
                 </div>
@@ -146,7 +112,7 @@
                 </div>
 
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
                         <div class="form-group-sm">
                         <label for="id_method" class="col-sm-4 control-label">{% trans 'Device' %}</label>
@@ -156,7 +122,7 @@
                                         <span class="glyphicon glyphicon-hdd"></span> <span class="hidden-md">{{ device.comment|truncatechars:11 }} {{ device.ip_address }}</span>
                                     </a>
                                     <a href="{% url 'abonapp:clear_dev' abon_group.pk abon.pk %}" class="btn btn-sm btn-danger">
-					    <span class="glyphicon glyphicon-remove-circle"></span> <span class="hidden-xs hidden-lg">{% trans 'Remove clutch' %}</span>
+					                    <span class="glyphicon glyphicon-remove-circle"></span> <span class="hidden-xs hidden-lg">{% trans 'Remove clutch' %}</span>
                                     </a>
                                 {% else %}
                                     <a href="{% url 'abonapp:dev' abon_group.pk abon.pk %}" class="btn btn-success btn-sm btn-modal">
@@ -174,9 +140,9 @@
                                     <option value="0">{% trans 'Not assigned' %}</option>
                                     {% for port in dev_ports %}
                                         {% if port == abon.dev_port %}
-					    <option value="{{ port.pk }}" selected>{{ port.num }}: {{ port.descr }}</option>
+					                        <option value="{{ port.pk }}" selected>{{ port.num }}: {{ port.descr }}</option>
                                         {% else %}
-					    <option value="{{ port.pk }}">{{ port.num }}: {{ port.descr }}</option>
+                                            <option value="{{ port.pk }}">{{ port.num }}: {{ port.descr }}</option>
                                         {% endif %}
                                     {% empty %}
                                         <option value="0">{% trans 'Ports does not exist' %}</option>
@@ -195,8 +161,8 @@
                             <div class="col-sm-8 col-sm-offset-4">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
-			        </button>
-			    </div>
+			                    </button>
+			                </div>
                         </div>
                         {% endif %}
                     </form>
@@ -209,7 +175,7 @@
                     <h3 class="panel-title">{% trans 'Extra fields' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form role="form" class="form-horizontal" action="{% url 'abonapp:extra_field_edit' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form class="form-horizontal" action="{% url 'abonapp:extra_field_edit' abon_group.pk abon.pk %}" method="post">{% csrf_token %}
 
                         {% for ef in abon.extra_fields.all %}
                         <div class="form-group-sm">

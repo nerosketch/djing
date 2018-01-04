@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*
-import os
+import os, signal
+from pid.decorator import pidfile
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
@@ -8,10 +8,18 @@ from messaging.sms import SmsSubmit, SmsDeliver
 import re
 import asterisk.manager
 from time import sleep
-from dialing_app.models import SMSModel
+from dialing_app.models import SMSModel, SMSOut
 from django.conf import settings
 
-DJING_USERNAME_PASSWORD = getattr(settings, 'DJING_USERNAME_PASSWORD', ('admin', 'admin'))
+
+ASTERISK_MANAGER_AUTH = getattr(settings, 'ASTERISK_MANAGER_AUTH', {
+    'username': 'admin',
+    'password': 'admin',
+    'host': '127.0.0.1'
+})
+
+
+outbox_messages = False
 
 
 class SMS(object):
@@ -56,6 +64,15 @@ class MyAstManager(asterisk.manager.Manager):
             text=sms.text
         )
 
+    def send_sms(self, dev, recipient, utext):
+        if not validate_tel(recipient):
+            print("Tel %s is not valid" % recipient)
+            return
+        sms = SmsSubmit(recipient, utext)
+        for pdu in sms.to_pdu():
+            response = self.command('dongle pdu %s %s' % (dev, pdu.pdu))
+            print(response.data)
+
     def push_text(self, sms, ref, cnt):
         if not isinstance(sms, SMS):
             raise TypeError
@@ -71,6 +88,14 @@ class MyAstManager(asterisk.manager.Manager):
         elif chunk_len == 0:
             self.new_chunked_sms(cnt, ref, sms)
 
+    def send_from_outbox(self):
+        messages = SMSOut.objects.filter(status='nw')
+        for msg in messages:
+            if self.send_sms(dev='sim_8318999', recipient=msg.dst, utext=msg.text):
+                msg.status = 'st'
+            else:
+                msg.status = 'fd'
+            msg.save(update_fields=['status'])
 
 
 manager = MyAstManager()
@@ -80,20 +105,16 @@ def validate_tel(tel, reg=re.compile(r'^\+7978\d{7}$')):
     return bool(re.match(reg, tel))
 
 
-def send_sms(dev, recipient, utext):
-    if not validate_tel(recipient):
-        print("Tel %s is not valid" % recipient)
-        return
-    sms = SmsSubmit(recipient, utext)
-    for pdu in sms.to_pdu():
-        response = manager.command('dongle pdu %s %s' % (dev, pdu.pdu))
-        print(response.data)
-
-
 def handle_shutdown(event, manager):
     print("Recieved shutdown event")
     manager.close()
     # we could analize the event and reconnect here
+
+
+def signal_handler(signum, frame):
+    if signum != 10: return
+    global outbox_messages
+    outbox_messages = True
 
 
 def handle_inbox_long_sms_message(event, manager):
@@ -116,10 +137,12 @@ def handle_inbox_long_sms_message(event, manager):
             manager.save_sms(sms)
 
 
-if __name__ == '__main__':
+@pidfile(pidname='dialing.py.pid', piddir='/run')
+def main():
+    global outbox_messages
     try:
-        manager.connect('10.12.1.2')
-        manager.login(*DJING_USERNAME_PASSWORD)
+        manager.connect(ASTERISK_MANAGER_AUTH['host'])
+        manager.login(ASTERISK_MANAGER_AUTH['username'], ASTERISK_MANAGER_AUTH['password'])
 
         # register some callbacks
         manager.register_event('Shutdown', handle_shutdown)
@@ -128,14 +151,24 @@ if __name__ == '__main__':
         # get a status report
         response = manager.status()
         print(response)
+
+        signal.signal(signal.SIGUSR1, handler=signal_handler)
+
         while True:
-            sleep(60)
+            if outbox_messages:
+                outbox_messages = False
+                manager.send_from_outbox()
+            sleep(5)
 
     except asterisk.manager.ManagerSocketException as e:
-        print("Error connecting to the manager: %s" % e.strerror)
+        print("Error connecting to the manager: ", e)
     except asterisk.manager.ManagerAuthException as e:
-        print("Error logging in to the manager: %s" % e.strerror)
+        print("Error logging in to the manager: ", e)
     except asterisk.manager.ManagerException as e:
-        print("Error: %s" % e.strerror)
+        print("Error: ", e)
     finally:
         manager.logoff()
+
+
+if __name__ == '__main__':
+    main()

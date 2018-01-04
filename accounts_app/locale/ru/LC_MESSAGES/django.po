@@ -202,3 +202,15 @@ msgstr "Выберите тип объекта"
 
 msgid "Profile has been deleted"
 msgstr "Учётная запись удалена"
+
+msgid "profile username"
+msgstr "Логин"
+
+msgid "fio"
+msgstr "ФИО"
+
+msgid "birth day"
+msgstr "дата рождения"
+
+msgid "Is active"
+msgstr "Активен"

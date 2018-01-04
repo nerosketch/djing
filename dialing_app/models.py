@@ -85,3 +85,27 @@ class SMSModel(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class SMSOut(models.Model):
+    when = models.DateTimeField(_('When'), auto_now_add=True)
+    dst = models.CharField(_('Telephone'), max_length=16)
+    text = models.CharField(_('Text'), max_length=255)
+    SMS_OUT_STATUS = (
+        ('nw', _('New')),
+        ('st', _('Sent')),
+        ('fd', _('Failed'))
+    )
+    status = models.CharField(_('Status'), max_length=2, choices=SMS_OUT_STATUS, default='nw')
+
+    class Meta:
+        db_table = 'out_sms'
+        permissions = (
+            ('can_view_sms', _('Can view sms')),
+            ('can_send_sms', _('Can send sms'))
+        )
+        verbose_name = _('Out SMS')
+        verbose_name_plural = _('Out SMS')
+
+    def __str__(self):
+        return self.text

@@ -9,7 +9,7 @@
     </div>
     <div class="panel-body">
 
-        <form role="form" action="{% url 'devapp:edit' group.pk|default:0 dev.pk %}" method="post">{% csrf_token %}
+        <form autocomplete="off" action="{% url 'devapp:edit' group.pk|default:0 dev.pk %}" method="post">{% csrf_token %}
 
             {% bootstrap_icon 'globe' as ic %}
             {% bootstrap_field form.ip_address addon_before=ic %}

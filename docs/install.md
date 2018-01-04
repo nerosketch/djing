@@ -211,6 +211,9 @@ plugin=python3
 
 **TELEPHONE_REGEXP** &mdash; Регулярное выражение для валидации номера телефона.
 
+**ASTERISK_MANAGER_AUTH** &mdash; Данные для управления АТС [Asterisk](https://www.asterisk.org/), пример заполнения есть в *djing/settings_example.py*.
+
+
 
 #### Создание БД
 Подразумевается что сервер баз данных у вас уже есть, или вы его можете установить сами.

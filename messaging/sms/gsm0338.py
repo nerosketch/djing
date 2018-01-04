@@ -247,12 +247,12 @@ def decode(input_, errors='strict'):
             if index < len(input_):
                 c = input_[index]
                 index += 1
-                result.append(def_escape_decode_dict.get(c, u'\xa0'))
+                result.append(def_escape_decode_dict.get(chr(c), u'\xa0'))
             else:
                 result.append(u'\xa0')
         else:
             try:
-                result.append(def_regular_decode_dict[c])
+                result.append(def_regular_decode_dict.get(chr(c)))
             except KeyError:
                 # error handling: unassigned byte, must be > 0x7f
                 if errors == 'strict':
@@ -282,7 +282,8 @@ codecs.register(getregentry)
 def is_gsm_text(text):
     """Returns True if ``text`` can be encoded as gsm text"""
     try:
-        text.encode("gsm0338")
+        tx = text.encode("gsm0338")
+        print(tx, type(tx), len(tx))
     except UnicodeError:
         return False
     except:

@@ -124,3 +124,30 @@ msgstr "Звонки"
 
 msgid "Inbox sms"
 msgstr "Входящие смс"
+
+msgid "Out SMS"
+msgstr "Исходящие СМС"
+
+msgid "Can send sms"
+msgstr "Может отправлять смс"
+
+msgid "Send sms"
+msgstr "Отправить смс"
+
+msgid "Message was enqueued for sending"
+msgstr "Сообщение было поставлено в очередь для отправки"
+
+msgid "fix form errors"
+msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "When"
+msgstr "Когда"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Send"
+msgstr "Отправить"
