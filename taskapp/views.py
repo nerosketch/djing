@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from abonapp.models import Abon
 from django.utils.translation import ugettext as _
-from datetime import date
+from datetime import date, datetime
 from guardian.decorators import permission_required_or_403 as permission_required
 from chatbot.models import MessageQueue
 
@@ -93,11 +93,15 @@ def task_delete(request, task_id):
 @only_admins
 def view(request, task_id):
     tsk = get_object_or_404(Task, id=task_id)
-    toc = date(tsk.time_of_create.year, tsk.time_of_create.month, tsk.time_of_create.day)
-    time_diff = tsk.out_date - toc
+    #toc = date(tsk.time_of_create.year, tsk.time_of_create.month, tsk.time_of_create.day)
+    now_date = datetime.now().date()
+    if tsk.out_date > now_date:
+        time_diff = "%s: %s" % (_('time left'), RuTimedelta(tsk.out_date - now_date))
+    else:
+        time_diff = _("Expired timeout -%(time_left)s") % {'time_left': RuTimedelta(now_date - tsk.out_date)}
     return render(request, 'taskapp/view.html', {
         'task': tsk,
-        'time_diff': RuTimedelta(time_diff)
+        'time_diff': time_diff
     })
 
 

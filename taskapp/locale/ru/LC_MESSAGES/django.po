@@ -384,3 +384,6 @@ msgstr "Ip конфликт"
 
 msgid "Internet crash"
 msgstr "Нет интернета"
+
+msgid "Expired timeout -%(time_left)s"
+msgstr "Время ожидания истекло -%(time_left)s"

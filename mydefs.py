@@ -173,20 +173,22 @@ class RuTimedelta(timedelta):
             )
 
     def __str__(self):
-        hours, remainder = divmod(self.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        text_date = "%d:%d:%d" % (
-            hours,
-            minutes,
-            seconds
-        )
+        #hours, remainder = divmod(self.seconds, 3600)
+        #minutes, seconds = divmod(remainder, 60)
+        #text_date = "%d:%d" % (
+        #    hours,
+        #    minutes
+        #)
         if self.days > 1:
             ru_days = 'дней'
             if 5 > self.days > 1:
                 ru_days = 'дня'
             elif self.days == 1:
                 ru_days = 'день'
-            text_date = '%d %s %s' % (self.days, ru_days, text_date)
+            #text_date = '%d %s %s' % (self.days, ru_days, text_date)
+            text_date = '%d %s' % (self.days, ru_days)
+        else:
+            text_date = ''
         return text_date
 
 

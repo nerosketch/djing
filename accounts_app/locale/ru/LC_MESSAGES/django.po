@@ -77,7 +77,7 @@ msgstr "Административный доступ (все права)"
 
 #: accounts_app/templates/accounts/login.html:5
 msgid "Auth"
-msgstr "Авторизация"
+msgstr "Аутентификация"
 
 #: accounts_app/templates/accounts/login.html:23
 #: accounts_app/templates/accounts/login.html:52
