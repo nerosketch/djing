@@ -10,6 +10,7 @@
                     <tr>
                         <th width="50">{% trans 'Number' %}</th>
                         <th>{% trans 'Description' %}</th>
+                        <th>{% trans 'Count of subscribers' %}</th>
                         <th width="100">#</th>
                     </tr>
                     </thead>
@@ -20,6 +21,12 @@
                         <tr>
                             <td>{{ port.num }}</td>
                             <td>{{ port.descr }}</td>
+                            {% if port.num_abons > 1 %}
+                                {% url 'devapp:fix_port_confict' dev.user_group.id dev.id port.id as fixurl %}
+                                <td class="text-danger"><b>{{ port.num_abons }}</b>. {% blocktrans with furl=fixurl %}Port should not have more than one subscriber, <a href='{{ furl }}'>fix that</a>{% endblocktrans %}</td>
+                            {% else %}
+                                <td>{{ port.num_abons }}</td>
+                            {% endif %}
                             <td class="btn-group btn-group-sm">
                                 {% if can_del_port %}
                                     <a href="{% url 'devapp:del_port' gid did port.pk %}" class="btn btn-danger btn-modal" title="{% trans 'Delete' %}">
@@ -35,14 +42,14 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3">{% trans 'Ports not found' %}</td>
+                            <td colspan="4">{% trans 'Ports not found' %}</td>
                         </tr>
                     {% endfor %}
                     {% endwith %}
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="3" class="btn-group">
+                        <td colspan="4" class="btn-group">
                             {% if perms.devapp.add_port %}
                                 <a href="{% url 'devapp:add_ports' dev.user_group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}

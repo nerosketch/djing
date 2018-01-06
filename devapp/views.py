@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
@@ -22,8 +22,8 @@ from guardian.shortcuts import get_objects_for_user
 
 @login_required
 @only_admins
-def devices(request, grp):
-    group = get_object_or_404(AbonGroup, pk=grp)
+def devices(request, group_id):
+    group = get_object_or_404(AbonGroup, pk=group_id)
     if not request.user.has_perm('abonapp.can_view_abongroup', group):
         raise PermissionDenied
     try:
@@ -68,9 +68,9 @@ def devices_null_group(request):
 
 @login_required
 @permission_required('devapp.delete_device')
-def devdel(request, did):
+def devdel(request, device_id):
     try:
-        dev = Device.objects.get(pk=did)
+        dev = Device.objects.get(pk=device_id)
         back_url = resolve_url('devapp:devs', grp=dev.user_group.pk if dev.user_group else 0)
         dev.delete()
         return res_success(request, back_url)
@@ -82,15 +82,15 @@ def devdel(request, did):
 
 @login_required
 @permission_required('devapp.can_view_device')
-def dev(request, grp, devid=0):
-    user_group = get_object_or_404(AbonGroup, pk=grp)
+def dev(request, group_id, device_id=0):
+    user_group = get_object_or_404(AbonGroup, pk=group_id)
     if not request.user.has_perm('abonapp.can_view_abongroup', user_group):
         raise PermissionDenied
-    devinst = get_object_or_404(Device, id=devid) if devid != 0 else None
+    devinst = get_object_or_404(Device, id=device_id) if device_id != 0 else None
     already_dev = None
 
     if request.method == 'POST':
-        if devid == 0:
+        if device_id == 0:
             if not request.user.has_perm('devapp.add_device'):
                 raise PermissionDenied
         else:
@@ -152,17 +152,17 @@ def dev(request, grp, devid=0):
 
 @login_required
 @permission_required('devapp.change_device')
-def manage_ports(request, devid):
+def manage_ports(request, device_id):
     try:
-        dev = Device.objects.get(pk=devid)
+        dev = Device.objects.get(pk=device_id)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
             return redirect('devapp:fix_device_group', dev.pk)
-        ports = Port.objects.filter(device=dev)
+        ports = Port.objects.filter(device=dev).annotate(num_abons=Count('abon'))
 
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
-        return redirect('devapp:view', dev.user_group.pk if dev.user_group else 0, did=devid)
+        return redirect('devapp:view', dev.user_group.pk if dev.user_group else 0, did=device_id)
     except DeviceDBException as e:
         messages.error(request, e)
     return render(request, 'devapp/manage_ports/list.html', {
@@ -173,7 +173,7 @@ def manage_ports(request, devid):
 
 @login_required
 @permission_required('devapp.add_port')
-def add_ports(request, devid):
+def add_ports(request, device_id):
     class TempPort:
         def __init__(self, pid, text, status, from_db, pk=None):
             self.pid = pid
@@ -193,7 +193,7 @@ def add_ports(request, devid):
 
     try:
         res_ports = list()
-        dev = Device.objects.get(pk=devid)
+        dev = Device.objects.get(pk=device_id)
         if dev.user_group is None:
             messages.error(request, _('Device is not have a group, please fix that'))
             return redirect('devapp:fix_device_group', dev.pk)
@@ -242,7 +242,7 @@ def add_ports(request, devid):
 
 @login_required
 @permission_required('devapp.delete_port')
-def delete_single_port(request, grp, did, portid):
+def delete_single_port(request, group_id, device_id, portid):
     try:
         if request.method == 'POST':
             if request.POST.get('confirm') == 'yes':
@@ -250,22 +250,22 @@ def delete_single_port(request, grp, did, portid):
                 messages.success(request, _('Port successfully removed'))
         else:
             return render_to_text('devapp/manage_ports/modal_del_port.html', {
-                'grp': grp,
-                'did': did,
+                'grp': group_id,
+                'did': device_id,
                 'port_id': portid
             }, request=request)
     except Port.DoesNotExist:
         messages.error(request, _('Port does not exist'))
     except DeviceDBException as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', grp, did)
+    return redirect('devapp:manage_ports', group_id, device_id)
 
 
 @login_required
 @permission_required('devapp.add_port')
-def edit_single_port(request, grp, did, pid):
+def edit_single_port(request, group_id, device_id, port_id):
     try:
-        port = Port.objects.get(pk=pid)
+        port = Port.objects.get(pk=port_id)
         if request.method == 'POST':
             frm = PortForm(request.POST, instance=port)
             if frm.is_valid():
@@ -273,33 +273,33 @@ def edit_single_port(request, grp, did, pid):
                 messages.success(request, _('Port successfully saved'))
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
-            return redirect('devapp:manage_ports', grp, did)
+            return redirect('devapp:manage_ports', group_id, port_id)
 
         frm = PortForm(instance=port)
         return render_to_text('devapp/manage_ports/modal_add_edit_port.html', {
-            'port_id': pid,
-            'did': did,
-            'gid': grp,
+            'port_id': port_id,
+            'did': device_id,
+            'gid': group_id,
             'form': frm
         }, request=request)
     except Port.DoesNotExist:
         messages.error(request, _('Port does not exist'))
     except DeviceDBException as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', grp, did)
+    return redirect('devapp:manage_ports', group_id, device_id)
 
 
 @login_required
 @permission_required('devapp.add_port')
-def add_single_port(request, grp, did):
+def add_single_port(request, group_id, device_id):
     try:
-        device = Device.objects.get(pk=did)
+        device = Device.objects.get(pk=device_id)
         if request.method == 'POST':
             frm = PortForm(request.POST, instance=Port(device=device))
             if frm.is_valid():
                 frm.save()
                 messages.success(request, _('Port successfully saved'))
-                return redirect('devapp:manage_ports', grp, did)
+                return redirect('devapp:manage_ports', group_id, device_id)
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         else:
@@ -308,22 +308,22 @@ def add_single_port(request, grp, did):
                 'descr': request.GET.get('t')
             })
         return render_to_text('devapp/manage_ports/modal_add_edit_port.html', {
-            'did': did,
-            'gid': grp,
+            'did': device_id,
+            'gid': group_id,
             'form': frm
         }, request=request)
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
     except DeviceDBException as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', grp, did)
+    return redirect('devapp:manage_ports', group_id, device_id)
 
 
 @login_required
 @permission_required('devapp.can_view_device')
-def devview(request, did):
+def devview(request, device_id):
     ports, manager = None, None
-    dev = get_object_or_404(Device, id=did)
+    dev = get_object_or_404(Device, id=device_id)
 
     if not dev.user_group:
         messages.warning(request, _('Please attach user group for device'))
@@ -357,10 +357,10 @@ def devview(request, did):
 
 @login_required
 @permission_required('devapp.can_toggle_ports')
-def toggle_port(request, did, portid, status=0):
+def toggle_port(request, device_id, portid, status=0):
     portid = int(portid)
     status = int(status)
-    dev = get_object_or_404(Device, id=int(did))
+    dev = get_object_or_404(Device, id=int(device_id))
     try:
         if ping(dev.ip_address):
             if dev.man_passw:
@@ -378,7 +378,7 @@ def toggle_port(request, did, portid, status=0):
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     except EasySNMPError as e:
         messages.error(request, e)
-    return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, did)
+    return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, device_id)
 
 
 @login_required
@@ -405,8 +405,8 @@ def search_dev(request):
 
 
 @login_required
-def fix_device_group(request, did):
-    dev = get_object_or_404(Device, pk=did)
+def fix_device_group(request, device_id):
+    dev = get_object_or_404(Device, pk=device_id)
     try:
         if request.method == 'POST':
             frm = DeviceForm(request.POST, instance=dev)
@@ -458,3 +458,16 @@ def fix_onu(request):
         'dat': text
     }))
 
+
+@login_required
+def fix_port_confict(request, group_id, device_id, port_id):
+    user_group = get_object_or_404(AbonGroup, pk=group_id)
+    device = get_object_or_404(Device, pk=device_id)
+    port = get_object_or_404(Port, pk=port_id)
+    abons = Abon.objects.filter(device__id=device_id, dev_port__id=port_id)
+    return render(request, 'devapp/manage_ports/fix_abon_device.html', {
+        'abons': abons,
+        'user_group': user_group,
+        'device': device,
+        'port': port
+    })
