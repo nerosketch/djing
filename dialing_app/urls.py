@@ -2,6 +2,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'dialing_app'
+
+
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^filter$', views.vfilter, name='vfilter'),

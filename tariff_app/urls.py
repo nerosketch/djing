@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'tariff_app'
 
 urlpatterns = [
     url(r'^$', views.tarifs, name='home'),

@@ -3,6 +3,8 @@ from django.conf.urls import url, include
 from . import views
 
 
+app_name = 'abonapp'
+
 urlpatterns = [
 
     url(r'^$', views.grouplist, name='group_list'),

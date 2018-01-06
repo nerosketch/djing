@@ -275,5 +275,9 @@ div#loading>div.gif {
 }
 
 
-pre {border: 0; background-color: transparent;}
+pre {
+    border: 0; background-color: transparent;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
 

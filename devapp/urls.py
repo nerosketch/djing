@@ -3,6 +3,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'devapp'
+
+
 urlpatterns = [
     url(r'^$', views.group_list, name='group_list'),
     url(r'^devices_without_groups$', views.devices_null_group, name='devices_null_group'),

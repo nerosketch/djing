@@ -3,6 +3,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'taskapp'
+
+
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^(?P<task_id>\d+)$', views.view, name='view'),

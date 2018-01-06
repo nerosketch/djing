@@ -15,7 +15,7 @@ def get_dates():
 
 class StatManager(models.Manager):
 
-    def chart(self, ip_addr, count_of_parts=12, want_date=date.today()):
+    def chart(self, username, count_of_parts=12, want_date=date.today()):
         def byte_to_mbit(x):
             return ((x/60)*8)/2**20
 
@@ -28,7 +28,7 @@ class StatManager(models.Manager):
         def avarage(elements):
             return sum(elements) / len(elements)
 
-        charts_data = self.filter(ip=ip_addr)
+        charts_data = self.filter(uname=username)
         charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
         charts_octets = [cd.octets for cd in charts_data]
         if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
@@ -50,6 +50,7 @@ class StatManager(models.Manager):
 
 class StatElem(models.Model):
     cur_time = UnixDateTimeField(primary_key=True)
+    uname = models.CharField(max_length=127, blank=True, null=True, default=None)
     ip = MyGenericIPAddressField()
     octets = models.PositiveIntegerField(default=0)
     packets = models.PositiveIntegerField(default=0)
@@ -63,6 +64,10 @@ class StatElem(models.Model):
     # ReadOnly
     def delete(self, *args, **kwargs):
         pass
+
+    @property
+    def table_name(self):
+        return self._meta.db_table
 
     def delete_month(self):
         cursor = connection.cursor()
@@ -116,7 +121,6 @@ class StatCache(models.Model):
 
     def is_today(self):
         return date.today() == self.last_time.date()
-
 
     class Meta:
         db_table = 'flowcache'
