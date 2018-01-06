@@ -88,7 +88,11 @@
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
                                 {% if ip and perms.abonapp.can_ping %}
                                     <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
-                                        <span class="glyphicon glyphicon-check"></span> Ping
+                                        <span class="glyphicon glyphicon-flash"></span> Ping
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-default disabled">
+                                        <span class="glyphicon glyphicon-flash"></span> {% trans 'No have ip' %}
                                     </a>
                                 {% endif %}
 
