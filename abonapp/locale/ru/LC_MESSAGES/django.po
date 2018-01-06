@@ -988,3 +988,7 @@ msgstr "Инфо."
 
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "No have ip"
+msgstr "Нет ip адреса"
+

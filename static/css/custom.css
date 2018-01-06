@@ -273,3 +273,7 @@ div#loading>div.gif {
     overflow-y: auto;
     max-height: 65vh;
 }
+
+
+pre {border: 0; background-color: transparent;}
+
