@@ -4,7 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Count
 from .models import Dot
 from .forms import DotForm

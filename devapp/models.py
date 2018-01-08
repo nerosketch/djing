@@ -7,7 +7,7 @@ from mydefs import MyGenericIPAddressField, MyChoicesAdapter, ip2int
 from . import dev_types
 from subprocess import run
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from json.decoder import JSONDecodeError
 
 

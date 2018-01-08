@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from statistics.models import StatCache
 from tariff_app.models import Tariff
@@ -745,11 +745,23 @@ def save_user_dev_port(request, gid, uid):
     user_port = mydefs.safe_int(request.POST.get('user_port'))
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
     try:
+        abon = models.Abon.objects.get(pk=uid)
         if user_port == 0:
             port = None
         else:
             port = DevPort.objects.get(pk=user_port)
-        abon = models.Abon.objects.get(pk=uid)
+            if abon.device is not None:
+                try:
+                    other_abon = models.Abon.objects.get(device=abon.device, dev_port=port)
+                    user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.id)
+                    messages.error(request, _("<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
+                        'user_url': user_url,
+                        'user_name': other_abon.get_full_name()
+                    })
+                    return redirect('abonapp:abon_home', gid, uid)
+                except models.Abon.DoesNotExist:
+                    pass
+
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
             abon.is_dynamic_ip = is_dynamic_ip

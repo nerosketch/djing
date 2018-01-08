@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, redirect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from guardian.decorators import permission_required_or_403 as permission_required
 from django.db.models import Q
 

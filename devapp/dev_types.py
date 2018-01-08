@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from mydefs import RuTimedelta, safe_int
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError

@@ -427,10 +427,6 @@ msgstr "Добавить муфту"
 msgid "Device port"
 msgstr "Порт&nbsp;устройства"
 
-#: templates/abonapp/editAbon.html:182
-msgid "Ports does not exist"
-msgstr "Порты не найдены"
-
 #: templates/abonapp/editAbon.html:190
 msgid "Is dynamic network settings"
 msgstr "Динамические настройки по dhcp"
@@ -992,3 +988,7 @@ msgstr "Звонки"
 msgid "No have ip"
 msgstr "Нет ip адреса"
 
+#: views.py:757
+#, python-format
+msgid "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device"
+msgstr "<a href='%(user_url)s'>%(user_name)s</a> уже привязан к этому порту на этом устройстве"

@@ -4,9 +4,9 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.transaction import atomic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from abonapp.models import AbonLog, AbonTariff, InvoiceForPayment, Abon
+from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
 from mydefs import pag_mn, LogicError
 from agent import NasFailedResult, NasNetworkError

@@ -148,8 +148,6 @@
                                         {% else %}
                                             <option value="{{ port.pk }}">{{ port.num }}: {{ port.descr }}</option>
                                         {% endif %}
-                                    {% empty %}
-                                        <option value="0">{% trans 'Ports does not exist' %}</option>
                                     {% endfor %}
                                 </select>
                             </div>

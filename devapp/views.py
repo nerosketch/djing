@@ -7,7 +7,7 @@ from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from json import dumps
 
