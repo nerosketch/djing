@@ -581,7 +581,7 @@ def charts(request, gid, uid):
             charts_data = None
         else:
             charts_data = StatElem.objects.chart(
-                abon.ip_address,
+                abon.username,
                 count_of_parts=30,
                 want_date=wandate
             )
@@ -608,7 +608,7 @@ def charts(request, gid, uid):
         'abon': abon,
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
         'high': high,
-        'dates': get_dates()
+        'wantdate': wandate
     })
 
 

@@ -36,9 +36,9 @@ class AbonGroup(models.Model):
 
 
 class AbonLog(models.Model):
-    abon = models.ForeignKey('Abon')
+    abon = models.ForeignKey('Abon', models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, related_name='+')
+    author = models.ForeignKey(UserProfile, models.CASCADE, related_name='+')
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -53,7 +53,7 @@ class AbonLog(models.Model):
 
 
 class AbonTariff(models.Model):
-    tariff = models.ForeignKey(Tariff, related_name='linkto_tariff')
+    tariff = models.ForeignKey(Tariff, models.CASCADE, related_name='linkto_tariff')
 
     # время начала действия услуги
     time_start = models.DateTimeField(null=True, blank=True, default=None)
@@ -86,7 +86,7 @@ class AbonTariff(models.Model):
 
 class AbonStreet(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(AbonGroup)
+    group = models.ForeignKey(AbonGroup, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -289,7 +289,7 @@ class PassportInfo(models.Model):
 
 
 class InvoiceForPayment(models.Model):
-    abon = models.ForeignKey(Abon)
+    abon = models.ForeignKey(Abon, models.CASCADE)
     status = models.BooleanField(default=False)
     amount = models.FloatField(default=0.0)
     comment = models.CharField(max_length=128)
@@ -363,7 +363,7 @@ class AllPayLog(models.Model):
 
 
 class AbonRawPassword(models.Model):
-    account = models.OneToOneField(Abon, primary_key=True)
+    account = models.OneToOneField(Abon, models.CASCADE, primary_key=True)
     passw_text = models.CharField(max_length=64)
 
     def __str__(self):
@@ -374,7 +374,7 @@ class AbonRawPassword(models.Model):
 
 
 class AdditionalTelephone(models.Model):
-    abon = models.ForeignKey(Abon, related_name='additional_telephones')
+    abon = models.ForeignKey(Abon, models.CASCADE, related_name='additional_telephones')
     telephone = models.CharField(
         max_length=16,
         verbose_name=_('Telephone'),

@@ -132,7 +132,7 @@ class Device(models.Model):
 
 
 class Port(models.Model):
-    device = models.ForeignKey(Device, verbose_name=_('Device'))
+    device = models.ForeignKey(Device, models.CASCADE, verbose_name=_('Device'))
     num = models.PositiveSmallIntegerField(_('Number'), default=0)
     descr = models.CharField(_('Description'), max_length=60, null=True, blank=True)
 

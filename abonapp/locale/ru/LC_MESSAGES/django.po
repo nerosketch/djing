@@ -300,10 +300,6 @@ msgstr "График использования"
 msgid "Static info was Not found"
 msgstr "Статистика не найдена"
 
-#: templates/abonapp/charts.html:51
-msgid "Graphs by dates"
-msgstr "Графики по датам"
-
 #: templates/abonapp/debtors.html:9
 msgid "Debtors"
 msgstr "Должники"
@@ -987,6 +983,13 @@ msgstr "Звонки"
 
 msgid "No have ip"
 msgstr "Нет ip адреса"
+
+#, python-format
+msgid "Graph of use by %(wantdate_d)s"
+msgstr "График использования за %(wantdate_d)s"
+
+msgid "Show graph by date"
+msgstr "Показать график по дате"
 
 #: views.py:757
 #, python-format

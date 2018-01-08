@@ -4,6 +4,9 @@ from django.conf.urls import url
 from . import views
 
 
+app_name = 'mapapp'
+
+
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^options$', views.options, name='options'),

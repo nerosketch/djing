@@ -42,7 +42,7 @@
                                 <small>{{ msg.sent_at|date:'d M, H:i:s' }}</small>
                             </h5>
 
-                            <p>{{ msg.text }}</p>
+                            <pre>{{ msg.text }}</pre>
                             {% if msg.attachment %}
                                 <a href="{{ msg.attachment }}" class="btn btn-default btn-sm" target="_blank">
                                     <span class="glyphicon glyphicon-gift"></span> {{ msg.attachment }}
