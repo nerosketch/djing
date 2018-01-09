@@ -81,7 +81,7 @@ class EltexSwitch(DLinkDevice):
 ```
 Метод **@description** Просто отображает человекопонятное название вашего устройства в биллинге.
 Заметьте что строка на английском и заключена в процедуру **_** (это ugettext_lazy, см. в импорте вверху файла),
-это локализация для текущего языка. Про локализацию можно почитать в соответствующем разделе [django translation](https://docs.djangoproject.com/en/1.9/topics/i18n/translation/).
+это локализация для текущего языка. Про локализацию можно почитать в соответствующем разделе [django translation](https://docs.djangoproject.com/en/1.11/topics/i18n/translation/).
 
 Метод **@get_ports** чаще всего редко изменяется по алгоритму, так что вам, в большенстве случаев, достаточно добавить
 нужные SNMP OID в соответствующие места процедуры. Но вы вольны реализовать ваш метод получения портов
@@ -133,7 +133,9 @@ def my_custom_pay_system(request):
 Для примера это будет выглядеть так:
 
 ```python
-@atomic
+from django.db import transaction
+
+@transaction.atomic
 def terminal_pay(request):
     from .pay_systems import my_custom_pay_system
     ret_text = my_custom_pay_system(request)
@@ -141,7 +143,7 @@ def terminal_pay(request):
 ```
 
 Проследите чтоб ваша процедура не вызывала исключений, обрабатывайте всё внутри тела процедуры.
-Про декоратор **@atomic** вы можете прочитать в документации к [Django](https://docs.djangoproject.com/en/1.9/topics/db/transactions).
+Про декоратор **@atomic** вы можете прочитать в документации к [Django](https://docs.djangoproject.com/en/1.11/topics/db/transactions).
 В кратце этот декоратор защищает от незавешённых транзакций, например при высокой нагрузке.
 
 

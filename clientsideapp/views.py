@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.transaction import atomic
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
@@ -42,7 +42,7 @@ def services(request):
 
 
 @login_required
-@atomic
+@transaction.atomic
 def buy_service(request, srv_id):
     abon = get_object_or_404(Abon, pk=request.user.pk)
     service = get_object_or_404(Tariff, pk=srv_id)
@@ -73,7 +73,7 @@ def debts_list(request):
 
 
 @login_required
-@atomic
+@transaction.atomic
 def debt_buy(request, d_id):
     debt = get_object_or_404(InvoiceForPayment, id=d_id)
     abon = get_object_or_404(Abon, id=request.user.id)

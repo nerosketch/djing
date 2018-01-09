@@ -4,7 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError
 from django.db.models import Count, Q, signals
-from django.db.transaction import atomic
+from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -202,7 +202,7 @@ def del_abon(request):
 
 @login_required
 @permission_required('abonapp.can_add_ballance')
-@atomic
+@transaction.atomic
 def abonamount(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     try:
@@ -330,7 +330,7 @@ def abonhome(request, gid, uid):
         })
 
 
-@atomic
+@transaction.atomic
 def terminal_pay(request):
     from .pay_systems import allpay
     ret_text = allpay(request)
@@ -376,7 +376,7 @@ def add_invoice(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.can_buy_tariff')
-@atomic
+@transaction.atomic
 def pick_tariff(request, gid, uid):
     grp = get_object_or_404(models.AbonGroup, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
