@@ -753,18 +753,22 @@ def save_user_dev_port(request, gid, uid):
             if abon.device is not None:
                 try:
                     other_abon = models.Abon.objects.get(device=abon.device, dev_port=port)
-                    user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.id)
-                    messages.error(request, _("<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
-                        'user_url': user_url,
-                        'user_name': other_abon.get_full_name()
-                    })
-                    return redirect('abonapp:abon_home', gid, uid)
+                    if other_abon != abon:
+                        user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.id)
+                        messages.error(request, _("<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
+                            'user_url': user_url,
+                            'user_name': other_abon.get_full_name()
+                        })
+                        return redirect('abonapp:abon_home', gid, uid)
                 except models.Abon.DoesNotExist:
                     pass
 
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
-            abon.is_dynamic_ip = is_dynamic_ip
+            if is_dynamic_ip == 'on':
+                abon.is_dynamic_ip = True
+            else:
+                abon.is_dynamic_ip = False
             abon.save(update_fields=['dev_port', 'is_dynamic_ip'])
         else:
             abon.save(update_fields=['dev_port'])
