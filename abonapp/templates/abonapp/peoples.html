@@ -21,32 +21,32 @@
                     <tr>
                         <th>#</th>
                         <th class="col-xs-1">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=username dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='username' dir=dir|default:"down" %}">
                                 {% trans 'Sub' %}
                             </a>
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="hidden-xs">{% trans 'Last traffic' %}</th>
                         <th class="col-xs-1 hidden-md">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ip_address dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='ip_address' dir=dir|default:"down" %}">
                                 {% trans 'Ip address' %}
                             </a>
                             {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="col-xs-2">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=fio dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='fio' dir=dir|default:"down" %}">
                                 {% trans 'fio' %}
                             </a>
                             {% if order_by == 'fio' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="col-xs-2">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=street dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='street' dir=dir|default:"down" %}">
                                 {% trans 'Street' %}
                             </a>
                             {% if order_by == 'street' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="col-xs-1">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=house dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='house' dir=dir|default:"down" %}">
                                 {% trans 'Apartment' %}
                             </a>
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -54,7 +54,7 @@
                         <th class="col-xs-2">{% trans 'Telephone' %}</th>
                         <th class="col-xs-2">{% trans 'Service' %}</th>
                         <th class="hidden-xs col-sm-1">
-                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by=ballance dir=dir|default:"down" %}">
+                            <a href="{% url 'abonapp:people_list' abon_group.pk %}?{% url_replace request order_by='ballance' dir=dir|default:"down" %}">
                                 {% trans 'Ballance' %}
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
