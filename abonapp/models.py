@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -55,23 +54,21 @@ class AbonLog(models.Model):
 class AbonTariff(models.Model):
     tariff = models.ForeignKey(Tariff, models.CASCADE, related_name='linkto_tariff')
 
-    # время начала действия услуги
     time_start = models.DateTimeField(null=True, blank=True, default=None)
 
-    # время завершения услуги
     deadline = models.DateTimeField(null=True, blank=True, default=None)
 
     def calc_amount_service(self):
         amount = self.tariff.amount
         return round(amount, 2)
 
-    # Используется-ли услуга сейчас, если время старта есть то он активирован
+    # is used service now, if time start is present than it activated
     def is_started(self):
         return False if self.time_start is None else True
 
     def __str__(self):
-        return "%d: %s" % (
-            self.pk or 0,
+        return "%s: %s" % (
+            self.deadline,
             self.tariff.title
         )
 
@@ -139,7 +136,6 @@ class ExtraFieldsModel(models.Model):
         db_table = 'abon_extra_fields'
 
 
-
 class AbonManager(MyUserManager):
 
     def get_queryset(self):
@@ -159,7 +155,6 @@ class Abon(UserProfile):
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(default=False)
 
-    # возвращает связь с текущим тарифом для абонента
     def active_tariff(self):
         return self.current_tariff
 
@@ -177,12 +172,10 @@ class Abon(UserProfile):
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
 
-    # Платим за что-то
     def make_pay(self, curuser, how_match_to_pay=0.0):
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
 
-    # Пополняем счёт
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
             abon=self,
@@ -192,7 +185,6 @@ class Abon(UserProfile):
         )
         self.ballance += amount
 
-    # покупаем тариф
     def pick_tariff(self, tariff, author, comment=None, deadline=None):
         if not isinstance(tariff, Tariff):
             raise TypeError
@@ -204,13 +196,13 @@ class Abon(UserProfile):
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
-                # Эта услуга уже подключена
+                # if service already connected
                 raise LogicError(_('That service already activated'))
             else:
-                # Не надо молча заменять услугу если какая-то уже есть
+                # if service is present then speak about it
                 raise LogicError(_('Service already activated'))
 
-        # если не хватает денег
+        # if not enough money
         if self.ballance < amount:
             raise LogicError(_('not enough money'))
 
@@ -218,30 +210,30 @@ class Abon(UserProfile):
         new_abtar.save()
         self.current_tariff = new_abtar
 
-        # снимаем деньги за услугу
+        # charge for the service
         self.ballance -= amount
 
         self.save()
 
-        # Запись об этом в лог
+        # make log about it
         AbonLog.objects.create(
             abon=self, amount=-tariff.amount,
             author=author,
             comment=comment or _('Buy service default log')
         )
 
-    # Производим расчёт услуги абонента, т.е. завершаем если пришло время
+    # Destroy the service if the time has come
     def bill_service(self, author):
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
             return
         nw = timezone.now()
-        # если услуга просрочена
+        # if service is overdue
         if nw > abon_tariff.deadline:
             print("Service %s for user %s is overdued, end service" % (abon_tariff.tariff, self))
             abon_tariff.delete()
 
-    # есть-ли доступ у абонента к услуге, смотрим в tariff_app.custom_tariffs.<TariffBase>.manage_access()
+    # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self):
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
@@ -250,7 +242,7 @@ class Abon(UserProfile):
         ct = trf.get_calc_type()(abon_tariff)
         return ct.manage_access(self)
 
-    # создаём абонента из структуры агента
+    # make subscriber from agent structure
     def build_agent_struct(self):
         if self.ip_address:
             user_ip = ip2int(self.ip_address)
@@ -265,7 +257,7 @@ class Abon(UserProfile):
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
     def save(self, *args, **kwargs):
-        # проверяем не-ли у кого такого-же ip
+        # check if ip address already busy
         if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
@@ -319,7 +311,8 @@ class InvoiceForPayment(models.Model):
 
 class AllTimePayLogManager(models.Manager):
 
-    def by_days(self):
+    @staticmethod
+    def by_days():
         cur = connection.cursor()
         cur.execute(r'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
                     r'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")')
@@ -408,10 +401,8 @@ def abon_post_save(sender, **kwargs):
     try:
         tm = Transmitter()
         if created:
-            # создаём абонента
             tm.add_user(agent_abon, ip_timeout=timeout)
         else:
-            # обновляем абонента на NAS
             tm.update_user(agent_abon, ip_timeout=timeout)
 
     except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
@@ -426,9 +417,7 @@ def abon_del_signal(sender, **kwargs):
         ab = abon.build_agent_struct()
         if ab is None:
             return True
-        # подключаемся к NAS'у
         tm = Transmitter()
-        # нашли абонента, и удаляем его на NAS
         tm.remove_user(ab)
     except (NasFailedResult, NasNetworkError):
         return True

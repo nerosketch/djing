@@ -908,6 +908,39 @@ def phonebook(request, gid):
 
 
 @login_required
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def abon_export(request, gid):
+    res_format = request.GET.get('f')
+
+    if request.method == 'POST':
+        frm = forms.ExportUsersForm(request.POST)
+        if frm.is_valid():
+            cleaned_data = frm.clean()
+            fields = cleaned_data.get('fields')
+            subscribers = models.Abon.objects.filter(group__id=gid).only(*fields).values_list(*fields)
+            if res_format == 'csv':
+                import csv
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="users.csv"'
+                writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
+                for row in subscribers:
+                    writer.writerow(row)
+                return response
+            else:
+                messages.info(request, _('Unexpected format %(export_format)s') % {'export_format': res_format})
+                return redirect('abonapp:group_list')
+        else:
+            messages.error(request, _('fix form errors'))
+            return redirect('abonapp:group_list')
+    else:
+        frm = forms.ExportUsersForm()
+    return render_to_text('abonapp/modal_export.html', {
+        'gid': gid,
+        'form': frm
+    }, request=request)
+
+
+@login_required
 @permission_required('abonapp.change_abon')
 @permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def reset_ip(request, gid, uid):

@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^addabon$', views.addabon, name='add_abon'),
     url(r'^services$', views.chgroup_tariff, name='ch_group_tariff'),
     url(r'^phonebook$', views.phonebook, name='phonebook'),
+    url(r'^export$', views.abon_export, name='abon_export'),
     url(r'^street/add$', views.street_add, name='street_add'),
     url(r'^street/edit', views.street_edit, name='street_edit'),
     url(r'^street/(?P<sid>\d+)/delete$', views.street_del, name='street_del'),
