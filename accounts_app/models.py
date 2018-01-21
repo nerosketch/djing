@@ -108,3 +108,4 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         )
         verbose_name = _('Staff account profile')
         verbose_name_plural = _('Staff account profiles')
+        ordering = ['fio']
