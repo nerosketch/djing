@@ -136,6 +136,9 @@
                             <a href="{% url 'abonapp:phonebook' abon_group.pk %}" class="btn btn-default btn-modal">
                                 <span class="glyphicon glyphicon-earphone"></span> {% trans 'Phonebook' %}
                             </a>
+                            <a href="{% url 'abonapp:abon_export' abon_group.pk %}" class="btn btn-default btn-modal">
+                                <span class="glyphicon glyphicon-export"></span> {% trans 'Export users' %}
+                            </a>
                         </td>
                     </tr>
                     </tfoot>

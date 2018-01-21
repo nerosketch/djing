@@ -923,6 +923,8 @@ def abon_export(request, gid):
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="users.csv"'
                 writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
+                display_values = [f[1] for f in frm.fields['fields'].choices if f[0] in fields]
+                writer.writerow(display_values)
                 for row in subscribers:
                     writer.writerow(row)
                 return response
