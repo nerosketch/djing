@@ -38,5 +38,9 @@ urlpatterns = [
 
     url(r'^(?P<uid>\d+)/tel$', views.tels, name='telephones'),
     url(r'^(?P<uid>\d+)/tel/add$', views.tel_add, name='telephone_new'),
-    url(r'^(?P<uid>\d+)/tel/del$', views.tel_del, name='telephone_del')
+    url(r'^(?P<uid>\d+)/tel/del$', views.tel_del, name='telephone_del'),
+
+    url(r'^(?P<uid>\d+)/periodic_pay$', views.add_edit_periodic_pay, name='add_periodic_pay'),
+    url(r'^(?P<uid>\d+)/periodic_pay(?P<periodic_pay_id>\d+)$', views.add_edit_periodic_pay, name='add_periodic_pay'),
+    url(r'^(?P<uid>\d+)/periodic_pay(?P<periodic_pay_id>\d+)/del$', views.del_periodic_pay, name='del_periodic_pay')
 ]

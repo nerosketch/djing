@@ -1,5 +1,6 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
+{% load bootstrap3 %}
 {% block main %}
 
     <ol class="breadcrumb">
@@ -21,65 +22,27 @@
             <h3 class="panel-title">{% if tarif_id == 0 %}{% trans 'Create' %}{% else %}{% trans 'Edit' %}{% endif %} {% trans 'tariff' %}</h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
+            <form action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
 
-                <div class="form-group">
-                    <label for="id_title">{% trans 'Service title' %}</label>
+                {% bootstrap_icon 'tag' as ic %}
+                {% bootstrap_field form.title addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-tag"></span></span>
-                        {{ form.title }}{{ form.title.errors }}
-                    </div>
-                </div>
+                {% bootstrap_icon 'comment' as ic %}
+                {% bootstrap_field form.descr addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="id_descr">{% trans 'Service description' %}</label>
+                {% bootstrap_icon 'chevron-down' as ic %}
+                {% bootstrap_field form.speedIn addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
-                        {{ form.descr }}{{ form.descr.errors }}
-                    </div>
-                </div>
+                {% bootstrap_icon 'chevron-up' as ic %}
+                {% bootstrap_field form.speedOut addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="id_speedIn">{% trans 'Speed In' %}</label>
+                {% bootstrap_icon 'usd' as ic %}
+                {% bootstrap_field form.amount addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-chevron-down"></span></span>
-                        {{ form.speedIn }}{{ form.speedIn.errors }}
-                    </div>
-                </div>
+                {% bootstrap_icon 'link' as ic %}
+                {% bootstrap_field form.calc_type addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="id_speedOut">{% trans 'Speed Out' %}</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-chevron-up"></span></span>
-                        {{ form.speedOut }}{{ form.speedOut.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_amount">{% trans 'Price' %}</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-usd"></span></span>
-                        {{ form.amount }}{{ form.amount.errors }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_calc_type">{% trans 'Script' %}</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-link"></span></span>
-                        {{ form.calc_type }}{{ form.calc_type.errors }}
-                    </div>
-                </div>
-
-                <div class="checkbox">
-                    <label>{{ form.is_admin }} {% trans 'Tech service' %}</label>
-                </div>
+                {% bootstrap_field form.is_admin %}
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">

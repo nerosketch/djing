@@ -21,7 +21,7 @@ from devapp.models import Device, Port as DevPort
 from datetime import datetime, date, timedelta
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
-from statistics.models import getModel, get_dates
+from statistics.models import getModel
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 
@@ -263,11 +263,21 @@ def abon_services(request, gid, uid):
         raise PermissionDenied
     abon = get_object_or_404(models.Abon, pk=uid)
 
+    if abon.group != grp:
+        messages.warning(request, _("User group id is not matches with group in url"))
+        return redirect('abonapp:abon_services', abon.group.id, abon.id)
+
+    try:
+        periodic_pay = models.PeriodicPayForId.objects.get(account=abon)
+    except models.PeriodicPayForId.DoesNotExist:
+        periodic_pay = None
+
     return render(request, 'abonapp/service.html', {
         'abon': abon,
         'abon_tariff': abon.current_tariff,
         'abon_group': abon.group,
-        'services': grp.tariffs.all()
+        'services': grp.tariffs.all(),
+        'periodic_pay': periodic_pay
     })
 
 
@@ -918,7 +928,6 @@ def reset_ip(request, gid, uid):
     }))
 
 
-
 @login_required
 @mydefs.only_admins
 def fin_report(request):
@@ -935,6 +944,50 @@ def fin_report(request):
     return render(request, 'abonapp/fin_report.html', {
         'logs': q
     })
+
+
+@login_required
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+def add_edit_periodic_pay(request, gid, uid, periodic_pay_id=0):
+    if periodic_pay_id == 0:
+        if not request.user.has_perm('abonapp.add_periodicpayforid'):
+            raise PermissionDenied
+        periodic_pay_instance = models.PeriodicPayForId()
+    else:
+        if not request.user.has_perm('abonapp.change_periodicpayforid'):
+            raise PermissionDenied
+        periodic_pay_instance = get_object_or_404(models.PeriodicPayForId, pk=periodic_pay_id)
+    if request.method == 'POST':
+        frm = forms.PeriodicPayForIdForm(request.POST, instance=periodic_pay_instance)
+        if frm.is_valid():
+            abon = get_object_or_404(models.Abon, pk=uid)
+            inst = frm.save(commit=False)
+            inst.account = abon
+            inst.save()
+            messages.success(request, _('Periodic pays has been designated'))
+        else:
+            messages.error(request, _('Something wrong in form'))
+        return redirect('abonapp:abon_services', gid, uid)
+    else:
+        frm = forms.PeriodicPayForIdForm(instance=periodic_pay_instance)
+    return render_to_text('abonapp/modal_periodic_pay.html', {
+        'form': frm,
+        'gid': gid,
+        'uid': uid
+    }, request=request)
+
+
+@login_required
+@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('abonapp.delete_periodicpayforid')
+def del_periodic_pay(request, gid, uid, periodic_pay_id):
+    periodic_pay_instance = get_object_or_404(models.PeriodicPayForId, pk=periodic_pay_id)
+    if periodic_pay_instance.account.id != uid:
+        uid = periodic_pay_instance.account.id
+    periodic_pay_instance.delete()
+    messages.success(request, _('Periodic pay successfully deleted'))
+    return redirect('abonapp:abon_services', gid, uid)
+
 
 
 # API's

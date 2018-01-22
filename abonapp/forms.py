@@ -150,3 +150,9 @@ class AdditionalTelephoneForm(forms.ModelForm):
             }),
             'owner_name': forms.TextInput(attrs={'class': 'form-control', 'required':''})
         }
+
+
+class PeriodicPayForIdForm(forms.ModelForm):
+    class Meta:
+        model = models.PeriodicPayForId
+        exclude = ['account']

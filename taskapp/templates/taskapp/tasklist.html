@@ -33,10 +33,10 @@
                     {% endif %}
                 {% endif %}
 
-                <td class="hidden-xs"><a href="{% url 'taskapp:view' task.pk %}" target="_blank">{{ task.pk }}</a></td>
+                <td class="hidden-xs"><a href="{% url 'taskapp:view' task.pk %}">{{ task.pk }}</a></td>
 
                 {% if task.abon and task.abon.group %}
-		    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank" title="{{ task.abon.description|default:'' }}" data-toggle="tooltip">{{ task.abon.get_full_name }}</a></td>
+		    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" title="{{ task.abon.description|default:'' }}" data-toggle="tooltip">{{ task.abon.get_full_name }}</a></td>
 		    <td>{{ task.abon.group.title }}, {{ task.abon.street|default:'' }} {{ task.abon.house|default:'' }}</td>
                 {% else %}
                     <td>{% trans 'User does not exist' %}</td>
@@ -51,7 +51,7 @@
                     {% else %}
                         {% trans 'Author does not exist' %}
                     {% endif %}
-		</td>
+		        </td>
                 <td class="hidden-xs">{{ task.time_of_create|date:'d E H:i' }}</td>
 
                 <td class="btn-group btn-group-xs btn-group-justified">

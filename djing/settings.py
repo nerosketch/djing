@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*
 import os
 
+
+try:
+    from . import local_settings
+except ImportError:
+    raise ImportError("You must create config file local_settings.py from template")
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from django.urls import reverse_lazy
@@ -9,12 +16,12 @@ from django.urls import reverse_lazy
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '!!!!!!!!!!!!!!!!!!!!!!!!YOUR SECRET KEY!!!!!!!!!!!!!!!!!!!!!!!!'
+SECRET_KEY = local_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = local_settings.DEBUG or False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 
 # required for django-guardian
 AUTHENTICATION_BACKENDS = (
@@ -87,23 +94,13 @@ WSGI_APPLICATION = 'djing.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        #'ENGINE': 'django.db.backends.mysql',
-        #'NAME': 'djingdb',
-        #'USER': 'USER',  # You can change the user name
-        #'PASSWORD': 'PASSWORD',  # You can change the password
-        #'HOST': 'localhost'
-    }
-}
+DATABASES = local_settings.DATABASES
 
 
 # Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -125,7 +122,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 SESSION_COOKIE_HTTPONLY = True
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'ru-RU'
 
@@ -137,12 +134,12 @@ USE_L10N = False
 
 USE_TZ = False
 
-DEFAULT_FROM_EMAIL = 'nerosketch@gmail.com'
+DEFAULT_FROM_EMAIL = local_settings.DEFAULT_FROM_EMAIL
 
-# Максимальный загружаемый файл 3.90625M (кратно размеру блока диска 4kb, 4000 блоков)
+# Maximum file size is 3.90625M
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4096000
 
-# Время жизни сессии, 1 сутки
+# time to session live, 1 day
 SESSION_COOKIE_AGE = 60 * 60 * 24
 
 
@@ -154,7 +151,7 @@ if DEBUG:
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 
-# Пример вывода: 16 сентября 2012
+# Example output: 16 september 2018
 DATE_FORMAT = 'd E Y'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -167,23 +164,19 @@ LOGIN_URL = reverse_lazy('acc_app:login')
 LOGIN_REDIRECT_URL = reverse_lazy('acc_app:profile')
 LOGOUT_URL = reverse_lazy('acc_app:logout_link')
 
-PAGINATION_ITEMS_PER_PAGE=10
+PAGINATION_ITEMS_PER_PAGE = local_settings.PAGINATION_ITEMS_PER_PAGE
 
-PAY_SERV_ID = '<service id>'
-PAY_SECRET = '<secret>'
+PAY_SERV_ID = local_settings.PAY_SERV_ID
+PAY_SECRET = local_settings.PAY_SECRET
 
-DIALING_MEDIA = 'path/to/asterisk_records'
+DIALING_MEDIA = local_settings.DIALING_MEDIA
 
-DHCP_TIMEOUT = 14400
+DHCP_TIMEOUT = local_settings.DHCP_TIMEOUT
 
-DEFAULT_SNMP_PASSWORD = 'public'
+DEFAULT_SNMP_PASSWORD = local_settings.DEFAULT_SNMP_PASSWORD
 
-TELEGRAM_BOT_TOKEN = 'bot token'
+TELEGRAM_BOT_TOKEN = local_settings.TELEGRAM_BOT_TOKEN
 
 TELEPHONE_REGEXP = r'^\+[7,8,9,3]\d{10,11}$'
 
-ASTERISK_MANAGER_AUTH = {
-    'username': 'admin',
-    'password': 'password',
-    'host': '127.0.0.1'
-}
+ASTERISK_MANAGER_AUTH = local_settings.ASTERISK_MANAGER_AUTH

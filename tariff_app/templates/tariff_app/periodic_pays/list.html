@@ -1,0 +1,62 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,tariff_app/ext.html' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th class="col-sm-4">{% trans 'Periodic pay name' %}</th>
+                <th class="col-sm-2">{% trans 'When pay created' %}</th>
+                <th class="col-sm-3">{% trans 'Script type for calculations' %}</th>
+                <th class="col-sm-2">{% trans 'Total amount' %}</th>
+                <th class="col-sm-1">#</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% trans 'Edit' as edtext %}
+            {% with can_view=perms.tariff_app.can_view_periodic_pay %}
+            {% for pay in pays %}
+            <tr>
+                <td>{{ pay.name }}</td>
+                <td>{{ pay.when_add|date:'j M Y' }}</td>
+                <td>{{ pay.get_calc_type_display }}</td>
+                <td>{{ pay.amount }}</td>
+                <td>
+                    {% if can_view %}
+                        <a href="{% url 'tarifs:periodic_pay_edit' pay.id %}" class="btn btn-sm btn-default" title="{{ edtext }}">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-sm btn-default" disabled>
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">{% trans 'The list is empty' %}</td>
+                </tr>
+            {% endfor %}
+            {% endwith %}
+            </tbody>
+
+            {% if perms.tariff_app.add_periodicpay %}
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    <a href="{% url 'tarifs:periodic_pay_add' %}" class="btn btn-sm btn-success">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+            {% endif %}
+
+        </table>
+    </div>
+
+    {% include 'toolbar_page.html' with pag=pays %}
+
+{% endblock %}

@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from guardian.decorators import permission_required_or_403 as permission_required
 
-from .models import Tariff
+from .models import Tariff, PeriodicPay
 import mydefs
 from . import forms
 
@@ -15,7 +15,7 @@ from . import forms
 @login_required
 @mydefs.only_admins
 def tarifs(request):
-    tars = Tariff.objects.all()
+    tars = Tariff.objects.order_by('title')
 
     # фильтр
     direct, field = mydefs.order_helper(request)
@@ -72,3 +72,44 @@ def del_tarif(request, tid):
             messages.error(request, _('Not have a confirmations of delete'))
         return mydefs.res_success(request, 'tarifs:home')
     return render_to_text('tariff_app/modal_del_warning.html', {'tid': tid}, request=request)
+
+
+@login_required
+@permission_required('tariff_app.can_view_periodic_pay')
+def periodic_pays(request):
+    pays = PeriodicPay.objects.all()
+    pays = mydefs.pag_mn(request, pays)
+    return render(request, 'tariff_app/periodic_pays/list.html', {
+        'pays': pays
+    })
+
+
+@login_required
+def periodic_pay(request, pay_id=0):
+    if pay_id != 0:
+        pay_inst = get_object_or_404(PeriodicPay, pk=pay_id)
+        if not request.user.has_perm('tariff_app.change_periodicpay'):
+            raise PermissionDenied
+    else:
+        pay_inst = None
+        if not request.user.has_perm('tariff_app.add_periodicpay'):
+            raise PermissionDenied
+    if request.method == 'POST':
+        frm = forms.PeriodicPayForm(request.POST, instance=pay_inst)
+        if frm.is_valid():
+            new_periodic_pay = frm.save()
+            if pay_inst is None:
+                comment = _('New periodic pay successfully created')
+            else:
+                comment = _('Periodic pay has been changed')
+            messages.success(request, comment)
+            return redirect('tarifs:periodic_pay_edit', new_periodic_pay.pk)
+        else:
+            messages.error(request, _('Some fields were filled incorrect, please try again'))
+    else:
+        frm = forms.PeriodicPayForm(instance=pay_inst)
+
+    return render(request, 'tariff_app/periodic_pays/add_edit.html', {
+        'pay_instance': pay_inst,
+        'form': frm
+    })

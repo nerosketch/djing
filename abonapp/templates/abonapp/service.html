@@ -55,7 +55,7 @@
                     {% endif %}
 
                     {% if abon_tariff %}
-                        <a href="{% url 'abonapp:unsubscribe_service' abon_group.pk abon.pk abon_tariff.pk %}" class="btn btn-danger">
+                        <a href="{% url 'abonapp:unsubscribe_service' abon_group.pk abon.pk abon_tariff.pk %}" class="btn btn-sm btn-danger">
                             <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
                         </a>
                     {% endif %}
@@ -65,7 +65,7 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Услуги для заказа</h3>
+                    <h3 class="panel-title">{% trans 'Services for buy' %}</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table table-condensed">
@@ -108,12 +108,41 @@
                         {% endwith %}
                         </tbody>
                     </table>
-                    <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}">
+                    <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-primary" title="{% trans 'User groups' %}">
                         <span class="glyphicon glyphicon-cog"></span> {% trans 'Attach services to group' %}
                     </a>
                 </div>
             </div>
         </div>
+
+        {% if perms.tariff_app.can_view_periodic_pay %}
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'Periodic pay' %}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if periodic_pay %}
+                        <dl class="dl-horizontal">
+                            <dt>{% trans 'Pay logic' %}</dt>
+                            <dd>{{ periodic_pay.periodic_pay }}</dd>
+                            <dt>{% trans 'Last pay' %}</dt>
+                            <dd>{{ periodic_pay.last_pay|default:'Not yet paid' }}</dd>
+                            <dt>{% trans 'Next time to pay' %}</dt>
+                            <dd>{{ periodic_pay.next_pay|date:'d E Y' }}</dd>
+                        </dl>
+                        <a href="{% url 'abonapp:del_periodic_pay' abon_group.pk abon.pk periodic_pay.pk %}" class="btn btn-sm btn-danger">
+                            <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove periodic pay' %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'abonapp:add_periodic_pay' abon_group.pk abon.pk %}" class="btn btn-primary btn-sm btn-modal">
+                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add periodic pay' %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
 {% endblock %}

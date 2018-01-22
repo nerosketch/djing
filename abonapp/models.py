@@ -5,11 +5,11 @@ from django.core.validators import RegexValidator
 from django.db.models.signals import post_save, post_delete, pre_delete, post_init
 from django.dispatch import receiver
 from django.utils import timezone
-from django.db import models, connection
+from django.db import models, connection, transaction
 from django.core import validators
 from django.utils.translation import ugettext as _
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
-from tariff_app.models import Tariff
+from tariff_app.models import Tariff, PeriodicPay
 from accounts_app.models import UserProfile, MyUserManager
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from django.conf import settings
@@ -30,6 +30,7 @@ class AbonGroup(models.Model):
         )
         verbose_name = _('Abon group')
         verbose_name_plural = _('Abon groups')
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -38,7 +39,7 @@ class AbonGroup(models.Model):
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon', models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, models.CASCADE, related_name='+')
+    author = models.ForeignKey(UserProfile, models.CASCADE, related_name='+', blank=True, null=True)
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -47,6 +48,7 @@ class AbonLog(models.Model):
         permissions = (
             ('can_view_abonlog', _('Can view subscriber logs')),
         )
+        ordering = ['-date']
 
     def __str__(self):
         return self.comment
@@ -82,6 +84,7 @@ class AbonTariff(models.Model):
         )
         verbose_name = _('Abon service')
         verbose_name_plural = _('Abon services')
+        ordering = ['time_start']
 
 
 class AbonStreet(models.Model):
@@ -95,6 +98,7 @@ class AbonStreet(models.Model):
         db_table = 'abon_street'
         verbose_name = _('Street')
         verbose_name_plural = _('Streets')
+        ordering = ['name']
 
 
 class ExtraFieldsModel(models.Model):
@@ -173,14 +177,18 @@ class Abon(UserProfile):
             ('can_add_ballance', _('fill account')),
             ('can_ping', _('Can ping'))
         )
-        unique_together = ('device', 'dev_port')
+        # TODO: Fix when duplicates already in database
+        #unique_together = ('device', 'dev_port')
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
+        ordering = ['fio']
 
-    # Платим за что-то
+    # pay something
     def make_pay(self, curuser, how_match_to_pay=0.0):
+        post_save.disconnect(abon_post_save, sender=Abon)
         self.ballance -= how_match_to_pay
         self.save(update_fields=['ballance'])
+        post_save.connect(abon_post_save, sender=Abon)
 
     # Пополняем счёт
     def add_ballance(self, current_user, amount, comment):
@@ -318,8 +326,8 @@ class InvoiceForPayment(models.Model):
 
 
 class AllTimePayLogManager(models.Manager):
-
-    def by_days(self):
+    @staticmethod
+    def by_days():
         cur = connection.cursor()
         cur.execute(r'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
                     r'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")')
@@ -333,9 +341,12 @@ class AllTimePayLogManager(models.Manager):
 
 # Log for pay system "AllTime"
 class AllTimePayLog(models.Model):
+    abon = models.ForeignKey(Abon, models.SET_DEFAULT, blank=True, null=True, default=None)
     pay_id = models.CharField(max_length=36, unique=True, primary_key=True)
     date_add = models.DateTimeField(auto_now_add=True)
     summ = models.FloatField(default=0.0)
+    trade_point = models.CharField(_('Trade point'), max_length=20, default=None, null=True, blank=True)
+    receipt_num = models.IntegerField(_('Receipt number'), default=0)
 
     objects = AllTimePayLogManager()
 
@@ -344,7 +355,7 @@ class AllTimePayLog(models.Model):
 
     class Meta:
         db_table = 'all_time_pay_log'
-        ordering = ('date_add',)
+        ordering = ['-date_add']
 
 
 # log for all terminals
@@ -359,7 +370,7 @@ class AllPayLog(models.Model):
 
     class Meta:
         db_table = 'all_pay_log'
-        ordering = ('date_action',)
+        ordering = ['-date_action']
 
 
 class AbonRawPassword(models.Model):
@@ -394,6 +405,42 @@ class AdditionalTelephone(models.Model):
         )
         verbose_name = _('Additional telephone')
         verbose_name_plural = _('Additional telephones')
+
+
+class PeriodicPayForId(models.Model):
+    periodic_pay = models.ForeignKey(PeriodicPay, models.CASCADE, verbose_name=_('Periodic pay'))
+    last_pay = models.DateTimeField(_('Last pay time'), blank=True, null=True)
+    next_pay = models.DateTimeField(_('Next time to pay'))
+    account = models.ForeignKey(Abon, models.CASCADE, verbose_name=_('Account'))
+
+    def payment_for_service(self, author=None, comment=None):
+        """
+        Charge for the service and leave a log about it
+        """
+        now = timezone.now()
+        if self.next_pay < now:
+            pp = self.periodic_pay
+            amount = pp.calc_amount()
+            next_pay_date = pp.get_next_time_to_pay(self.last_pay)
+            abon = self.account
+            with transaction.atomic():
+                abon.make_pay(author, amount)
+                AbonLog.objects.create(
+                    abon=abon, amount=-amount,
+                    author=author,
+                    comment=comment or _('Charge for "%(service)s"') % {
+                        'service': self.periodic_pay
+                    }
+                )
+                self.last_pay = now
+                self.next_pay = next_pay_date
+                self.save(update_fields=['last_pay', 'next_pay'])
+
+    def __str__(self):
+        return "%s %s" % (self.periodic_pay, self.next_pay)
+
+    class Meta:
+        db_table = 'periodic_pay_for_id'
 
 
 @receiver(post_save, sender=Abon)

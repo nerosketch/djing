@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load bootstrap3 %}
+<form action="{% url 'abonapp:add_periodic_pay' gid uid %}" method="post">{% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span>{% trans 'Add periodic pay' %}</h4>
+    </div>
+
+    {% include 'message_block.html' %}
+
+    <div class="modal-body">
+
+        {% bootstrap_icon 'calendar' as ic %}
+        {% bootstrap_field form.periodic_pay addon_before=ic %}
+
+        {% bootstrap_icon 'time' as ic %}
+        {% bootstrap_field form.next_pay addon_before=ic %}
+        <script type="text/javascript">
+            $(function () {
+                $('#{{ form.next_pay.id_for_label }}').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+        </script>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-sm btn-success">
+                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+            </button>
+            <button type="reset" class="btn btn-sm btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>

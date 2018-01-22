@@ -1,29 +1,57 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
-# from abonapp import Abon
 
 
 class TariffBase(metaclass=ABCMeta):
     @abstractmethod
     def calc_amount(self):
-        """Считает итоговую сумму платежа"""
+        """Calculates total amount of payment"""
+        raise NotImplementedError
 
     @abstractmethod
     def calc_deadline(self):
-        """Считаем дату, до которой действкет тариф"""
+        """Calculate deadline date"""
+        raise NotImplementedError
 
     @staticmethod
     def description():
-        """Возвращает текстовое описание"""
+        """
+        Usage in mydefs.MyChoicesAdapter for choices fields.
+        :return: human readable description
+        """
+        raise NotImplementedError
 
     @staticmethod
     def manage_access(abon):
-        """Управляет доступом абонента к услуге"""
+        """Manage subscribers access to service"""
         #assert isinstance(abon, Abon)
-        # если абонент не активен то выходим
         if not abon.is_active: return False
-        # смотрим на текущую услугу
         act_tar = abon.active_tariff()
-        # если есть услуга
         if act_tar:
             return True
+
+
+class PeriodicPayCalcBase(metaclass=ABCMeta):
+
+    @abstractmethod
+    def calc_amount(self, model_object):
+        """
+        :param model_object: it is a instance of models.PeriodicPay model
+        :return: float: amount for the service
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_next_time_to_pay(self, model_object, last_time_payment):
+        """
+        :param model_object: it is a instance of models.PeriodicPay model
+        :param last_time_payment: May be None if first pay
+        :return: datetime.datetime: time for next pay
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def description():
+        """Return text description.
+        Uses in mydefs.MyChoicesAdapter for CHOICES fields"""
+        raise NotImplementedError

@@ -2,16 +2,15 @@
 from datetime import timedelta, datetime
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from .base_intr import TariffBase
+from .base_intr import TariffBase, PeriodicPayCalcBase
 from calendar import monthrange
 
-# from abonapp import AbonTariff
+from random import uniform
 
 
 class TariffDefault(TariffBase):
-
     def __init__(self, abon_tariff):
-        #assert isinstance(abon_tariff, AbonTariff)
+        # assert isinstance(abon_tariff, AbonTariff)
         self.abon_tariff = abon_tariff
 
     # Базовый функционал считает стоимость пропорционально использованному времени
@@ -62,11 +61,10 @@ class TariffDp(TariffDefault):
 
 # Как в IS только не на время, а на 10 лет
 class TariffCp(TariffDp):
-
     def calc_deadline(self):
         # делаем время окончания услуги на 10 лет вперёд
         nw = timezone.now()
-        long_long_time = datetime(year=nw.year+10, month=nw.month, day=nw.day,
+        long_long_time = datetime(year=nw.year + 10, month=nw.month, day=nw.day,
                                   hour=23, minute=59, second=59)
         return long_long_time
 
@@ -80,4 +78,36 @@ TARIFF_CHOICES = (
     ('Df', TariffDefault),
     ('Dp', TariffDp),
     ('Cp', TariffCp)
+)
+
+
+class PeriodicPayCalcDefault(PeriodicPayCalcBase):
+    def calc_amount(self, model_object):
+        return model_object.amount
+
+    def get_next_time_to_pay(self, model_object, last_time_payment):
+        # TODO: решить какой будет расёт периодических платежей
+        return datetime.now() + timedelta(days=30)
+
+    @staticmethod
+    def description():
+        return _('Default periodic pay')
+
+
+class PeriodicPayCalcCustom(PeriodicPayCalcDefault):
+    def calc_amount(self, model_object):
+        """
+        :param model_object: it is a instance of models.PeriodicPay model
+        :return: float: amount for the service
+        """
+        return uniform(1, 10)
+
+    @staticmethod
+    def description():
+        return _('Custom periodic pay')
+
+
+PERIODIC_PAY_CHOICES = (
+    ('df', PeriodicPayCalcDefault),
+    ('cs', PeriodicPayCalcCustom)
 )

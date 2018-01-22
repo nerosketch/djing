@@ -1,0 +1,51 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block main %}
+
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'tarifs:periodic_pays' %}">{% trans 'Services' %}</a></li>
+        {% if pay_instance %}
+            <li class="active">{% trans 'Change periodic pay' %}</li>
+        {% else %}
+            <li class="active">{% trans 'Add new periodic pay' %}</li>
+        {% endif %}
+    </ol>
+
+    {% include 'message_block.html' %}
+
+    {% if pay_instance %}
+        <div class="page-header">
+            <h2>{{ pay_instance.name }}</h2>
+        </div>
+        {% url 'tarifs:periodic_pay_edit' pay_instance.id as form_url %}
+    {% else %}
+        {% url 'tarifs:periodic_pay_add' as form_url %}
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Pay details' %}</h3>
+        </div>
+        <div class="panel-body">
+
+            <form action="{{ form_url }}" method="post" autocomplete="off">{% csrf_token %}
+
+                {% bootstrap_icon 'header' as ic %}
+                {% bootstrap_field form.name addon_before=ic %}
+
+                {% bootstrap_icon 'transfer' as ic %}
+                {% bootstrap_field form.calc_type addon_before=ic %}
+
+                {% bootstrap_icon 'rub' as ic %}
+                {% bootstrap_field form.amount addon_before=ic %}
+
+                {% trans 'Save' as ic %}
+                {% bootstrap_button ic button_class="btn-primary" icon="save" %}
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

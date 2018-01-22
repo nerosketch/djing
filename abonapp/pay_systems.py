@@ -10,10 +10,6 @@ SECRET = getattr(settings, 'PAY_SECRET')
 SERV_ID = getattr(settings, 'PAY_SERV_ID')
 
 
-#?ACT=1&PAY_ACCOUNT=960849&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=377&SIGN=32e533a72389fe4e93746509f9d672f8
-#?ACT=4&PAY_ACCOUNT=960849&PAY_AMOUNT=1.00&RECEIPT_NUM=29096&SERVICE_ID=y832r92y8f9e&PAY_ID=3561234&TRADE_POINT=496&SIGN=c42161214099dba01e6ab008552bbd3d
-
-
 def allpay(request):
 
     def bad_ret(err_id):
@@ -60,6 +56,8 @@ def allpay(request):
                     "  <time_stamp>%s</time_stamp>\n" % current_date +\
                     "</pay-response>"
         elif act == 4:
+            trade_point = safe_int(request.GET.get('TRADE_POINT'))
+            receipt_num = safe_int(request.GET.get('RECEIPT_NUM'))
             abon = Abon.objects.get(username=pay_account)
             pays = AllTimePayLog.objects.filter(pay_id=pay_id)
             if pays.count() > 0:
@@ -71,7 +69,10 @@ def allpay(request):
 
             AllTimePayLog.objects.create(
                 pay_id=pay_id,
-                summ=pay_amount
+                summ=pay_amount,
+                abon=abon,
+                trade_point=trade_point,
+                receipt_num=receipt_num
             )
             current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
             return "<?xml version='1.0' encoding='UTF-8'?>" \
