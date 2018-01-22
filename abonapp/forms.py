@@ -16,7 +16,7 @@ def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
     username = ''.join([choice(chars) for i in range(length)])
 
     if split:
-        username = delimiter.join([username[start:start+split] for start in range(0, len(username), split)])
+        username = delimiter.join([username[start:start + split] for start in range(0, len(username), split)])
 
     try:
         models.Abon.objects.get(username=username)
@@ -26,7 +26,7 @@ def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
 
 
 def generate_random_password():
-    return generate_random_username(length=8, chars=digits+ascii_lowercase)
+    return generate_random_username(length=8, chars=digits + ascii_lowercase)
 
 
 class AbonForm(forms.ModelForm):
@@ -41,14 +41,16 @@ class AbonForm(forms.ModelForm):
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
 
-    username = forms.CharField(max_length=127, required=False, initial=generate_random_username, widget=forms.TextInput(attrs={
-        'placeholder': _('login'),
-        'class': "form-control",
-        'required': ''
-    }))
+    username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
+                               widget=forms.TextInput(attrs={
+                                   'placeholder': _('login'),
+                                   'class': "form-control",
+                                   'required': ''
+                               }))
 
     password = forms.CharField(max_length=64, initial=generate_random_password,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'}))
+                               widget=forms.TextInput(
+                                   attrs={'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'}))
 
     class Meta:
         model = models.Abon
@@ -116,7 +118,6 @@ class PassportForm(forms.ModelForm):
 
 
 class ExtraFieldForm(forms.ModelForm):
-
     class Meta:
         model = models.ExtraFieldsModel
         fields = '__all__'
@@ -132,7 +133,7 @@ class AbonStreetForm(forms.ModelForm):
         model = models.AbonStreet
         fields = '__all__'
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'required':'', 'autofocus':''}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'autofocus': ''}),
             'group': forms.Select(attrs={'class': 'form-control'})
         }
 
@@ -148,7 +149,7 @@ class AdditionalTelephoneForm(forms.ModelForm):
                 'required': '',
                 'class': 'form-control'
             }),
-            'owner_name': forms.TextInput(attrs={'class': 'form-control', 'required':''})
+            'owner_name': forms.TextInput(attrs={'class': 'form-control', 'required': ''})
         }
 
 
@@ -156,3 +157,25 @@ class PeriodicPayForIdForm(forms.ModelForm):
     class Meta:
         model = models.PeriodicPayForId
         exclude = ['account']
+
+
+class ExportUsersForm(forms.Form):
+    FIELDS_CHOICES = (
+        ('username', _('profile username')),
+        ('fio', _('fio')),
+        ('ip_address', _('Ip Address')),
+        ('description', _('Comment')),
+        ('street__name', _('Street')),
+        ('house', _('House')),
+        ('birth_day', _('birth day')),
+        ('is_active', _('Is active')),
+        ('telephone', _('Telephone')),
+        ('current_tariff__tariff__title', _('Service title')),
+        ('ballance', _('Ballance')),
+        ('device__comment', _('Device')),
+        ('dev_port__descr', _('Device port')),
+        ('is_dynamic_ip', _('Is dynamic ip'))
+    )
+    fields = forms.MultipleChoiceField(choices=FIELDS_CHOICES,
+                                       widget=forms.CheckboxSelectMultiple(attrs={"checked": ""}),
+                                       label=_('Fields'))

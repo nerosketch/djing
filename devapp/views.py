@@ -71,7 +71,7 @@ def devices_null_group(request):
 def devdel(request, device_id):
     try:
         dev = Device.objects.get(pk=device_id)
-        back_url = resolve_url('devapp:devs', grp=dev.user_group.pk if dev.user_group else 0)
+        back_url = resolve_url('devapp:devs', group_id=dev.user_group.pk if dev.user_group else 0)
         dev.delete()
         return res_success(request, back_url)
     except Device.DoesNotExist:
@@ -162,7 +162,7 @@ def manage_ports(request, device_id):
 
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
-        return redirect('devapp:view', dev.user_group.pk if dev.user_group else 0, did=device_id)
+        return redirect('devapp:group_list')
     except DeviceDBException as e:
         messages.error(request, e)
     return render(request, 'devapp/manage_ports/list.html', {
@@ -273,7 +273,7 @@ def edit_single_port(request, group_id, device_id, port_id):
                 messages.success(request, _('Port successfully saved'))
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
-            return redirect('devapp:manage_ports', group_id, port_id)
+            return redirect('devapp:manage_ports', group_id, device_id)
 
         frm = PortForm(instance=port)
         return render_to_text('devapp/manage_ports/modal_add_edit_port.html', {

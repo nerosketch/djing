@@ -469,7 +469,7 @@ msgstr "Добавить муфту"
 
 #: templates/abonapp/editAbon.html:141
 msgid "Device port"
-msgstr "Порт&nbsp;устройства"
+msgstr "Порт устройства"
 
 #: templates/abonapp/editAbon.html:158
 msgid "Is dynamic network settings"
@@ -1076,3 +1076,39 @@ msgstr "Инфо."
 
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "No have ip"
+msgstr "Нет ip адреса"
+
+#, python-format
+msgid "Graph of use by %(wantdate_d)s"
+msgstr "График использования за %(wantdate_d)s"
+
+msgid "Show graph by date"
+msgstr "Показать график по дате"
+
+#: views.py:757
+#, python-format
+msgid "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device"
+msgstr "<a href='%(user_url)s'>%(user_name)s</a> уже привязан к этому порту на этом устройстве"
+
+msgid "Export"
+msgstr "Экспорт"
+
+msgid "Export users"
+msgstr "Экспорт абонентов"
+
+msgid "Fields"
+msgstr "Поля"
+
+msgid "Select the fields"
+msgstr "Выберите поля"
+
+msgid "Service title"
+msgstr "Название тарифа"
+
+msgid "Is dynamic ip"
+msgstr "Динамический ip"
+
+msgid "Unexpected format %(export_format)s"
+msgstr "Нежиданный формат %(export_format)s"
