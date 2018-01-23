@@ -339,7 +339,7 @@ class AllTimePayLog(models.Model):
     date_add = models.DateTimeField(auto_now_add=True)
     summ = models.FloatField(default=0.0)
     trade_point = models.CharField(_('Trade point'), max_length=20, default=None, null=True, blank=True)
-    receipt_num = models.IntegerField(_('Receipt number'), default=0)
+    receipt_num = models.BigIntegerField(_('Receipt number'), default=0)
 
     objects = AllTimePayLogManager()
 

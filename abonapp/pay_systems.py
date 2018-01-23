@@ -12,13 +12,17 @@ SERV_ID = getattr(settings, 'PAY_SERV_ID')
 
 def allpay(request):
 
-    def bad_ret(err_id):
+    def bad_ret(err_id, err_description=None):
         current_date = timezone.now()
-        return "<?xml version='1.0' encoding='UTF-8'?>\n" \
-               "<pay-response>\n" \
-               "  <status_code>%d</status_code>\n" % safe_int(err_id) +\
-               "  <time_stamp>%s</time_stamp>\n" % current_date.strftime("%d.%m.%Y %H:%M:%S") +\
-               "</pay-response>"
+        res = [
+            "<?xml version='1.0' encoding='UTF-8'?>",
+            "<pay-response>",
+            "  <status_code>%d</status_code>" % safe_int(err_id),
+            "  <time_stamp>%s</time_stamp>" % current_date.strftime("%d.%m.%Y %H:%M:%S"),
+            "  <description>%s</description>" % err_description if err_description is not None else '',
+            "</pay-response>"
+        ]
+        return '\n'.join(res)
 
     try:
         serv_id = request.GET.get('SERVICE_ID')
@@ -36,8 +40,8 @@ def allpay(request):
         if our_sign != sign:
             return bad_ret(-101)
 
-        if act <= 0: return bad_ret(-101)
-        if pay_account == 0: return bad_ret(-40)
+        if act <= 0: return bad_ret(-101, 'ACT less than zero')
+        if pay_account == 0: return bad_ret(-40, 'PAY_ACCOUNT is not passed')
 
         if act == 1:
             abon = Abon.objects.get(username=pay_account)
@@ -99,7 +103,7 @@ def allpay(request):
                    "  </transaction>\n" \
                    "</pay-response>"
         else:
-            return bad_ret(-101)
+            return bad_ret(-101, 'ACT is not passed')
 
     except Abon.DoesNotExist:
         return bad_ret(-40)
