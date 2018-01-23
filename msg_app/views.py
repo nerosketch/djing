@@ -75,15 +75,19 @@ def remove_msg(request, conv_id, msg_id):
     return redirect('msg_app:to_conversation', conversation_id)
 
 
-@login_required
 def check_news(request):
-    msg = MessageQueue.objects.pop(user=request.user, tag='msgapp')
-    if msg is not None:
-        r = {
-            'exist': True,
-            'content': msg,
-            'title': "%s" % _('Message')
-        }
+    if request.user.is_authenticated:
+        msg = MessageQueue.objects.pop(user=request.user, tag='msgapp')
+        if msg is None:
+            r = {'auth': True, 'exist': False}
+        else:
+            r = {
+                'auth': True,
+                'exist': True,
+                'content': msg,
+                'title': "%s" % _('Message')
+            }
     else:
-        r = {'exist': False}
+        r = {'auth': False}
     return HttpResponse(dumps(r))
+

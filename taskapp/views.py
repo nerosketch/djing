@@ -211,16 +211,18 @@ def remind(request, task_id):
     return redirect('taskapp:home')
 
 
-@login_required
-@only_admins
 def check_news(request):
-    msg = MessageQueue.objects.pop(user=request.user, tag='taskap')
-    if msg is not None:
-        r = {
-            'exist': True,
-            'content': msg,
-            'title': _('Task')
-        }
+    if request.user.is_authenticated and request.user.is_admin:
+        msg = MessageQueue.objects.pop(user=request.user, tag='taskap')
+        if msg is not None:
+            r = {
+                'auth': True,
+                'exist': True,
+                'content': msg,
+                'title': _('Task')
+            }
+        else:
+            r = {'auth': True, 'exist': False}
     else:
-        r = {'exist': False}
+        r = {'auth': False}
     return HttpResponse(dumps(r))

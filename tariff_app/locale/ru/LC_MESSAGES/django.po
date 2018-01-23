@@ -101,3 +101,34 @@ msgid ""
 msgstr ""
 "После того как вы удалите тарифный план то абоненты, подписанные на него, сразу потеряют услугу по этому тарифу. "
 "Так что сначала убедитесь что уже никто не пользуется тарифом, и только после этого удалите его."
+
+msgid "Services"
+msgstr "Тарифы"
+
+msgid "Periodic pays"
+msgstr "Периодические платежи"
+
+msgid "Periodic pay name"
+msgstr "Название"
+
+msgid "When pay created"
+msgstr "Когда создан"
+
+msgid "Script type for calculations"
+msgstr "Алгоритм расчёта"
+
+msgid "Total amount"
+msgstr "Стоимость"
+
+msgid "Pay details"
+msgstr "Подробности платежа"
+
+msgid "Default periodic pay"
+msgstr "Логика по умолчанию"
+
+msgid "Custom periodic pay"
+msgstr "Пробная логика"
+
+msgid "Add new periodic pay"
+msgstr "Добавить периодический платёж"
+

@@ -1056,11 +1056,11 @@ msgstr "Периодический платёж успешно удалён"
 #~ msgid "Buy"
 #~ msgstr "Купить"
 
-#~ msgid "Not confirmed"
-#~ msgstr "Действие не подтверждено"
+msgid "Not confirmed"
+msgstr "Действие не подтверждено"
 
-#~ msgid "Services"
-#~ msgstr "Услуги"
+msgid "Services"
+msgstr "Услуги"
 
 msgid "Payments"
 msgstr "Финансы"
@@ -1076,21 +1076,6 @@ msgstr "Инфо."
 
 msgid "Dialing"
 msgstr "Звонки"
-
-msgid "No have ip"
-msgstr "Нет ip адреса"
-
-#, python-format
-msgid "Graph of use by %(wantdate_d)s"
-msgstr "График использования за %(wantdate_d)s"
-
-msgid "Show graph by date"
-msgstr "Показать график по дате"
-
-#: views.py:757
-#, python-format
-msgid "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device"
-msgstr "<a href='%(user_url)s'>%(user_name)s</a> уже привязан к этому порту на этом устройстве"
 
 msgid "Export"
 msgstr "Экспорт"

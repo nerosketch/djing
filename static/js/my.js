@@ -202,10 +202,13 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
             var perm = Notification.permission.toLowerCase();
             if(perm == "granted" && settings.news_url){
                 $.getJSON(settings.news_url, function(r){
-                    if(r.exist){
-                        notifShow(r.title, r.content);
-                        /*console.log('News from '+settings.news_url+'. '+r.content);*/
-                    }/*else console.log('No news from '+settings.news_url);*/
+                    if(r.auth){
+                        if(r.exist){
+                            notifShow(r.title, r.content);
+                        }
+                    }else{
+                        window.location.href = '/';
+                    }
                 });
             }
         }
@@ -295,7 +298,7 @@ $(document).ready(function () {
 
 	$('.btn_ajloader').ajloader({'dst_block': '#id_block_devices'});
 
-	$(document).notifys({news_url: '/tasks/check_news', check_interval: 10});
+	$(document).notifys({news_url: '/tasks/check_news', check_interval: 50});
 	$(document).notifys({news_url: '/msg/check_news', check_interval: 55});
 
 });
