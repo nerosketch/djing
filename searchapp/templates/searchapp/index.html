@@ -26,7 +26,11 @@
                         <h4 class="list-group-item-heading">{{ ab.username|safe }}</h4>
 
                         <p class="list-group-item-text">
-                            {{ ab.fio|safe }} <span>{{ ab.ip_address }}</span> {{ ab.telephone|safe }}
+                        {{ ab.fio|safe }}
+                        {% if ab.ip_address %}
+                            <span>{{ ab.ip_address }}</span>
+                        {% endif %}
+                        {{ ab.telephone|safe }}
                         </p>
                     </a>
                 {% empty %}
