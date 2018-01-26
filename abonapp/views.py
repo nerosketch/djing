@@ -395,12 +395,15 @@ def pick_tariff(request, gid, uid):
         if request.method == 'POST':
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
             deadline = request.POST.get('deadline')
+            log_comment = _("Service '%(service_name)s' has connected via admin") % {
+                'service_name': trf.title
+            }
             if deadline == '' or deadline is None:
-                abon.pick_tariff(trf, request.user)
+                abon.pick_tariff(trf, request.user, comment=log_comment)
             else:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d')
                 deadline += timedelta(hours=23, minutes=59, seconds=59)
-                abon.pick_tariff(trf, request.user, deadline=deadline)
+                abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except (mydefs.LogicError, NasFailedResult) as e:
@@ -426,7 +429,6 @@ def pick_tariff(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.delete_abontariff')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
 def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
