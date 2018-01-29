@@ -449,10 +449,12 @@ def fix_onu(request):
                     status = 0
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
+            text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' %\
+                (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
         else:
             text = text + ' %s' % _('Parent device not found')
     except Device.DoesNotExist:
-        pass
+        text = '<span class="glyphicon glyphicon-exclamation-sign"></span> DeviceDoesNtExist'
     return HttpResponse(dumps({
         'status': status,
         'dat': text

@@ -473,6 +473,9 @@ msgstr "Исправлено, обновите страницу"
 msgid "Parent device not found"
 msgstr "Вышестоящее устройство не найдено"
 
+msgid "Device with mac address %(mac)s does not exist"
+msgstr "Устройство мак адресом %(mac)s не найдено"
+
 #~ msgid "Map point"
 #~ msgstr "Точка топологии"
 
