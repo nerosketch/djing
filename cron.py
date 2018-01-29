@@ -6,7 +6,6 @@ django.setup()
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import signals
-from django.utils.translation import ugettext_lazy as _
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
 from agent import Transmitter, NasNetworkError, NasFailedResult
 from mydefs import LogicError
@@ -22,15 +21,16 @@ def main():
     # finishing expires services
     with transaction.atomic():
         for ex_srv in expired_services.only(*fields).values(*fields):
-            AbonLog.objects.create(
+            log = AbonLog.objects.create(
                 abon_id=ex_srv['abon__id'],
                 amount=0,
                 author=None,
                 date=now,
-                comment=_("Service '%(service_name)s' has expired") % {
+                comment=_("Срок действия услуги '%(service_name)s' истёк") % {
                     'service_name': ex_srv['tariff__title']
                 }
             )
+            print(log)
         expired_services.delete()
     signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
 
