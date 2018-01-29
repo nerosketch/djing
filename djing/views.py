@@ -8,7 +8,3 @@ def home(request):
         return redirect('acc_app:profile')
     else:
         return redirect('client_side:home')
-
-
-def finance_report(request):
-    pass

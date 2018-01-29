@@ -1,5 +1,4 @@
 from django.conf.urls import url
-
 from . import views
 
 
@@ -23,5 +22,8 @@ urlpatterns = [
     url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<portid>\d+)/del$', views.delete_single_port, name='del_port'),
     url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<port_id>\d+)/edit$', views.edit_single_port, name='edit_port'),
     url(r'^fix_device_group/(?P<device_id>\d+)$', views.fix_device_group, name='fix_device_group'),
-    url(r'^search_dev$', views.search_dev)
+    url(r'^search_dev$', views.search_dev),
+
+    # Monitoring api
+    url(r'^on_device_down/$', views.OnDevDown.as_view())
 ]

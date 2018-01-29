@@ -15,10 +15,10 @@ def handle(task, author, recipients, abon_group):
         try:
             dst_account = recipient
             text = _('Task')
-            # Если сигнал самому себе то молчим
+            # If signal to myself then quietly
             if author == recipient:
                 return
-            # Если задача завершена или провалена
+            # If task completed or failed
             elif task.state == 'F' or task.state == 'C':
                 text = _('Task completed')
             if task.abon is not None:
@@ -36,7 +36,7 @@ def handle(task, author, recipients, abon_group):
             fulltext += task.descr if task.descr else ''
 
             if task.state == 'F' or task.state == 'C':
-                # Если задача завершена или провалена то отправляем одно оповещение автору
+                # If task completed or failed than send one message to author
                 try:
                     send_notify(fulltext, author, tag='taskap')
                 except ChatException as e:

@@ -54,7 +54,17 @@ class Device(models.Model):
     user_group = models.ForeignKey('abonapp.AbonGroup', verbose_name=_('User group'), on_delete=models.SET_NULL, null=True, blank=True)
     parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True, on_delete=models.SET_NULL)
 
-    snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0)
+    snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0, blank=True)
+
+    NETWORK_STATES = (
+        ('und', _('Undefined')),
+        ('up', _('Up')),
+        ('unr', _('Unreachable')),
+        ('dwn', _('Down'))
+    )
+    status = models.CharField(_('Status'), max_length=3, choices=NETWORK_STATES, default='und')
+
+    is_noticeable = models.BooleanField(_('Send notify when monitoring state changed'), default=False)
 
     objects = DeviceManager()
 
@@ -65,14 +75,13 @@ class Device(models.Model):
         )
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
+        ordering = ['comment']
 
     def get_abons(self):
         pass
 
     def get_status(self):
-        url = getattr(settings, 'NAGIOS_URL')
-        if url:
-            return requests.get('%s/host/status?addr=%s' % (url, self.ip_address))
+        return self.status
 
     def get_manager_klass(self):
         klasses = [kl for kl in DEVICE_TYPES if kl[0] == self.devtype]

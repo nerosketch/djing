@@ -115,7 +115,6 @@ class DjingTelebot(helper.ChatHandler):
         self._dialog_fn = None
         self._chat_id = 0
 
-    # пингуем адрес
     def ping(self, ip=None):
         if ip is None:
             self._question(_("Let's ping, write ip. It will be necessary to wait 10 seconds"), self.ping)
@@ -131,7 +130,7 @@ class DjingTelebot(helper.ChatHandler):
         self._sent_reply(_("You're '%s', right?") % self._current_user.get_full_name())
 
 
-# Просто отправляем текст оповещения указанной учётке
+# Just sending text to specified account
 def send_notify(msg_text, account, tag='none'):
     try:
         MessageQueue.objects.push(msg=msg_text, user=account, tag=tag)
@@ -143,6 +142,6 @@ def send_notify(msg_text, account, tag='none'):
     except TelegramBot.DoesNotExist:
         raise ChatException(_("Recipient '%s' does not subscribed on notifications") % account.get_full_name())
     except ProtocolError as e:
-        raise ChatException(e)
+        raise ChatException('ProtocolError: %s' % e)
     except TelegramError as e:
-        raise ChatException("%s - %s" % (e, tb.user.get_full_name()))
+        raise ChatException('Telegram error: %s' % e)

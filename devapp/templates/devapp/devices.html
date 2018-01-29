@@ -29,7 +29,7 @@
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-md-3">{% trans 'Mac address' %}</th>
-		<th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th>
+		        {# <th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th> #}
                 <th class="col-md-1">
                     <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:"down" }}">
                         {% trans 'Device type' %}
@@ -43,20 +43,24 @@
             <tbody>
             {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device %}
             {% for dev in devices %}
+
                 <tr>
                     <td>
-                        {% if dev.mon %}
-                            {% if dev.mon.current_state == '0' %}
+                        {% if dev.status == 'und' %}&ndash;
+                        {% else %}
+                            {% if dev.status == 'unr' or dev.status == 'dwn' %}
+                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                            {% elif dev.status == 'up' %}
                                 <span class="glyphicon glyphicon-ok-circle text-success"></span>
                             {% else %}
-                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                                <span class="glyphicon glyphicon-question-sign text-warning"></span>
                             {% endif %}
-                        {% else %}&ndash;{% endif %}
+                        {% endif %}
                     </td>
                     <td><a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
-                    <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td>
+                    {# <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td> #}
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}
@@ -73,7 +77,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="7">{% trans 'Devices does not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
+                    <td colspan="6">{% trans 'Devices does not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
                 </tr>
             {% endfor %}
             {% endwith %}
@@ -81,7 +85,7 @@
 
             <tfoot>
             <tr>
-                <td colspan="7">
+                <td colspan="6">
                     <a href="{% url 'devapp:add' group.pk %}" class="btn btn-success btn-sm">
                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Create' %}
                     </a>

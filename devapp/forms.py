@@ -19,7 +19,7 @@ class DeviceForm(forms.ModelForm):
 
     class Meta:
         model = models.Device
-        exclude = ['map_dot']
+        exclude = ['map_dot', 'status']
         widgets = {
             'ip_address': forms.TextInput(attrs={
                 'pattern': ip_addr_regex,

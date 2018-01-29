@@ -20,3 +20,4 @@ django-jsonfield
 requests
 webdavclient
 pyst2
+django-jsonview

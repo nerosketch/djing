@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
+import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
-from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from json import dumps
 
-from .models import Device, Port, DeviceDBException, DeviceMonitoringException
-from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper
-from .forms import DeviceForm, PortForm
+from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper, ip_addr_regex
 from abonapp.models import AbonGroup, Abon
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
+from chatbot.telebot import send_notify
+from chatbot.models import ChatException
+from jsonview.decorators import json_view
+from djing.global_base_views import HashAuthView, AllowedSubnetMixin
+from .models import Device, Port, DeviceDBException, DeviceMonitoringException
+from .forms import DeviceForm, PortForm
 
 
 @login_required
@@ -27,15 +32,16 @@ def devices(request, group_id):
     if not request.user.has_perm('abonapp.can_view_abongroup', group):
         raise PermissionDenied
     try:
-        devs = Device.objects.filter(user_group=group).select_related('user_group').only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
+        devs = Device.objects.filter(user_group=group) \
+            .select_related('user_group') \
+            .only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
 
-        # фильтр
         dr, field = order_helper(request)
         if field:
             devs = devs.order_by(field)
 
         devs = pag_mn(request, devs)
-        devs = Device.objects.wrap_monitoring_info(devs)
+        #devs = Device.objects.wrap_monitoring_info(devs)
 
     except (DeviceDBException, DeviceMonitoringException) as e:
         messages.error(request, e)
@@ -52,7 +58,7 @@ def devices(request, group_id):
 @only_admins
 def devices_null_group(request):
     devs = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
-    # фильтр
+
     dr, field = order_helper(request)
     if field:
         devs = devs.order_by(field)
@@ -99,11 +105,8 @@ def dev(request, group_id, device_id=0):
         try:
             frm = DeviceForm(request.POST, instance=devinst)
             if frm.is_valid():
-                ndev = frm.save()
-                ndev.update_dhcp()
-                messages.success(request, _('Device info has been saved'))
-                return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
-            else:
+
+                # check if that device is exist
                 try:
                     already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
                     if already_dev.user_group:
@@ -114,6 +117,14 @@ def dev(request, group_id, device_id=0):
                         return redirect('devapp:fix_device_group', already_dev.pk)
                 except Device.DoesNotExist:
                     pass
+
+                # else update device info
+                ndev = frm.save()
+                # change device info in dhcpd.conf
+                ndev.update_dhcp()
+                messages.success(request, _('Device info has been saved'))
+                return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
+            else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         except IntegrityError as e:
             if 'unique constraint' in e.message:
@@ -129,7 +140,7 @@ def dev(request, group_id, device_id=0):
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
                 'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
-                'snmp_item_num': request.GET.get('n')
+                'snmp_item_num': request.GET.get('n') or 0
             })
         else:
             frm = DeviceForm(instance=devinst)
@@ -401,7 +412,7 @@ def search_dev(request):
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
         results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
-    return HttpResponse(dumps(results, ensure_ascii=False))
+    return JsonResponse(results, json_dumps_params={'ensure_ascii': False})
 
 
 @login_required
@@ -453,10 +464,10 @@ def fix_onu(request):
             text = text + ' %s' % _('Parent device not found')
     except Device.DoesNotExist:
         pass
-    return HttpResponse(dumps({
+    return JsonResponse({
         'status': status,
         'dat': text
-    }))
+    })
 
 
 @login_required
@@ -471,3 +482,66 @@ def fix_port_confict(request, group_id, device_id, port_id):
         'device': device,
         'port': port
     })
+
+
+class OnDevDown(AllowedSubnetMixin, HashAuthView):
+    #
+    # Api view for monitoring devices
+    #
+    http_method_names = ['get']
+
+    @method_decorator(json_view)
+    def get(self, request):
+        try:
+            dev_ip = request.GET.get('ip')
+            dev_status = request.GET.get('status')
+
+            if dev_ip is None or dev_ip == '':
+                return {'text': 'ip does not passed'}
+
+            if not bool(re.match(ip_addr_regex, dev_ip)):
+                return {'text': 'ip address is not valid'}
+
+            possible_devices = Device.objects.filter(ip_address=dev_ip)
+
+            if possible_devices.count() < 1:
+                return {
+                    'text': 'Devices with ip %s does not exist' % dev_ip
+                }
+            else:
+                device_down = possible_devices[0]
+
+            recipients = device_down.user_group.profiles.all()
+            names = list()
+
+            if dev_status == 'UP':
+                device_down.status = 'up'
+                notify_text = 'Device %(device_name)s is up'
+            elif dev_status == 'DOWN':
+                device_down.status = 'dwn'
+                notify_text = 'Device %(device_name)s is down'
+            elif dev_status == 'UNREACHABLE':
+                device_down.status = 'unr'
+                notify_text = 'Device %(device_name)s is unreachable'
+            else:
+                device_down.status = 'und'
+                notify_text = 'Device %(device_name)s getting undefined status code'
+            device_down.save(update_fields=['status'])
+
+            for recipient in recipients:
+                send_notify(
+                    msg_text=gettext(notify_text) % {
+                        'device_name': "%s %s" % (device_down.ip_address, device_down.comment)
+                    },
+                    account=recipient,
+                    tag='devmon'
+                )
+                names.append(recipient.username)
+            return {
+                'text': 'notification successfully sent',
+                'recipients': names
+            }
+        except ChatException as e:
+            return {
+                'text': str(e)
+            }

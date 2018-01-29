@@ -221,7 +221,7 @@ msgstr "Прикрепленный абонент"
 
 #: templates/devapp/custom_dev_page/onu.html:47
 msgid "ONU Status"
-msgstr ""
+msgstr "Состояние ONU"
 
 #: templates/devapp/custom_dev_page/onu.html:57
 msgid "ONU error"
@@ -229,7 +229,7 @@ msgstr "ONU ошибка"
 
 #: templates/devapp/custom_dev_page/onu.html:71
 msgid "Name on OLT"
-msgstr ""
+msgstr "Имя на OLT"
 
 #: templates/devapp/custom_dev_page/onu.html:72
 msgid "Distance(m)"
@@ -238,11 +238,11 @@ msgstr "Расстояние (м)"
 #: templates/devapp/custom_dev_page/onu.html:77
 #: templates/devapp/custom_dev_page/onu.html:85
 msgid "Mac on OLT"
-msgstr ""
+msgstr "MAC адрес на OLT"
 
 #: templates/devapp/custom_dev_page/onu.html:78
 msgid "Mac-addresses does not match"
-msgstr ""
+msgstr "MAC адреса не совпадают"
 
 #: templates/devapp/custom_dev_page/onu.html:79
 #: templates/devapp/custom_dev_page/onu.html:81
@@ -312,7 +312,7 @@ msgstr "Устройства без группы"
 
 #: templates/devapp/fix_dev_group.html:17
 msgid "Fix device group"
-msgstr ""
+msgstr "Поправить группу устройства"
 
 #: templates/devapp/group_list.html:18
 msgid "Group title"
@@ -408,11 +408,11 @@ msgstr "Инфа о точке сохранена"
 
 #: views.py:110
 msgid "You have redirected to existing device"
-msgstr ""
+msgstr "Вы были переадресованы на существующее устройство"
 
 #: views.py:113 views.py:329 views.py:419
 msgid "Please attach user group for device"
-msgstr ""
+msgstr "Пожалуйста назначте устройству группу в настройках"
 
 #: views.py:117 views.py:275 views.py:304 views.py:421
 msgid "Form is invalid, check fields and try again"
@@ -473,11 +473,29 @@ msgstr "Исправлено, обновите страницу"
 msgid "Parent device not found"
 msgstr "Вышестоящее устройство не найдено"
 
-#~ msgid "Map point"
-#~ msgstr "Точка топологии"
+msgid "Send notify when monitoring state changed"
+msgstr "Отправлять уведомления при событиях мониторинга"
 
-#~ msgid "Find the subscriber"
-#~ msgstr "Найти абонента"
+msgid "Device %(device_name)s is up"
+msgstr "%(device_name)s в сети"
 
-#~ msgid "View the device"
-#~ msgstr "Посмотреть устройство"
+msgid "Device %(device_name)s is down"
+msgstr "%(device_name)s не в сети"
+
+msgid "Device %(device_name)s is unreachable"
+msgstr "%(device_name)s недостижим"
+
+msgid "Device %(device_name)s getting undefined status code"
+msgstr "Устройство %(device_name)s получило не определённый код состояния"
+
+msgid "Undefined"
+msgstr "Не определено"
+
+msgid "Up"
+msgstr "В сети"
+
+msgid "Unreachable"
+msgstr "Не доступно"
+
+msgid "Down"
+msgstr "Не в сети"
