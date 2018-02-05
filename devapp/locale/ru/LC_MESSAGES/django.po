@@ -32,11 +32,11 @@ msgstr "не нашёл мак"
 
 #: dev_types.py:108
 msgid "PON OLT"
-msgstr "PON OLT голова"
+msgstr ""
 
 #: dev_types.py:160
 msgid "PON ONU"
-msgstr "Онушка"
+msgstr ""
 
 #: dev_types.py:205
 msgid "ONU not connected"

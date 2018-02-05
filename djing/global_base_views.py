@@ -26,18 +26,21 @@ class HashAuthView(View):
         return sign == my_sign
 
     def __init__(self, *args, **kwargs):
-        if API_AUTH_SECRET is None:
-            raise ImportError('You must specified API_AUTH_SECRET is settings')
+        if API_AUTH_SECRET is None or API_AUTH_SECRET == 'your api secret':
+            raise NotImplementedError('You must specified API_AUTH_SECRET in settings')
         else:
             super(HashAuthView, self).__init__(*args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         sign = request.GET.get('sign')
+        if sign is None or sign == '':
+            return HttpResponseForbidden('Access Denied')
 
         # Transmittent get list without sign
         get_values = request.GET.copy()
         del get_values['sign']
-        if HashAuthView.check_sign(list(get_values.values()) + [API_AUTH_SECRET], sign):
+        heshable = (get_values.get('ip'), get_values.get('status'), API_AUTH_SECRET)
+        if HashAuthView.check_sign(heshable, sign):
             return super(HashAuthView, self).dispatch(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('Access Denied')

@@ -26,7 +26,7 @@ def main():
                 amount=0,
                 author=None,
                 date=now,
-                comment=_("Срок действия услуги '%(service_name)s' истёк") % {
+                comment="Срок действия услуги '%(service_name)s' истёк" % {
                     'service_name': ex_srv['tariff__title']
                 }
             )

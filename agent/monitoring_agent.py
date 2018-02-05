@@ -4,7 +4,7 @@ import re
 from hashlib import sha256
 import requests
 
-API_AUTH_SECRET = 'asihdfaoisydoiayosidyaoisydoiasydaisydasd'
+API_AUTH_SECRET = 'your api key'
 
 SERVER_DOMAIN = 'http://localhost:8000'
 
@@ -60,6 +60,10 @@ if __name__ == '__main__':
         print('You forget parameters, example of usage:\n'
               '$ python3 ./monitoring_agent.py 192.168.0.100 DOWN|UP|UNREACHABLE')
         exit(0)
+
+    if API_AUTH_SECRET == 'your api key':
+        raise NotImplementedError('You must specified secret api key')
+
     dev_ip = validate(IP_REGEXP, sys.argv[1])
     status = validate_status(sys.argv[2])
 

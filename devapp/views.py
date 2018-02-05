@@ -108,7 +108,7 @@ def dev(request, group_id, device_id=0):
 
                 # check if that device is exist
                 try:
-                    already_dev = Device.objects.get(mac_addr=request.POST.get('mac_addr'))
+                    already_dev = Device.objects.exclude(pk=device_id).get(mac_addr=request.POST.get('mac_addr'))
                     if already_dev.user_group:
                         messages.warning(request, _('You have redirected to existing device'))
                         return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
@@ -405,14 +405,14 @@ def group_list(request):
 @login_required
 def search_dev(request):
     word = request.GET.get('s')
-    if word is None:
+    if word is None or word == '':
         results = [{'id': 0, 'text': ''}]
     else:
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
         results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
-    return JsonResponse(results, json_dumps_params={'ensure_ascii': False})
+    return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
 
 
 @login_required
@@ -502,7 +502,7 @@ class OnDevDown(AllowedSubnetMixin, HashAuthView):
                 return {'text': 'ip does not passed'}
 
             if not bool(re.match(ip_addr_regex, dev_ip)):
-                return {'text': 'ip address is not valid'}
+                return {'text': 'ip address %s is not valid' % dev_ip}
 
             possible_devices = Device.objects.filter(ip_address=dev_ip)
 
@@ -512,6 +512,9 @@ class OnDevDown(AllowedSubnetMixin, HashAuthView):
                 }
             else:
                 device_down = possible_devices[0]
+
+            if not device_down.is_noticeable:
+                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address}
 
             recipients = device_down.user_group.profiles.all()
             names = list()

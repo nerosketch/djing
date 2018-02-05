@@ -50,3 +50,10 @@ ASTERISK_MANAGER_AUTH = {
     'password': 'password',
     'host': '127.0.0.1'
 }
+
+# Secret word for auth to api views by hash
+API_AUTH_SECRET = 'your api secret'
+
+# Allowed subnet for api
+API_AUTH_SUBNET = '127.0.0.0/8'
+
