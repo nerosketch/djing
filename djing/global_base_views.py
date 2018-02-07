@@ -58,3 +58,33 @@ class AllowedSubnetMixin(object):
             return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('Access Denied')
+
+
+class OrderingMixin(object):
+    """
+    Ordering result object list by @order_by variable in get request.
+    For example url?order_by=username orders objects by username.
+    @dir - direction of ordering. down or up.
+    @order_by - ordering field name
+    """
+    def get_context_data(self, **kwargs):
+        context = super(OrderingMixin, self).get_context_data(**kwargs)
+        context['order_by'] = self.request.GET.get('order_by')
+        direction = self.request.GET.get('dir')
+        if direction == 'down':
+            direction = 'up'
+        elif direction == 'up':
+            direction = 'down'
+        else:
+            direction = ''
+        context['dir'] = direction
+        return context
+
+    def get_ordering(self):
+        direction = self.request.GET.get('dir')
+        order_by = self.request.GET.get('order_by')
+        dfx = ''
+        if direction == 'down':
+            dfx = '-'
+        if order_by:
+            return ["%s%s" % (dfx, order_by)]
