@@ -2,14 +2,16 @@
 from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
-from django.db import IntegrityError, ProgrammingError
+from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q, signals
-from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView
+from django.conf import settings
 
 from statistics.models import StatCache
 from tariff_app.models import Tariff
@@ -24,48 +26,54 @@ from dialing_app.models import AsteriskCDR
 from statistics.models import getModel
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
+from djing.global_base_views import OrderingMixin
 
 
-@login_required
-@mydefs.only_admins
-def peoples(request, gid):
-    abon_group = get_object_or_404(models.AbonGroup, pk=gid)
-    if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
-        raise PermissionDenied
-    street_id = mydefs.safe_int(request.GET.get('street'))
-    peoples_list = models.Abon.objects.select_related('group', 'street')
-    if street_id > 0:
-        peoples_list = peoples_list.filter(group=abon_group, street=street_id)
-    else:
-        peoples_list = peoples_list.filter(group=abon_group)
+PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
-    # фильтр
-    dr, field = mydefs.order_helper(request)
-    if field:
-        peoples_list = peoples_list.order_by(field)
 
-    try:
-        peoples_list = mydefs.pag_mn(request, peoples_list)
-        for abon in peoples_list:
-            if abon.ip_address is not None:
-                try:
-                    abon.stat_cache = StatCache.objects.get(ip=abon.ip_address)
-                except StatCache.DoesNotExist:
-                    pass
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class PeoplesListView(ListView, OrderingMixin):
+    context_object_name = 'peoples'
+    template_name = 'abonapp/peoples.html'
+    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    http_method_names = ['get']
 
-    except mydefs.LogicError as e:
-        messages.warning(request, e)
+    def get_queryset(self):
+        street_id = mydefs.safe_int(self.request.GET.get('street'))
+        gid = mydefs.safe_int(self.kwargs.get('gid'))
+        peoples_list = models.Abon.objects.select_related('group', 'street')
+        if street_id > 0:
+            peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
+        else:
+            peoples_list = peoples_list.filter(group__pk=gid)
 
-    streets = models.AbonStreet.objects.filter(group=gid)
+        try:
+            for abon in peoples_list:
+                if abon.ip_address is not None:
+                    try:
+                        abon.stat_cache = StatCache.objects.get(ip=abon.ip_address)
+                    except StatCache.DoesNotExist:
+                        pass
+        except mydefs.LogicError as e:
+            messages.warning(self.request, e)
 
-    return render(request, 'abonapp/peoples.html', {
-        'peoples': peoples_list,
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
-        'streets': streets,
-        'street_id': street_id,
-        'dir': dr,
-        'order_by': request.GET.get('order_by')
-    })
+        return peoples_list
+
+    def get_context_data(self, **kwargs):
+        gid = mydefs.safe_int(self.kwargs.get('gid'))
+        if gid == 0:
+            return HttpResponseBadRequest('group id is broken')
+        abon_group = get_object_or_404(models.AbonGroup, pk=gid)
+        if not self.request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+            raise PermissionDenied
+
+        context = super(PeoplesListView, self).get_context_data(**kwargs)
+
+        context['streets'] = models.AbonStreet.objects.filter(group=gid)
+        context['street_id'] = mydefs.safe_int(self.request.GET.get('street'))
+        context['abon_group'] = abon_group
+        return context
 
 
 @login_required
