@@ -17,13 +17,13 @@
             <tr>
                 <th>#</th>
                 <th class="col-md-2">
-                    <a href="{% url 'devapp:devs' group.pk %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devs' group.pk %}?order_by=ip_address&dir={{ dir|default:'down' }}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-md-5">
-                    <a href="{% url 'devapp:devs' group.pk %}?order_by=comment&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devs' group.pk %}?order_by=comment&dir={{ dir|default:'down' }}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -31,7 +31,7 @@
                 <th class="col-md-3">{% trans 'Mac address' %}</th>
 		        {# <th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th> #}
                 <th class="col-md-1">
-                    <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devs' group.pk %}?order_by=devtype&dir={{ dir|default:'down' }}">
                         {% trans 'Device type' %}
                     </a>
                     {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -96,6 +96,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=devices %}
+    {% include 'toolbar_page_cbv.html' %}
 
 {% endblock %}

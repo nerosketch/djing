@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
+from django.views.generic import ListView
 
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper, ip_addr_regex
 from abonapp.models import AbonGroup, Abon
@@ -20,38 +21,42 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing.global_base_views import HashAuthView, AllowedSubnetMixin
+from djing.global_base_views import HashAuthView, AllowedSubnetMixin, OrderingMixin
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
+from mydefs import safe_int
 
 
-@login_required
-@only_admins
-def devices(request, group_id):
-    group = get_object_or_404(AbonGroup, pk=group_id)
-    if not request.user.has_perm('abonapp.can_view_abongroup', group):
-        raise PermissionDenied
-    try:
-        devs = Device.objects.filter(user_group=group) \
+PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+
+
+@method_decorator([login_required, only_admins], name='dispatch')
+class DevicesListView(ListView, OrderingMixin):
+    context_object_name = 'devices'
+    template_name = 'devapp/devices.html'
+    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        group_id = safe_int(self.kwargs.get('group_id'))
+        queryset = Device.objects.filter(user_group__pk=group_id) \
             .select_related('user_group') \
             .only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
+        return queryset
 
-        dr, field = order_helper(request)
-        if field:
-            devs = devs.order_by(field)
+    def get_context_data(self, **kwargs):
+        group_id = safe_int(self.kwargs.get('group_id'))
+        context = super(DevicesListView, self).get_context_data(**kwargs)
+        context['group'] = get_object_or_404(AbonGroup, pk=group_id)
+        return context
 
-        devs = pag_mn(request, devs)
-        #devs = Device.objects.wrap_monitoring_info(devs)
-
-    except (DeviceDBException, DeviceMonitoringException) as e:
-        messages.error(request, e)
-
-    return render(request, 'devapp/devices.html', {
-        'devices': devs,
-        'dir': dr,
-        'order_by': request.GET.get('order_by'),
-        'group': group
-    })
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            response = super(DevicesListView, self).dispatch(request, *args, **kwargs)
+        except (DeviceDBException, DeviceMonitoringException) as e:
+            messages.error(request, e)
+            response = HttpResponse('Error')
+        return response
 
 
 @login_required

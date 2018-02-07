@@ -1,0 +1,26 @@
+{% if paginator.num_pages > 1 %}
+{% load dpagination %}
+<div class="row">
+    <div class="col-sm-4 col-sm-offset-4">
+        <ul class="pagination">
+            {% if page_obj.number == 1 %}
+                <li class="disabled"><a href="#">&laquo;</a></li>
+            {% else %}
+                <li><a href="?{% url_page_replace request 'page' 1 %}">&laquo;</a></li>
+            {% endif %}
+            {% if page_obj.has_previous %}
+                <li><a href="?{% url_page_replace request 'page' page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a></li>
+            {% endif %}
+            <li class="disabled"><a href="#">{{ page_obj.number }}</a></li>
+            {% if page_obj.has_next %}
+                <li><a href="?{% url_page_replace request 'page' page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a></li>
+            {% endif %}
+            {% if page_obj.number == paginator.num_pages %}
+                <li class="disabled"><a href="#">&raquo;</a></li>
+            {% else %}
+                <li><a href="?{% url_page_replace request 'page' paginator.num_pages %}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endif %}
