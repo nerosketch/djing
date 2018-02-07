@@ -33,11 +33,14 @@ PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @method_decorator([login_required, mydefs.only_admins], name='dispatch')
-class PeoplesListView(ListView, OrderingMixin):
-    context_object_name = 'peoples'
-    template_name = 'abonapp/peoples.html'
+class BaseAbonListView(ListView, OrderingMixin):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
+
+
+class PeoplesListView(BaseAbonListView):
+    context_object_name = 'peoples'
+    template_name = 'abonapp/peoples.html'
 
     def get_queryset(self):
         street_id = mydefs.safe_int(self.request.GET.get('street'))
@@ -102,24 +105,16 @@ def addgroup(request):
     })
 
 
-@login_required
-@mydefs.only_admins
-def grouplist(request):
-    groups = models.AbonGroup.objects.annotate(usercount=Count('abon')).order_by('title')
-    groups = get_objects_for_user(request.user, 'abonapp.can_view_abongroup', klass=groups, accept_global_perms=False)
+class GroupListView(BaseAbonListView):
+    context_object_name = 'groups'
+    template_name = 'abonapp/group_list.html'
+    queryset = models.AbonGroup.objects.annotate(usercount=Count('abon')).order_by('title')
 
-    # фильтр
-    directory, field = mydefs.order_helper(request)
-    if field:
-        groups = groups.order_by(field)
-
-    groups = mydefs.pag_mn(request, groups)
-
-    return render(request, 'abonapp/group_list.html', {
-        'groups': groups,
-        'dir': directory,
-        'order_by': request.GET.get('order_by')
-    })
+    def get_queryset(self):
+        queryset = super(GroupListView, self).get_queryset()
+        queryset = get_objects_for_user(self.request.user, 'abonapp.can_view_abongroup', klass=queryset,
+                                        accept_global_perms=False)
+        return queryset
 
 
 @login_required
