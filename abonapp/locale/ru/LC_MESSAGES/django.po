@@ -1184,3 +1184,7 @@ msgstr "Инфо."
 
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "Multiple users on the same device port"
+msgstr "Несколько абонентов на одном и том же порту устройства"
+
