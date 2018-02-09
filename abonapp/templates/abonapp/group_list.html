@@ -2,7 +2,6 @@
 {% load i18n %}
 {% block main %}
 
-
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'User groups' %}</li>
@@ -18,7 +17,7 @@
             <tr>
                 <th width="50">#</th>
                 <th>
-                    <a href="{% url 'abonapp:group_list' %}?order_by=title&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'abonapp:group_list' %}?order_by=title&dir={{ dir|default:'down' }}">
                         {% trans 'Group title' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -84,6 +83,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=groups %}
+    {% include 'toolbar_page_cbv.html' %}
 
 {% endblock %}
