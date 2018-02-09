@@ -5,14 +5,22 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
 from django.db.models import Count
+from django.views.generic import ListView
+from django.conf import settings
 from .models import Dot
 from .forms import DotForm
-from mydefs import pag_mn, safe_int
+from mydefs import safe_int
 from devapp.models import Device
 from guardian.decorators import permission_required
 from abonapp.models import AbonGroup
 from json import dumps
+
+
+class BaseListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @login_required
@@ -27,16 +35,16 @@ def home(request):
     })
 
 
-@login_required
-def options(request):
-    if not request.user.is_superuser:
-        return redirect('/')
-    dots = Dot.objects.all()
-    dots = pag_mn(request, dots)
-    return render(request, 'maps/options.html', {
-        'dots': dots
-    })
+@method_decorator(login_required, name='dispatch')
+class OptionsListView(BaseListView):
+    template_name = 'maps/options.html'
+    model = Dot
+    context_object_name = 'dots'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return redirect('/')
+        return super(OptionsListView, self).get(request, *args, **kwargs)
 
 @login_required
 def dot(request, did=0):

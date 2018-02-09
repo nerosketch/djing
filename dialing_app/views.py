@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from abonapp.models import Abon
-from mydefs import only_admins, pag_mn
+from mydefs import only_admins
 from .models import AsteriskCDR, SMSModel
 from .forms import SMSOutForm
 

@@ -9,7 +9,7 @@ app_name = 'mapapp'
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
-    url(r'^options$', views.options, name='options'),
+    url(r'^options$', views.OptionsListView.as_view(), name='options'),
     url(r'^options/add$', views.dot, name='add_dot'),
     url(r'^options/(?P<did>\d+)/edit$', views.dot, name='edit_dot'),
     url(r'^options/(?P<did>\d+)/remove$', views.remove, name='remove_dot'),
