@@ -457,6 +457,8 @@ def fix_onu(request):
         if parent is not None:
             manobj = parent.get_manager_object()
             ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
+            text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' %\
+                    (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
             for srcmac, snmpnum in ports:
                 real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
                 if mac == real_mac:
@@ -465,10 +467,8 @@ def fix_onu(request):
                     status = 0
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
-            text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' %\
-                (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
         else:
-            text = text + ' %s' % _('Parent device not found')
+            text = text + '\n%s' % _('Parent device not found')
     except Device.DoesNotExist:
         pass
     return JsonResponse({
@@ -478,7 +478,7 @@ def fix_onu(request):
 
 
 @login_required
-def fix_port_confict(request, group_id, device_id, port_id):
+def fix_port_conflict(request, group_id, device_id, port_id):
     user_group = get_object_or_404(AbonGroup, pk=group_id)
     device = get_object_or_404(Device, pk=device_id)
     port = get_object_or_404(Port, pk=port_id)

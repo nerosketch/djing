@@ -12,7 +12,7 @@
 
 Затем установим зависимости
 ```
-# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 redis net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config
+# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config
 ```
 
 Лучше чтоб версия python по умолчанию была третья:
