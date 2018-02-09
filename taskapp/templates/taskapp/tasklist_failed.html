@@ -17,6 +17,7 @@
             </tr>
             </thead>
             <tbody>
+            {% with has_change_task=perms.taskapp.change_task %}
             {% for task in tasks %}
 
                 {% if task.is_relevant %}
@@ -53,7 +54,7 @@
                     <a href="{% url 'taskapp:finish' task.pk %}" class="btn btn-success" title="{% trans 'Complete' %}" data-toggle="tooltip">
                         <span class="glyphicon glyphicon-ok"></span>
                     </a>
-                    {% if perms.taskapp.change_task %}
+                    {% if has_change_task %}
                         <a href="{% url 'taskapp:edit' task.pk %}" class="btn btn-default" title="{% trans 'Edit' %}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
@@ -65,6 +66,7 @@
                     <td colspan="8">{% trans 'The list is empty' %}</td>
                 </tr>
             {% endfor %}
+            {% endwith %}
             </tbody>
             <tfoot>
             <tr>
@@ -76,6 +78,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=tasks %}
+    {% include 'pagination.html' %}
 
 {% endblock %}

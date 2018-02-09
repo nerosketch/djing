@@ -9,7 +9,7 @@
 
 ### Пагинатор
 Есть реализованный шаблон для пагинации. При использовании [Class Based View](https://docs.djangoproject.com/en/1.11/topics/class-based-views/),
-в шаблоне вы можете включить страницу *templates/toolbar_page_cbv.html*.
+в шаблоне вы можете включить страницу *templates/pagination.html*.
 
 Например вы создали клас представления:
 

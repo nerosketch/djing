@@ -7,7 +7,7 @@ app_name = 'taskapp'
 
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
+    url(r'^$', views.NewTasksView.as_view(), name='home'),
     url(r'^(?P<task_id>\d+)$', views.view, name='view'),
     url(r'^(?P<task_id>\d+)/edit$', views.task_add_edit, name='edit'),
     url(r'^(?P<task_id>\d+)/delete$', views.task_delete, name='delete'),
@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^(?P<task_id>\d+)/fail$', views.task_failed, name='fail'),
     url(r'^(?P<task_id>\d+)/remind', views.remind, name='remind'),
     url(r'^add$', views.task_add_edit, name='add'),
-    url(r'^failed$', views.failed_tasks, name='failed_tasks'),
+    url(r'^failed$', views.FailedTasksView.as_view(), name='failed_tasks'),
     url(r'^finished$', views.finished_tasks, name='finished_tasks'),
     url(r'^own$', views.own_tasks, name='own_tasks'),
     url(r'^my$', views.my_tasks, name='my_tasks'),

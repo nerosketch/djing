@@ -5,36 +5,48 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from abonapp.models import Abon
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView
 from django.utils.translation import ugettext as _
-from datetime import date, datetime
+from django.conf import settings
+
+from datetime import datetime
 from guardian.decorators import permission_required_or_403 as permission_required
 from chatbot.models import MessageQueue
-
+from abonapp.models import Abon
 from .handle import TaskException
 from .models import Task
 from mydefs import pag_mn, only_admins, safe_int, MultipleException, RuTimedelta
 from .forms import TaskFrm
 
 
-@login_required
-@only_admins
-def home(request):
-    tasks = Task.objects.filter(recipients=request.user, state='S')  # Новые задачи
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist.html', {
-        'tasks': tasks
-    })
+class BaseTaskListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@login_required
-@only_admins
-def failed_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user, state='C')  # Проваленные
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_failed.html', {
-        'tasks': tasks
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class NewTasksView(BaseTaskListView):
+    """
+    Show new tasks
+    """
+    template_name = 'taskapp/tasklist.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(recipients=self.request.user, state='S')
+
+
+@method_decorator([login_required, only_admins], name='dispatch')
+class FailedTasksView(BaseTaskListView):
+    """
+    Show crashed tasks
+    """
+    template_name = 'taskapp/tasklist_failed.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(recipients=self.request.user, state='C')
 
 
 @login_required
