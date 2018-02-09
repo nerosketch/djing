@@ -62,11 +62,14 @@ class AsteriskCDR(models.Model):
 
     def url(self):
         if type(self.calldate) is datetime:
-            return "%s/%s-%s-%s.wav" % (self.path_to_media(), self.calldate.strftime('%Y/%m/%d/%H_%M'), self.src, self.dst)
+            return "%s/%s-%s-%s.wav" % (
+                self.path_to_media(), self.calldate.strftime('%Y/%m/%d/%H_%M'), self.src, self.dst
+            )
 
     class Meta:
         db_table = 'cdr'
         managed = False
+        ordering = ['-calldate']
 
 
 class SMSModel(models.Model):
@@ -82,6 +85,7 @@ class SMSModel(models.Model):
         )
         verbose_name = _('SMS')
         verbose_name_plural = _('SMS')
+        ordering = ['-when']
 
     def __str__(self):
         return self.text

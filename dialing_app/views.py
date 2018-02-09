@@ -5,8 +5,11 @@ from django.contrib import messages
 from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, redirect
 from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView
 from guardian.decorators import permission_required_or_403 as permission_required
 from django.db.models import Q
+from django.conf import settings
 
 from abonapp.models import Abon
 from mydefs import only_admins, pag_mn
@@ -14,16 +17,21 @@ from .models import AsteriskCDR, SMSModel
 from .forms import SMSOutForm
 
 
-@login_required
-@permission_required('dialing_app.change_asteriskcdr')
-def home(request):
-    logs = AsteriskCDR.objects.exclude(userfield='request').order_by('-calldate')
-    logs = pag_mn(request, logs)
-    title = _('Last calls')
-    return render(request, 'index.html', {
-        'logs': logs,
-        'title': title
-    })
+class BaseListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+
+
+@method_decorator([login_required, permission_required('dialing_app.change_asteriskcdr')], name='dispatch')
+class LastCallsListView(BaseListView):
+    template_name = 'index.html'
+    context_object_name = 'logs'
+    queryset = AsteriskCDR.objects.exclude(userfield='request')
+
+    def get_context_data(self, **kwargs):
+        context = super(LastCallsListView, self).get_context_data(**kwargs)
+        context['title'] = _('Last calls')
+        return context
 
 
 @login_required
@@ -43,69 +51,67 @@ def to_abon(request, tel):
         return redirect('abonapp:group_list')
 
 
-@login_required
-@only_admins
-def vmail_request(request):
-    title = _('Voice mail request')
-    cdr = AsteriskCDR.objects.filter(userfield='request').order_by('-calldate')
-    cdr = pag_mn(request, cdr)
-    return render(request, 'vmail.html', {
-        'title': title,
-        'vmessages': cdr
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class VoiceMailRequestsListView(BaseListView):
+    template_name = 'vmail.html'
+    context_object_name = 'vmessages'
+    queryset = AsteriskCDR.objects.filter(userfield='request')
 
-@login_required
-@only_admins
-def vmail_report(request):
-    title = _('Voice mail report')
-    cdr = AsteriskCDR.objects.filter(userfield='report').order_by('-calldate')
-    cdr = pag_mn(request, cdr)
-    return render(request, 'vmail.html', {
-        'title': title,
-        'vmessages': cdr
-    })
+    def get_context_data(self, **kwargs):
+        context = super(VoiceMailRequestsListView, self).get_context_data(**kwargs)
+        context['title'] = _('Voice mail request')
+        return context
 
 
-@login_required
-@only_admins
-def vfilter(request):
-    cdr_q = None
-    sd = request.GET.get('sd')
-    s = request.GET.get('s')
-    if s:
-        cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
+class VoiceMailReportsListView(VoiceMailRequestsListView):
+    queryset = AsteriskCDR.objects.filter(userfield='report')
 
-    try:
-        if sd:
-            sd_date = datetime.strptime(sd, '%Y-%m-%d')
-            if cdr_q:
-                cdr_q |= Q(calldate__date=sd_date)
-            else:
-                cdr_q = Q(calldate__date=sd_date)
-    except ValueError:
-        messages.error(request, _('Make sure that your date format is correct'))
-
-    if cdr_q is None:
-        cdr = AsteriskCDR.objects.all()
-    else:
-        cdr = AsteriskCDR.objects.filter(cdr_q)
-    cdr = pag_mn(request, cdr)
-    return render(request, 'index.html', {
-        'logs': cdr,
-        'title': _('Find dials'),
-        's': s,
-        'sd': sd
-    })
+    def get_context_data(self, **kwargs):
+        context = super(VoiceMailRequestsListView, self).get_context_data(**kwargs)
+        context['title'] = _('Voice mail report')
+        return context
 
 
-@login_required
-@permission_required('dialing_app.can_view_sms')
-def inbox_sms(request):
-    msgs = SMSModel.objects.all().order_by('-when')
-    msgs = pag_mn(request, msgs)
-    return render(request, 'inbox_sms.html', {
-        'sms_messages': msgs
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class DialsFilterListView(BaseListView):
+    context_object_name = 'logs'
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DialsFilterListView, self).get_context_data(**kwargs)
+        context['title'] = _('Find dials')
+        context['s'] = self.request.GET.get('s')
+        context['sd'] = self.request.GET.get('sd')
+        return context
+
+    def get_queryset(self):
+        s = self.request.GET.get('s')
+        sd = self.request.GET.get('sd')
+        if isinstance(s, str) and s != '':
+            cdr_q = Q(src__icontains=s) | Q(dst__icontains=s)
+        else:
+            cdr_q = None
+        try:
+            if isinstance(sd, str) and sd != '':
+                sd_date = datetime.strptime(sd, '%Y-%m-%d')
+                if cdr_q:
+                    cdr_q |= Q(calldate__date=sd_date)
+                else:
+                    cdr_q = Q(calldate__date=sd_date)
+        except ValueError:
+            messages.add_message(self.request, messages.ERROR, _('Make sure that your date format is correct'))
+        if cdr_q is None:
+            cdr = AsteriskCDR.objects.all()
+        else:
+            cdr = AsteriskCDR.objects.filter(cdr_q)
+        return cdr
+
+
+@method_decorator([login_required, permission_required('dialing_app.can_view_sms')], name='dispatch')
+class InboxSMSListView(BaseListView):
+    template_name = 'inbox_sms.html'
+    context_object_name = 'sms_messages'
+    model = SMSModel
 
 
 @login_required
@@ -118,8 +124,8 @@ def send_sms(request):
         if frm.is_valid():
             frm.save()
             messages.success(request, _('Message was enqueued for sending'))
+            pidfile_name = '/run/dialing.py.pid'
             try:
-                pidfile_name = '/run/dialing.py.pid'
                 with open(pidfile_name, 'r') as f:
                     pid = int(f.read())
                 run(['/usr/bin/kill', '-SIGUSR1', str(pid)])

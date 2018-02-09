@@ -16,7 +16,7 @@ from chatbot.models import MessageQueue
 from abonapp.models import Abon
 from .handle import TaskException
 from .models import Task
-from mydefs import pag_mn, only_admins, safe_int, MultipleException, RuTimedelta
+from mydefs import only_admins, safe_int, MultipleException, RuTimedelta
 from .forms import TaskFrm
 
 
@@ -34,11 +34,11 @@ class NewTasksView(BaseTaskListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(recipients=self.request.user, state='S')
+        return Task.objects.filter(recipients=self.request.user, state='S') \
+                           .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
-class FailedTasksView(BaseTaskListView):
+class FailedTasksView(NewTasksView):
     """
     Show crashed tasks
     """
@@ -46,47 +46,44 @@ class FailedTasksView(BaseTaskListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(recipients=self.request.user, state='C')
+        return Task.objects.filter(recipients=self.request.user, state='C') \
+                           .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
-@login_required
-@only_admins
-def finished_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user, state='F')  # Выполненные
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_finish.html', {
-        'tasks': tasks
-    })
+class FinishedTaskListView(NewTasksView):
+    template_name = 'taskapp/tasklist_finish.html'
+
+    def get_queryset(self):
+        return Task.objects.filter(recipients=self.request.user, state='F') \
+                           .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
-@login_required
-@only_admins
-def own_tasks(request):
-    tasks = Task.objects.filter(author=request.user).exclude(state='F')  # Назначенные мной и не законченная
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_own.html', {
-        'tasks': tasks
-    })
+class OwnTaskListView(NewTasksView):
+    template_name = 'taskapp/tasklist_own.html'
+
+    def get_queryset(self):
+        # Attached and not finished tasks
+        return Task.objects.filter(author=self.request.user)\
+                           .exclude(state='F')\
+                           .select_related('abon', 'abon__street', 'abon__group')
 
 
-@login_required
-@only_admins
-def my_tasks(request):
-    tasks = Task.objects.filter(recipients=request.user)  # Задачи где я учавствовал
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist.html', {
-        'tasks': tasks
-    })
+class MyTaskListView(NewTasksView):
+    template_name = 'taskapp/tasklist.html'
+
+    def get_queryset(self):
+        # Tasks in which I participated
+        return Task.objects.filter(recipients=self.request.user) \
+                           .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
-@login_required
-@permission_required('taskapp.can_viewall')
-def all_tasks(request):
-    tasks = Task.objects.all()
-    tasks = pag_mn(request, tasks)
-    return render(request, 'taskapp/tasklist_all.html', {
-        'tasks': tasks
-    })
+@method_decorator([login_required, permission_required('taskapp.can_viewall')], name='dispatch')
+class AllTasksListView(BaseTaskListView):
+    template_name = 'taskapp/tasklist_all.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 @login_required

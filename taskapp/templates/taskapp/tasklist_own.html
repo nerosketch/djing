@@ -17,6 +17,7 @@
             </tr>
             </thead>
             <tbody>
+            {% with can_change_task=perms.taskapp.change_task can_remind=perms.taskapp.can_remind can_del_task=perms.taskapp.delete_task %}
             {% for task in tasks %}
 
                 {% if task.is_relevant %}
@@ -36,8 +37,15 @@
                 <td class="hidden-xs"><a href="{% url 'taskapp:view' task.id %}">{{ task.id }}</a></td>
 
                 {% if task.abon and task.abon.group %}
-                    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}">{{ task.abon.get_full_name }}</a></td>
-                    <td>{{ task.abon.group.title }}, {{ task.abon.street|default:_('Not assigned') }} {{ task.abon.house|default:_('Not assigned') }}</td>
+                    <td>
+                        <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}">
+                            {{ task.abon.get_full_name }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ task.abon.group.title }}, {{ task.abon.street|default:_('Not assigned') }}
+                        {{ task.abon.house|default:_('Not assigned') }}
+                    </td>
                 {% else %}
                     <td>{% trans 'User does not exist' %}</td>
                     <td>---</td>
@@ -49,17 +57,17 @@
                 <td class="hidden-xs">{{ task.time_of_create|date:'d E H:i' }}</td>
 
                 <td class="btn-group btn-group-justified">
-                    {% if perms.taskapp.change_task %}
+                    {% if can_change_task %}
                     <a href="{% url 'taskapp:edit' task.id %}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>
                     {% endif %}
-                    {% if perms.taskapp.can_remind %}
+                    {% if can_remind %}
                         <a href="{% url 'taskapp:remind' task.id %}" class="btn btn-default btn-sm" title="{% trans 'Remind' %}">
                             <span class="glyphicon glyphicon-bell"></span>
                         </a>
                     {% endif %}
-                    {% if perms.taskapp.delete_task %}
+                    {% if can_del_task %}
                         <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-sm btn-danger" title="{% trans 'Delete' %}">
                             <span class="glyphicon glyphicon-remove-circle"></span>
                         </a>
@@ -71,6 +79,7 @@
                     <td colspan="8">{% trans 'All your tasks has been performed' %}</td>
                 </tr>
             {% endfor %}
+            {% endwith %}
             </tbody>
             <tfoot>
             <tr>
@@ -82,6 +91,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=tasks %}
+    {% include 'pagination.html' %}
 
 {% endblock %}
