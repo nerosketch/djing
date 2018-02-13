@@ -1,0 +1,31 @@
+{% load i18n %}
+<form action="{% url 'abonapp:markers_edit' gid uid %}" method="post"> {% csrf_token %}
+
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-bookmark"></span>{% trans 'Markers' %}</h4>
+    </div>
+
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label class="control-label">{% trans 'Markers' %}</label>
+            {% for ch in form.markers %}
+                <div class="checkbox">
+                    <label for="{{ ch.id_for_label }}">
+                        <input type="checkbox" name="{{ ch.data.name }}" value="{{ ch.data.value }}" id="{{ ch.id_for_label }}" {% if ch.selected %}checked {% endif %}/>
+                        <span class="m-icon m-{{ ch.data.value }}"></span>
+                        {{ ch.choice_label }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-ok-circle"></span> {% trans 'Save' %}
+        </button>
+    </div>
+</form>

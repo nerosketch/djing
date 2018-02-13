@@ -280,3 +280,22 @@ pre {
     word-wrap: break-word;
 }
 
+/*
+ * Markers icons
+ */
+.m-icon{
+    background-image: url(../img/user_markers.png);
+    width: 26px;
+    height: 26px;
+    display: inline-block;
+    margin-bottom: -9px;
+}
+.m-icon_donkey{background-position: 0 0;}
+.m-icon_fire{background-position: -26px 0;}
+.m-icon_ok{background-position: -52px 0;}
+.m-icon_king{background-position: 0 -26px;}
+.m-icon_tv{background-position: -26px -26px;}
+.m-icon_smile{background-position: -52px -26px;}
+.m-icon_dollar{background-position: 0 -52px;}
+.m-icon_service{background-position: -26px -52px;}
+.m-icon_mrk{background-position: -52px -52px;}

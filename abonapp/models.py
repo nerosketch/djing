@@ -1,17 +1,20 @@
 from datetime import datetime
+
+from django.conf import settings
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.db import models, connection, transaction
 from django.db.models.signals import post_save, post_delete, pre_delete, post_init
 from django.dispatch import receiver
 from django.utils import timezone
-from django.db import models, connection, transaction
-from django.core import validators
-from django.utils.translation import ugettext as _
-from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
-from tariff_app.models import Tariff, PeriodicPay
+from django.utils.translation import ugettext_lazy as _
+
 from accounts_app.models import UserProfile, MyUserManager
+from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
-from django.conf import settings
+from tariff_app.models import Tariff, PeriodicPay
+from bitfield import BitField
 
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
@@ -158,6 +161,29 @@ class Abon(UserProfile):
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(default=False)
+
+    MARKER_FLAGS = (
+        ('icon_donkey', _('Donkey')),
+        ('icon_fire', _('Fire')),
+        ('icon_ok', _('Ok')),
+        ('icon_king', _('King')),
+        ('icon_tv', _('TV')),
+        ('icon_smile', _('Smile')),
+        ('icon_dollar', _('Dollar')),
+        ('icon_service', _('Service')),
+        ('icon_mrk', _('Marker'))
+    )
+    markers = BitField(flags=MARKER_FLAGS, default=0)
+
+    def get_flag_icons(self):
+        """
+        Return icon list of set flags from self.markers
+        :return: ['m-icon-donkey', 'm-icon-tv', ...]
+        """
+        return ["m-%s" % name for name, state in self.markers if state]
+
+    def is_markers_empty(self):
+        return int(self.markers) == 0
 
     def active_tariff(self):
         return self.current_tariff

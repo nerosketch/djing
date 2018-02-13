@@ -216,6 +216,23 @@
                 </div>
             </div>
             {% endif %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans 'User flags' %}</h3>
+                </div>
+                <div class="panel-body">
+                    {% for user_icon in abon.get_flag_icons %}
+                    <span class="m-icon {{ user_icon }}"></span>
+                    {% endfor %}
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group">
+                        <a href="{% url 'abonapp:markers_edit' abon_group.pk abon.pk %}" class="btn btn-default btn-modal">
+                            <span class="glyphicon glyphicon-edit"></span> {% trans 'Edit' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

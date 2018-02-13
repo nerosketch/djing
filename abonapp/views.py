@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
 from django.conf import settings
 
 from statistics.models import StatCache
@@ -1035,6 +1035,34 @@ def del_periodic_pay(request, gid, uid, periodic_pay_id):
     messages.success(request, _('Periodic pay successfully deleted'))
     return redirect('abonapp:abon_services', gid, uid)
 
+
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class EditSibscriberMarkers(UpdateView):
+    http_method_names = ['get', 'post']
+    template_name = 'abonapp/modal_user_markers.html'
+    form_class = forms.MarkersForm
+
+    def get_object(self, queryset=None):
+        obj = models.Abon.objects.get(pk=self.kwargs.get('uid'))
+        return obj
+
+    def get_success_url(self):
+        return resolve_url('abonapp:abon_home', self.kwargs.get('gid'), self.kwargs.get('uid'))
+
+    def get_context_data(self, **kwargs):
+        context = super(EditSibscriberMarkers, self).get_context_data(**kwargs)
+        context['gid'] = self.kwargs.get('gid')
+        context['uid'] = self.kwargs.get('uid')
+        return context
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR, _('fix form errors'))
+        return super(EditSibscriberMarkers, self).form_invalid(form)
+    
+    def form_valid(self, form):
+        v = super(EditSibscriberMarkers, self).form_valid(form)
+        messages.add_message(self.request, messages.SUCCESS, _('User flags has changed successfully'))
+        return v
 
 
 # API's
