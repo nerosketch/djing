@@ -502,3 +502,12 @@ msgstr "Не доступно"
 
 msgid "Down"
 msgstr "Не в сети"
+
+msgid "Subscriber on port"
+msgstr "Абонент на порту"
+
+msgid "Show subscriber on port"
+msgstr "Показать абонента на порту"
+
+msgid "Subscribers on port does not exist"
+msgstr "Абоненты на порту не найдены"

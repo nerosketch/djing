@@ -1,9 +1,7 @@
 from django.conf.urls import url
 from . import views
 
-
 app_name = 'devapp'
-
 
 urlpatterns = [
     url(r'^$', views.group_list, name='group_list'),
@@ -16,7 +14,10 @@ urlpatterns = [
     url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/add$', views.add_single_port, name='add_port'),
     url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/edit$', views.dev, name='edit'),
     url(r'^(\d+)/(?P<device_id>\d+)/ports$', views.manage_ports, name='manage_ports'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/ports/(?P<port_id>\d+)/fix_port_conflict$', views.fix_port_conflict, name='fix_port_conflict'),
+    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/ports/(?P<port_id>\d+)/fix_port_conflict$', views.fix_port_conflict,
+        name='fix_port_conflict'),
+    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/ports/(?P<port_id>\d+)/show_subscriber_on_port$',
+        views.ShowSubscriberOnPort.as_view(), name='show_subscriber_on_port'),
     url(r'^(\d+)/(?P<device_id>\d+)/ports_add', views.add_ports, name='add_ports'),
     url(r'^(\d+)/(?P<device_id>\d+)/(?P<portid>\d+)_(?P<status>[0-1]{1})$', views.toggle_port, name='port_toggle'),
     url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<portid>\d+)/del$', views.delete_single_port, name='del_port'),

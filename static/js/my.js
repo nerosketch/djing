@@ -19,7 +19,7 @@ function showSuccess(errContent) {show_Modal('Успешно', errContent, 'succ
 function showPrimary(errContent) {show_Modal('Внимание!', errContent, 'primary');}
 
 $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
-	showErr(jqXHR.status + ': ' + jqXHR.statusText);
+	showErr(jqXHR.status + ': ' + jqXHR.responseText);
 });
 
 

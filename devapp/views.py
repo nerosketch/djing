@@ -5,13 +5,13 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper, ip_addr_regex
 from abonapp.models import AbonGroup, Abon
@@ -185,6 +185,21 @@ def manage_ports(request, device_id):
         'ports': ports,
         'dev': dev
     })
+
+
+@method_decorator([login_required, only_admins], name='dispatch')
+class ShowSubscriberOnPort(DetailView):
+    template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
+    http_method_names = ['get']
+
+    def get_object(self, queryset=None):
+        dev_id = self.kwargs.get('device_id')
+        port_id = self.kwargs.get('port_id')
+        try:
+            obj = Abon.objects.get(device_id=dev_id, dev_port_id=port_id)
+        except Abon.DoesNotExist:
+            raise Http404(gettext('Subscribers on port does not exist'))
+        return obj
 
 
 @login_required
