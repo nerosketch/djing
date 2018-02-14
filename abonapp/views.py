@@ -1058,7 +1058,7 @@ class EditSibscriberMarkers(UpdateView):
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR, _('fix form errors'))
         return super(EditSibscriberMarkers, self).form_invalid(form)
-    
+
     def form_valid(self, form):
         v = super(EditSibscriberMarkers, self).form_valid(form)
         messages.add_message(self.request, messages.SUCCESS, _('User flags has changed successfully'))

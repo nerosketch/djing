@@ -7,7 +7,6 @@ from random import choice
 from string import digits, ascii_lowercase
 from . import models
 from django.conf import settings
-from bitfield.forms import BitFieldCheckboxSelectMultiple
 
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')

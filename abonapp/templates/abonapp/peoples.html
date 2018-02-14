@@ -58,6 +58,7 @@
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
+                        <th class="hidden-xs">{% trans 'Markers' %}</th>
                         <th class="hidden-xs">#</th>
                     </tr>
                     </thead>
@@ -102,6 +103,10 @@
                             {% endif %}
                         </td>
                         <td class="hidden-xs">{{ human.ballance|floatformat:2 }}</td>
+                        <td>
+                            {% for user_icon in human.get_flag_icons %}<span class="m-icon {{ user_icon }}"></span>
+                            {% endfor %}
+                        </td>
                         <td class="hidden-xs">
                             {% if can_del_trf %}
                                 <a href="{% url 'abonapp:del_abon' %}?id={{ human.pk }}" class="btn btn-danger btn-sm">
@@ -112,7 +117,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11">
+                            <td colspan="12">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' abon_group.pk %}">{% trans 'Add abon' %}</a>
@@ -124,7 +129,7 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="11" class="btn-group btn-group-sm">
+                        <td colspan="12" class="btn-group btn-group-sm">
                             {% if perms.abonapp.add_abon %}
                                 <a href="{% url 'abonapp:add_abon' abon_group.pk %}" class="btn btn-default" title="{% trans 'Add' %}" data-toggle="tooltip">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
