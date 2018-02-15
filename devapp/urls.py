@@ -4,7 +4,7 @@ from . import views
 app_name = 'devapp'
 
 urlpatterns = [
-    url(r'^$', views.group_list, name='group_list'),
+    url(r'^$', views.GroupsListView.as_view(), name='group_list'),
     url(r'^devices_without_groups$', views.DevicesWithoutGroupsListView.as_view(), name='devices_null_group'),
     url(r'^fix_onu/$', views.fix_onu, name='fix_onu'),
     url(r'^(?P<group_id>\d+)$', views.DevicesListView.as_view(), name='devs'),

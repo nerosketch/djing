@@ -230,32 +230,39 @@ def abonamount(request, gid, uid):
     }, request=request)
 
 
-@login_required
-@mydefs.only_admins
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
-def invoice_for_payment(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
-    invoices = models.InvoiceForPayment.objects.filter(abon=abon)
-    invoices = mydefs.pag_mn(request, invoices)
-    return render(request, 'abonapp/invoiceForPayment.html', {
-        'invoices': invoices,
-        'abon_group': abon.group,
-        'abon': abon
-    })
+@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+class DebtsListView(BaseAbonListView):
+    context_object_name = 'invoices'
+    template_name = 'abonapp/invoiceForPayment.html'
+
+    def get_queryset(self):
+        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        self.abon = abon
+        return models.InvoiceForPayment.objects.filter(abon=abon)
+
+    def get_context_data(self, **kwargs):
+        context = super(DebtsListView, self).get_context_data(**kwargs)
+        context['abon_group'] = self.abon.group
+        context['abon'] = self.abon
+        return context
 
 
-@login_required
-@mydefs.only_admins
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
-def pay_history(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
-    pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
-    pay_history = mydefs.pag_mn(request, pay_history)
-    return render(request, 'abonapp/payHistory.html', {
-        'pay_history': pay_history,
-        'abon_group': abon.group,
-        'abon': abon
-    })
+@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+class PayHistoryListView(BaseAbonListView):
+    context_object_name = 'pay_history'
+    template_name = 'abonapp/payHistory.html'
+
+    def get_queryset(self):
+        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        self.abon = abon
+        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
+        return pay_history
+
+    def get_context_data(self, **kwargs):
+        context = super(PayHistoryListView, self).get_context_data(**kwargs)
+        context['abon_group'] = self.abon.group
+        context['abon'] = self.abon
+        return context
 
 
 @login_required
@@ -447,36 +454,44 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
     return redirect('abonapp:abon_services', gid=gid, uid=uid)
 
 
-@login_required
-@permission_required('abonapp.can_view_abonlog')
-def log_page(request):
-    logs = models.AbonLog.objects.all()
-    logs = mydefs.pag_mn(request, logs)
-    return render(request, 'abonapp/log.html', {
-        'logs': logs
-    })
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('abonapp.can_view_abonlog'), name='dispatch')
+class LogListView(ListView):
+    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    http_method_names = ['get']
+    context_object_name = 'logs'
+    template_name = 'abonapp/log.html'
+    model = models.AbonLog
 
 
-@login_required
-@permission_required('abonapp.can_view_invoiceforpayment')
-def debtors(request):
-    invs = models.InvoiceForPayment.objects.filter(status=True)
-    invs = mydefs.pag_mn(request, invs)
-    return render(request, 'abonapp/debtors.html', {
-        'invoices': invs
-    })
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('abonapp.can_view_invoiceforpayment'), name='dispatch')
+class DebtorsListView(ListView):
+    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    http_method_names = ['get']
+    context_object_name = 'invoices'
+    template_name = 'abonapp/debtors.html'
+    queryset = models.InvoiceForPayment.objects.filter(status=True)
 
 
-@login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
-def task_log(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
-    tasks = Task.objects.filter(abon=abon)
-    return render(request, 'abonapp/task_log.html', {
-        'tasks': tasks,
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
-        'abon': abon
-    })
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+class TaskLogListView(ListView):
+    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    http_method_names = ['get']
+    context_object_name = 'tasks'
+    template_name = 'abonapp/task_log.html'
+
+    def get_queryset(self):
+        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        self.abon = abon
+        return Task.objects.filter(abon=abon)
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskLogListView, self).get_context_data(**kwargs)
+        context['abon_group'] = self.abon.group
+        context['abon'] = self.abon
+        return context
 
 
 @login_required
@@ -728,27 +743,34 @@ def abon_ping(request):
     }))
 
 
-@login_required
-@mydefs.only_admins
-def dials(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
-    if not request.user.has_perm('abonapp.can_view_abongroup', abon.group):
-        raise PermissionDenied
-    if hasattr(abon.group, 'pk') and abon.group.pk != int(gid):
-        return redirect('abonapp:dials', abon.group.pk, abon.pk)
-    if abon.telephone is not None and abon.telephone != '':
-        tel = abon.telephone.replace('+', '')
-        logs = AsteriskCDR.objects.filter(
-            Q(src__contains=tel) | Q(dst__contains=tel)
-        )
-        logs = mydefs.pag_mn(request, logs)
-    else:
-        logs = None
-    return render(request, 'abonapp/dial_log.html', {
-        'logs': logs,
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
-        'abon': abon
-    })
+class DialsListView(BaseAbonListView):
+    context_object_name = 'logs'
+    template_name = 'abonapp/dial_log.html'
+
+    def get_queryset(self):
+        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        if not self.request.user.has_perm('abonapp.can_view_abongroup', abon.group):
+            raise PermissionDenied
+        self.abon = abon
+        if abon.telephone is not None and abon.telephone != '':
+            tel = abon.telephone.replace('+', '')
+            logs = AsteriskCDR.objects.filter(
+                Q(src__contains=tel) | Q(dst__contains=tel)
+            )
+            return logs
+        else:
+            return AsteriskCDR.objects.empty()
+
+    def get_context_data(self, **kwargs):
+        context = super(DialsListView, self).get_context_data(**kwargs)
+        context['abon_group'] = get_object_or_404(models.AbonGroup, pk=self.kwargs.get('gid'))
+        context['abon'] = self.abon
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if hasattr(self.abon.group, 'pk') and self.abon.group.pk != int(self.kwargs.get('gid')):
+            return redirect('abonapp:dials', self.abon.group.pk, self.abon.pk)
+        return super(DialsListView, self).render_to_response(context, **response_kwargs)
 
 
 @login_required

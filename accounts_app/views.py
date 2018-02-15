@@ -5,7 +5,11 @@ from django.core.exceptions import PermissionDenied
 from django.urls import NoReverseMatch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
+from django.views.generic import ListView
+from django.conf import settings
+
 from abonapp.models import AbonGroup
 
 from photo_app.models import Photo
@@ -13,6 +17,11 @@ from .models import UserProfile
 import mydefs
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
+
+
+class BaseAccListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @login_required
@@ -208,15 +217,15 @@ def delete_profile(request, uid):
     return redirect('acc_app:accounts_list')
 
 
-@login_required
-@mydefs.only_admins
-def acc_list(request):
-    users = UserProfile.objects.filter(is_admin=True).exclude(pk=request.user.pk)
-    users = get_objects_for_user(request.user, 'accounts_app.can_view_userprofile', users)
-    users = mydefs.pag_mn(request, users)
-    return render(request, 'accounts/acc_list.html', {
-        'users': users
-    })
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class AccountsListView(BaseAccListView):
+    template_name = 'accounts/acc_list.html'
+    context_object_name = 'users'
+
+    def get_queryset(self):
+        users = UserProfile.objects.filter(is_admin=True).exclude(pk=self.request.user.pk)
+        users = get_objects_for_user(self.request.user, 'accounts_app.can_view_userprofile', users)
+        return users
 
 
 @login_required
@@ -235,24 +244,32 @@ def perms(request, uid):
     })
 
 
-@login_required
-def perms_klasses(request, uid, klass_name):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-    from django.apps import apps
-    userprofile = get_object_or_404(UserProfile, pk=uid)
-    app_label, model_name = klass_name.split('.', 1)
-    klass = apps.get_model(app_label, model_name)
+@method_decorator(login_required, name='dispatch')
+class PermissionClassListView(BaseAccListView):
+    template_name = 'accounts/perms/objects_of_type.html'
+    context_object_name = 'objects'
 
-    objects = klass.objects.all()
-    objects = mydefs.pag_mn(request, objects)
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return super(PermissionClassListView, self).get(request, *args, **kwargs)
 
-    return render(request, 'accounts/perms/objects_of_type.html', {
-        'userprofile': userprofile,
-        'klass': klass_name,
-        'klass_name': klass._meta.verbose_name,
-        'objects': objects
-    })
+    def get_context_data(self, **kwargs):
+        context = super(PermissionClassListView, self).get_context_data(**kwargs)
+        context['klass'] = self.kwargs.get('klass_name')
+        context['klass_name'] = self.required_klass_name._meta.verbose_name
+        context['userprofile'] = get_object_or_404(UserProfile, pk=self.kwargs.get('uid'))
+        return context
+
+    def get_queryset(self):
+        from django.apps import apps
+        klass_name = self.kwargs.get('klass_name')
+        app_label, model_name = klass_name.split('.', 1)
+        klass = apps.get_model(app_label, model_name)
+        objects = klass.objects.all()
+        self.required_klass_name = klass
+        return objects
+
 
 @login_required
 def perms_edit(request, uid, klass_name, obj_id):

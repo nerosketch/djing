@@ -3,24 +3,26 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView
+
 from chatbot.models import MessageQueue
 
-from mydefs import pag_mn
 from .models import Conversation, MessageError, Message
 from .forms import ConversationForm, MessageForm
 
 
-@login_required
-def home(request):
-    # TODO: optimise queries
-    conversations = Conversation.objects.fetch(request.user)
-    conversations = pag_mn(request, conversations, 8)
-    return render(request, 'msg_app/conversations.html', {
-        'conversations': conversations
-    })
+@method_decorator(login_required, name='dispatch')
+class ConversationsListView(ListView):
+    context_object_name = 'conversations'
+    template_name = 'msg_app/conversations.html'
+
+    def get_queryset(self):
+        # TODO: optimise queries
+        return Conversation.objects.fetch(self.request.user)
 
 
 @login_required
@@ -90,4 +92,3 @@ def check_news(request):
     else:
         r = {'auth': False}
     return HttpResponse(dumps(r))
-

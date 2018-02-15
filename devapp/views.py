@@ -404,14 +404,17 @@ def toggle_port(request, device_id, portid, status=0):
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, device_id)
 
 
-@login_required
-@only_admins
-def group_list(request):
-    groups = AbonGroup.objects.all().order_by('title')
-    groups = get_objects_for_user(request.user, 'abonapp.can_view_abongroup', klass=groups, accept_global_perms=False)
-    return render(request, 'devapp/group_list.html', {
-        'groups': groups
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class GroupsListView(BaseDeviceListView):
+    context_object_name = 'groups'
+    template_name = 'devapp/group_list.html'
+    model = AbonGroup
+
+    def get_queryset(self):
+        groups = super(GroupsListView, self).get_queryset()
+        groups = get_objects_for_user(self.request.user, 'abonapp.can_view_abongroup', klass=groups,
+                                      accept_global_perms=False)
+        return groups
 
 
 @login_required

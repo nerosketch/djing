@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
-from mydefs import pag_mn, LogicError
+from mydefs import LogicError
 from agent import NasFailedResult, NasNetworkError
 
 
@@ -20,7 +20,6 @@ def home(request):
 @login_required
 def pays(request):
     pay_history = AbonLog.objects.filter(abon=request.user).order_by('-id')
-    pay_history = pag_mn(request, pay_history)
     return render(request, 'clientsideapp/pays.html', {
         'pay_history': pay_history
     })

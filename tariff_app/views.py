@@ -74,14 +74,12 @@ def del_tarif(request, tid):
     return render_to_text('tariff_app/modal_del_warning.html', {'tid': tid}, request=request)
 
 
-@login_required
-@permission_required('tariff_app.can_view_periodic_pay')
-def periodic_pays(request):
-    pays = PeriodicPay.objects.all()
-    pays = mydefs.pag_mn(request, pays)
-    return render(request, 'tariff_app/periodic_pays/list.html', {
-        'pays': pays
-    })
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('tariff_app.can_view_periodic_pay'), name='dispatch')
+class PeriodicPaysListView(BaseServiceListView):
+    context_object_name = 'pays'
+    model = PeriodicPay
+    template_name = 'tariff_app/periodic_pays/list.html'
 
 
 @login_required

@@ -8,15 +8,16 @@ import os
 from functools import wraps
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import models
 from django.conf import settings
-
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 DEBUG = getattr(settings, 'DEBUG', False)
 
-ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 
 def ip2int(addr):
@@ -59,19 +60,6 @@ def res_error(request, text):
         return HttpResponse(dumps({'errnum': 1, 'errtext': text}))
     else:
         raise Http404(text)
-
-
-# Pagination
-def pag_mn(request, objs, count_per_page=PAGINATION_ITEMS_PER_PAGE):
-    page = request.GET.get('p')
-    pgn = Paginator(objs, count_per_page)
-    try:
-        objs = pgn.page(page)
-    except PageNotAnInteger:
-        objs = pgn.page(1)
-    except EmptyPage:
-        objs = pgn.page(pgn.num_pages)
-    return objs
 
 
 class MyGenericIPAddressField(models.GenericIPAddressField):
@@ -143,7 +131,6 @@ def ping(hostname, count=1):
 
 # Русифицированный вывод timedelta
 class RuTimedelta(timedelta):
-
     def __new__(cls, tm):
         if isinstance(tm, timedelta):
             return timedelta.__new__(
@@ -154,19 +141,19 @@ class RuTimedelta(timedelta):
             )
 
     def __str__(self):
-        #hours, remainder = divmod(self.seconds, 3600)
-        #minutes, seconds = divmod(remainder, 60)
-        #text_date = "%d:%d" % (
+        # hours, remainder = divmod(self.seconds, 3600)
+        # minutes, seconds = divmod(remainder, 60)
+        # text_date = "%d:%d" % (
         #    hours,
         #    minutes
-        #)
+        # )
         if self.days > 1:
             ru_days = 'дней'
             if 5 > self.days > 1:
                 ru_days = 'дня'
             elif self.days == 1:
                 ru_days = 'день'
-            #text_date = '%d %s %s' % (self.days, ru_days, text_date)
+            # text_date = '%d %s %s' % (self.days, ru_days, text_date)
             text_date = '%d %s' % (self.days, ru_days)
         else:
             text_date = ''
@@ -179,17 +166,18 @@ def require_ssl(view):
     the page.
     from: https://gist.github.com/ckinsey/9709984
     """
+
     @wraps(view)
     def wrapper(request, *args, **kwargs):
         if not DEBUG and not request.is_secure():
             target_url = "https://" + request.META['HTTP_HOST'] + request.path_info
             return HttpResponseRedirect(target_url)
         return view(request, *args, **kwargs)
+
     return wrapper
 
 
 class MultipleException(Exception):
-
     def __init__(self, err_list):
         if not isinstance(err_list, list):
             raise TypeError
@@ -202,8 +190,10 @@ class LogicError(Exception):
 
 def singleton(class_):
     instances = {}
+
     def getinstance(*args, **kwargs):
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         return instances[class_]
+
     return getinstance
