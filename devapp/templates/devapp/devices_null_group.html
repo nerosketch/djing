@@ -16,19 +16,19 @@
             <thead>
             <tr>
                 <th>
-                    <a href="{% url 'devapp:devices_null_group' %}?order_by=ip_address&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devices_null_group' %}?order_by=ip_address&dir={{ dir|default:'down' }}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'devapp:devices_null_group' %}?order_by=comment&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devices_null_group' %}?order_by=comment&dir={{ dir|default:'down' }}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="250">
-                    <a href="{% url 'devapp:devices_null_group' %}?order_by=devtype&dir={{ dir|default:"down" }}">
+                    <a href="{% url 'devapp:devices_null_group' %}?order_by=devtype&dir={{ dir|default:'down' }}">
                         {% trans 'Device type' %}
                     </a>
                     {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
@@ -78,6 +78,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=devices %}
+    {% include 'pagination.html' %}
 
 {% endblock %}

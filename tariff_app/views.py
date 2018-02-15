@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.views.generic import ListView
+from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
 
+from djing.global_base_views import OrderingMixin
 from .models import Tariff, PeriodicPay
 import mydefs
 from . import forms
 
 
-@login_required
-@mydefs.only_admins
-def tarifs(request):
-    tars = Tariff.objects.order_by('title')
+class BaseServiceListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
-    # фильтр
-    direct, field = mydefs.order_helper(request)
-    if field:
-        tars = tars.order_by(field)
 
-    tars = mydefs.pag_mn(request, tars)
-
-    return render(request, 'tariff_app/tarifs.html', {
-        'tariflist': tars,
-        'dir': direct,
-        'order_by': request.GET.get('order_by')
-    })
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class TariffsListView(BaseServiceListView, OrderingMixin):
+    """
+    Show Services(Tariffs) list
+    """
+    template_name = 'tariff_app/tarifs.html'
+    context_object_name = 'tariflist'
+    model = Tariff
 
 
 @login_required

@@ -124,26 +124,6 @@ class MyChoicesAdapter(Iterator):
             return res
 
 
-# Для сортировки таблиц
-# через get должно быть передано order_by=<поле в бд> а в dir=<up|down> направление сортировки
-# возвращает новое направление сортировки и поле для сортировки с направлением
-def order_helper(request):
-    print('DEPRECATION: use global_base_views.OrderingMixin')
-    dr = request.GET.get('dir')
-    dfx = ''
-    if dr == 'down':
-        dr = 'up'
-        dfx = '-'
-    else:
-        dr = 'down'
-
-    orby = request.GET.get('order_by')
-    if orby:
-        return dr, dfx + orby
-    else:
-        return dr, orby
-
-
 # Декоратор проверяет аккаунт, чтоб не пускать клиентов в страницы администрации
 def only_admins(fn):
     @wraps(fn)
