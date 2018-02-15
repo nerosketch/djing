@@ -1,23 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li class="active">Администраторы</li>
+        <li class="active">{% trans 'Administrators' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <h3>Список аккаунтов администраторов</h3>
+    <h3>{% trans 'Admin accounts list' %}</h3>
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th class="col-sm-1">Фото</th>
-                <th class="col-sm-2">Ник</th>
-                <th class="col-sm-4">ФИО (или ник если нет)</th>
-                <th class="col-sm-2 hidden-xs">Телефон</th>
-                <th class="col-sm-2 hidden-xs">Email</th>
+                <th class="col-sm-1">{% trans 'Photo' %}</th>
+                <th class="col-sm-2">{% trans 'profile username' %}</th>
+                <th class="col-sm-4">{% trans 'Fullname, or login if name is empty' %}</th>
+                <th class="col-sm-2 hidden-xs">{% trans 'Telephone' %}</th>
+                <th class="col-sm-2 hidden-xs">{% trans 'Email' %}</th>
                 <th class="col-sm-1 hidden-xs">&mdash;</th>
             </tr>
             </thead>
@@ -30,10 +31,20 @@
                     </a></td>
                     <td><a href="{% url 'acc_app:other_profile' usr.id %}">{{ usr.username }}</a></td>
                     <td>{{ usr.get_full_name }}</td>
-                    <td class="hidden-xs">{% if usr.telephone %}<a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>{% else %}
-                        Нету{% endif %}</td>
-                    <td class="hidden-xs">{% if usr.email %}<a href="mailto:{{ usr.email }}">{{ usr.email }}{% else %}
-                        Нету{% endif %}</a></td>
+                    <td class="hidden-xs">
+                        {% if usr.telephone %}
+                            <a href="tel:{{ usr.telephone }}">{{ usr.telephone }}</a>
+                        {% else %}
+                            {% trans 'Not assigned' %}
+                        {% endif %}
+                    </td>
+                    <td class="hidden-xs">
+                        {% if usr.email %}
+                            <a href="mailto:{{ usr.email }}">{{ usr.email }}</a>
+                        {% else %}
+                            {% trans 'Not assigned' %}
+                        {% endif %}
+                    </td>
                     {% if usr.id == request.user.id or perms.acc_app.delete_userprofile %}
                         <td class="btn-group hidden-xs">
                             <a href="{% url 'acc_app:delete_profile' usr.id %}" class="btn btn-sm btn-danger">
@@ -42,7 +53,7 @@
                         </td>
                     {% else %}
                         <td class="btn-group hidden-xs">
-                            <a href="#" class="btn btn-sm btn-danger disabled" title="Не прав на удаление">
+                            <a href="#" class="btn btn-sm btn-danger disabled" title="{% trans 'You have not permissions to delete' %}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         </td>
@@ -51,7 +62,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6"><b>Нет пользователей</b></td>
+                    <td colspan="6"><b>{% trans 'Users not found' %}</b></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -59,7 +70,7 @@
                 <tfoot>
                 <tr>
                     <th colspan="6">
-                        <a href="{% url 'acc_app:create_profile' %}" class="btn btn-default" title="Добавить аккаунт">
+                        <a href="{% url 'acc_app:create_profile' %}" class="btn btn-default" title="{% trans 'Add account' %}">
                             <span class="glyphicon glyphicon-plus-sign"></span>
                         </a>
                     </th>
@@ -69,6 +80,6 @@
         </table>
     </div>
 
-    {% include 'toolbar_page.html' with pag=users %}
+    {% include 'pagination.html' %}
 
 {% endblock %}
