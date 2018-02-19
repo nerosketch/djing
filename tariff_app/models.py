@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy as _
@@ -19,8 +18,11 @@ class Tariff(models.Model):
                                  choices=MyChoicesAdapter(TARIFF_CHOICES))
     is_admin = models.BooleanField(_('Tech service'), default=False)
 
-    # Возвращает потомок класса TariffBase, методы которого дают нужную логику оплаты по тарифу
     def get_calc_type(self):
+        """
+        :return: Child of tariff_app.base_intr.TariffBase,
+                 methods which provide the desired logic of payments
+        """
         calc_code = self.calc_type
         for choice_pair in TARIFF_CHOICES:
             choice_code, logic_class = choice_pair
@@ -36,6 +38,12 @@ class Tariff(models.Model):
 
     def __str__(self):
         return "%s (%.2f)" % (self.title, self.amount)
+
+    class Meta:
+        db_table = 'tariffs'
+        ordering = ['title']
+        verbose_name = _('Service')
+        verbose_name_plural = _('Services')
 
 
 class PeriodicPay(models.Model):

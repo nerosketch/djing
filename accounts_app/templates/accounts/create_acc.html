@@ -3,15 +3,15 @@
 
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'acc_app:accounts_list' %}">Администраторы</a></li>
-        <li class="active">Добавить</li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li class="active">{% trans 'Add' %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Создайте новый аккаунт</h3>
+            <h3 class="panel-title">{% trans 'Create new account' %}</h3>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -28,26 +28,26 @@
 
                     <form role="form" action="{% url 'acc_app:create_profile' %}" method="post">{% csrf_token %}
                         <div class="form-group">
-                            <label for="login">Логин</label>
+                            <label for="login">{% trans 'Username' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                                <input id="login" type="text" name="username" placeholder="Имя пользователя" required
+                                <input id="login" type="text" name="username" placeholder="{% trans 'Username' %}" required
                                        value="{{ newuser.username }}" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="fio">Фамилия Имя</label>
+                            <label for="fio">{% trans 'Fullname' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span
                                         class="glyphicon glyphicon-folder-close"></span></span>
-                                <input id="fio" type="text" name="fio" placeholder="ФИО" value="{{ newuser.fio }}"
+                                <input id="fio" type="text" name="fio" placeholder="{% trans 'Fullname' %}" value="{{ newuser.fio }}"
                                        class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="mail">Почта</label>
+                            <label for="mail">{% trans 'EMail' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span
@@ -57,17 +57,17 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="tel">Телефон</label>
+                            <label for="tel">{% trans 'Telephone' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
                                 <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone"
-                                       placeholder="+[7,8,9,3] и 10,11 цифр" value="{{ newuser.telephone }}"
+                                       placeholder="{% trans '+[7,8,9,3] and 10,11 digits' %}" value="{{ newuser.telephone }}"
                                        class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="passw1">Введите пароль</label>
+                            <label for="passw1">{% trans 'Type password' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="passw2">Повторите пароль</label>
+                            <label for="passw2">{% trans 'Repeat password' %}</label>
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
@@ -84,10 +84,10 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
-                                <span class="glyphicon glyphicon-floppy-disk"></span> Сохранить
+                                <span class="glyphicon glyphicon-floppy-disk"></span> {% trans 'Save' %}
                             </button>
                             <button type="reset" class="btn btn-default">
-                                <span class="glyphicon glyphicon-remove"></span> Сбросить
+                                <span class="glyphicon glyphicon-remove"></span> {% trans 'Reset' %}
                             </button>
                         </div>
                     </form>

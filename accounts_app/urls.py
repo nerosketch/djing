@@ -13,7 +13,7 @@ urlpatterns = [
 
     url(r'^me$', views.profile_show, name='profile'),
 
-    url(r'^$', views.acc_list, name='accounts_list'),
+    url(r'^$', views.AccountsListView.as_view(), name='accounts_list'),
 
     url(r'^add$', views.create_profile, name='create_profile'),
 
@@ -22,7 +22,7 @@ urlpatterns = [
 
     url(r'^(?P<uid>\d+)$', views.profile_show, name='other_profile'),
     url(r'^(?P<uid>\d+)/perms$', views.perms, name='setup_perms'),
-    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)$', views.perms_klasses, name='perms_klasses'),
+    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)$', views.PermissionClassListView.as_view(), name='perms_klasses'),
     url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)$', views.perms_edit, name='perms_edit'),
     url(r'^(?P<uid>\d+)/chgroup$', views.chgroup, name='profile_setup_group'),
     url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile'),

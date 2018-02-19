@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from django.views.generic import ListView, DetailView
 
-from mydefs import pag_mn, res_success, res_error, only_admins, ping, order_helper, ip_addr_regex
+from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
 from abonapp.models import AbonGroup, Abon
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
@@ -30,12 +30,15 @@ from mydefs import safe_int
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
+class BaseDeviceListView(ListView):
+    http_method_names = ['get']
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+
+
 @method_decorator([login_required, only_admins], name='dispatch')
-class DevicesListView(ListView, OrderingMixin):
+class DevicesListView(BaseDeviceListView, OrderingMixin):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
-    paginate_by = PAGINATION_ITEMS_PER_PAGE
-    http_method_names = ['get']
 
     def get_queryset(self):
         group_id = safe_int(self.kwargs.get('group_id'))
@@ -59,22 +62,11 @@ class DevicesListView(ListView, OrderingMixin):
         return response
 
 
-@login_required
-@only_admins
-def devices_null_group(request):
-    devs = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
-
-    dr, field = order_helper(request)
-    if field:
-        devs = devs.order_by(field)
-
-    devs = pag_mn(request, devs)
-
-    return render(request, 'devapp/devices_null_group.html', {
-        'devices': devs,
-        'dir': dr,
-        'order_by': request.GET.get('order_by')
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class DevicesWithoutGroupsListView(BaseDeviceListView, OrderingMixin):
+    context_object_name = 'devices'
+    template_name = 'devapp/devices_null_group.html'
+    queryset = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
 
 
 @login_required
@@ -412,14 +404,17 @@ def toggle_port(request, device_id, portid, status=0):
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, device_id)
 
 
-@login_required
-@only_admins
-def group_list(request):
-    groups = AbonGroup.objects.all().order_by('title')
-    groups = get_objects_for_user(request.user, 'abonapp.can_view_abongroup', klass=groups, accept_global_perms=False)
-    return render(request, 'devapp/group_list.html', {
-        'groups': groups
-    })
+@method_decorator([login_required, only_admins], name='dispatch')
+class GroupsListView(BaseDeviceListView):
+    context_object_name = 'groups'
+    template_name = 'devapp/group_list.html'
+    model = AbonGroup
+
+    def get_queryset(self):
+        groups = super(GroupsListView, self).get_queryset()
+        groups = get_objects_for_user(self.request.user, 'abonapp.can_view_abongroup', klass=groups,
+                                      accept_global_perms=False)
+        return groups
 
 
 @login_required

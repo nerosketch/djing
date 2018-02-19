@@ -6,9 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-27 14:20+0300\n"
+"POT-Creation-Date: 2018-02-15 15:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -19,198 +17,281 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: accounts_app/models.py:18
+#: models.py:22
 msgid "Users must have an telephone number"
 msgstr "У пользователей должен быть номер телефона"
 
-#: accounts_app/templates/accounts/group.html:7
-#: accounts_app/templates/accounts/group_list.html:7
-msgid "Administrators"
-msgstr "Сотрудники"
-
-#: accounts_app/templates/accounts/group.html:8
-#: accounts_app/templates/accounts/group_list.html:8
-msgid "Groups"
-msgstr "Группы"
-
-#: accounts_app/templates/accounts/group.html:44
-#: accounts_app/templates/accounts/profile_chgroup.html:20
-#: accounts_app/templates/accounts/settings/ch_info.html:66
-msgid "Save"
-msgstr "Сохранить"
-
-#: accounts_app/templates/accounts/group.html:44
-#: accounts_app/templates/accounts/login.html:55
-#: accounts_app/templates/accounts/profile_chgroup.html:20
-#: accounts_app/templates/accounts/settings/ch_info.html:69
-msgid "Reset"
-msgstr "Сбросить"
-
-#: accounts_app/templates/accounts/index.html:8
-#: accounts_app/templates/accounts/settings/ch_info.html:37
-msgid "Telephone"
-msgstr "Телефон"
-
-#: accounts_app/templates/accounts/index.html:12
-#: accounts_app/templates/accounts/login.html:35
-#: accounts_app/templates/accounts/settings/ch_info.html:8
-#: accounts_app/templates/accounts/settings/ch_info.html:12
-msgid "User name"
-msgstr "Логин"
-
-#: accounts_app/templates/accounts/index.html:16
-#: accounts_app/templates/accounts/settings/ch_info.html:18
-msgid "Name and surname"
-msgstr "Фамилия и Имя"
-
-#: accounts_app/templates/accounts/index.html:20
-msgid "Is enable"
-msgstr "Включён-ли"
-
-#: accounts_app/templates/accounts/index.html:24
-msgid "Last login"
-msgstr "Последняя авторизация"
-
-#: accounts_app/templates/accounts/index.html:29
-msgid "All permissions"
-msgstr "Административный доступ (все права)"
-
-#: accounts_app/templates/accounts/login.html:5
-msgid "Auth"
-msgstr "Аутентификация"
-
-#: accounts_app/templates/accounts/login.html:23
-#: accounts_app/templates/accounts/login.html:52
-msgid "Login"
-msgstr "Войти"
-
-#: accounts_app/templates/accounts/login.html:43
-msgid "Password"
-msgstr "Пароль"
-
-#: accounts_app/templates/accounts/profile_chgroup.html:5
-msgid "The responsibility of the administrator of the group of subscribers"
-msgstr "Ответственность администратора за группы абонентов"
-
-#: accounts_app/templates/accounts/settings/ch_info.html:27
-msgid "Email"
-msgstr "Адрес электронной почты"
-
-#: accounts_app/templates/accounts/settings/ch_info.html:42
-msgid "+[7,8,9,3] and 10,11 digits"
-msgstr "+[7,8,9,3] и 10,11 цифр"
-
-#: accounts_app/templates/accounts/settings/ch_info.html:47
-msgid "Old password"
-msgstr "Старый пароль"
-
-#: accounts_app/templates/accounts/settings/ch_info.html:56
-msgid "New password"
-msgstr "Новый пароль"
-
-#: accounts_app/views.py:42
-msgid "Wrong login or password, please try again"
-msgstr "Неправильный логин или пароль, попробуйте ещё раз"
-
-#: accounts_app/views.py:141
-msgid "New password is empty, fill it"
-msgstr "Новый пароль пустой, придумайте себе пароль"
-
-#: accounts_app/views.py:143
-msgid "Wrong password"
-msgstr "Неправильный пароль"
-
-#: accounts_app/views.py:145
-msgid "Empty password, fill it"
-msgstr "Пустой пароль, впишите что-то в пароль"
-
-#: accounts_app/views.py:168
-msgid "You forget specify a password for the new account"
-msgstr "Забыли указать пароль для нового аккаунта"
-
-#: accounts_app/views.py:171
-msgid "You forget to repeat a password for the new account"
-msgstr "Забыли повторить пароль для нового аккаунта"
-
-#: accounts_app/views.py:180
-msgid "Subscriber with this name already exist"
-msgstr "Пользователь с таким именем уже есть"
-
-#: accounts_app/views.py:182
-msgid "Passwords does not match, try again"
-msgstr "Пароли не совпадают, попробуйте ещё раз"
-
-msgid "Administrator"
-msgstr "Администратор"
-
-msgid "Options"
-msgstr "Настройки"
-
-msgid "Not assigned"
-msgstr "&lt;Не назначено&gt;"
-
-msgid "Change self onfo"
-msgstr "Изменить инфу о себе"
-
-msgid "Permission options"
-msgstr "Права"
-
-msgid "Edit"
-msgstr "Редактировать"
-
-msgid "Please select an image"
-msgstr "Пожалуйста выберите изображение"
-
-msgid "Avatar successfully changed"
-msgstr "Аватар успешно изменён"
-
-msgid "Access to groups"
-msgstr "Доступ к группам"
-
-msgid "The list of user groups to which the account has access"
-msgstr "Список групп абонентов, к которым учётка имеет доступ"
-
-msgid "The responsibility of the staff of the group of subscribers"
-msgstr "Ответственность работника за группы абонентов"
-
-msgid "Not set"
-msgstr "Не найдено"
-
-msgid "Change permission for that object"
-msgstr "Изменение прав доступа для выбранного объекта"
-
-msgid "Permissions has successfully updated"
-msgstr "Права успешно обновлены"
-
-msgid "Profile is superuser, permissions to change it makes no sense"
-msgstr "Учётная запись является суперпользователем, разрешения менять нет смысла"
-
-msgid "Staff account profile"
-msgstr "Учётная запись работника"
-
-msgid "Staff account profiles"
-msgstr "Учётные записи работников"
-
-msgid "Can view staff profile"
-msgstr "Может просматривать учётку сотрудника"
-
-msgid "Pick object for edit permissions"
-msgstr "Выберите объект для редактирования прав доступа"
-
-msgid "Pick the type of object"
-msgstr "Выберите тип объекта"
-
-msgid "Profile has been deleted"
-msgstr "Учётная запись удалена"
-
+#: models.py:49 templates/accounts/acc_list.html:18
 msgid "profile username"
 msgstr "Логин"
 
+#: models.py:50
 msgid "fio"
 msgstr "ФИО"
 
+#: models.py:51
 msgid "birth day"
 msgstr "дата рождения"
 
+#: models.py:52
 msgid "Is active"
 msgstr "Активен"
+
+#: models.py:56 templates/accounts/acc_list.html:20
+#: templates/accounts/create_acc.html:60 templates/accounts/index.html:9
+#: templates/accounts/settings/ch_info.html:37
+msgid "Telephone"
+msgstr "Телефон"
+
+#: models.py:107
+msgid "Can view staff profile"
+msgstr "Может просматривать учётку сотрудника"
+
+#: models.py:109
+msgid "Staff account profile"
+msgstr "Учётная запись работника"
+
+#: models.py:110
+msgid "Staff account profiles"
+msgstr "Учётные записи работников"
+
+#: templates/accounts/acc_list.html:7 templates/accounts/create_acc.html:6
+#: templates/accounts/perms/objects_of_type.html:7
+#: templates/accounts/perms/objects_types.html:8
+#: templates/accounts/perms/perms_edit.html:8
+msgid "Administrators"
+msgstr "Сотрудники"
+
+#: templates/accounts/acc_list.html:12
+msgid "Admin accounts list"
+msgstr "Список аккаунтов администраторов"
+
+#: templates/accounts/acc_list.html:17
+msgid "Photo"
+msgstr "Фото"
+
+#: templates/accounts/acc_list.html:19
+msgid "Fullname, or login if name is empty"
+msgstr "ФИО (или ник если нет)"
+
+#: templates/accounts/acc_list.html:21
+#: templates/accounts/settings/ch_info.html:27
+msgid "Email"
+msgstr "Адрес электронной почты"
+
+#: templates/accounts/acc_list.html:38 templates/accounts/acc_list.html:45
+msgid "Not assigned"
+msgstr "&lt;Не назначено&gt;"
+
+#: templates/accounts/acc_list.html:56
+msgid "You have not permissions to delete"
+msgstr "У вас нет прав на удаление"
+
+#: templates/accounts/acc_list.html:65
+msgid "Users not found"
+msgstr "Пользователи не найдены"
+
+#: templates/accounts/acc_list.html:73
+msgid "Add account"
+msgstr "Добавить учётную запись"
+
+#: templates/accounts/create_acc.html:7
+msgid "Add"
+msgstr "Добавить"
+
+#: templates/accounts/create_acc.html:14
+msgid "Create new account"
+msgstr "Создать новую учётную запись"
+
+#: templates/accounts/create_acc.html:31 templates/accounts/create_acc.html:35
+msgid "Username"
+msgstr "Логин"
+
+#: templates/accounts/create_acc.html:40 templates/accounts/create_acc.html:45
+msgid "Fullname"
+msgstr "Полное имя"
+
+#: templates/accounts/create_acc.html:50
+msgid "EMail"
+msgstr "Адрес электронной почты"
+
+#: templates/accounts/create_acc.html:65
+#: templates/accounts/settings/ch_info.html:42
+msgid "+[7,8,9,3] and 10,11 digits"
+msgstr "+[7,8,9,3] и 10,11 цифр"
+
+#: templates/accounts/create_acc.html:70
+msgid "Type password"
+msgstr "Введите пароль"
+
+#: templates/accounts/create_acc.html:78
+msgid "Repeat password"
+msgstr "Повторите пароль"
+
+#: templates/accounts/create_acc.html:87
+#: templates/accounts/perms/perms_edit.html:61
+#: templates/accounts/profile_chgroup.html:20
+#: templates/accounts/set_abon_groups_permission.html:20
+#: templates/accounts/settings/ch_info.html:66
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/accounts/create_acc.html:90 templates/accounts/login.html:59
+#: templates/accounts/perms/perms_edit.html:64
+#: templates/accounts/profile_chgroup.html:20
+#: templates/accounts/set_abon_groups_permission.html:21
+#: templates/accounts/settings/ch_info.html:69
+msgid "Reset"
+msgstr "Сбросить"
+
+#: templates/accounts/index.html:13 templates/accounts/login.html:39
+#: templates/accounts/settings/ch_info.html:8
+#: templates/accounts/settings/ch_info.html:12
+msgid "User name"
+msgstr "Логин"
+
+#: templates/accounts/index.html:17 templates/accounts/settings/ch_info.html:18
+msgid "Name and surname"
+msgstr "Фамилия и Имя"
+
+#: templates/accounts/index.html:21
+msgid "Is enable"
+msgstr "Включён-ли"
+
+#: templates/accounts/index.html:25
+msgid "Last login"
+msgstr "Последняя авторизация"
+
+#: templates/accounts/index.html:30
+msgid "All permissions"
+msgstr "Административный доступ (все права)"
+
+#: templates/accounts/login.html:5
+msgid "Auth"
+msgstr "Аутентификация"
+
+#: templates/accounts/login.html:27 templates/accounts/login.html:56
+msgid "Login"
+msgstr "Войти"
+
+#: templates/accounts/login.html:47
+msgid "Password"
+msgstr "Пароль"
+
+#: templates/accounts/login.html:70
+msgid "Contact us"
+msgstr "Напишите нам"
+
+#: templates/accounts/perms/objects_of_type.html:9
+#: templates/accounts/perms/objects_types.html:10
+#: templates/accounts/perms/perms_edit.html:10
+msgid "Permission options"
+msgstr "Права"
+
+#: templates/accounts/perms/objects_of_type.html:13
+#: templates/accounts/perms/perms_edit.html:16
+msgid "Pick object for edit permissions"
+msgstr "Выберите объект для редактирования прав доступа"
+
+#: templates/accounts/perms/objects_types.html:13
+msgid "Pick the type of object"
+msgstr "Выберите тип объекта"
+
+#: templates/accounts/perms/objects_types.html:21
+msgid "Group"
+msgstr "Группа"
+
+#: templates/accounts/perms/perms_edit.html:24
+msgid "Profile is superuser, permissions to change it makes no sense"
+msgstr ""
+"Учётная запись является суперпользователем, разрешения менять нет смысла"
+
+#: templates/accounts/perms/perms_edit.html:30
+msgid "Change permission for that object"
+msgstr "Изменение прав доступа для выбранного объекта"
+
+#: templates/accounts/perms/perms_edit.html:52
+msgid "Not set"
+msgstr "Не найдено"
+
+#: templates/accounts/profile_chgroup.html:5
+msgid "The responsibility of the staff of the group of subscribers"
+msgstr "Ответственность работника за группы абонентов"
+
+#: templates/accounts/set_abon_groups_permission.html:5
+msgid "The list of user groups to which the account has access"
+msgstr "Список групп абонентов, к которым учётка имеет доступ"
+
+#: templates/accounts/settings/ch_info.html:47
+msgid "Old password"
+msgstr "Старый пароль"
+
+#: templates/accounts/settings/ch_info.html:56
+msgid "New password"
+msgstr "Новый пароль"
+
+#: views.py:45
+msgid "Wrong login or password, please try again"
+msgstr "Неправильный логин или пароль, попробуйте ещё раз"
+
+#: views.py:114
+msgid "Please select an image"
+msgstr "Пожалуйста выберите изображение"
+
+#: views.py:125
+msgid "Avatar successfully changed"
+msgstr "Аватар успешно изменён"
+
+#: views.py:153
+msgid "New password is empty, fill it"
+msgstr "Новый пароль пустой, придумайте себе пароль"
+
+#: views.py:155
+msgid "Wrong password"
+msgstr "Неправильный пароль"
+
+#: views.py:157
+msgid "Empty password, fill it"
+msgstr "Пустой пароль, впишите что-то в пароль"
+
+#: views.py:180
+msgid "You forget specify a password for the new account"
+msgstr "Забыли указать пароль для нового аккаунта"
+
+#: views.py:183
+msgid "You forget to repeat a password for the new account"
+msgstr "Забыли повторить пароль для нового аккаунта"
+
+#: views.py:192
+msgid "Subscriber with this name already exist"
+msgstr "Пользователь с таким именем уже есть"
+
+#: views.py:194
+msgid "Passwords does not match, try again"
+msgstr "Пароли не совпадают, попробуйте ещё раз"
+
+#: views.py:209
+msgid "Profile has been deleted"
+msgstr "Учётная запись удалена"
+
+#: views.py:279
+msgid "Permissions has successfully updated"
+msgstr "Права успешно обновлены"
+
+#~ msgid "The responsibility of the administrator of the group of subscribers"
+#~ msgstr "Ответственность администратора за группы абонентов"
+
+#~ msgid "Administrator"
+#~ msgstr "Администратор"
+
+#~ msgid "Options"
+#~ msgstr "Настройки"
+
+#~ msgid "Change self onfo"
+#~ msgstr "Изменить инфу о себе"
+
+#~ msgid "Edit"
+#~ msgstr "Редактировать"
+
+#~ msgid "Access to groups"
+#~ msgstr "Доступ к группам"
