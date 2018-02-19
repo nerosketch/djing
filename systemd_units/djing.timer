@@ -1,10 +1,9 @@
 [Unit]
-Description=Run every 30 minutes a job for djing
+Description=Run every night a job for djing
 
 [Timer]
-OnCalendar=*-*-* *:30:00
+OnCalendar=*-*-* 01:59:00
 Persistent=true
-RandomizedDelaySec=300
 Unit=djing.service
 
 [Install]

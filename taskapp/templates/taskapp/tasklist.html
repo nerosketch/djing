@@ -1,18 +1,19 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
 {% load i18n %}
+{% load tasktags %}
 {% block content %}
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th class="hidden-xs">#</th>
+                <th class="col-sm-1">#</th>
                 <th class="col-sm-3">{% trans 'Name' %}</th>
                 <th class="col-sm-1">{% trans 'Address' %}</th>
                 <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
                 <th class="col-sm-4">{% trans 'Description' %}</th>
                 <th class="col-sm-1">{% trans 'Task author' %}</th>
-                <th class="col-sm-1 hidden-xs">{% trans 'Date of create' %}</th>
+                <th class="hidden-xs">{% trans 'Date of create' %}</th>
                 <th class="col-sm-1">{% trans 'Actions' %}</th>
             </tr>
             </thead>
@@ -22,18 +23,21 @@
                 {% if task.is_relevant %}
                     <tr class="text-muted">
                 {% else %}
-                    {% if task.priority == 'E' %}
-                        <tr class="success">
-                    {% elif task.priority == 'C' %}
-                        <tr>
-                    {% elif task.priority == 'A' %}
-                        <tr class="danger">
-                    {% else %}
-                        <tr>
-                    {% endif %}
+                    <tr>
                 {% endif %}
 
-                <td class="hidden-xs"><a href="{% url 'taskapp:view' task.pk %}">{{ task.pk }}</a></td>
+                <td class="hidden-xs">
+                    <a href="{% url 'taskapp:view' task.pk %}">
+                        {% if not task.is_relevant %}
+                            {% if task.priority == 'E' %}
+                                <span class="glyphicon glyphicon-ok-circle text-success"></span>
+                            {% elif task.priority == 'A' %}
+                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
+                            {% endif %}
+                        {% endif %}
+                        {{ task.pk }}
+                    </a>
+                </td>
 
                 {% if task.abon and task.abon.group %}
 		    <td><a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" title="{{ task.abon.description|default:'' }}" data-toggle="tooltip">{{ task.abon.get_full_name }}</a></td>
@@ -52,7 +56,18 @@
                         {% trans 'Author does not exist' %}
                     {% endif %}
 		        </td>
-                <td class="hidden-xs">{{ task.time_of_create|date:'d E H:i' }}</td>
+
+                <td class="hidden-xs">
+                    {% is_today task.time_of_create as is_timecreate_is_today %}
+                    {% is_yesterday task.time_of_create as is_timecreate_is_yesterday %}
+                    {% if is_timecreate_is_today %}
+                        {% trans 'Today' %} {{ task.time_of_create|date:'H:i' }}
+                    {% elif is_timecreate_is_yesterday %}
+                        {% trans 'Yesterday' %} {{ task.time_of_create|date:'H:i' }}
+                    {% else %}
+                        {{ task.time_of_create|date:'d E H:i' }}
+                    {% endif %}
+                </td>
 
                 <td class="btn-group btn-group-xs btn-group-justified">
                     <a href="{% url 'taskapp:finish' task.pk %}" class="btn btn-success" data-toggle="tooltip" title="{% trans 'Complete' %}">
