@@ -135,5 +135,3 @@ msgstr "Добавить периодический платёж"
 msgid "Service"
 msgstr "Услуга"
 
-msgid "Services"
-magstr "Услуги"
