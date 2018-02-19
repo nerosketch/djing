@@ -427,6 +427,8 @@ msgstr "Время ожидания истекло -%(time_left)s"
 msgid "fix form errors"
 msgstr "исправте ошибки формы"
 
+msgid "Task has successfully created"
+msgstr "Задача успешно создана"
 
 msgid "Failed tasks"
 msgstr "Проваленные задачи"
@@ -448,3 +450,6 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "locality %s. Task type - %s. "
 msgstr "с. %s. Тип задачи - %s. "
+
+msgid "Recipients"
+msgstr "Исполнители"

@@ -110,10 +110,13 @@ class TaskUpdateView(UpdateView):
     def get_object(self, queryset=None):
         task_id = safe_int(self.kwargs.get('task_id'))
         if task_id == 0:
+            uid = safe_int(self.request.GET.get('uid'))
+            if uid != 0:
+                self.selected_abon = Abon.objects.get(username=str(uid))
             return
         else:
             task = get_object_or_404(Task, pk=task_id)
-            setattr(self, 'selected_abon', task.abon)
+            self.selected_abon = task.abon
             return task
 
     def dispatch(self, request, *args, **kwargs):
@@ -126,32 +129,33 @@ class TaskUpdateView(UpdateView):
                 raise PermissionDenied
         return super(TaskUpdateView, self).dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super(TaskUpdateView, self).get_form_kwargs()
+        if hasattr(self, 'selected_abon'):
+            kwargs.update({'initial_abon': self.selected_abon})
+        return kwargs
+
     def form_valid(self, form):
-        task_instance = form.save()
-        self.object = task_instance
-        selected_abon = task_instance.abon
-        setattr(self, 'selected_abon', selected_abon)
-        if selected_abon:
-            # fetch profiles that has been attached on group of selected subscriber
-            profiles = selected_abon.group.profiles.filter(is_active=True).filter(is_admin=True)
-            if profiles.count() > 0:
-                profile_ids = [prof.id for prof in profiles]
-                task_instance.recipients.add(*profile_ids)
-                task_instance.save()
-                messages.add_message(self.request, messages.SUCCESS, _('Task has changed successfully'))
+        try:
+            self.object = form.save()
+            task_id = safe_int(self.kwargs.get('task_id', 0))
+            if task_id == 0:
+                log_text = _('Task has successfully created')
             else:
-                messages.add_message(self.request, messages.ERROR, _('No responsible employee for the users group'))
-        else:
-            messages.add_message(self.request, messages.ERROR, _('You must select the subscriber'))
-        return super(TaskUpdateView, self).form_valid(form)
+                log_text = _('Task has changed successfully')
+            messages.add_message(self.request, messages.SUCCESS, log_text)
+        except MultipleException as e:
+            for err in e:
+                messages.add_message(self.request, messages.WARNING, err)
+        except TaskException as e:
+            messages.add_message(self.request, messages.ERROR, e)
+        return FormMixin.form_valid(self, form)
 
     def get_context_data(self, **kwargs):
-        uid = safe_int(self.kwargs.get('uid'))
-        selected_abon = getattr(
-            self,
-            'selected_abon',
-            Abon.objects.get(username=str(uid)) if uid != 0 else None
-        )
+        if hasattr(self, 'selected_abon'):
+            selected_abon = self.selected_abon
+        else:
+            selected_abon = None
 
         now_date = datetime.now().date()
         task = self.object

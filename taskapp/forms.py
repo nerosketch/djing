@@ -2,12 +2,27 @@ from django.utils.translation import ugettext as _
 from django import forms
 from .models import Task, ExtraComment, _delta_add_days
 from accounts_app.models import UserProfile
+from taskapp.handle import TaskException
 
 
 class TaskFrm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, initial_abon=None, *args, **kwargs):
         super(TaskFrm, self).__init__(*args, **kwargs)
         self.fields['recipients'].queryset = UserProfile.objects.filter(is_admin=True)
+
+        if initial_abon is not None:
+            # fetch profiles that has been attached on group of selected subscriber
+            profile_ids = initial_abon.group.profiles.filter(is_active=True).filter(is_admin=True).values_list('pk')
+            if len(profile_ids) > 0:
+                self.fields['recipients'].initial = [pi[0] for pi in profile_ids]
+            else:
+                raise TaskException(_('No responsible employee for the users group'))
+
+    def save(self, commit=True):
+        abon = self.data.get('abon') or None
+        if abon is None:
+            raise TaskException(_('You must select the subscriber'))
+        return super(TaskFrm, self).save(commit)
 
     class Meta:
         model = Task

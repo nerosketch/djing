@@ -61,7 +61,7 @@ def _delta_add_days():
 
 class Task(models.Model):
     descr = models.CharField(_('Description'), max_length=128, null=True, blank=True)
-    recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='them_task')
+    recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('Recipients'), related_name='them_task')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Task author'))
     priority = models.CharField(_('A priority'), max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
     out_date = models.DateField(_('Reality'), null=True, blank=True, default=_delta_add_days)

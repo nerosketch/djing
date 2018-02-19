@@ -99,7 +99,7 @@
         </div>
         {% if task %}
         <div class="col-sm-6">
-            {% include 'taskapp/details.html' with task=task %}
+            {% include 'taskapp/details.html' with task=task time_diff=time_diff %}
         </div>
         <div class="col-sm-6">
             {% include "taskapp/comments/task_comments.html" with comments=comments task_uid=task.pk comment_form=comment_form %}
