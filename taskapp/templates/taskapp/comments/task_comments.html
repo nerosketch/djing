@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load bootstrap3 %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{% trans 'Task comments' %}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="list-group">
+            {% for comment in comments %}
+                {% with author=comment.author %}
+                    <div class="list-group-item">
+                        {% if comment.author == request.user %}
+                            <a href="{% url 'taskapp:comment_del' task_uid comment.pk %}" class="btn btn-link pull-right btn-modal" title="{% trans 'Delete' %}" data-toggle="tooltip">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        {% endif %}
+                            <h5><b>{{ author.get_short_name }}</b>
+                                <small>{{ comment.date_create|date:'d M, H:i:s' }}</small>
+                            </h5>
+                        <p>{{ comment.text }}</p>
+                    </div>
+                {% endwith %}
+            {% empty %}
+                <div class="list-group-item clearfix">
+                    <p class="list-group-item-text">{% trans 'Comment history is empty' %}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <form action="{% url 'taskapp:comment_add' task_uid %}" method="post">{% csrf_token %}
+            {% bootstrap_form comment_form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% bootstrap_icon "send" %} {% trans 'Send' %}
+                </button>
+            {% endbuttons %}
+        </form>
+    </div>
+</div>

@@ -6,90 +6,105 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
 	    <li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
-	    <li class="active">{% if task_id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
+	    <li class="active">{% if task.id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
     </ol>
 
     {% include 'message_block.html' %}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-        {% if task_id %}
-		    <h3 class="panel-title">{% trans 'Add new task' %}</h3>
-        {% else %}
-            <h3 class="panel-title">{% trans 'Edit task' %}</h3>
-        {% endif %}
-        </div>
-        <div class="panel-body">
-
-            {% if task_id %}
-                <form role="form" action="{% url 'taskapp:edit' task_id %}" method="post" enctype="multipart/form-data">
-            {% else %}
-                <form role="form" action="{% url 'taskapp:add' %}" method="post" enctype="multipart/form-data">
-            {% endif %}
-            {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
-
-            {% bootstrap_icon 'tag' as ic %}
-            {% bootstrap_field form.descr addon_before=ic %}
-
-            {% bootstrap_icon 'pawn' as ic %}
-            {% bootstrap_field form.mode addon_before=ic %}
-
-            {% bootstrap_icon 'sort-by-order' as ic %}
-            {% bootstrap_field form.priority addon_before=ic %}
-
-            {% bootstrap_icon 'retweet' as ic %}
-            {% bootstrap_field form.state addon_before=ic %}
-
-            <div class="form-group">
-		        <label for="id_abon">{% trans 'Subscriber' %}</label>
-
-                <div class="input-group selectajax" data-dst="/abons/api/abon_filter">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                    <input type="hidden" name="abon" class="selectajax-hid"{% if selected_abon %} value="{{ selected_abon.pk }}"{% endif %}>
-                {% if selected_abon %}
-                    <button class="selectajax-btn form-control btn btn-default">{{ selected_abon.fio }}</button>
-                    <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
+    <div class="row">
+        <div class="{% if task %}col-sm-6{% else %}col-sm-12{% endif %}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                {% if task.id %}
+                    <h3 class="panel-title">{% trans 'Add new task' %}</h3>
                 {% else %}
-                    <button class="selectajax-btn form-control btn btn-default hidden"></button>
-                    <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
+                    <h3 class="panel-title">{% trans 'Edit task' %}</h3>
                 {% endif %}
-                    <ul class="dropdown-menu selectajax-ul"></ul>{{ form.abon.errors }}
+                </div>
+                <div class="panel-body">
+
+                    {% if task.id %}
+                        <form role="form" action="{% url 'taskapp:edit' task.id %}" method="post" enctype="multipart/form-data">
+                    {% else %}
+                        <form role="form" action="{% url 'taskapp:add' %}" method="post" enctype="multipart/form-data">
+                    {% endif %}
+                    {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
+
+                    {% bootstrap_icon 'tag' as ic %}
+                    {% bootstrap_field form.descr addon_before=ic %}
+
+                    {% bootstrap_icon 'task' as ic %}
+                    {% bootstrap_field form.recipients addon_before=ic %}
+
+                    {% bootstrap_icon 'pawn' as ic %}
+                    {% bootstrap_field form.mode addon_before=ic %}
+
+                    {% bootstrap_icon 'sort-by-order' as ic %}
+                    {% bootstrap_field form.priority addon_before=ic %}
+
+                    {% bootstrap_icon 'retweet' as ic %}
+                    {% bootstrap_field form.state addon_before=ic %}
+
+                    <div class="form-group">
+                        <label for="id_abon">{% trans 'Subscriber' %}</label>
+
+                        <div class="input-group selectajax" data-dst="/abons/api/abon_filter">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <input type="hidden" name="abon" class="selectajax-hid"{% if selected_abon %} value="{{ selected_abon.pk }}"{% endif %}>
+                        {% if selected_abon %}
+                            <button class="selectajax-btn form-control btn btn-default">{{ selected_abon.fio }}</button>
+                            <input type="text" class="form-control dropdown-toggle selectajax-inp hidden" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
+                        {% else %}
+                            <button class="selectajax-btn form-control btn btn-default hidden"></button>
+                            <input type="text" class="form-control dropdown-toggle selectajax-inp" data-toggle="dropdown" id="id_abon" placeholder="{% trans 'Find the subscriber' %}">
+                        {% endif %}
+                            <ul class="dropdown-menu selectajax-ul"></ul>{{ form.abon.errors }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_out_date">{% trans 'Reality' %}</label>
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            {{ form.out_date }}{{ form.out_date.errors }}
+                        </div>
+                        <script type="text/javascript">
+                            $(function () {
+                                $('#id_out_date').datetimepicker({
+                                    format: 'YYYY-MM-DD'
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    {% bootstrap_icon 'picture' as ic %}
+                    {% bootstrap_field form.attachment addon_before=ic %}
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                        </button>
+                        <button type="reset" class="btn btn-default">
+                            <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+                        </button>
+                        {% if task.id %}
+                            <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                            </a>
+                        {% endif %}
+                    </div>
+                    </form>
                 </div>
             </div>
-            <div class="form-group">
-		        <label for="id_out_date">{% trans 'Reality' %}</label>
-
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                    {{ form.out_date }}{{ form.out_date.errors }}
-                </div>
-                <script type="text/javascript">
-                    $(function () {
-                        $('#id_out_date').datetimepicker({
-                            format: 'YYYY-MM-DD'
-                        });
-                    });
-                </script>
-            </div>
-
-            {% bootstrap_icon 'picture' as ic %}
-            {% bootstrap_field form.attachment addon_before=ic %}
-
-            <div class="btn-group btn-group-sm">
-                <button type="submit" class="btn btn-primary">
-                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
-                </button>
-                <button type="reset" class="btn btn-default">
-                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
-                </button>
-                {% if task_id %}
-                    <a href="{% url 'taskapp:delete' task_id %}" class="btn btn-danger">
-                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
-                    </a>
-                {% endif %}
-            </div>
-            </form>
         </div>
+        {% if task %}
+        <div class="col-sm-6">
+            {% include 'taskapp/details.html' with task=task %}
+        </div>
+        <div class="col-sm-6">
+            {% include "taskapp/comments/task_comments.html" with comments=comments task_uid=task.pk comment_form=comment_form %}
+        </div>
+        {% endif %}
     </div>
 
 {% endblock %}

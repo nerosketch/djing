@@ -80,8 +80,8 @@ class Task(models.Model):
         )
 
     def finish(self, current_user):
-        self.state = 'F'  # Выполнена
-        self.out_date = timezone.now()  # Время завершения
+        self.state = 'F'  # Finished
+        self.out_date = timezone.now()  # End time
         ChangeLog.objects.create(
             task=self,
             act_type='f',
@@ -90,7 +90,7 @@ class Task(models.Model):
         self.save(update_fields=['state', 'out_date'])
 
     def do_fail(self, current_user):
-        self.state = 'C'  # Провалена
+        self.state = 'C'  # Crashed
         ChangeLog.objects.create(
             task=self,
             act_type='b',
@@ -105,35 +105,33 @@ class Task(models.Model):
         return self.out_date < timezone.now().date() or self.state == 'F'
 
 
+class ExtraComment(models.Model):
+    text = models.TextField(_('Text of comment'))
+    task = models.ForeignKey(Task, verbose_name=_('Owner task'))
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'))
+    date_create = models.DateTimeField(_('Time of create'), auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        db_table = 'extra_comments'
+        permissions = (
+            ('can_view_comments', _('Can view comments')),
+        )
+        verbose_name = _('Extra comment')
+        verbose_name_plural = _('Extra comments')
+
+
 def task_handler(sender, instance, **kwargs):
-    group = ''
     if instance.abon:
         group = instance.abon.group
-    if kwargs['created']:
-        ChangeLog.objects.create(
-            task=instance,
-            act_type='c',
-            who=instance.author
-        )
     else:
-        ChangeLog.objects.create(
-            task=instance,
-            act_type='e',
-            who=instance.author
-        )
+        group = ''
     task_handle(
         instance, instance.author,
         instance.recipients.all(), group
     )
 
 
-#def task_delete(sender, instance, **kwargs):
-#    ChangeLog.objects.create(
-#        task=instance,
-#        act_type='d',
-#        who=instance.author
-#    )
-
-
 models.signals.post_save.connect(task_handler, sender=Task)
-#models.signals.post_delete.connect(task_delete, sender=Task)

@@ -33,7 +33,7 @@
                     {% endif %}
                 {% endif %}
 
-                <td class="hidden-xs"><a href="{% url 'taskapp:view' task.pk %}">{{ task.pk }}</a></td>
+                <td class="hidden-xs"><a href="{% url 'taskapp:edit' task.pk %}">{{ task.pk }}</a></td>
 
                 {% if task.abon and task.abon.group %}
                     <td>

@@ -1,0 +1,19 @@
+{% load i18n %}
+<form action="{% url 'taskapp:comment_del' task_id object.pk %}" method="post">{% csrf_token %}
+
+    <div class="modal-header warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{% trans 'Delete comment' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        <p>{% blocktrans %}Are you sure you want to delete "{{ object }}"?{% endblocktrans %}</p>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-sm btn-danger">
+            <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+        </button>
+    </div>
+
+</form>
