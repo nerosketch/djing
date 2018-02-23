@@ -53,9 +53,13 @@
                 <td>{{ task.get_mode_display }}</td>
                 <td>{{ task.descr }}</td>
                 <td>
+                    {% if task.author %}
                     <a href="{% url 'acc_app:other_profile' task.author.pk %}" data-toggle="tooltip" title="{{ task.author.get_full_name }}">
                         {{ task.author.username }}
                     </a>
+                    {% else %}
+                    {% trans 'Author does not specified' %}
+                    {% endif %}
                 </td>
                 <td class="hidden-xs">{{ task.time_of_create|date:'d E H:i' }}</td>
 

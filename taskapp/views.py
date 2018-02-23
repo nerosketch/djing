@@ -147,7 +147,7 @@ class TaskUpdateView(UpdateView):
                 log_text = _('Task has changed successfully')
             messages.add_message(self.request, messages.SUCCESS, log_text)
         except MultipleException as e:
-            for err in e:
+            for err in e.err_list:
                 messages.add_message(self.request, messages.WARNING, err)
         except TaskException as e:
             messages.add_message(self.request, messages.ERROR, e)
