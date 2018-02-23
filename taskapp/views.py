@@ -3,7 +3,7 @@ from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404, resolve_url
+from django.shortcuts import redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView
@@ -137,15 +137,16 @@ class TaskUpdateView(UpdateView):
 
     def form_valid(self, form):
         try:
-            self.object = form.save(commit=False)
+            self.object = form.save()
             self.object.author = self.request.user
-            self.object.save()
+            self.object.save(update_fields=['author'])
             task_id = safe_int(self.kwargs.get('task_id', 0))
             if task_id == 0:
                 log_text = _('Task has successfully created')
             else:
                 log_text = _('Task has changed successfully')
             messages.add_message(self.request, messages.SUCCESS, log_text)
+            self.object.send_notification()
         except MultipleException as e:
             for err in e.err_list:
                 messages.add_message(self.request, messages.WARNING, err)
@@ -196,6 +197,7 @@ def task_finish(request, task_id):
     try:
         task = get_object_or_404(Task, id=task_id)
         task.finish(request.user)
+        task.send_notification()
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
@@ -210,6 +212,7 @@ def task_failed(request, task_id):
     try:
         task = get_object_or_404(Task, id=task_id)
         task.do_fail(request.user)
+        task.send_notification()
     except TaskException as e:
         messages.error(request, e)
     return redirect('taskapp:home')
@@ -221,6 +224,7 @@ def remind(request, task_id):
     try:
         task = get_object_or_404(Task, id=task_id)
         task.save(update_fields=['state'])
+        task.send_notification()
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)

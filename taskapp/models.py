@@ -98,6 +98,16 @@ class Task(models.Model):
         )
         self.save(update_fields=['state'])
 
+    def send_notification(self):
+        if self.abon:
+            group = self.abon.group
+        else:
+            group = ''
+        task_handle(
+            self, self.author,
+            self.recipients.all(), group
+        )
+
     def get_attachment_fname(self):
         return os.path.basename(self.attachment.name)
 
@@ -121,17 +131,3 @@ class ExtraComment(models.Model):
         )
         verbose_name = _('Extra comment')
         verbose_name_plural = _('Extra comments')
-
-
-def task_handler(sender, instance, **kwargs):
-    if instance.abon:
-        group = instance.abon.group
-    else:
-        group = ''
-    task_handle(
-        instance, instance.author,
-        instance.recipients.all(), group
-    )
-
-
-models.signals.post_save.connect(task_handler, sender=Task)
