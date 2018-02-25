@@ -96,10 +96,6 @@ msgstr "Динамический ip"
 msgid "Fields"
 msgstr "Поля"
 
-#: models.py:31
-msgid "Can view subscriber group"
-msgstr "Может просматривать группу абонентов"
-
 #: models.py:33
 msgid "Abon group"
 msgstr "Группа абонентов"
@@ -894,18 +890,10 @@ msgstr "Просмотр абонента"
 msgid "yes,no"
 msgstr "Да,Нет"
 
-#: views.py:94
-msgid "create group success msg"
-msgstr "Группа успешно создана"
-
 #: views.py:97 views.py:161 views.py:308 views.py:423 views.py:500 views.py:642
 #: views.py:812 views.py:884 views.py:953 views.py:1059
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
-
-#: views.py:128
-msgid "delete group success msg"
-msgstr "Группа успешно удалена"
 
 #: views.py:158
 msgid "create abon success msg"
@@ -1128,7 +1116,7 @@ msgid "User flags has changed successfully"
 msgstr "Флаги абонента изменены успешно"
 
 msgid "Services"
-msgstr "Услуги"
+msgstr "Тарифы"
 
 msgid "Payments"
 msgstr "Финансы"
@@ -1144,3 +1132,6 @@ msgstr "Инфо."
 
 msgid "Dialing"
 msgstr "Звонки"
+
+msgid "Subscribers"
+msgstr "Абоненты"

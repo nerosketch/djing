@@ -41,11 +41,11 @@
                                 <b>{{ port.num }}</b>
                             </a>
                             {% if port.st %}
-                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 0 %}" class="btn btn-xs btn-danger" title="{% trans 'Disable port' %}">
+                                <a href="{% url 'devapp:port_toggle' dev.group.pk|default:0 dev.id port.num 0 %}" class="btn btn-xs btn-danger" title="{% trans 'Disable port' %}">
                                     <span class="glyphicon glyphicon-off"></span>
                                 </a>
                             {% else %}
-                                <a href="{% url 'devapp:port_toggle' dev.user_group.pk|default:0 dev.id port.num 1 %}" class="btn btn-xs btn-success" title="{% trans 'Enable port' %}">
+                                <a href="{% url 'devapp:port_toggle' dev.group.pk|default:0 dev.id port.num 1 %}" class="btn btn-xs btn-success" title="{% trans 'Enable port' %}">
                                     <span class="glyphicon glyphicon-ok"></span>
                                 </a>
                             {% endif %}

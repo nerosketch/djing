@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^client/', include('clientsideapp.urls', namespace='client_side')),
     url(r'^msg/', include('msg_app.urls', namespace='msg_app')),
     url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
+    url(r'^groups/', include('group_app.urls', namespace='group_app')),
     url(r'^admin/', admin.site.urls)
 
 ]

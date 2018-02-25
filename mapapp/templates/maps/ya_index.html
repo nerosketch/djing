@@ -145,7 +145,7 @@
             <h4 class="modal-title">{% trans 'Layers' %}</h4>
         </div>
         <div class="list-group">
-            {% for grp in abon_groups %}
+            {% for grp in groups %}
             <button type="button" data-href="{% url 'mapapp:resolve_dots_by_group' grp.pk %}" class="list-group-item mapbtns">{{ grp.title }}</button>
             {% endfor %}
         </div>

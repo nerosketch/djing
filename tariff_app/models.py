@@ -4,8 +4,15 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from .base_intr import TariffBase, PeriodicPayCalcBase
 from .custom_tariffs import TARIFF_CHOICES, PERIODIC_PAY_CHOICES
+from group_app.models import Group
 from mydefs import MyChoicesAdapter
 from jsonfield import JSONField
+
+
+class TariffManager(models.Manager):
+
+    def get_tariffs_by_group(self, group_id):
+        return self.filter(groups__id__in=[group_id])
 
 
 class Tariff(models.Model):
@@ -17,6 +24,10 @@ class Tariff(models.Model):
     calc_type = models.CharField(_('Script'), max_length=2, default=TARIFF_CHOICES[0][0],
                                  choices=MyChoicesAdapter(TARIFF_CHOICES))
     is_admin = models.BooleanField(_('Tech service'), default=False)
+
+    groups = models.ManyToManyField(Group, blank=True)
+
+    objects = TariffManager()
 
     def get_calc_type(self):
         """

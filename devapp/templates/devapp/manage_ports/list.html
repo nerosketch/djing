@@ -16,19 +16,19 @@
                     </thead>
 
                     <tbody>
-                    {% with gid=dev.user_group.pk did=dev.pk can_del_port=perms.devapp.delete_port can_edit_port=perms.devapp.change_port %}
+                    {% with gid=dev.group.pk did=dev.pk can_del_port=perms.devapp.delete_port can_edit_port=perms.devapp.change_port %}
                     {% for port in ports %}
                         <tr>
                             <td>{{ port.num }}</td>
                             <td>{{ port.descr }}</td>
                             {% if port.num_abons > 1 %}
-                                {% url 'devapp:fix_port_conflict' dev.user_group.id dev.id port.id as fixurl %}
+                                {% url 'devapp:fix_port_conflict' gid did port.id as fixurl %}
                                 <td class="text-danger"><b>{{ port.num_abons }}</b>. {% blocktrans with furl=fixurl %}Port should not have more than one subscriber, <a href='{{ furl }}'>fix that</a>{% endblocktrans %}</td>
                             {% else %}
                                 <td>{{ port.num_abons }}</td>
                             {% endif %}
                             <td class="btn-group btn-group-sm">
-                                <a href="{% url 'devapp:show_subscriber_on_port' dev.user_group.id dev.id port.id %}" class="btn btn-default btn-modal" title="{% trans 'Show subscriber on port' %}" data-toggle="tooltip">
+                                <a href="{% url 'devapp:show_subscriber_on_port' gid did port.id %}" class="btn btn-default btn-modal" title="{% trans 'Show subscriber on port' %}" data-toggle="tooltip">
                                     <span class="glyphicon glyphicon-eye-open"></span>
                                 </a>
                                 {% if can_del_port %}
@@ -54,7 +54,7 @@
                     <tr>
                         <td colspan="4" class="btn-group">
                             {% if perms.devapp.add_port %}
-                                <a href="{% url 'devapp:add_ports' dev.user_group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
+                                <a href="{% url 'devapp:add_ports' dev.group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
                                 </a>
                             {% endif %}

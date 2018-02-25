@@ -411,7 +411,7 @@ msgid "You have redirected to existing device"
 msgstr "Вы были переадресованы на существующее устройство"
 
 #: views.py:113 views.py:329 views.py:419
-msgid "Please attach user group for device"
+msgid "Please attach group for device"
 msgstr "Пожалуйста назначте устройству группу в настройках"
 
 #: views.py:117 views.py:275 views.py:304 views.py:421
@@ -424,7 +424,7 @@ msgid "Duplicate user and port: %s"
 msgstr "Пользователь с таким портом и устройством уже есть: %s"
 
 #: views.py:159 views.py:198
-msgid "Device is not have a group, please fix that"
+msgid "Device does not have a group, please fix that"
 msgstr "У устройства нет группы, пожалуйста, исправьте это"
 
 #: views.py:164 views.py:231 views.py:316

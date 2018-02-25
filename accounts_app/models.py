@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from photo_app.models import Photo
+from group_app.models import Group
 
 
 DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
@@ -45,7 +46,7 @@ class MyUserManager(BaseUserManager):
         return user
 
 
-class UserProfile(AbstractBaseUser, PermissionsMixin):
+class BaseAccount(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_('profile username'), max_length=127, unique=True)
     fio = models.CharField(_('fio'), max_length=256)
     birth_day = models.DateField(_('birth day'), auto_now_add=True)
@@ -57,8 +58,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         #unique=True,
         validators=[RegexValidator(TELEPHONE_REGEXP)]
     )
-    avatar = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
-    email = models.EmailField(default='admin@example.ru')
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['telephone']
@@ -77,6 +76,26 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         " Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+    def __str__(self):
+        return self.get_full_name()
+
+    class Meta:
+        db_table = 'base_accounts'
+
+
+class UserProfileManager(MyUserManager):
+
+    def get_profiles_by_group(self, group_id):
+        return self.filter(responsibility_groups__id__in=[group_id], is_admin=True, is_active=True)
+
+
+class UserProfile(BaseAccount):
+    avatar = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
+    email = models.EmailField(default='admin@example.ru')
+    responsibility_groups = models.ManyToManyField(Group, blank=True, verbose_name=_('Responsibility groups'))
+
+    objects = UserProfileManager()
 
     def get_big_ava(self):
         if self.avatar:
@@ -98,9 +117,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
                 return DEFAULT_PICTURE
         else:
             return DEFAULT_PICTURE
-
-    def __str__(self):
-        return self.get_full_name()
 
     class Meta:
         permissions = (

@@ -5,8 +5,8 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
-        <li><a href="{% url 'devapp:devs' user_group.pk %}">{{ user_group.title }}</a></li>
-        <li><a href="{% url 'devapp:view' user_group.pk device.pk %}">{{ device.comment }}</a></li>
+        <li><a href="{% url 'devapp:devs' group.pk %}">{{ group.title }}</a></li>
+        <li><a href="{% url 'devapp:view' group.pk device.pk %}">{{ device.comment }}</a></li>
         <li class="active">{% trans 'Fix subscriber ports conflict' %}</li>
     </ol>
 

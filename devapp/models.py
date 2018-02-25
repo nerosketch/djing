@@ -9,6 +9,7 @@ from subprocess import run
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from json.decoder import JSONDecodeError
+from group_app.models import Group
 
 
 DEVICE_TYPES = (
@@ -51,7 +52,7 @@ class Device(models.Model):
     comment = models.CharField(_('Comment'), max_length=256)
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0], choices=MyChoicesAdapter(DEVICE_TYPES))
     man_passw = models.CharField(_('SNMP password'), max_length=16, null=True, blank=True)
-    user_group = models.ForeignKey('abonapp.AbonGroup', verbose_name=_('User group'), on_delete=models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Device group'))
     parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True, on_delete=models.SET_NULL)
 
     snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0, blank=True)
@@ -106,6 +107,7 @@ class Device(models.Model):
     def update_dhcp(self):
         if self.devtype not in ('On','Dl'):
             return
+        # FIXME: переделать это безобразие
         grp = self.user_group.id
         code = ''
         if grp == 87:

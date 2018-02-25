@@ -51,11 +51,11 @@ INSTALLED_APPS = [
     'chatbot',
     'msg_app',
     'dialing_app',
+    'group_app',
     'guardian',
     'pinax_theme_bootstrap',
     'bootstrapform',
     'bootstrap3'
-
 ]
 
 MIDDLEWARE = [

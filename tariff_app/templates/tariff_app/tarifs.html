@@ -31,54 +31,54 @@
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th width="250">{% trans 'Script' %}</th>
-                <th width="50">Do</th>
+                <th width="50">#</th>
             </tr>
             </thead>
             <tbody>
             {% with can_ch_trf=perms.tariff_app.change_tariff can_del_trf=perms.tariff_app.delete_tariff %}
-            {% for tar in tariflist %}
-                <tr>
-                    <td>
-                        {% if can_ch_trf %}
-                            <a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a>
-                        {% else %}
-                            {{ tar.title }}
-                        {% endif %}
-                    </td>
-                    <td>{{ tar.speedIn }}</td>
-                    <td>{{ tar.speedOut }}</td>
-                    <td>{{ tar.amount }} {% trans 'currency' %}</td>
-                    <td>{{ tar.get_calc_type_display }}</td>
-                    <td>
-                        {% if can_del_trf %}
-                            <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger btn-modal">
-                                <span class="glyphicon glyphicon-remove-circle"></span>
-                            </a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="6">{% trans 'Services does not exist yet' %}.
-                        {% if perms.tariff_app.add_tariff %}
-                            <a href="{% url 'tarifs:add' %}" class="lgtbx">{% trans 'Create' %}</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
+                {% for tar in tariflist %}
+                    <tr>
+                        <td>
+                            {% if can_ch_trf %}
+                                <a href="{% url 'tarifs:edit' tar.id %}"><b>{{ tar.title }}</b></a>
+                            {% else %}
+                                {{ tar.title }}
+                            {% endif %}
+                        </td>
+                        <td>{{ tar.speedIn }}</td>
+                        <td>{{ tar.speedOut }}</td>
+                        <td>{{ tar.amount }} {% trans 'currency' %}</td>
+                        <td>{{ tar.get_calc_type_display }}</td>
+                        <td>
+                            {% if can_del_trf %}
+                                <a href="{% url 'tarifs:del' tar.id %}" class="btn btn-sm btn-danger btn-modal">
+                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">{% trans 'Services does not exist yet' %}.
+                            {% if perms.tariff_app.add_tariff %}
+                                <a href="{% url 'tarifs:add' %}" class="lgtbx">{% trans 'Create' %}</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
             {% endwith %}
             </tbody>
 
             {% if perms.tariff_app.add_tariff %}
-            <tfoot>
-            <tr>
-                <td colspan="6">
-                    <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
-                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
-                    </a>
-                </td>
-            </tr>
-            </tfoot>
+                <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
+                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                        </a>
+                    </td>
+                </tr>
+                </tfoot>
             {% endif %}
 
         </table>

@@ -29,9 +29,9 @@ def pays(request):
 def services(request):
     try:
         abon = Abon.objects.get(pk=request.user.pk)
-        all_tarifs = abon.group.tariffs.filter(is_admin=False)
+        all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk)
         current_service = abon.active_tariff()
-    except:
+    except Abon.DoesNotExist:
         all_tarifs = None
         current_service = None
     return render(request, 'clientsideapp/services.html', {

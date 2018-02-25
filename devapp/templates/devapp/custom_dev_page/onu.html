@@ -30,7 +30,7 @@
                         {% endfor %}
                         {% if dev.parent_dev %}
                             <li class="list-group-item">
-                                {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.user_group %}
+                                {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.group %}
                                     {% trans 'Parent device' %}:<a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}"
                                                                    title="{{ pdev.mac_addr|default:'' }}"
                                                                    target="_blank">{{ pdev.ip_address }} {{ pdev.comment }}</a>

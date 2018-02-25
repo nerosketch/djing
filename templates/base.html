@@ -1,4 +1,5 @@
 {% extends 'all_base.html' %}
+{% load i18n %}
 {% block base_content %}
 
     <!-- Left menu -->
@@ -8,7 +9,7 @@
             <div class="col-sm-5">
 
                 <a href="{% url 'acc_app:profile' %}">
-                    <img alt="авка" class="img-circle img-responsive" src="{{ user.get_min_ava }}"/>
+                    <img alt="profile image" class="img-circle img-responsive" src="{{ user.get_min_ava }}"/>
                 </a>
 
             </div>
@@ -24,41 +25,47 @@
             {% url 'acc_app:accounts_list' as accounts_list %}
             <li{% if accounts_list in request.path %} class="active"{% endif %}>
                 <a href="{{ accounts_list }}">
-                    <span class="glyphicon glyphicon-eye-open"></span> администраторы
+                    <span class="glyphicon glyphicon-eye-open"></span> {% trans 'Administrators' %}
                 </a>
             </li>
 
-            {% url 'abonapp:group_list' as abongroup_list_link %}
-            <li{% if abongroup_list_link in request.path %} class="active"{% endif %}>
-                <a href="{{ abongroup_list_link }}">
-                    <span class="glyphicon glyphicon-user"></span> абоненты
+            {% url 'abonapp:group_list' as abon_groups_link %}
+            <li{% if abon_groups_link in request.path %} class="active"{% endif %}>
+                <a href="{{ abon_groups_link }}">
+                    <span class="glyphicon glyphicon-user"></span> {% trans 'Subscribers' %}
                 </a></li>
 
             {% url 'taskapp:home' as task_home %}
             <li{% if task_home in request.path %} class="active"{% endif %}>
                 <a href="{{ task_home }}">
-                    <span class="glyphicon glyphicon-tasks"></span> Задачи
+                    <span class="glyphicon glyphicon-tasks"></span> {% trans 'Tasks' %}
                     {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
+                </a></li>
+
+            {% url 'group_app:group_list' as group_list_link %}
+            <li{% if group_list_link in request.path %} class="active"{% endif %}>
+                <a href="{{ group_list_link }}">
+                    <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Groups' %}
                 </a></li>
 
             {% url 'tarifs:home' as tarifs_home %}
             <li{% if tarifs_home in request.path %} class="active"{% endif %}>
                 <a href="{{ tarifs_home }}">
-                    <span class="glyphicon glyphicon-usd"></span> тарифы
+                    <span class="glyphicon glyphicon-usd"></span> {% trans 'Services' %}
                 </a></li>
 
             {% if request.user.is_superuser %}
                 {% url 'mapapp:options' as mapapp_ops %}
                 <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
                     <a href="{{ mapapp_ops }}">
-                        <span class="glyphicon glyphicon-map-marker"></span> Настройки карты
+                        <span class="glyphicon glyphicon-map-marker"></span> {% trans 'Map settings' %}
                     </a></li>
             {% endif %}
 
             {% url 'msg_app:home' as privmsg_home %}
             <li{% if privmsg_home in request.path %} class="active"{% endif %}>
                 <a href="{{ privmsg_home }}">
-                    <span class="glyphicon glyphicon-envelope"></span> Сообщения
+                    <span class="glyphicon glyphicon-envelope"></span> {% trans 'Messages' %}
                     {% if new_messages_count > 0 %}
                         <span class="badge">{{ new_messages_count }}</span>
                     {% endif %}
@@ -68,14 +75,14 @@
             {% url 'dialapp:home' as dialhome %}
             <li{% if dialhome in request.path %} class="active"{% endif %}>
                 <a href="{{ dialhome }}">
-                    <span class="glyphicon glyphicon-phone-alt"></span> Телефония
+                    <span class="glyphicon glyphicon-phone-alt"></span> {% trans 'Dialing' %}
                 </a></li>
             {% endif %}
 
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_groups }}">
-                    <span class="glyphicon glyphicon-hdd"></span> железки
+                    <span class="glyphicon glyphicon-hdd"></span> {% trans 'Devices' %}
                 </a></li>
 
         </ul>

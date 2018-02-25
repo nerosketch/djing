@@ -10,32 +10,15 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from accounts_app.models import UserProfile, MyUserManager
+from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
+from group_app.models import Group
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
-
-
-class AbonGroup(models.Model):
-    title = models.CharField(max_length=127, unique=True)
-    profiles = models.ManyToManyField(UserProfile, blank=True, related_name='abon_groups')
-    tariffs = models.ManyToManyField(Tariff, blank=True, related_name='tariff_groups')
-
-    class Meta:
-        db_table = 'abonent_groups'
-        permissions = (
-            ('can_view_abongroup', _('Can view subscriber group')),
-        )
-        verbose_name = _('Abon group')
-        verbose_name_plural = _('Abon groups')
-        ordering = ['title']
-
-    def __str__(self):
-        return self.title
 
 
 class AbonLog(models.Model):
@@ -89,7 +72,7 @@ class AbonTariff(models.Model):
 
 class AbonStreet(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(AbonGroup, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -149,9 +132,9 @@ class AbonManager(MyUserManager):
         return super(MyUserManager, self).get_queryset().filter(is_admin=False)
 
 
-class Abon(UserProfile):
+class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
+    group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_address = MyGenericIPAddressField(blank=True, null=True)
     description = models.TextField(_('Comment'), null=True, blank=True)

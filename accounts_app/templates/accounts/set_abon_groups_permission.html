@@ -4,15 +4,15 @@
 
     <legend>{% trans 'The list of user groups to which the account has access' %}</legend>
     <form action="{% url 'acc_app:set_abon_groups_permission' userprofile.pk %}" method="post" role="form">{% csrf_token %}
-        {% for ag in abongroups %}
+        {% for grp in groups %}
             <div class="checkbox">
                 <label>
-                    {% if ag.pk in picked_groups_ids %}
-                        <input name="ag" type="checkbox" value="{{ ag.pk }}" checked/>
+                    {% if grp.pk in picked_groups_ids %}
+                        <input name="grp" type="checkbox" value="{{ grp.pk }}" checked/>
                     {% else %}
-                        <input name="ag" type="checkbox" value="{{ ag.pk }}"/>
+                        <input name="grp" type="checkbox" value="{{ grp.pk }}"/>
                     {% endif %}
-                    {{ ag.title }}
+                    {{ grp.title }}
                 </label>
             </div>
         {% endfor %}

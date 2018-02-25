@@ -24,6 +24,7 @@ from datetime import datetime, date, timedelta
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel
+from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing.global_base_views import OrderingMixin
@@ -67,74 +68,28 @@ class PeoplesListView(BaseAbonListView):
         gid = mydefs.safe_int(self.kwargs.get('gid'))
         if gid == 0:
             return HttpResponseBadRequest('group id is broken')
-        abon_group = get_object_or_404(models.AbonGroup, pk=gid)
-        if not self.request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+        group = get_object_or_404(Group, pk=gid)
+        if not self.request.user.has_perm('group_app.can_view_group', group):
             raise PermissionDenied
 
         context = super(PeoplesListView, self).get_context_data(**kwargs)
 
         context['streets'] = models.AbonStreet.objects.filter(group=gid)
         context['street_id'] = mydefs.safe_int(self.request.GET.get('street'))
-        context['abon_group'] = abon_group
+        context['group'] = group
         return context
-
-
-@login_required
-@permission_required('abonapp.add_abongroup')
-def addgroup(request):
-    frm = forms.AbonGroupForm()
-    try:
-        if request.method == 'POST':
-            frm = forms.AbonGroupForm(request.POST)
-            if frm.is_valid():
-                grp = frm.save()
-                assign_perm('abonapp.can_view_abongroup', request.user, grp)
-                assign_perm('abonapp.delete_abongroup', request.user, grp)
-                assign_perm('abonapp.change_abongroup', request.user, grp)
-                messages.success(request, _('create group success msg'))
-                return redirect('abonapp:group_list')
-            else:
-                messages.error(request, _('fix form errors'))
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-    return render(request, 'abonapp/addGroup.html', {
-        'form': frm
-    })
 
 
 class GroupListView(BaseAbonListView):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
-    queryset = models.AbonGroup.objects.annotate(usercount=Count('abon')).order_by('title')
+    queryset = Group.objects.annotate(usercount=Count('abon'))
 
     def get_queryset(self):
         queryset = super(GroupListView, self).get_queryset()
-        queryset = get_objects_for_user(self.request.user, 'abonapp.can_view_abongroup', klass=queryset,
+        queryset = get_objects_for_user(self.request.user, 'group_app.can_view_group', klass=queryset,
                                         accept_global_perms=False)
         return queryset
-
-
-@login_required
-def delgroup(request):
-    try:
-        agd = mydefs.safe_int(request.GET.get('id'))
-        abon_group = models.AbonGroup.objects.get(pk=agd)
-        if not request.user.has_perm('abonapp.delete_abongroup', abon_group):
-            raise PermissionDenied
-        abon_group.delete()
-        messages.success(request, _('delete group success msg'))
-        return mydefs.res_success(request, 'abonapp:group_list')
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
-    except models.AbonGroup.DoesNotExist:
-        return mydefs.res_error(request, 'Group with id=%d does not exist' % agd)
-    return mydefs.res_error(request, 'abonapp:group_list')
 
 
 @login_required
@@ -143,8 +98,8 @@ def addabon(request, gid):
     frm = None
     group = None
     try:
-        group = get_object_or_404(models.AbonGroup, pk=gid)
-        if not request.user.has_perm('abonapp.can_view_abongroup', group):
+        group = get_object_or_404(Group, pk=gid)
+        if not request.user.has_perm('group_app.can_view_group', group):
             raise PermissionDenied
         if request.method == 'POST':
             frm = forms.AbonForm(request.POST, initial={'group': group})
@@ -164,7 +119,7 @@ def addabon(request, gid):
         messages.error(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
 
     if not frm:
         frm = forms.AbonForm(initial={
@@ -175,7 +130,7 @@ def addabon(request, gid):
 
     return render(request, 'abonapp/addAbon.html', {
         'form': frm,
-        'abon_group': group
+        'group': group
     })
 
 
@@ -186,7 +141,7 @@ def del_abon(request):
     try:
         abon = get_object_or_404(models.Abon, pk=uid)
         if not request.user.has_perm('abonapp.delete_abon') or not request.user.has_perm(
-                'abonapp.can_view_abongroup', abon.group):
+                'group_app.can_view_group', abon.group):
             raise PermissionDenied
         gid = abon.group.id
         abon.delete()
@@ -199,7 +154,7 @@ def del_abon(request):
         messages.error(request, _("NAS says: '%s'") % e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
     return redirect('abonapp:group_list')
 
 
@@ -223,14 +178,14 @@ def abonamount(request, gid, uid):
         messages.error(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
     return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid)
+        'group_id': gid
     }, request=request)
 
 
-@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+@method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(BaseAbonListView):
     context_object_name = 'invoices'
     template_name = 'abonapp/invoiceForPayment.html'
@@ -242,12 +197,12 @@ class DebtsListView(BaseAbonListView):
 
     def get_context_data(self, **kwargs):
         context = super(DebtsListView, self).get_context_data(**kwargs)
-        context['abon_group'] = self.abon.group
+        context['group'] = self.abon.group
         context['abon'] = self.abon
         return context
 
 
-@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+@method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(BaseAbonListView):
     context_object_name = 'pay_history'
     template_name = 'abonapp/payHistory.html'
@@ -260,7 +215,7 @@ class PayHistoryListView(BaseAbonListView):
 
     def get_context_data(self, **kwargs):
         context = super(PayHistoryListView, self).get_context_data(**kwargs)
-        context['abon_group'] = self.abon.group
+        context['group'] = self.abon.group
         context['abon'] = self.abon
         return context
 
@@ -268,8 +223,8 @@ class PayHistoryListView(BaseAbonListView):
 @login_required
 @mydefs.only_admins
 def abon_services(request, gid, uid):
-    grp = get_object_or_404(models.AbonGroup, pk=gid)
-    if not request.user.has_perm('abonapp.can_view_abongroup', grp):
+    grp = get_object_or_404(Group, pk=gid)
+    if not request.user.has_perm('group_app.can_view_group', grp):
         raise PermissionDenied
     abon = get_object_or_404(models.Abon, pk=uid)
 
@@ -285,8 +240,8 @@ def abon_services(request, gid, uid):
     return render(request, 'abonapp/service.html', {
         'abon': abon,
         'abon_tariff': abon.current_tariff,
-        'abon_group': abon.group,
-        'services': grp.tariffs.all(),
+        'group': abon.group,
+        'services': Tariff.objects.get_tariffs_by_group(abon.group.pk),
         'periodic_pay': periodic_pay
     })
 
@@ -295,8 +250,8 @@ def abon_services(request, gid, uid):
 @mydefs.only_admins
 def abonhome(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
-    abon_group = get_object_or_404(models.AbonGroup, pk=gid)
-    if not request.user.has_perm('abonapp.can_view_abongroup', abon_group):
+    group = get_object_or_404(Group, pk=gid)
+    if not request.user.has_perm('group_app.can_view_group', group):
         raise PermissionDenied
     frm = None
     passw = None
@@ -329,13 +284,13 @@ def abonhome(request, gid, uid):
         messages.warning(request, _('User has not have password, and cannot login'))
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
 
     if request.user.has_perm('abonapp.change_abon'):
         return render(request, 'abonapp/editAbon.html', {
             'form': frm or forms.AbonForm(instance=abon, initial={'password': passw}),
             'abon': abon,
-            'abon_group': abon_group,
+            'group': group,
             'ip': abon.ip_address,
             'is_bad_ip': getattr(abon, 'is_bad_ip', False),
             'device': abon.device,
@@ -344,7 +299,7 @@ def abonhome(request, gid, uid):
     else:
         return render(request, 'abonapp/viewAbon.html', {
             'abon': abon,
-            'abon_group': abon_group,
+            'group': group,
             'ip': abon.ip_address,
             'passw': passw
         })
@@ -362,7 +317,7 @@ def terminal_pay(request):
 def add_invoice(request, gid, uid):
     uid = mydefs.safe_int(uid)
     abon = get_object_or_404(models.Abon, pk=uid)
-    grp = get_object_or_404(models.AbonGroup, pk=gid)
+    grp = get_object_or_404(Group, pk=gid)
 
     try:
         if request.method == 'POST':
@@ -386,21 +341,22 @@ def add_invoice(request, gid, uid):
         messages.error(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
     return render(request, 'abonapp/addInvoice.html', {
         'abon': abon,
         'invcount': models.InvoiceForPayment.objects.filter(abon=abon).count(),
-        'abon_group': grp
+        'group': grp
     })
 
 
 @login_required
+@mydefs.only_admins
 @permission_required('abonapp.can_buy_tariff')
 @transaction.atomic
 def pick_tariff(request, gid, uid):
-    grp = get_object_or_404(models.AbonGroup, pk=gid)
+    grp = get_object_or_404(Group, pk=gid)
     abon = get_object_or_404(models.Abon, pk=uid)
-    tariffs = grp.tariffs.all()
+    tariffs = Tariff.objects.get_tariffs_by_group(grp.pk)
     try:
         if request.method == 'POST':
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
@@ -425,14 +381,14 @@ def pick_tariff(request, gid, uid):
         messages.error(request, _('Tariff your picked does not exist'))
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
     except ValueError as e:
         messages.error(request, "%s: %s" % (_('fix form errors'), e))
 
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
         'abon': abon,
-        'abon_group': grp,
+        'group': grp,
         'selected_tariff': mydefs.safe_int(request.GET.get('selected_tariff'))
     })
 
@@ -450,7 +406,7 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
         messages.warning(request, e)
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
     return redirect('abonapp:abon_services', gid=gid, uid=uid)
 
 
@@ -475,7 +431,7 @@ class DebtorsListView(ListView):
 
 
 @method_decorator(login_required, name='dispatch')
-@method_decorator(permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid')), name='dispatch')
+@method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class TaskLogListView(ListView):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
@@ -489,7 +445,7 @@ class TaskLogListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(TaskLogListView, self).get_context_data(**kwargs)
-        context['abon_group'] = self.abon.group
+        context['group'] = self.abon.group
         context['abon'] = self.abon
         return context
 
@@ -497,8 +453,8 @@ class TaskLogListView(ListView):
 @login_required
 @permission_required('abonapp.can_view_passport')
 def passport_view(request, gid, uid):
+    abon = get_object_or_404(models.Abon, pk=uid)
     try:
-        abon = models.Abon.objects.get(pk=uid)
         if request.method == 'POST':
             try:
                 passport_instance = models.PassportInfo.objects.get(abon=abon)
@@ -523,7 +479,7 @@ def passport_view(request, gid, uid):
         messages.warning(request, _('Passport info for the user does not exist'))
         frm = forms.PassportForm()
     return render(request, 'abonapp/passport_view.html', {
-        'abon_group': get_object_or_404(models.AbonGroup, pk=gid),
+        'group': get_object_or_404(Group, pk=gid),
         'abon': abon,
         'frm': frm
     })
@@ -532,17 +488,19 @@ def passport_view(request, gid, uid):
 @login_required
 @mydefs.only_admins
 def chgroup_tariff(request, gid):
-    grp = get_object_or_404(models.AbonGroup, pk=gid)
+    grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('abonapp.change_abongroup', grp):
         raise PermissionDenied
     if request.method == 'POST':
         tr = request.POST.getlist('tr')
+
+        # FIXME после создания метода привязки тарифов к группам убрать это представление
         grp.tariffs.clear()
         grp.tariffs.add(*[int(d) for d in tr])
         grp.save()
     tariffs = Tariff.objects.all()
     return render(request, 'abonapp/group_tariffs.html', {
-        'abon_group': grp,
+        'group': grp,
         'tariffs': tariffs
     })
 
@@ -567,7 +525,7 @@ def dev(request, gid, uid):
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
     return render(request, 'abonapp/modal_dev.html', {
-        'devices': Device.objects.filter(user_group=gid),
+        'devices': Device.objects.filter(group=gid),
         'dev': abon_dev,
         'gid': gid, 'uid': uid
     })
@@ -575,7 +533,7 @@ def dev(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.change_abon')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
@@ -589,7 +547,7 @@ def clear_dev(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def charts(request, gid, uid):
     high = 100
 
@@ -603,9 +561,8 @@ def charts(request, gid, uid):
         StatElem = getModel(wandate)
         abon = models.Abon.objects.get(pk=uid)
         if abon.group is None:
-            abon.group = models.AbonGroup.objects.get(pk=gid)
+            abon.group = Group.objects.get(pk=gid)
             abon.save(update_fields=['group'])
-        abongroup = abon.group
 
         if abon.ip_address is None:
             charts_data = None
@@ -626,7 +583,7 @@ def charts(request, gid, uid):
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid)
-    except models.AbonGroup.DoesNotExist:
+    except Group.DoesNotExist:
         messages.error(request, _("Group what you want doesn't exist"))
         return redirect('abonapp:group_list')
     except ProgrammingError as e:
@@ -634,7 +591,7 @@ def charts(request, gid, uid):
         return redirect('abonapp:abon_home', gid=gid, uid=uid)
 
     return render(request, 'abonapp/charts.html', {
-        'abon_group': abongroup,
+        'group': abon.group,
         'abon': abon,
         'charts_data': ',\n'.join(charts_data) if charts_data is not None else None,
         'high': high,
@@ -664,7 +621,7 @@ def make_extra_field(request, gid, uid):
         frm = forms.ExtraFieldForm()
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
-            messages.add_message(request, messages.constants.ERROR, err)
+            messages.error(request, err)
         frm = forms.ExtraFieldForm()
     return render_to_text('abonapp/modal_extra_field.html', {
         'abon': abon,
@@ -749,7 +706,7 @@ class DialsListView(BaseAbonListView):
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
-        if not self.request.user.has_perm('abonapp.can_view_abongroup', abon.group):
+        if not self.request.user.has_perm('group_app.can_view_group', abon.group):
             raise PermissionDenied
         self.abon = abon
         if abon.telephone is not None and abon.telephone != '':
@@ -763,7 +720,7 @@ class DialsListView(BaseAbonListView):
 
     def get_context_data(self, **kwargs):
         context = super(DialsListView, self).get_context_data(**kwargs)
-        context['abon_group'] = get_object_or_404(models.AbonGroup, pk=self.kwargs.get('gid'))
+        context['group'] = get_object_or_404(Group, pk=self.kwargs.get('gid'))
         context['abon'] = self.abon
         return context
 
@@ -771,6 +728,15 @@ class DialsListView(BaseAbonListView):
         if hasattr(self.abon.group, 'pk') and self.abon.group.pk != int(self.kwargs.get('gid')):
             return redirect('abonapp:dials', self.abon.group.pk, self.abon.pk)
         return super(DialsListView, self).render_to_response(context, **response_kwargs)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super(DialsListView, self).get(request, *args, **kwargs)
+        except ProgrammingError as e:
+            messages.error(request, e)
+            return redirect('abonapp:abon_home',
+                            self.kwargs.get('gid'),
+                            self.kwargs.get('uid'))
 
 
 @login_required
@@ -801,7 +767,7 @@ def save_user_dev_port(request, gid, uid):
                     pass
                 except models.Abon.MultipleObjectsReturned:
                     messages.error(request, _('Multiple users on the same device port'))
-                    return redirect('devapp:manage_ports', abon.device.user_group.pk, abon.device.pk)
+                    return redirect('devapp:manage_ports', abon.device.group.pk, abon.device.pk)
 
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
@@ -822,7 +788,7 @@ def save_user_dev_port(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.add_abonstreet')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_add(request, gid):
     if request.method == 'POST':
         frm = forms.AbonStreetForm(request.POST)
@@ -842,7 +808,7 @@ def street_add(request, gid):
 
 @login_required
 @permission_required('abonapp.change_abonstreet')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_edit(request, gid):
     try:
         if request.method == 'POST':
@@ -867,7 +833,7 @@ def street_edit(request, gid):
 
 @login_required
 @permission_required('abonapp.delete_abonstreet')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_del(request, gid, sid):
     try:
         models.AbonStreet.objects.get(pk=sid, group=gid).delete()
@@ -879,7 +845,7 @@ def street_del(request, gid, sid):
 
 @login_required
 @permission_required('abonapp.can_view_additionaltelephones')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def tels(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     telephones = abon.additional_telephones.all()
@@ -927,7 +893,7 @@ def tel_del(request, gid, uid):
 
 
 @login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def phonebook(request, gid):
     res_format = request.GET.get('f')
     t1 = models.Abon.objects.filter(group__id=int(gid)).only('telephone', 'fio').values_list('telephone', 'fio')
@@ -948,7 +914,7 @@ def phonebook(request, gid):
 
 
 @login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def abon_export(request, gid):
     res_format = request.GET.get('f')
 
@@ -984,7 +950,7 @@ def abon_export(request, gid):
 
 @login_required
 @permission_required('abonapp.change_abon')
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def reset_ip(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
     signals.post_save.disconnect(models.abon_post_save, sender=models.Abon)
@@ -1016,7 +982,7 @@ def fin_report(request):
 
 
 @login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def add_edit_periodic_pay(request, gid, uid, periodic_pay_id=0):
     if periodic_pay_id == 0:
         if not request.user.has_perm('abonapp.add_periodicpayforid'):
@@ -1047,7 +1013,7 @@ def add_edit_periodic_pay(request, gid, uid, periodic_pay_id=0):
 
 
 @login_required
-@permission_required('abonapp.can_view_abongroup', (models.AbonGroup, 'pk', 'gid'))
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 @permission_required('abonapp.delete_periodicpayforid')
 def del_periodic_pay(request, gid, uid, periodic_pay_id):
     periodic_pay_instance = get_object_or_404(models.PeriodicPayForId, pk=periodic_pay_id)
@@ -1078,12 +1044,12 @@ class EditSibscriberMarkers(UpdateView):
         return context
 
     def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR, _('fix form errors'))
+        messages.error(self.request, _('fix form errors'))
         return super(EditSibscriberMarkers, self).form_invalid(form)
 
     def form_valid(self, form):
         v = super(EditSibscriberMarkers, self).form_valid(form)
-        messages.add_message(self.request, messages.SUCCESS, _('User flags has changed successfully'))
+        messages.success(self.request, _('User flags has changed successfully'))
         return v
 
 

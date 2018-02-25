@@ -12,7 +12,7 @@ from django.conf import settings
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
-def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
+def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
     username = ''.join([choice(chars) for i in range(length)])
 
     if split:
@@ -25,8 +25,13 @@ def generate_random_username(length=6, chars=digits, split=2, delimiter=''):
         return username
 
 
+def generate_random_username():
+    username = generate_random_chars(length=6, chars=digits)
+    return str(int(username))
+
+
 def generate_random_password():
-    return generate_random_username(length=8, chars=digits + ascii_lowercase)
+    return generate_random_chars(length=8, chars=digits + ascii_lowercase)
 
 
 class AbonForm(forms.ModelForm):
@@ -90,16 +95,6 @@ class AbonForm(forms.ModelForm):
                 passw_text=raw_password
             )
         return acc
-
-
-class AbonGroupForm(forms.ModelForm):
-    class Meta:
-        model = models.AbonGroup
-        fields = '__all__'
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'profiles': forms.TextInput(attrs={'class': 'form-control'})
-        }
 
 
 class PassportForm(forms.ModelForm):

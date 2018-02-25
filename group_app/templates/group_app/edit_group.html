@@ -1,0 +1,20 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,group_app/ext.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block active_text %}{% trans 'Edit group' %}{% endblock %}
+{% block content %}
+<form action="{% url 'group_app:edit' object.pk %}" method="post">{% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-info-sign"></span>{% trans 'Edit group' %}</h4>
+    </div>
+    <div class="modal-body">
+        {% bootstrap_form form %}
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+        </button>
+    </div>
+</form>
+{% endblock %}

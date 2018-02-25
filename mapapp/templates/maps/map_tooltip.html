@@ -2,7 +2,7 @@
 <h4>{{ dot.title }}</h4>
 <div class="list-group">
     {% for dev in devs %}
-        <a class="list-group-item" href="{% url 'devapp:view' dev.user_group.pk dev.pk %}" target="_blank" title="{{ dev.mon.plugin_output }}">
+        <a class="list-group-item" href="{% url 'devapp:view' dev.group.pk dev.pk %}" target="_blank" title="{{ dev.mon.plugin_output }}">
             {% if dev.mon.current_state == '0' %}
                 <span class="glyphicon glyphicon-ok-circle text-success"></span>
             {% else %}

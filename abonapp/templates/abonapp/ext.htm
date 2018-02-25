@@ -5,7 +5,7 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
-        <li><a href="{% url 'abonapp:people_list' abon_group.pk %}">{{ abon_group.title }}</a></li>
+        <li><a href="{% url 'abonapp:people_list' group.pk %}">{{ group.title }}</a></li>
         <li class="active">{{ abon.fio }}</li>
     </ol>
 
@@ -21,39 +21,39 @@
 
     <ul class="nav nav-tabs nav-justified">
 
-        {% url 'abonapp:abon_home' abon_group.pk abon.pk as abon_home %}
+        {% url 'abonapp:abon_home' group.pk abon.pk as abon_home %}
         <li{% if abon_home == request.path %} class="active"{% endif %}>
             <a href="{{ abon_home }}">{% trans 'Sub information' %}</a>
         </li>
 
-        {% url 'abonapp:abon_services' abon_group.pk abon.pk as abserv %}
+        {% url 'abonapp:abon_services' group.pk abon.pk as abserv %}
         <li{% if abserv == request.path %} class="active"{% endif %}>
             <a href="{{ abserv }}">{% trans 'Services' %}</a>
         </li>
 
         {% if perms.abonapp.can_view_passport %}
-            {% url 'abonapp:passport_view' abon_group.pk abon.pk as passport_view_url %}
+            {% url 'abonapp:passport_view' group.pk abon.pk as passport_view_url %}
             <li{% if passport_view_url == request.path %} class="active"{% endif %}>
                 <a href="{{ passport_view_url }}">{% trans 'Passport information' %}</a>
             </li>
         {% endif %}
 
-        {% url 'abonapp:abon_phistory' abon_group.pk abon.pk as abphist %}
+        {% url 'abonapp:abon_phistory' group.pk abon.pk as abphist %}
         <li{% if abphist == request.path %} class="active"{% endif %}>
             <a href="{{ abphist }}">{% trans 'Payments' %}</a>
         </li>
 
-        {% url 'abonapp:task_log' abon_group.pk abon.pk as abtasklog %}
+        {% url 'abonapp:task_log' group.pk abon.pk as abtasklog %}
         <li{% if abtasklog == request.path %} class="active"{% endif %}>
             <a href="{{ abtasklog }}">{% trans 'History of tasks' %}</a>
         </li>
 
-        {% url 'abonapp:charts' abon_group.pk abon.pk as abtasklog %}
+        {% url 'abonapp:charts' group.pk abon.pk as abtasklog %}
         <li{% if abtasklog == request.path %} class="active"{% endif %}>
             <a href="{{ abtasklog }}">{% trans 'Charts' %}</a>
         </li>
 
-        {% url 'abonapp:dials' abon_group.pk abon.pk as abdials %}
+        {% url 'abonapp:dials' group.pk abon.pk as abdials %}
         <li{% if abdials == request.path %} class="active"{% endif %}>
             <a href="{{ abdials }}">{% trans 'Dialing' %}</a>
         </li>

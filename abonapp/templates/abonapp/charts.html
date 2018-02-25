@@ -11,7 +11,7 @@
                 <div class="panel-body">
                     {% if charts_data %}
                         <div id="chrt"></div>
-                        <form action="{% url 'abonapp:charts' abon_group.pk abon.pk %}" method="get" class="input-group">
+                        <form action="{% url 'abonapp:charts' group.pk abon.pk %}" method="get" class="input-group">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">
                                     <span class="glyphicon glyphicon-calendar"></span> {% trans 'Show graph by date' %}

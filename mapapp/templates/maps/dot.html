@@ -66,8 +66,8 @@
                 {% for dev in dot.devices.all %}
                 <tr>
                     <td>
-                        {% if dev.user_group %}
-                            <a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.comment }}</a>
+                        {% if dev.group %}
+                            <a href="{% url 'devapp:view' dev.group.pk dev.pk %}">{{ dev.comment }}</a>
                         {% else %}
                             <a href="{% url 'devapp:view' 0 dev.pk %}">{{ dev.comment }}</a>
                         {% endif %}
@@ -75,9 +75,9 @@
                     <td>{{ dev.ip_address }}</td>
                     <td>{{ dev.get_comment_display }}</td>
                     <td>
-                        {% if dev.user_group %}
-                        <a href="{% url 'abonapp:people_list' dev.user_group.pk %}">
-                            {{ dev.user_group }}
+                        {% if dev.group %}
+                        <a href="{% url 'abonapp:people_list' dev.group.pk %}">
+                            {{ dev.group }}
                         </a>
                         {% else %}
                         {% trans 'User group has no attached' %}
