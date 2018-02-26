@@ -6,7 +6,7 @@ from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q, signals
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, Http404
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -33,7 +33,7 @@ PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @method_decorator([login_required, mydefs.only_admins], name='dispatch')
-class BaseAbonListView(ListView, OrderingMixin):
+class BaseAbonListView(OrderingMixin, ListView):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
 
@@ -45,7 +45,7 @@ class PeoplesListView(BaseAbonListView):
     def get_queryset(self):
         street_id = mydefs.safe_int(self.request.GET.get('street'))
         gid = mydefs.safe_int(self.kwargs.get('gid'))
-        peoples_list = models.Abon.objects.select_related('group', 'street')
+        peoples_list = models.Abon.objects.all()
         if street_id > 0:
             peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
         else:
@@ -60,13 +60,17 @@ class PeoplesListView(BaseAbonListView):
                         pass
         except mydefs.LogicError as e:
             messages.warning(self.request, e)
-
-        return peoples_list
+        ordering = self.get_ordering()
+        if ordering:
+            if isinstance(ordering, str):
+                ordering = (ordering,)
+                peoples_list = peoples_list.order_by(*ordering)
+        return peoples_list.select_related('group', 'street', 'current_tariff')
 
     def get_context_data(self, **kwargs):
         gid = mydefs.safe_int(self.kwargs.get('gid'))
         if gid == 0:
-            return HttpResponseBadRequest('group id is broken')
+            return Http404('group id is broken')
         abon_group = get_object_or_404(models.AbonGroup, pk=gid)
         if not self.request.user.has_perm('abonapp.can_view_abongroup', abon_group):
             raise PermissionDenied

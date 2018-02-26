@@ -87,4 +87,4 @@ class OrderingMixin(object):
         if direction == 'down':
             dfx = '-'
         if order_by:
-            return ["%s%s" % (dfx, order_by)]
+            return "%s%s" % (dfx, order_by)
