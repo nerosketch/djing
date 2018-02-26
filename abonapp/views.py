@@ -45,7 +45,7 @@ class PeoplesListView(BaseAbonListView):
     def get_queryset(self):
         street_id = mydefs.safe_int(self.request.GET.get('street'))
         gid = mydefs.safe_int(self.kwargs.get('gid'))
-        peoples_list = models.Abon.objects.all()
+        peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
         if street_id > 0:
             peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
         else:
@@ -65,7 +65,7 @@ class PeoplesListView(BaseAbonListView):
             if isinstance(ordering, str):
                 ordering = (ordering,)
                 peoples_list = peoples_list.order_by(*ordering)
-        return peoples_list.select_related('group', 'street', 'current_tariff')
+        return peoples_list
 
     def get_context_data(self, **kwargs):
         gid = mydefs.safe_int(self.kwargs.get('gid'))
