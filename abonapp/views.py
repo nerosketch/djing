@@ -489,7 +489,7 @@ def passport_view(request, gid, uid):
 @mydefs.only_admins
 def chgroup_tariff(request, gid):
     grp = get_object_or_404(Group, pk=gid)
-    if not request.user.has_perm('abonapp.change_abongroup', grp):
+    if not request.user.has_perm('group_app.change_group', grp):
         raise PermissionDenied
     if request.method == 'POST':
         tr = request.POST.getlist('tr')

@@ -91,29 +91,6 @@ def profile_show(request, uid=0):
 
 @login_required
 @mydefs.only_admins
-def chgroup(request, uid):
-    uid = mydefs.safe_int(uid)
-    if uid == 0:
-        usr = request.user
-    else:
-        usr = get_object_or_404(UserProfile, id=uid)
-    if usr != request.user and not request.user.has_perm('accounts_app.change_userprofile', usr):
-        raise PermissionDenied
-    if request.method == 'POST':
-        ag = request.POST.getlist('ag')
-        usr.abon_groups.clear()
-        usr.abon_groups.add(*[int(d) for d in ag])
-        usr.save()
-    groups = Group.objects.only('pk', 'title')
-    return render(request, 'accounts/profile_chgroup.html', {
-        'uid': uid,
-        'userprofile': usr,
-        'groups': groups
-    })
-
-
-@login_required
-@mydefs.only_admins
 def ch_ava(request):
     if request.method == 'POST':
         phname = request.FILES.get('avatar')
