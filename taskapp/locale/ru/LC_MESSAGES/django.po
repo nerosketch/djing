@@ -456,3 +456,7 @@ msgstr "Исполнители"
 
 msgid "Author does not specified"
 msgstr "Автор не указан"
+
+msgid "Name and comment count"
+msgstr "Имя и количество комментов"
+
