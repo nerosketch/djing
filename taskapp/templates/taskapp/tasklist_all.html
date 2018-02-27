@@ -19,7 +19,7 @@
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th class="col-sm-2">{% trans 'Name' %}</th>
+                <th class="col-sm-2">{% trans 'Name and comment count' %}</th>
                 <th class="col-sm-2">{% trans 'Address' %}</th>
                 <th class="col-sm-1">{% trans 'The nature of the damage' %}</th>
                 <th class="col-sm-3">{% trans 'Description' %}</th>
@@ -53,6 +53,7 @@
                         <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}">
                             {{ task.abon.get_full_name }}
                         </a>
+                        {% if task.comment_count > 0 %}({{ task.comment_count }}){% endif %}
 
                     </td>
                     <td>{{ task.abon.group.title }}, {{ task.abon.street|default:_('Not assigned') }} {{ task.abon.house|default:_('Not assigned') }}</td>

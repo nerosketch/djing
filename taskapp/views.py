@@ -3,6 +3,7 @@ from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.db.models import Count
 from django.shortcuts import redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -37,6 +38,7 @@ class NewTasksView(BaseTaskListView):
 
     def get_queryset(self):
         return Task.objects.filter(recipients=self.request.user, state='S') \
+                           .annotate(comment_count=Count('extracomment')) \
                            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
@@ -85,7 +87,8 @@ class AllTasksListView(BaseTaskListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.annotate(comment_count=Count('extracomment')) \
+                           .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 @login_required
