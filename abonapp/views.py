@@ -26,14 +26,13 @@ from dialing_app.models import AsteriskCDR
 from statistics.models import getModel
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
-from djing.global_base_views import OrderingMixin
-
+from djing.global_base_views import OrderingMixin, BaseListWithFiltering
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @method_decorator([login_required, mydefs.only_admins], name='dispatch')
-class BaseAbonListView(OrderingMixin, ListView):
+class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
 

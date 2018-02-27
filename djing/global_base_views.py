@@ -1,12 +1,24 @@
 from hashlib import sha256
 from django.views.generic.base import View
-from django.http.response import HttpResponseForbidden
+from django.http.response import HttpResponseForbidden, Http404, HttpResponseRedirect
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.views.generic import ListView
 from netaddr import IPNetwork, IPAddress
-
+from django.core.paginator import InvalidPage, EmptyPage
 
 API_AUTH_SECRET = getattr(settings, 'API_AUTH_SECRET')
 API_AUTH_SUBNET = getattr(settings, 'API_AUTH_SUBNET')
+
+
+class RedirectWhenError(Exception):
+    def __init__(self, url, failed_message=None):
+        self.url = url
+        if failed_message is not None:
+            self.message = failed_message
+
+    def __str__(self):
+        return self.message or ''
 
 
 class HashAuthView(View):
@@ -88,3 +100,44 @@ class OrderingMixin(object):
             dfx = '-'
         if order_by:
             return "%s%s" % (dfx, order_by)
+
+
+class BaseListWithFiltering(ListView):
+    """
+    When queryset contains filter and pagination than data may be missing,
+    and original code is raising 404 error. We want to redirect without pagination.
+    """
+
+    def paginate_queryset(self, queryset, page_size):
+        paginator = self.get_paginator(
+            queryset, page_size, orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty())
+        page_kwarg = self.page_kwarg
+        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
+        try:
+            page_number = int(page)
+        except ValueError:
+            if page == 'last':
+                page_number = paginator.num_pages
+            else:
+                raise Http404(_("Page is not 'last', nor can it be converted to an int."))
+        try:
+            page = paginator.page(page_number)
+            return paginator, page, page.object_list, page.has_other_pages()
+        except EmptyPage:
+            # remove pagination from url
+            url = self.request.GET.copy()
+            del url[self.page_kwarg]
+            raise RedirectWhenError("%s?%s" % (self.request.path, url.urlencode()),
+                                    _('Filter does not contains data, filter without pagination'))
+        except InvalidPage as e:
+            raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
+                'page_number': page_number,
+                'message': str(e)
+            })
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super(BaseListWithFiltering, self).get(request, *args, **kwargs)
+        except RedirectWhenError as e:
+            return HttpResponseRedirect(e.url)
