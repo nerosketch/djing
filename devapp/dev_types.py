@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from mydefs import RuTimedelta, safe_int
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
-from .base_intr import DevBase, SNMPBaseWorker, BasePort
+from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError
 
 
 class DLinkPort(BasePort):
@@ -41,21 +41,25 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
 
     def get_ports(self):
+        interfaces_count = safe_int(self.get_item('.1.3.6.1.2.1.2.1.0'))
         nams = list(self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3'))
         stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
         macs = list(self.get_list('.1.3.6.1.2.1.2.2.1.6'))
-        speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
+        speeds = list(self.get_list('.1.3.6.1.2.1.2.2.1.5'))
         res = []
-        for n, speed in enumerate(speeds):
-            status = True if int(stats[n]) == 1 else False
-            res.append(DLinkPort(
-                n+1,
-                nams[n] if len(nams) > 0 else _('does not fetch the name'),
-                status,
-                macs[n] if len(macs) > 0 else _('does not fetch the mac'),
-                int(speed or 0),
-            self))
-        return res
+        try:
+            for n in range(interfaces_count):
+                status = True if int(stats[n]) == 1 else False
+                res.append(DLinkPort(
+                    n+1,
+                    nams[n] if len(nams) > 0 else _('does not fetch the name'),
+                    status,
+                    macs[n] if len(macs) > 0 else _('does not fetch the mac'),
+                    int(speeds[n]) if len(speeds) > 0 else 0,
+                self))
+            return res
+        except IndexError:
+            raise DeviceImplementationError('Dlink port index error')
 
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.1.0')

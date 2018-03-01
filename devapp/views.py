@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from django.views.generic import ListView, DetailView
 
+from devapp.base_intr import DeviceImplementationError
 from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
 from abonapp.models import AbonGroup, Abon
 from django.conf import settings
@@ -371,7 +372,7 @@ def devview(request, device_id):
         })
     except EasySNMPError:
         messages.error(request, _('SNMP error on device'))
-    except DeviceDBException as e:
+    except (DeviceDBException, DeviceImplementationError) as e:
         messages.error(request, e)
     return render(request, 'devapp/custom_dev_page/' + template_name, {
         'dev': dev
