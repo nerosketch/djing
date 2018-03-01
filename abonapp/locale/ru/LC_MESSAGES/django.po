@@ -1135,3 +1135,6 @@ msgstr "Звонки"
 
 msgid "Subscribers"
 msgstr "Абоненты"
+
+msgid "Successfully saved"
+msgstr "Успешно сохранено"

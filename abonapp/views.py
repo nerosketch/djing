@@ -493,14 +493,16 @@ def chgroup_tariff(request, gid):
         raise PermissionDenied
     if request.method == 'POST':
         tr = request.POST.getlist('tr')
-
-        # FIXME после создания метода привязки тарифов к группам убрать это представление
-        grp.tariffs.clear()
-        grp.tariffs.add(*[int(d) for d in tr])
+        grp.tariff_set.clear()
+        grp.tariff_set.add(*[int(d) for d in tr])
         grp.save()
+        messages.success(request, _('Successfully saved'))
+        return redirect('abonapp:ch_group_tariff', gid)
     tariffs = Tariff.objects.all()
+    seleted_tariffs_id = [pk[0] for pk in grp.tariff_set.only('pk').values_list('pk')]
     return render(request, 'abonapp/group_tariffs.html', {
         'group': grp,
+        'seleted_tariffs': seleted_tariffs_id,
         'tariffs': tariffs
     })
 

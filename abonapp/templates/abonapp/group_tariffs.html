@@ -16,8 +16,7 @@
         {% for tariff in tariffs %}
             <div class="checkbox">
                 <label>
-                    {# FIXME после создания метода привязки тарифов к группам применить его тут #}
-                    {% if tariff in abon_group.tariffs.all %}
+                    {% if tariff.pk in seleted_tariffs %}
                         <input name="tr" type="checkbox" value="{{ tariff.pk }}" checked/>
                     {% else %}
                         <input name="tr" type="checkbox" value="{{ tariff.pk }}"/>
