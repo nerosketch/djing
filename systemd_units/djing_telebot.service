@@ -3,7 +3,7 @@ Description=Djing telegram bot
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 ./telebot.py > /dev/null
+ExecStart=/usr/bin/python3 ./telebot.py
 PIDFile=/run/djing_telebot.pid
 WorkingDirectory=/var/www/djing
 TimeoutSec=9
