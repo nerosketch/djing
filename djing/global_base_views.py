@@ -1,6 +1,7 @@
 from hashlib import sha256
+from json import dumps
 from django.views.generic.base import View
-from django.http.response import HttpResponseForbidden, Http404, HttpResponseRedirect
+from django.http.response import HttpResponseForbidden, Http404, HttpResponseRedirect, HttpResponse
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.views.generic import ListView
@@ -102,7 +103,22 @@ class OrderingMixin(object):
             return "%s%s" % (dfx, order_by)
 
 
-class BaseListWithFiltering(ListView):
+class RedirectWhenErrorMixin(object):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super(RedirectWhenErrorMixin, self).get(request, *args, **kwargs)
+        except RedirectWhenError as e:
+            if request.is_ajax():
+                return HttpResponse(dumps({
+                    'url': e.url,
+                    'text': e.message or ''
+                }))
+            else:
+                return HttpResponseRedirect(e.url)
+
+
+class BaseListWithFiltering(RedirectWhenErrorMixin, ListView):
     """
     When queryset contains filter and pagination than data may be missing,
     and original code is raising 404 error. We want to redirect without pagination.
@@ -135,9 +151,3 @@ class BaseListWithFiltering(ListView):
                 'page_number': page_number,
                 'message': str(e)
             })
-
-    def get(self, request, *args, **kwargs):
-        try:
-            return super(BaseListWithFiltering, self).get(request, *args, **kwargs)
-        except RedirectWhenError as e:
-            return HttpResponseRedirect(e.url)

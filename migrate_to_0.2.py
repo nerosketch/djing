@@ -50,7 +50,7 @@ def get_fixture_from_unchanget_model(model_name: str, model_class):
     return res
 
 
-def dump_abonapp():
+def dump_groups():
     from abonapp import models
     print('group_app.group')
     res = [{
@@ -60,16 +60,44 @@ def dump_abonapp():
             'title': abon_group.title
         }
     } for abon_group in models.AbonGroup.objects.all()]
+    return res
 
+
+def dump_abonapp():
+    from abonapp import models
     # res += get_fixture_from_unchanget_model('abonapp.abonlog', models.AbonLog)
 
-    res += get_fixture_from_unchanget_model('abonapp.abontariff', models.AbonTariff)
+    res = get_fixture_from_unchanget_model('abonapp.abontariff', models.AbonTariff)
 
     res += get_fixture_from_unchanget_model('abonapp.abonstreet', models.AbonStreet)
 
     res += get_fixture_from_unchanget_model('abonapp.extrafieldsmodel', models.ExtraFieldsModel)
 
-    res += get_fixture_from_unchanget_model('abonapp.abon', models.Abon)
+    res += [{
+        'model': 'abonapp.abon',
+        'pk': abon.pk,
+        'fields': {
+            'current_tariff': abon.current_tariff.pk if abon.current_tariff else None,
+            'group': abon.group.pk if abon.group else None,
+            'ballance': abon.ballance,
+            'ip_address': abon.ip_address,
+            'description': abon.description,
+            'street': abon.street.pk if abon.street else None,
+            'house': abon.house,
+            'extra_fields': [a.pk for a in abon.extra_fields.all()],
+            'device': abon.device.pk if abon.device else None,
+            'dev_port': abon.dev_port if abon.dev_port else None,
+            'is_dynamic_ip': abon.is_dynamic_ip,
+            'markers': abon.markers,
+
+            'username': abon.username,
+            'fio': abon.fio,
+            'birth_day': abon.birth_day,
+            'is_active': abon.is_active,
+            'is_admin': abon.is_admin,
+            'telephone': abon.telephone
+        }
+    } for abon in models.Abon.objects.filter(is_admin=False)]
 
     res += get_fixture_from_unchanget_model('abonapp.passportinfo', models.PassportInfo)
 
@@ -106,8 +134,8 @@ def dump_devs():
             'mac_addr': dv.mac_addr,
             'devtype': dv.devtype,
             'man_passw': dv.man_passw,
-            'group': dv.user_group.pk if dv.user_group else 0,
-            'parent_dev': dv.parent_dev.pk if dv.parent_dev else 0
+            'group': dv.user_group.pk if dv.user_group else None,
+            'parent_dev': dv.parent_dev.pk if dv.parent_dev else None
         }
     } for dv in models.Device.objects.all()]
 
@@ -135,7 +163,7 @@ def dump_accounts():
             'is_active': up.is_active,
             'is_admin': up.is_admin,
             'telephone': up.telephone,
-            'avatar': up.avatar.pk if up.avatar else 0,
+            'avatar': up.avatar.pk if up.avatar else None,
             'email': up.email,
             'responsibility_groups': get_responsibility_groups(up)
         }
@@ -146,7 +174,15 @@ def dump_accounts():
 
 def dump_photos():
     from photo_app.models import Photo
-    res = get_fixture_from_unchanget_model('photo_app.photo', Photo)
+    res = [{
+        'model': 'photo_app.photo',
+        'pk': p.pk,
+        'fields': {
+            'image': "%s" % p.image,
+            'wdth': p.wdth,
+            'heigt': p.heigt
+        }
+    } for p in Photo.objects.all()]
     return res
 
 
@@ -198,16 +234,17 @@ def make_migration():
             dump(func(), f, default=my_date_converter, ensure_ascii=False)
 
     django.setup()
-    appdump(['fixtures', 'tariff_app', 'tariffs_fixture.json'], dump_tariffs)
-    appdump(['fixtures', 'photo_app', 'photos_fixture.json'], dump_photos)
-    appdump(['fixtures', 'devapp', 'devs_fixture.json'], dump_devs)
-    appdump(['fixtures', 'abonapp', 'abon_fixture.json'], dump_abonapp)
+    #appdump(['fixtures', 'group_app', 'groups_fixture.json'], dump_groups)
+    #appdump(['fixtures', 'tariff_app', 'tariffs_fixture.json'], dump_tariffs)
+    #appdump(['fixtures', 'photo_app', 'photos_fixture.json'], dump_photos)
+    #appdump(['fixtures', 'devapp', 'devs_fixture.json'], dump_devs)
     appdump(['fixtures', 'accounts_app', 'accounts_fixture.json'], dump_accounts)
+    appdump(['fixtures', 'abonapp', 'abon_fixture.json'], dump_abonapp)
 
-    appdump(['fixtures', 'chatbot', 'chatbot_fixture.json'], dump_chatbot)
-    appdump(['fixtures', 'mapapp', 'map_fixture.json'], dump_map)
-    appdump(['fixtures', 'msg_app', 'mesages_fixture.json'], dump_messages)
-    appdump(['fixtures', 'taskapp', 'task_fixture.json'], dump_task_app)
+    #appdump(['fixtures', 'chatbot', 'chatbot_fixture.json'], dump_chatbot)
+    #appdump(['fixtures', 'mapapp', 'map_fixture.json'], dump_map)
+    #appdump(['fixtures', 'msg_app', 'mesages_fixture.json'], dump_messages)
+    #appdump(['fixtures', 'taskapp', 'task_fixture.json'], dump_task_app)
 
 
 def move_to_fixtures_dirs():
