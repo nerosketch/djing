@@ -73,6 +73,7 @@ def dump_abonapp():
 
     res += get_fixture_from_unchanget_model('abonapp.extrafieldsmodel', models.ExtraFieldsModel)
 
+    print('abonapp.abon')
     res += [{
         'model': 'abonapp.abon',
         'pk': abon.pk,
@@ -88,14 +89,7 @@ def dump_abonapp():
             'device': abon.device.pk if abon.device else None,
             'dev_port': abon.dev_port if abon.dev_port else None,
             'is_dynamic_ip': abon.is_dynamic_ip,
-            'markers': abon.markers,
-
-            'username': abon.username,
-            'fio': abon.fio,
-            'birth_day': abon.birth_day,
-            'is_active': abon.is_active,
-            'is_admin': abon.is_admin,
-            'telephone': abon.telephone
+            'markers': abon.markers
         }
     } for abon in models.Abon.objects.filter(is_admin=False)]
 
@@ -152,9 +146,9 @@ def dump_accounts():
         ids = [ag.pk for ag in responsibility_groups]
         return ids
 
-    print('accounts_app.userprofile')
+    print('accounts_app.baseaccount')
     res = [{
-        'model': 'accounts_app.userprofile',
+        'model': 'accounts_app.baseaccount',
         'pk': up.pk,
         'fields': {
             'username': up.username,
@@ -162,7 +156,15 @@ def dump_accounts():
             'birth_day': up.birth_day,
             'is_active': up.is_active,
             'is_admin': up.is_admin,
-            'telephone': up.telephone,
+            'telephone': up.telephone
+        }
+    } for up in models.UserProfile.objects.exclude(username='AnonymousUser')]
+
+    print('accounts_app.userprofile')
+    res += [{
+        'model': 'accounts_app.userprofile',
+        'pk': up.pk,
+        'fields': {
             'avatar': up.avatar.pk if up.avatar else None,
             'email': up.email,
             'responsibility_groups': get_responsibility_groups(up)
@@ -174,6 +176,7 @@ def dump_accounts():
 
 def dump_photos():
     from photo_app.models import Photo
+    print('photo_app.photo')
     res = [{
         'model': 'photo_app.photo',
         'pk': p.pk,
@@ -233,6 +236,8 @@ def make_migration():
         with open(fname, 'w') as f:
             dump(func(), f, default=my_date_converter, ensure_ascii=False)
 
+    if not os.path.isdir('fixtures'):
+        os.mkdir('fixtures')
     django.setup()
     #appdump(['fixtures', 'group_app', 'groups_fixture.json'], dump_groups)
     #appdump(['fixtures', 'tariff_app', 'tariffs_fixture.json'], dump_tariffs)
