@@ -22,15 +22,14 @@ def get_fixture_from_unchanget_model(model_name: str, model_class):
     def get_fields(obj):
         fields = dict()
         for field in obj._meta.get_fields():
-            if isinstance(field, django_fields.reverse_related.ManyToOneRel) or \
-                    isinstance(field, django_fields.reverse_related.ManyToManyRel):
+            if isinstance(field, (django_fields.reverse_related.ManyToOneRel, django_fields.reverse_related.ManyToManyRel)):
                 continue
             field_val = getattr(obj, field.name)
             if field_val is None:
                 continue
             if isinstance(field, django_fields.related.ManyToManyField):
                 fields[field.name] = [f.pk for f in field_val.all()]
-            elif isinstance(field, django_fields.related.ForeignKey):
+            elif isinstance(field, (django_fields.related.ForeignKey, django.contrib.contenttypes.fields.GenericForeignKey)):
                 fields[field.name] = field_val.pk
             elif isinstance(field, django_fields.FloatField):
                 fields[field.name] = float(field_val)
@@ -156,9 +155,11 @@ def dump_accounts():
             'birth_day': up.birth_day,
             'is_active': up.is_active,
             'is_admin': up.is_admin,
-            'telephone': up.telephone
+            'telephone': up.telephone,
+            'password': up.password,
+            'last_login': up.last_login
         }
-    } for up in models.UserProfile.objects.exclude(username='AnonymousUser')]
+    } for up in models.UserProfile.objects.all()]
 
     print('accounts_app.userprofile')
     res += [{
@@ -203,15 +204,6 @@ def dump_map():
     return res
 
 
-def dump_messages():
-    from msg_app import models
-    res = get_fixture_from_unchanget_model('msg_app.messagestatus', models.MessageStatus)
-    res += get_fixture_from_unchanget_model('msg_app.message', models.Message)
-    res += get_fixture_from_unchanget_model('msg_app.conversationmembership', models.ConversationMembership)
-    res += get_fixture_from_unchanget_model('msg_app.conversation', models.Conversation)
-    return res
-
-
 def dump_task_app():
     from taskapp import models
     res = get_fixture_from_unchanget_model('taskapp.changelog', models.ChangeLog)
@@ -220,9 +212,22 @@ def dump_task_app():
     return res
 
 
+def dump_auth():
+    from django.contrib.auth import models
+    res = get_fixture_from_unchanget_model('auth.group', models.Group)
+    res += get_fixture_from_unchanget_model('auth.permission', models.Permission)
+    return res
+
+
+def dump_guardian():
+    from guardian import models
+    res = get_fixture_from_unchanget_model('guardian.groupobjectpermission', models.GroupObjectPermission)
+    res += get_fixture_from_unchanget_model('guardian.userobjectpermission', models.UserObjectPermission)
+    return res
+
+
 def make_migration():
-    from datetime import datetime
-    from datetime import date
+    from datetime import datetime, date
 
     def my_date_converter(o):
         if isinstance(o, datetime) or isinstance(o, date):
@@ -238,32 +243,51 @@ def make_migration():
 
     if not os.path.isdir('fixtures'):
         os.mkdir('fixtures')
-    django.setup()
-    #appdump(['fixtures', 'group_app', 'groups_fixture.json'], dump_groups)
-    #appdump(['fixtures', 'tariff_app', 'tariffs_fixture.json'], dump_tariffs)
-    #appdump(['fixtures', 'photo_app', 'photos_fixture.json'], dump_photos)
-    #appdump(['fixtures', 'devapp', 'devs_fixture.json'], dump_devs)
+    appdump(['fixtures', 'group_app', 'groups_fixture.json'], dump_groups)
+    appdump(['fixtures', 'tariff_app', 'tariffs_fixture.json'], dump_tariffs)
+    appdump(['fixtures', 'photo_app', 'photos_fixture.json'], dump_photos)
+    appdump(['fixtures', 'devapp', 'devs_fixture.json'], dump_devs)
     appdump(['fixtures', 'accounts_app', 'accounts_fixture.json'], dump_accounts)
     appdump(['fixtures', 'abonapp', 'abon_fixture.json'], dump_abonapp)
-
-    #appdump(['fixtures', 'chatbot', 'chatbot_fixture.json'], dump_chatbot)
-    #appdump(['fixtures', 'mapapp', 'map_fixture.json'], dump_map)
-    #appdump(['fixtures', 'msg_app', 'mesages_fixture.json'], dump_messages)
-    #appdump(['fixtures', 'taskapp', 'task_fixture.json'], dump_task_app)
+    appdump(['fixtures', 'chatbot', 'chatbot_fixture.json'], dump_chatbot)
+    appdump(['fixtures', 'mapapp', 'map_fixture.json'], dump_map)
+    appdump(['fixtures', 'taskapp', 'task_fixture.json'], dump_task_app)
+    appdump(['fixtures', 'accounts_app', 'auth_fixture.json'], dump_auth)
+    appdump(['fixtures', 'accounts_app', 'guardian_fixture.json'], dump_guardian)
 
 
 def move_to_fixtures_dirs():
     fixdir = 'fixtures'
     for dr in os.listdir(fixdir):
         fixture_dir = os.path.join(fixdir, dr)
-        fixture_file = os.listdir( fixture_dir )[0]
-        from_file = os.path.join(fixture_dir, fixture_file)
-        dst_dir = os.path.join(dr, fixdir)
-        to_file = os.path.join(dst_dir, fixture_file)
-        if not os.path.isdir( dst_dir ):
-            os.mkdir(dst_dir)
-        shutil.copyfile( from_file, to_file )
-        print('cp %s -> %s' % (from_file, to_file))
+        for fixture_file in os.listdir(fixture_dir):
+            from_file = os.path.join(fixture_dir, fixture_file)
+            dst_dir = os.path.join(dr, fixdir)
+            to_file = os.path.join(dst_dir, fixture_file)
+            if not os.path.isdir(dst_dir):
+                os.mkdir(dst_dir)
+            shutil.copyfile(from_file, to_file)
+            print('cp %s -> %s' % (from_file, to_file))
+
+
+def apply_fixtures():
+    from django.core.management import execute_from_command_line
+    from accounts_app.models import UserProfile
+    from django.contrib.auth import models
+
+    UserProfile.objects.filter(username='AnonymousUser').delete()
+    print('clearing auth.group')
+    models.Group.objects.all().delete()
+    print('clearing auth.permission')
+    models.Permission.objects.all().delete()
+
+    print('./manage.py loaddata -v2 ...')
+    execute_from_command_line([sys.argv[0], 'loaddata', '-v', '2',
+        'groups_fixture.json', 'tariffs_fixture.json', 'photos_fixture.json',
+        'devs_fixture.json', 'accounts_fixture.json', 'abon_fixture.json',
+        'chatbot_fixture.json', 'map_fixture.json', 'task_fixture.json',
+        'auth_fixture.json', 'guardian_fixture.json'
+    ])
 
 
 if __name__ == '__main__':
@@ -272,9 +296,12 @@ if __name__ == '__main__':
         exit(1)
     choice = sys.argv[1]
     if choice == 'applydump':
+        django.setup()
         move_to_fixtures_dirs()
-        print('And now apply created fixtures by ./manage.py loaddata')
+        apply_fixtures()
+        os.remove('fixtures')
     elif choice == 'makedump':
+        django.setup()
         make_migration()
     else:
         print('Unexpected choice')
