@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-28 12:46+0300\n"
+"POT-Creation-Date: 2018-03-08 14:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -19,19 +19,19 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:6
+#: templates/clientsideapp/debt_buy.html:6
 msgid "Debts"
 msgstr "Задолженность"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:11
+#: templates/clientsideapp/debt_buy.html:11
 msgid "repayment of debts"
 msgstr "Оплатить задолженность"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:18
+#: templates/clientsideapp/debt_buy.html:18
 msgid "Are you sure you want to spend a payment?"
 msgstr "Вы уверены что хотите провести платёж?"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:21
+#: templates/clientsideapp/debt_buy.html:21
 #, fuzzy, python-format
 #| msgid ""
 #| "From your account, they withdraw funds in <b>%(amount)s</b> rub. <br/>\n"
@@ -48,92 +48,86 @@ msgstr ""
 "В результате у вас на счету останется %(ballance_after)s руб.<br/>\n"
 "Администратор сразу сможет видеть что у вас закрыта задолженность."
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:24
+#: templates/clientsideapp/debt_buy.html:24
 msgid "Description of payment"
 msgstr "Описание платежа"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:32
+#: templates/clientsideapp/debt_buy.html:32
 msgid "Confirm"
 msgstr "Подтвердить"
 
-#: clientsideapp/templates/clientsideapp/debt_buy.html:35
+#: templates/clientsideapp/debt_buy.html:35
 msgid "Cancel"
 msgstr "Отменить"
 
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:5
+#: templates/clientsideapp/modal_service_buy.html:5
 msgid "Pick service"
 msgstr "Заказать услугу"
 
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:8
+#: templates/clientsideapp/modal_service_buy.html:8
 msgid "Are you sure you want to order the service?"
 msgstr "Вы уверены что хотите заказать услугу?"
 
+#: templates/clientsideapp/modal_service_buy.html:15
+#, python-format
+msgid ""
+"Inbound speed: %(speedIn)s MBit/s<br>\n"
+"Outgoing speed: %(speedOut)s MBit/s<br>\n"
+"Cost: %(amount)s rubles."
+msgstr ""
 
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:28
+#: templates/clientsideapp/modal_service_buy.html:22
+#: templates/clientsideapp/services.html:59
 msgid "Pick"
 msgstr "Заказать"
 
-#: clientsideapp/templates/clientsideapp/modal_service_buy.html:30
+#: templates/clientsideapp/modal_service_buy.html:24
 msgid "Close"
 msgstr "Закрыть"
 
-#: clientsideapp/templates/clientsideapp/pays.html:6
+#: templates/clientsideapp/pays.html:6
 msgid "conducted payments"
 msgstr "Проведённые платежи"
 
-#: clientsideapp/templates/clientsideapp/pays.html:11
+#: templates/clientsideapp/pays.html:11
 msgid "Transaction Amount (rubles)"
 msgstr "Сумма транзакции (руб)"
 
-#: clientsideapp/templates/clientsideapp/pays.html:12
+#: templates/clientsideapp/pays.html:12
 msgid "Date of transaction"
 msgstr "Дата транзакции"
 
-#: clientsideapp/templates/clientsideapp/pays.html:13
+#: templates/clientsideapp/pays.html:13
 msgid "Comment"
 msgstr "Комментарий"
 
-#: clientsideapp/templates/clientsideapp/pays.html:25
+#: templates/clientsideapp/pays.html:25
 msgid "You have not spent payments"
 msgstr "У вас нет проведённых платежей"
 
-#: clientsideapp/views.py:53
+#: templates/clientsideapp/services.html:25
+msgid "currency"
+msgstr ""
+
+#: views.py:51
 #, python-format
 msgid "Buy the service via user side, service '%s'"
 msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
 
-#: clientsideapp/views.py:82
-#, python-format
-msgid "Service '%s' has been finished"
-msgstr "Услуга '%s' успешно завершена"
-
-#: clientsideapp/views.py:87
-#, python-format
-msgid "Early terminated service '%s' via client side"
-msgstr "Досрочное завершение услуги '%s' из личного кабинета"
-
-#: clientsideapp/views.py:90 clientsideapp/views.py:119
-#: clientsideapp/views.py:147
-msgid "Act is not confirmed"
-msgstr "Действие не подтверждено"
-
-#: clientsideapp/views.py:103 clientsideapp/views.py:130
-msgid "Temporary network bug"
-msgstr "Временные неполадки в сети"
-
-#: clientsideapp/views.py:126
-msgid "The service was not found"
-msgstr "Указанная подписка на услугу не найдена"
-
-#: clientsideapp/views.py:145
+#: views.py:54
 #, python-format
 msgid "The service '%s' wan successfully activated"
 msgstr "Услуга '%s' успешно подключена"
 
-#: clientsideapp/views.py:181
+#: views.py:84
 msgid "Are you not sure that you want buy the service?"
 msgstr "Вы не уверены что хотите оплатить долг?"
 
-#: clientsideapp/views.py:183
+#: views.py:86
 msgid "Your account have not enough money"
 msgstr "Недостаточно средств на счету"
+
+#: views.py:90
+#, python-format
+msgid "%(username)s paid the debt %(amount).2f"
+msgstr "%(username)s заплатил долг в размере %(amount).2f"

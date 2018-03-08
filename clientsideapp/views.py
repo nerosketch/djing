@@ -4,7 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
@@ -50,6 +50,7 @@ def buy_service(request, srv_id):
         if request.method == 'POST':
             abon.pick_tariff(service, request.user, _("Buy the service via user side, service '%s'")
                              % service)
+            abon.abon.sync_with_nas(created=False)
             messages.success(request, _("The service '%s' wan successfully activated") % service.title)
         else:
             return render_to_text('clientsideapp/modal_service_buy.html', {
@@ -84,9 +85,13 @@ def debt_buy(request, d_id):
             if abon.ballance < debt.amount:
                 raise LogicError(_('Your account have not enough money'))
 
-            abon.make_pay(request.user, debt.amount)
-            debt.set_ok()
+            amount = -debt.amount
+            abon.add_ballance(request.user, amount, comment=gettext('%(username)s paid the debt %(amount).2f') % {
+                'username': abon.get_full_name(),
+                'amount': amount
+            })
             abon.save(update_fields=['ballance'])
+            debt.set_ok()
             debt.save(update_fields=['status', 'date_pay'])
             return redirect('client_side:debts')
         except LogicError as e:

@@ -21,9 +21,8 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
             print('D:', 'User %s is not access to service' % abon.username)
             return
         abon.ip_address = client_ip
-        abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
-        # print('S:', _("Ip address:'%s' update for '%s' successfull, on port: %s") % (client_ip, abon.get_short_name(), port))
+        abon.sync_with_nas(created=False)
     except Abon.DoesNotExist:
         print('N:', "User with device '%s' does not exist" % dev)
     except Device.DoesNotExist:
@@ -41,8 +40,8 @@ def dhcp_expiry(client_ip):
     try:
         abon = Abon.objects.get(ip_address=client_ip)
         abon.ip_address = None
-        abon.is_dhcp = True
         abon.save(update_fields=['ip_address'])
+        abon.sync_with_nas(created=False)
     except Abon.DoesNotExist:
         pass
 

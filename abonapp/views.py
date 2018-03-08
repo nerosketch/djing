@@ -3,7 +3,7 @@ from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError, transaction
-from django.db.models import Count, Q, signals
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -28,7 +28,6 @@ from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing.global_base_views import OrderingMixin
-
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
@@ -110,6 +109,7 @@ def addabon(request, gid):
                 assign_perm("abonapp.can_buy_tariff", request.user, abon)
                 assign_perm("abonapp.can_view_passport", request.user, abon)
                 assign_perm('abonapp.can_add_ballance', request.user, abon)
+                abon.sync_with_nas(created=True)
                 messages.success(request, _('create abon success msg'))
                 return redirect('abonapp:abon_home', group.id, abon.pk)
             else:
@@ -145,6 +145,7 @@ def del_abon(request):
             raise PermissionDenied
         gid = abon.group.id
         abon.delete()
+        abon.sync_with_nas(created=False)
         messages.success(request, _('delete abon success msg'))
         return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
 
@@ -264,7 +265,8 @@ def abonhome(request, gid, uid):
                 newip = request.POST.get('ip')
                 if newip:
                     abon.ip_address = newip
-                frm.save()
+                abon = frm.save()
+                abon.sync_with_nas(created=False)
                 messages.success(request, _('edit abon success msg'))
             else:
                 messages.warning(request, _('fix form errors'))
@@ -370,6 +372,7 @@ def pick_tariff(request, gid, uid):
                 deadline = datetime.strptime(deadline, '%Y-%m-%d')
                 deadline += timedelta(hours=23, minutes=59, seconds=59)
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
+            abon.sync_with_nas(created=False)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
     except (mydefs.LogicError, NasFailedResult) as e:
@@ -397,8 +400,10 @@ def pick_tariff(request, gid, uid):
 @permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
+        abon = get_object_or_404(models.Abon, pk=uid)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
         abon_tariff.delete()
+        abon.sync_with_nas(created=False)
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -679,14 +684,17 @@ def abon_ping(request):
         else:
             if type(ping_result) is tuple:
                 loses_percent = (ping_result[0] / ping_result[1] if ping_result[1] != 0 else 1)
-                ping_result = {'all':ping_result[0], 'return': ping_result[1]}
+                ping_result = {'all': ping_result[0], 'return': ping_result[1]}
                 if loses_percent > 1.0:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('IP Conflict! %(all)d/%(return)d results') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
+                        'IP Conflict! %(all)d/%(return)d results') % ping_result
                 elif loses_percent > 0.5:
-                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ok ping, %(all)d/%(return)d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _(
+                        'ok ping, %(all)d/%(return)d loses') % ping_result
                     status = True
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping, %(all)d/%(return)d loses') % ping_result
+                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
+                        'no ping, %(all)d/%(return)d loses') % ping_result
             else:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
@@ -760,10 +768,11 @@ def save_user_dev_port(request, gid, uid):
                     other_abon = models.Abon.objects.get(device=abon.device, dev_port=port)
                     if other_abon != abon:
                         user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.id)
-                        messages.error(request, _("<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
-                            'user_url': user_url,
-                            'user_name': other_abon.get_full_name()
-                        })
+                        messages.error(request, _(
+                            "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
+                                           'user_url': user_url,
+                                           'user_name': other_abon.get_full_name()
+                                       })
                         return redirect('abonapp:abon_home', gid, uid)
                 except models.Abon.DoesNotExist:
                     pass
@@ -899,7 +908,8 @@ def tel_del(request, gid, uid):
 def phonebook(request, gid):
     res_format = request.GET.get('f')
     t1 = models.Abon.objects.filter(group__id=int(gid)).only('telephone', 'fio').values_list('telephone', 'fio')
-    t2 = models.AdditionalTelephone.objects.filter(abon__group__id=gid).only('telephone', 'owner_name').values_list('telephone', 'owner_name')
+    t2 = models.AdditionalTelephone.objects.filter(abon__group__id=gid).only('telephone', 'owner_name').values_list(
+        'telephone', 'owner_name')
     tels = list(t1) + list(t2)
     if res_format == 'csv':
         import csv
@@ -955,10 +965,8 @@ def abon_export(request, gid):
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def reset_ip(request, gid, uid):
     abon = get_object_or_404(models.Abon, pk=uid)
-    signals.post_save.disconnect(models.abon_post_save, sender=models.Abon)
     abon.ip_address = None
     abon.save(update_fields=['ip_address'])
-    signals.post_save.connect(models.abon_post_save, sender=models.Abon)
     return HttpResponse(dumps({
         'status': 0,
         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
@@ -1059,17 +1067,17 @@ class EditSibscriberMarkers(UpdateView):
 
 def abons(request):
     ablist = [{
-                  'id': abn.pk,
-                  'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
-                  'ip': abn.ip_address.int_ip(),
-                  'is_active': abn.is_active
-              } for abn in models.Abon.objects.all()]
+        'id': abn.pk,
+        'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
+        'ip': abn.ip_address.int_ip(),
+        'is_active': abn.is_active
+    } for abn in models.Abon.objects.all()]
 
     tarlist = [{
-                   'id': trf.pk,
-                   'speedIn': trf.speedIn,
-                   'speedOut': trf.speedOut
-               } for trf in Tariff.objects.all()]
+        'id': trf.pk,
+        'speedIn': trf.speedIn,
+        'speedOut': trf.speedOut
+    } for trf in Tariff.objects.all()]
 
     data = {
         'subscribers': ablist,

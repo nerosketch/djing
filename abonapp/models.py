@@ -5,10 +5,10 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import post_save, post_delete, pre_delete, post_init
+from django.db.models.signals import post_delete, pre_delete, post_init
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
@@ -187,13 +187,6 @@ class Abon(BaseAccount):
         verbose_name_plural = _('Abons')
         ordering = ['fio']
 
-    # pay something
-    def make_pay(self, curuser, how_match_to_pay=0.0):
-        post_save.disconnect(abon_post_save, sender=Abon)
-        self.ballance -= how_match_to_pay
-        self.save(update_fields=['ballance'])
-        post_save.connect(abon_post_save, sender=Abon)
-
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
             abon=self,
@@ -280,6 +273,23 @@ class Abon(BaseAccount):
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
+
+    def sync_with_nas(self, created: bool):
+        timeout = None
+        if hasattr(self, 'is_dhcp') and self.is_dhcp:
+            timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
+        agent_abon = self.build_agent_struct()
+        if agent_abon is None:
+            return True
+        try:
+            tm = Transmitter()
+            if created:
+                tm.add_user(agent_abon, ip_timeout=timeout)
+            else:
+                tm.update_user(agent_abon, ip_timeout=timeout)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return True
 
 
 class PassportInfo(models.Model):
@@ -426,14 +436,10 @@ class PeriodicPayForId(models.Model):
             next_pay_date = pp.get_next_time_to_pay(self.last_pay)
             abon = self.account
             with transaction.atomic():
-                abon.make_pay(author, amount)
-                AbonLog.objects.create(
-                    abon=abon, amount=-amount,
-                    author=author,
-                    comment=comment or _('Charge for "%(service)s"') % {
-                        'service': self.periodic_pay
-                    }
-                )
+                abon.add_ballance(author, -amount, comment=gettext('Charge for "%(service)s"') % {
+                    'service': self.periodic_pay
+                })
+                abon.save(update_fields=['ballance'])
                 self.last_pay = now
                 self.next_pay = next_pay_date
                 self.save(update_fields=['last_pay', 'next_pay'])
@@ -443,27 +449,6 @@ class PeriodicPayForId(models.Model):
 
     class Meta:
         db_table = 'periodic_pay_for_id'
-
-
-@receiver(post_save, sender=Abon)
-def abon_post_save(sender, **kwargs):
-    instance, created = kwargs["instance"], kwargs["created"]
-    timeout = None
-    if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
-    agent_abon = instance.build_agent_struct()
-    if agent_abon is None:
-        return True
-    try:
-        tm = Transmitter()
-        if created:
-            tm.add_user(agent_abon, ip_timeout=timeout)
-        else:
-            tm.update_user(agent_abon, ip_timeout=timeout)
-
-    except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
-        print('ERROR:', e)
-        return True
 
 
 @receiver(post_delete, sender=Abon)
