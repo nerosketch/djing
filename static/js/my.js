@@ -214,7 +214,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
         }
 
         if(settings.news_url){
-            // прверяем новости раз в минуту
+            // once per minute check news
             var tiid = setInterval(check_news, settings.check_interval*1000);
 
             //Notification.requestPermission(on_ask_perm);
@@ -266,13 +266,20 @@ $(document).ready(function () {
 	});
 
     $('.btn-modal').on('click', function(){
-        $.get(this.href, function(r){
-            show_ModalMyContent(r);
+        $.get(this.href, function(response){
+        console.log(response);
+            try{
+                var r = $.parseJSON(response);
+                console.log(r.text);
+                window.location.replace(r.url);
+            }catch (e){
+                show_ModalMyContent(response);
+            }
         });
         return false;
     });
 
-	// кнопка посылающая комманду и возвращающая результат выполнения
+	// button that send command and return response of that
 	$('.btn-cmd').on('click', function(){
 		var cmd_param = $(this).attr('data-param');
 		var self = $(this);

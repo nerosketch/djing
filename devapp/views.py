@@ -22,11 +22,10 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing.global_base_views import HashAuthView, AllowedSubnetMixin, OrderingMixin
+from djing import global_base_views
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
 from mydefs import safe_int
-
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
@@ -37,7 +36,7 @@ class BaseDeviceListView(ListView):
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
-class DevicesListView(BaseDeviceListView, OrderingMixin):
+class DevicesListView(BaseDeviceListView, global_base_views.OrderingMixin):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
 
@@ -64,7 +63,7 @@ class DevicesListView(BaseDeviceListView, OrderingMixin):
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
-class DevicesWithoutGroupsListView(BaseDeviceListView, OrderingMixin):
+class DevicesWithoutGroupsListView(BaseDeviceListView, global_base_views.OrderingMixin):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
     queryset = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
@@ -181,7 +180,7 @@ def manage_ports(request, device_id):
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
-class ShowSubscriberOnPort(DetailView):
+class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView):
     template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
     http_method_names = ['get']
 
@@ -192,6 +191,14 @@ class ShowSubscriberOnPort(DetailView):
             obj = Abon.objects.get(device_id=dev_id, dev_port_id=port_id)
         except Abon.DoesNotExist:
             raise Http404(gettext('Subscribers on port does not exist'))
+        except Abon.MultipleObjectsReturned:
+            errmsg = gettext('More than one subscriber on device port')
+            # messages.error(self.request, errmsg)
+            raise global_base_views.RedirectWhenError(
+                resolve_url('devapp:fix_port_conflict', group_id=self.kwargs.get('group_id'), device_id=dev_id,
+                            port_id=port_id),
+                errmsg
+            )
         return obj
 
 
@@ -468,8 +475,8 @@ def fix_onu(request):
         if parent is not None:
             manobj = parent.get_manager_object()
             ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
-            text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' %\
-                    (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
+            text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % \
+                   (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
             for srcmac, snmpnum in ports:
                 real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
                 if mac == real_mac:
@@ -502,7 +509,7 @@ def fix_port_conflict(request, group_id, device_id, port_id):
     })
 
 
-class OnDevDown(AllowedSubnetMixin, HashAuthView):
+class OnDevDown(global_base_views.AllowedSubnetMixin, global_base_views.HashAuthView):
     #
     # Api view for monitoring devices
     #
