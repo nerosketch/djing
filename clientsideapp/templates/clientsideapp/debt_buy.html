@@ -18,9 +18,13 @@
                         {% trans 'Are you sure you want to spend a payment?' %}
                     </label>
                 </div>
-                <p>{% blocktrans %}From your account, they withdraw funds in <b>{{ amount }}</b> rub.<br/>
-As a result, you will remain on your account {{ ballance_after }} rubles.<br/>
-The administrator can immediately see that you shut down the debt.{% endblocktrans %}</p>
+                <p>
+                {% blocktrans trimmed %}
+                    From your account, they withdraw funds in <b>{{ amount }}</b> rub.<br/>
+                    As a result, you will remain on your account {{ ballance_after }} rubles.<br/>
+                    The administrator can immediately see that you shut down the debt.
+                {% endblocktrans %}
+                </p>
                 <h4>{% trans 'Description of payment' %}</h4>
 
                 <div class="alert alert-info">

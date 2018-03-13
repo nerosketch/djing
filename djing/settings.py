@@ -86,6 +86,9 @@ TEMPLATES = [
                 'global_context_processors.context_processor_additional_profile',
                 'msg_app.context_processors.get_new_messages_count'
             ],
+            'libraries': {
+                'globaltags': 'djing.templatetags.globaltags',
+            }
         },
     },
 ]
@@ -187,3 +190,6 @@ API_AUTH_SECRET = local_settings.API_AUTH_SECRET
 
 # Allowed subnet for api
 API_AUTH_SUBNET = local_settings.API_AUTH_SUBNET
+
+# Company name
+COMPANY_NAME = local_settings.COMPANY_NAME
