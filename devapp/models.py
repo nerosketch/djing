@@ -75,7 +75,7 @@ class Device(models.Model):
         )
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
-        ordering = ['comment']
+        ordering = ['id']
 
     def get_abons(self):
         pass
