@@ -73,7 +73,7 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
         self.ses = Session(hostname=ip, community=community, version=ver)
 
     def set_int_value(self, oid, value):
-        return self.ses.set(oid, value)
+        return self.ses.set(oid, value, 'i')
 
     def get_list(self, oid):
         for v in self.ses.walk(oid):

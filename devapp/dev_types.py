@@ -52,7 +52,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
                 status = True if int(stats[n]) == 1 else False
                 res.append(DLinkPort(
                     n+1,
-                    nams[n] if len(nams) > 0 else _('does not fetch the name'),
+                    nams[n] if len(nams) > 0 else '',
                     status,
                     macs[n] if len(macs) > 0 else _('does not fetch the mac'),
                     int(speeds[n]) if len(speeds) > 0 else 0,
