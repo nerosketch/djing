@@ -583,7 +583,8 @@ def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         abon.device = None
-        abon.save(update_fields=['device'])
+        abon.dev_port = None
+        abon.save(update_fields=['device', 'dev_port'])
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))

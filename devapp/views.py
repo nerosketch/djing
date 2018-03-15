@@ -408,7 +408,7 @@ def toggle_port(request, device_id, portid, status=0):
     except EasySNMPTimeoutError:
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     except EasySNMPError as e:
-        messages.error(request, e)
+        messages.error(request, 'EasySNMPError: %s' % e)
     return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, device_id)
 
 
