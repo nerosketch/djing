@@ -19,13 +19,14 @@ from django.urls import reverse_lazy
 SECRET_KEY = local_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = local_settings.DEBUG or False
+DEBUG = local_settings.DEBUG
 
 ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 
 # required for django-guardian
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # default
+    'djing.auth_backends.CustomAuthBackend',
+    #'django.contrib.auth.backends.ModelBackend', # default
     'guardian.backends.ObjectPermissionBackend'
 )
 

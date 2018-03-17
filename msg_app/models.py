@@ -124,8 +124,10 @@ class ConversationManager(models.Manager):
         return conversation
 
     def get_new_messages_count(self, account):
-        ms_count = MessageStatus.objects.filter(user=account, state='new').count()
-        return ms_count
+        if isinstance(account, UserProfile):
+            return MessageStatus.objects.filter(user=account, state='new').count()
+        else:
+            return 0
 
     def fetch(self, account):
         conversations = self.filter(models.Q(author=account) | models.Q(participants__in=[account])).annotate(

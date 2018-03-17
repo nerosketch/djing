@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-08 14:24+0300\n"
+"POT-Creation-Date: 2018-03-18 00:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -32,31 +32,25 @@ msgid "Are you sure you want to spend a payment?"
 msgstr "Вы уверены что хотите провести платёж?"
 
 #: templates/clientsideapp/debt_buy.html:21
-#, fuzzy, python-format
-#| msgid ""
-#| "From your account, they withdraw funds in <b>%(amount)s</b> rub. <br/>\n"
-#| "As a result, you will remain on your account %(ballance_after)s rubles. "
-#| "<br/>\n"
-#| "The administrator can immediately see that you shut down the debt."
+#, python-format
 msgid ""
-"From your account, they withdraw funds in <b>%(amount)s</b> rub.<br/>\n"
-"As a result, you will remain on your account %(ballance_after)s rubles.<br/"
-">\n"
-"The administrator can immediately see that you shut down the debt."
+"From your account, they withdraw funds in <b>%(amount)s</b> rub.<br/> As a "
+"result, you will remain on your account %(ballance_after)s rubles.<br/> The "
+"administrator can immediately see that you shut down the debt."
 msgstr ""
-"С вашего счёта снимутся средства в размере <b>%(amount)s</b> руб.<br/>\n"
-"В результате у вас на счету останется %(ballance_after)s руб.<br/>\n"
-"Администратор сразу сможет видеть что у вас закрыта задолженность."
+"С вашего счёта снимутся средства в размере <b>%(amount)s</b> руб.<br/>В "
+"результате у вас на счету останется %(ballance_after)s руб.<br/"
+">Администратор сразу сможет видеть что у вас закрыта задолженность."
 
-#: templates/clientsideapp/debt_buy.html:24
+#: templates/clientsideapp/debt_buy.html:26
 msgid "Description of payment"
 msgstr "Описание платежа"
 
-#: templates/clientsideapp/debt_buy.html:32
+#: templates/clientsideapp/debt_buy.html:34
 msgid "Confirm"
 msgstr "Подтвердить"
 
-#: templates/clientsideapp/debt_buy.html:35
+#: templates/clientsideapp/debt_buy.html:37
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -107,7 +101,7 @@ msgstr "У вас нет проведённых платежей"
 
 #: templates/clientsideapp/services.html:25
 msgid "currency"
-msgstr ""
+msgstr "руб."
 
 #: views.py:51
 #, python-format
@@ -127,7 +121,7 @@ msgstr "Вы не уверены что хотите оплатить долг?"
 msgid "Your account have not enough money"
 msgstr "Недостаточно средств на счету"
 
-#: views.py:90
+#: views.py:89
 #, python-format
 msgid "%(username)s paid the debt %(amount).2f"
 msgstr "%(username)s заплатил долг в размере %(amount).2f"

@@ -39,7 +39,12 @@
                     </td>
                     <td>{{ l.comment }}</td>
                     <td>{{ l.date|date:"D d E Y H:i:s" }}</td>
-                    <td><a href="{% url 'acc_app:other_profile' l.author.id %}">{{ l.author.username }}</a></td>
+                    <td>
+                        {% if l.author %}
+                            <a href="{% url 'acc_app:other_profile' l.author.id %}">{{ l.author.username }}</a></td>
+                        {% else %}
+                            ---
+                        {% endif %}
                 </tr>
             {% empty %}
                 <tr>

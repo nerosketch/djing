@@ -402,8 +402,8 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
         abon = get_object_or_404(models.Abon, pk=uid)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
-        abon_tariff.delete()
         abon.sync_with_nas(created=False)
+        abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)

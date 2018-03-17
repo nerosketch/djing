@@ -41,7 +41,7 @@
             </thead>
 
             <tbody>
-            {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device grpid=dev.group.pk %}
+            {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device grpid=group.id %}
             {% for dev in devices %}
 
                 <tr>
