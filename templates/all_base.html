@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load globaltags %}
 <html lang="ru_RU">
 <head>
-    <title>InternetService - Админка</title>
+    <title>{% global_var 'COMPANY_NAME' %} - Админка</title>
     <meta charset="UTF-8">
     <!--[if lt IE 9]><meta http-equiv="refresh" content="0;URL=/static/bad_ie.html" /><![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand hidden-xs" href="{% url 'acc_app:other_profile' request.user.id %}">InternetService</a>
+            <a class="navbar-brand hidden-xs" href="{% url 'acc_app:other_profile' request.user.id %}">{% global_var 'COMPANY_NAME' %}</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">

@@ -5,10 +5,6 @@ img.navbar-brand {
     margin: 0 15px 0 0;
 }
 
-body > .container {
-    padding: 60px 15px 0;
-}
-
 .table thead {
     background-color: #ddd;
 }

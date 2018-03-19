@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!DOCTYPE HTML>{% load globaltags %}{% load i18n %}
 <html lang="ru">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Личный кабинет</title>
+    <title>{% global_var 'COMPANY_NAME' %} - {% trans 'Personal account' %}</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/clientside/custom.css" rel="stylesheet">
     <script src="/static/js/jquery-2.2.4.min.js"></script>
@@ -19,6 +19,8 @@
         <div class="modal-content" id="modContent"></div>
     </div>
 </div>
+
+{% url 'client_side:home' as client_side_home %}
 <!-- Fixed navbar -->
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -30,48 +32,36 @@
                 <span class="icon-bar"></span>
             </button>
             <img src="/static/clientside/bc.png" class="navbar-brand">
+            <a class="navbar-brand hidden-xs" href="{{ client_side_home }}">{% global_var 'COMPANY_NAME' %}</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
 
-                {% url 'client_side:home' as client_side_home %}
                 <li{% if client_side_home == request.path %} class="active"{% endif %}>
-                    <a href="{{ client_side_home }}">Личный кабинет</a>
+                <a href="{{ client_side_home }}">{% trans 'Personal account' %}</a>
                 </li>
 
                 {% url 'client_side:pays' as client_side_pays %}
                 <li{% if client_side_pays == request.path %} class="active"{% endif %}>
-                    <a href="{{ client_side_pays }}">Платежи</a>
+                <a href="{{ client_side_pays }}">{% trans 'Pays' %}</a>
                 </li>
 
                 {% url 'client_side:services' as client_side_services %}
                 <li{% if client_side_services == request.path %} class="active"{% endif %}>
-                    <a href="{{ client_side_services }}">Услуги</a>
+                <a href="{{ client_side_services }}">{% trans 'Services' %}</a>
                 </li>
 
-
-                <!--<li>
-                    <a href="#">
-                        Сообщения из администрации
-                        <span class="badge">14</span>
-                    </a>
-                </li>
-
-                <li><a href="#contact">График трафика</a></li>-->
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <!--<li><a href="#">Подать заявку</a></li>-->
-                        <li><a href="{% url 'client_side:debts' %}">Просмотреть и оплатить долги</a></li>
-                        <!--<li><a href="#">Сеансы подключений</a></li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Nav header</li>
-                        <li><a href="#">Separated link</a></li>-->
-                        <li><a href="{% url 'acc_app:logout' %}">Выйти</a></li>
+                        <li><a href="{% url 'client_side:debts' %}">{% trans 'Show debts and pay it' %}</a></li>
+                        <li><a href="{% url 'acc_app:logout' %}">{% trans 'Quit' %}</a></li>
                     </ul>
                 </li>
             </ul>
-            <span class="navbar-text">Ваш балланс <b>{{ request.user.ballance|floatformat:2 }}</b> руб.</span>
+            <span class="navbar-text">
+                {% blocktrans with ballance=request.user.ballance|floatformat:2 %}Your balance is <b>{{ ballance }}</b>{% endblocktrans %} {% trans 'currency' %}
+            </span>
         </div><!--/.nav-collapse -->
     </div>
 </div>
@@ -80,11 +70,12 @@
 <div class="container">
 
     {% if request.user.is_staff %}
-        <div class="alert alert-info">
-            <strong>Кстати.</strong>
-            Вы администратор, и не должны производить действия из кабинета пользователя, производите их из админки.
-            Кабинет клиента для вас только для ознакомления.
-        </div>
+    <div class="alert alert-info">
+        {% blocktrans trimmed %}
+            <strong>Attantion!</strong>
+            You are is admin, and do not be active here, please back to admin side. Client side to you for reference only.
+        {% endblocktrans %}
+    </div>
     {% endif %}
 
     {% include 'message_block.html' %}
@@ -95,7 +86,7 @@
 <div id="footer">
     <div class="container">
         <p class="text-muted">
-            Напишите разработчику <i>is-ttk@ya.ru</i>.
+            {% include 'clientsideapp/custom_pages/footer.htm' %}
         </p>
     </div>
 </div>

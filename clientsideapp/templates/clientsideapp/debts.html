@@ -1,25 +1,26 @@
 {% extends 'clientsideapp/ext.html' %}
+{% load i18n %}
 {% block client_main %}
 
     <div class="page-header">
-        <h3>Ваши долги</h3>
+        <h3>{% trans 'Your debt' %}</h3>
     </div>
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
-            <th class="col-xs-1">Состояние</th>
-            <th>Сумма</th>
-            <th>Описание</th>
-            <th>Дата создания</th>
-            <th>Дата платежа</th>
-            <th class="col-xs-1">Оплатить</th>
+            <th class="col-xs-1">{% trans 'State' %}</th>
+            <th>{% trans 'Summ' %}</th>
+            <th>{% trans 'Description' %}</th>
+            <th>{% trans 'Date of create' %}</th>
+            <th>{% trans 'Date of pay' %}</th>
+            <th class="col-xs-1">{% trans 'Pay' %}</th>
         </tr>
         </thead>
         <tbody>
         {% for debt in debts %}
             <tr>
                 <td class="text-center"><span class="glyphicon glyphicon-{{ debt.status|yesno:'ok,time' }}"></span></td>
-                <td>{{ debt.amount }} руб.</td>
+                <td>{{ debt.amount }} {% trans 'currency' %}</td>
                 <td>{{ debt.comment }}</td>
                 <td>{{ debt.date_create|date:'d b H:i' }}</td>
                 <td>
@@ -27,21 +28,21 @@
                         {{ debt.date_pay|date:'d b H:i' }}
                     {% else %}
                         {% if debt.status %}
-                            Создан оплаченным
+                            {% trans 'Created paid' %}
                         {% else %}
-                            Ещё не оплачен
+                            {% trans 'Not yet paid' %}
                         {% endif %}
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    <a href="{% url 'client_side:debt_buy' debt.id %}" class="btn btn-sm btn-success" title="Оплатить">
+                    <a href="{% url 'client_side:debt_buy' debt.id %}" class="btn btn-sm btn-success" title="{% trans 'Pay' %}">
                         <span class="glyphicon glyphicon-usd"></span>
                     </a>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="6">У вас нет долгов <span class="glyphicon glyphicon-ok"></span></td>
+                <td colspan="6">{% trans 'You have no debt' %} <span class="glyphicon glyphicon-ok"></span></td>
             </tr>
         {% endfor %}
         </tbody>

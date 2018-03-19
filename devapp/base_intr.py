@@ -1,6 +1,9 @@
-# -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 from easysnmp import Session
+
+
+class DeviceImplementationError(Exception):
+    pass
 
 
 class DevBase(object, metaclass=ABCMeta):
@@ -10,19 +13,19 @@ class DevBase(object, metaclass=ABCMeta):
 
     @staticmethod
     def description():
-        """Возвращает текстовое описание"""
+        pass
 
     @abstractmethod
     def reboot(self):
-        """Перезагружает устройство"""
+        pass
 
     @abstractmethod
     def get_ports(self):
-        """Получаем инфу о портах"""
+        pass
 
     @abstractmethod
     def get_device_name(self):
-        """Получаем имя устройства по snmp"""
+        """Return device name by snmp"""
 
     @abstractmethod
     def uptime(self):
@@ -30,17 +33,17 @@ class DevBase(object, metaclass=ABCMeta):
 
     @abstractmethod
     def get_template_name(self):
-        """Получаем путь к html шаблону отображения устройства"""
+        """Return path to html template for device"""
 
     @staticmethod
     @abstractmethod
     def has_attachable_to_subscriber():
-        """Можно-ли подключать устройство к абоненту"""
+        """Can connect device to subscriber"""
 
     @staticmethod
     @abstractmethod
     def is_use_device_port():
-        """True если при авторизации по opt82 используется порт"""
+        """True if used device port while opt82 authorization"""
 
 
 class BasePort(object, metaclass=ABCMeta):
@@ -70,7 +73,7 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
         self.ses = Session(hostname=ip, community=community, version=ver)
 
     def set_int_value(self, oid, value):
-        return self.ses.set(oid, value)
+        return self.ses.set(oid, value, 'i')
 
     def get_list(self, oid):
         for v in self.ses.walk(oid):

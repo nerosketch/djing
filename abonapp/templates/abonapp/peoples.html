@@ -63,7 +63,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% with can_ch_trf=perms.tariff_app.change_tariff can_del_trf=perms.abonapp.delete_abon %}
+                    {% with can_ch_trf=perms.tariff_app.change_tariff can_del_abon=perms.abonapp.delete_abon %}
                     {% for human in peoples %}
                         {% if human.is_active %}
                             <tr>
@@ -94,11 +94,11 @@
                         <td>{{ human.house|default:'-' }}</td>
                         <td><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                         <td>
-                            {% if human.active_tariff %}
-                                {% if perms.tariff_app.change_tariff %}
-                                    <a href="{% url 'tarifs:edit' human.active_tariff.tariff.pk %}">{{ human.active_tariff.tariff.title }}</a>
+                            {% if human.current_tariff %}
+                                {% if can_ch_trf %}
+                                    <a href="{% url 'tarifs:edit' human.current_tariff.tariff.pk %}">{{ human.current_tariff.tariff.title }}</a>
                                 {% else %}
-                                    {{ human.active_tariff.tariff.title }}
+                                    {{ human.current_tariff.tariff.title }}
                                 {% endif %}
                             {% else %}&mdash;&mdash;&mdash;
                             {% endif %}
@@ -109,7 +109,7 @@
                             {% endfor %}
                         </td>
                         <td class="hidden-xs">
-                            {% if can_del_trf %}
+                            {% if can_del_abon %}
                                 <a href="{% url 'abonapp:del_abon' %}?id={{ human.pk }}" class="btn btn-danger btn-sm">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </a>

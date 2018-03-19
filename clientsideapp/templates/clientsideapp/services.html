@@ -8,38 +8,42 @@
             <div class="row">
                 <div class="col-lg-7">
                     {% if current_service %}
+
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Ваша текущая услуга
+                            {% trans 'Your current service' %}
                         </div>
                         <div class="panel-body">
                             <h3 class="panel-title">{{ current_service.tariff.title }}</h3><br>
                             <dl class="dl-horizontal">
-                                <dt>Дата подключения</dt>
+                                <dt>{% trans 'The date of connection' %}</dt>
                                 <dd>{{ current_service.time_start|date:"d E Y, l" }}</dd>
 
-                                <dt>Время завершения услуги</dt>
+                                <dt>{% trans 'The date of finish service' %}</dt>
                                 <dd>{{ current_service.deadline|date:"d E Y, l" }}</dd>
 
-                                <dt>Стоимость</dt>
+                                <dt>{% trans 'Cost' %}</dt>
                                 <dd>{{ current_service.tariff.amount }} {% trans 'currency' %}</dd>
                             </dl>
                             <p>{{ current_service.tariff.descr }}</p>
                         </div>
                     </div>
 
-
                     {% else %}
                     <div class="alert alert-warning" role="alert">
                         <span class="glyphicon glyphicon-exclamation-sign"></span>
-                        <strong>Внимание!</strong> У вас нет услуги, для использования ресурсов приобретите нужную услугу из представленных тут.
+                        {% blocktrans trimmed %}
+                            <strong>Attantion!</strong>
+                            You have not yet a service, for use the services please purchase service you want.
+                        {% endblocktrans %}
                         </div>
                     {% endif %}
+
                 </div>
                 <div class="col-lg-5">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Доступные для заказа услуги
+                            {% trans 'Services available for ordering' %}
                         </div>
                         <div class="panel-body">
                             <div class="container-fluid">
@@ -48,7 +52,7 @@
                                         <div class="col-lg-12">
                                             <h3>{{ tarif.title }}</h3>
 
-                                            <i>{{ tarif.amount }} руб.</i>
+                                            <i>{{ tarif.amount }} {% trans 'currency' %}</i>
                                             <p>{{ tarif.descr }}</p>
 
                                             {% if request.user.is_staff or current_service %}
@@ -61,7 +65,7 @@
                                         </div>
                                     {% empty %}
                                         <div class="col-lg-4">
-                                            <h3 class="panel-title">Нет доступных услуг для заказа</h3>
+                                            <h3 class="panel-title">{% trans 'No services available for ordering' %}</h3>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -70,28 +74,10 @@
                     </div>
                 </div>
             </div>
-            {% include 'clientsideapp/services_ext.txt' %}
+            {% include 'clientsideapp/custom_pages/service.htm' with active_service=current_service %}
         </div>
     </div>
 
+    {% include 'clientsideapp/custom_pages/service_bottom.htm' %}
 
-
-
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <span class="glyphicon glyphicon-info-sign"></span>
-                    Как работает личный кабинет, раздел услуг
-                </div>
-                <div class="panel-body">
-                    <p>Перед вами находится 2 столбца, в левом ваша текущая подключённая услуга, а в правом доступные для заказа услуги.
-                       Когда у вас уже есть подключённая услуга то заказать новую вы не можете пока не завершится текущая.</p>
-                    <p>Когда у вас нет действующей подключённой услуги то кнопка заказа станет активной, и вы сможете заказать для себя услугу.
-                        Обратите внимание что именно в этот момент с вашего счёта снимутся деньги в соответствии со стоимостью услуги.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
