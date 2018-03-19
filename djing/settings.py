@@ -79,12 +79,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
+                #'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'taskapp.context_proc.get_active_tasks_count',
-                'global_context_processors.context_processor_additional_profile',
                 'msg_app.context_processors.get_new_messages_count'
             ],
         },
@@ -118,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SESSION_COOKIE_HTTPONLY = True
 

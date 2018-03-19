@@ -71,7 +71,7 @@
                     </ul>
                 </li>
             </ul>
-            <span class="navbar-text">Ваш балланс <b>{{ subscriber.ballance|floatformat:2 }}</b> руб.</span>
+            <span class="navbar-text">Ваш балланс <b>{{ request.user.ballance|floatformat:2 }}</b> руб.</span>
         </div><!--/.nav-collapse -->
     </div>
 </div>
