@@ -117,7 +117,22 @@ def dump_abonapp():
 
 def dump_tariffs():
     from tariff_app import models
-    res = get_fixture_from_unchanget_model('tariff_app.tariff', models.Tariff)
+    from abonapp.models import AbonGroup
+    print('tariff_app.tariff')
+    res = [{
+        'model': 'tariff_app.tariff',
+        'pk': trf.pk,
+        'fields': {
+            'title': trf.title,
+            'descr': trf.descr,
+            'speedIn': trf.speedIn,
+            'speedOut': trf.speedOut,
+            'amount': trf.amount,
+            'calc_type': trf.calc_type,
+            'is_admin': trf.is_admin,
+            'groups': [ag.pk for ag in AbonGroup.objects.filter(tariffs__in=[trf])]
+        }
+    } for trf in models.Tariff.objects.all()]
 
     res += get_fixture_from_unchanget_model('tariff_app.periodicpay', models.PeriodicPay)
 
@@ -132,11 +147,15 @@ def dump_devs():
         'pk': dv.pk,
         'fields': {
             'ip_address': dv.ip_address,
-            'mac_addr': dv.mac_addr,
+            'mac_addr': str(dv.mac_addr) if dv.mac_addr else None,
+            'comment': dv.comment,
             'devtype': dv.devtype,
             'man_passw': dv.man_passw,
             'group': dv.user_group.pk if dv.user_group else None,
-            'parent_dev': dv.parent_dev.pk if dv.parent_dev else None
+            'parent_dev': dv.parent_dev.pk if dv.parent_dev else None,
+            'snmp_item_num': dv.snmp_item_num,
+            'status': dv.status,
+            'is_noticeable': dv.is_noticeable
         }
     } for dv in models.Device.objects.all()]
 

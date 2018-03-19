@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load globaltags %}
 {% block main %}
 
 <ol class="breadcrumb">
@@ -20,7 +21,7 @@
 <div class="row">
     <div class="{% if dot.id %}col-sm-6{% else %}col-sm-12{% endif %}">
         <form role="form" action="{{ form_url }}" method="post" enctype="multipart/form-data">{% csrf_token %}
-            <input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
+            <input type="hidden" name="MAX_FILE_SIZE" value="{% global_var 'FILE_UPLOAD_MAX_MEMORY_SIZE' %}"/>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Map point' %}</h3>
