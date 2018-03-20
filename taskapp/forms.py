@@ -12,7 +12,7 @@ class TaskFrm(forms.ModelForm):
 
         if initial_abon is not None:
             # fetch profiles that has been attached on group of selected subscriber
-            profile_ids = initial_abon.group.profiles.filter(is_active=True).filter(is_admin=True).values_list('pk')
+            profile_ids = UserProfile.objects.get_profiles_by_group(initial_abon.group.pk).values_list('pk')
             if len(profile_ids) > 0:
                 self.fields['recipients'].initial = [pi[0] for pi in profile_ids]
             else:

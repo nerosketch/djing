@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from mydefs import MultipleException
@@ -27,11 +27,11 @@ def handle(task, author, recipients, abon_group):
                 fulltext = "%s\n" % text
             fulltext += _('locality %s.\n') % abon_group.title
             if task.abon:
-                fulltext += _('address %(street)s %(house)s.\ntelephone %(telephone)s\n') % (
-                    task.abon.street.name if task.abon.street is not None else '<'+_('not chosen')+'>',
-                    task.abon.house,
-                    task.abon.telephone
-                )
+                fulltext += _('address %(street)s %(house)s.\ntelephone %(telephone)s\n') % {
+                    'street': task.abon.street.name if task.abon.street is not None else '<'+_('not chosen')+'>',
+                    'house': task.abon.house,
+                    'telephone': task.abon.telephone
+                }
             fulltext += _('Task type - %s.') % task.get_mode_display() + '\n'
             fulltext += task.descr if task.descr else ''
 

@@ -3,7 +3,8 @@ from subprocess import run
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.gis.shortcuts import render_to_text
-from django.shortcuts import render, redirect
+from django.db import ProgrammingError
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView
@@ -27,6 +28,13 @@ class LastCallsListView(BaseListView):
     template_name = 'index.html'
     context_object_name = 'logs'
     queryset = AsteriskCDR.objects.exclude(userfield='request')
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super(LastCallsListView, self).get(request, *args, **kwargs)
+        except ProgrammingError as e:
+            messages.error(self.request, e)
+            return redirect('abonapp:group_list')
 
     def get_context_data(self, **kwargs):
         context = super(LastCallsListView, self).get_context_data(**kwargs)

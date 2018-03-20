@@ -53,12 +53,6 @@
                         {% trans 'Administrator' %}
                     </a>
                 </li>
-                {% url 'acc_app:profile_setup_group' uid as profilegroups_url %}
-                <li{% if profilegroups_url == request.path %} class="active"{% endif %}>
-                    <a href="{{ profilegroups_url }}">
-                        {% trans 'Groups' %}
-                    </a>
-                </li>
                 {% if request.user.is_superuser %}
                 {% url 'acc_app:set_abon_groups_permission' uid as set_ag_perm %}
                 <li{% if set_ag_perm == request.path %} class="active"{% endif %}>

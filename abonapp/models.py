@@ -5,37 +5,20 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import post_save, post_delete, pre_delete, post_init
+from django.db.models.signals import post_delete, pre_delete, post_init
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, gettext
 
-from accounts_app.models import UserProfile, MyUserManager
+from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
+from group_app.models import Group
 from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
-
-
-class AbonGroup(models.Model):
-    title = models.CharField(max_length=127, unique=True)
-    profiles = models.ManyToManyField(UserProfile, blank=True, related_name='abon_groups')
-    tariffs = models.ManyToManyField(Tariff, blank=True, related_name='tariff_groups')
-
-    class Meta:
-        db_table = 'abonent_groups'
-        permissions = (
-            ('can_view_abongroup', _('Can view subscriber group')),
-        )
-        verbose_name = _('Abon group')
-        verbose_name_plural = _('Abon groups')
-        ordering = ['title']
-
-    def __str__(self):
-        return self.title
 
 
 class AbonLog(models.Model):
@@ -89,7 +72,7 @@ class AbonTariff(models.Model):
 
 class AbonStreet(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(AbonGroup, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -149,9 +132,9 @@ class AbonManager(MyUserManager):
         return super(MyUserManager, self).get_queryset().filter(is_admin=False)
 
 
-class Abon(UserProfile):
+class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey(AbonGroup, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
+    group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_address = MyGenericIPAddressField(blank=True, null=True)
     description = models.TextField(_('Comment'), null=True, blank=True)
@@ -204,13 +187,6 @@ class Abon(UserProfile):
         verbose_name_plural = _('Abons')
         ordering = ['fio']
 
-    # pay something
-    def make_pay(self, curuser, how_match_to_pay=0.0):
-        post_save.disconnect(abon_post_save, sender=Abon)
-        self.ballance -= how_match_to_pay
-        self.save(update_fields=['ballance'])
-        post_save.connect(abon_post_save, sender=Abon)
-
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
             abon=self,
@@ -226,8 +202,11 @@ class Abon(UserProfile):
 
         amount = round(tariff.amount, 2)
 
-        if not author.is_staff and tariff.is_admin:
-            raise LogicError(_('User that is no staff can not buy admin services'))
+        if tariff.is_admin:
+            if author is not None and not author.is_staff:
+                raise LogicError(_('User that is no staff can not buy admin services'))
+            else:
+                raise LogicError(_('This user can not buy admin services'))
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
@@ -298,6 +277,23 @@ class Abon(UserProfile):
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
 
+    def sync_with_nas(self, created: bool):
+        timeout = None
+        if hasattr(self, 'is_dhcp') and self.is_dhcp:
+            timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
+        agent_abon = self.build_agent_struct()
+        if agent_abon is None:
+            return True
+        try:
+            tm = Transmitter()
+            if created:
+                tm.add_user(agent_abon, ip_timeout=timeout)
+            else:
+                tm.update_user(agent_abon, ip_timeout=timeout)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return True
+
 
 class PassportInfo(models.Model):
     series = models.CharField(max_length=4, validators=[validators.integer_validator])
@@ -354,7 +350,6 @@ class AllTimePayLogManager(models.Manager):
             r = cur.fetchone()
             if r is None: break
             summ, dat = r
-            print(summ, dat)
             yield {'summ': summ, 'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
 
 
@@ -443,14 +438,10 @@ class PeriodicPayForId(models.Model):
             next_pay_date = pp.get_next_time_to_pay(self.last_pay)
             abon = self.account
             with transaction.atomic():
-                abon.make_pay(author, amount)
-                AbonLog.objects.create(
-                    abon=abon, amount=-amount,
-                    author=author,
-                    comment=comment or _('Charge for "%(service)s"') % {
-                        'service': self.periodic_pay
-                    }
-                )
+                abon.add_ballance(author, -amount, comment=gettext('Charge for "%(service)s"') % {
+                    'service': self.periodic_pay
+                })
+                abon.save(update_fields=['ballance'])
                 self.last_pay = now
                 self.next_pay = next_pay_date
                 self.save(update_fields=['last_pay', 'next_pay'])
@@ -460,27 +451,6 @@ class PeriodicPayForId(models.Model):
 
     class Meta:
         db_table = 'periodic_pay_for_id'
-
-
-@receiver(post_save, sender=Abon)
-def abon_post_save(sender, **kwargs):
-    instance, created = kwargs["instance"], kwargs["created"]
-    timeout = None
-    if hasattr(instance, 'is_dhcp') and instance.is_dhcp:
-        timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
-    agent_abon = instance.build_agent_struct()
-    if agent_abon is None:
-        return True
-    try:
-        tm = Transmitter()
-        if created:
-            tm.add_user(agent_abon, ip_timeout=timeout)
-        else:
-            tm.update_user(agent_abon, ip_timeout=timeout)
-
-    except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
-        print('ERROR:', e)
-        return True
 
 
 @receiver(post_delete, sender=Abon)

@@ -15,7 +15,9 @@ from django.views.generic import ListView, DetailView
 
 from devapp.base_intr import DeviceImplementationError
 from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
-from abonapp.models import AbonGroup, Abon
+from abonapp.models import Abon
+from group_app.models import Group
+from accounts_app.models import UserProfile
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
@@ -26,8 +28,6 @@ from djing import global_base_views
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
 from mydefs import safe_int
-
-PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 class BaseDeviceListView(ListView):
@@ -42,15 +42,15 @@ class DevicesListView(BaseDeviceListView, global_base_views.OrderingMixin):
 
     def get_queryset(self):
         group_id = safe_int(self.kwargs.get('group_id'))
-        queryset = Device.objects.filter(user_group__pk=group_id) \
-            .select_related('user_group') \
-            .only('comment', 'mac_addr', 'devtype', 'user_group', 'pk', 'ip_address')
+        queryset = Device.objects.filter(group__pk=group_id) \
+            .select_related('group') \
+            .only('comment', 'mac_addr', 'devtype', 'group', 'pk', 'ip_address')
         return queryset
 
     def get_context_data(self, **kwargs):
         group_id = safe_int(self.kwargs.get('group_id'))
         context = super(DevicesListView, self).get_context_data(**kwargs)
-        context['group'] = get_object_or_404(AbonGroup, pk=group_id)
+        context['group'] = get_object_or_404(Group, pk=group_id)
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -66,7 +66,7 @@ class DevicesListView(BaseDeviceListView, global_base_views.OrderingMixin):
 class DevicesWithoutGroupsListView(BaseDeviceListView, global_base_views.OrderingMixin):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
-    queryset = Device.objects.filter(user_group=None).only('comment', 'devtype', 'user_group', 'pk', 'ip_address')
+    queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
 
 
 @login_required
@@ -74,7 +74,7 @@ class DevicesWithoutGroupsListView(BaseDeviceListView, global_base_views.Orderin
 def devdel(request, device_id):
     try:
         dev = Device.objects.get(pk=device_id)
-        back_url = resolve_url('devapp:devs', group_id=dev.user_group.pk if dev.user_group else 0)
+        back_url = resolve_url('devapp:devs', group_id=dev.group.pk if dev.group else 0)
         dev.delete()
         return res_success(request, back_url)
     except Device.DoesNotExist:
@@ -86,8 +86,8 @@ def devdel(request, device_id):
 @login_required
 @permission_required('devapp.can_view_device')
 def dev(request, group_id, device_id=0):
-    user_group = get_object_or_404(AbonGroup, pk=group_id)
-    if not request.user.has_perm('abonapp.can_view_abongroup', user_group):
+    device_group = get_object_or_404(Group, pk=group_id)
+    if not request.user.has_perm('group_app.can_view_group', device_group):
         raise PermissionDenied
     devinst = get_object_or_404(Device, id=device_id) if device_id != 0 else None
     already_dev = None
@@ -106,11 +106,11 @@ def dev(request, group_id, device_id=0):
                 # check if that device is exist
                 try:
                     already_dev = Device.objects.exclude(pk=device_id).get(mac_addr=request.POST.get('mac_addr'))
-                    if already_dev.user_group:
+                    if already_dev.group:
                         messages.warning(request, _('You have redirected to existing device'))
-                        return redirect('devapp:view', already_dev.user_group.pk, already_dev.pk)
+                        return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
                     else:
-                        messages.warning(request, _('Please attach user group for device'))
+                        messages.warning(request, _('Please attach group for device'))
                         return redirect('devapp:fix_device_group', already_dev.pk)
                 except Device.DoesNotExist:
                     pass
@@ -120,7 +120,7 @@ def dev(request, group_id, device_id=0):
                 # change device info in dhcpd.conf
                 ndev.update_dhcp()
                 messages.success(request, _('Device info has been saved'))
-                return redirect('devapp:edit', ndev.user_group.pk, ndev.pk)
+                return redirect('devapp:edit', ndev.group.pk, ndev.pk)
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         except IntegrityError as e:
@@ -131,7 +131,7 @@ def dev(request, group_id, device_id=0):
     else:
         if devinst is None:
             frm = DeviceForm(initial={
-                'user_group': user_group,
+                'group': device_group,
                 'devtype': request.GET.get('t'),
                 'mac_addr': request.GET.get('mac'),
                 'comment': request.GET.get('c'),
@@ -145,7 +145,7 @@ def dev(request, group_id, device_id=0):
     if devinst is None:
         return render(request, 'devapp/add_dev.html', {
             'form': frm,
-            'group': user_group,
+            'group': device_group,
             'already_dev': already_dev
         })
     else:
@@ -153,7 +153,7 @@ def dev(request, group_id, device_id=0):
             'form': frm,
             'dev': devinst,
             'selected_parent_dev': devinst.parent_dev,
-            'group': user_group,
+            'group': device_group,
             'already_dev': already_dev
         })
 
@@ -163,8 +163,8 @@ def dev(request, group_id, device_id=0):
 def manage_ports(request, device_id):
     try:
         dev = Device.objects.get(pk=device_id)
-        if dev.user_group is None:
-            messages.error(request, _('Device is not have a group, please fix that'))
+        if dev.group is None:
+            messages.error(request, _('Device does not have a group, please fix that'))
             return redirect('devapp:fix_device_group', dev.pk)
         ports = Port.objects.filter(device=dev).annotate(num_abons=Count('abon'))
 
@@ -220,13 +220,13 @@ def add_ports(request, device_id):
             return self.pid
 
         def __str__(self):
-            return "p:%d\tM:%s\tT:%s" % (self.pid, self.text)
+            return "p:%d\tT:%s" % (self.pid, self.text)
 
     try:
         res_ports = list()
         dev = Device.objects.get(pk=device_id)
-        if dev.user_group is None:
-            messages.error(request, _('Device is not have a group, please fix that'))
+        if dev.group is None:
+            messages.error(request, _('Device does not have a group, please fix that'))
             return redirect('devapp:fix_device_group', dev.pk)
         if request.method == 'POST':
             ports = zip(
@@ -356,8 +356,8 @@ def devview(request, device_id):
     ports, manager = None, None
     dev = get_object_or_404(Device, id=device_id)
 
-    if not dev.user_group:
-        messages.warning(request, _('Please attach user group for device'))
+    if not dev.group:
+        messages.warning(request, _('Please attach group for device'))
         return redirect('devapp:fix_device_group', dev.pk)
 
     template_name = 'ports.html'
@@ -409,18 +409,18 @@ def toggle_port(request, device_id, portid, status=0):
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     except EasySNMPError as e:
         messages.error(request, 'EasySNMPError: %s' % e)
-    return redirect('devapp:view', dev.user_group.pk if dev.user_group is not None else 0, device_id)
+    return redirect('devapp:view', dev.group.pk if dev.group is not None else 0, device_id)
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
 class GroupsListView(BaseDeviceListView):
     context_object_name = 'groups'
     template_name = 'devapp/group_list.html'
-    model = AbonGroup
+    model = Group
 
     def get_queryset(self):
         groups = super(GroupsListView, self).get_queryset()
-        groups = get_objects_for_user(self.request.user, 'abonapp.can_view_abongroup', klass=groups,
+        groups = get_objects_for_user(self.request.user, 'group_app.can_view_group', klass=groups,
                                       accept_global_perms=False)
         return groups
 
@@ -446,11 +446,11 @@ def fix_device_group(request, device_id):
             frm = DeviceForm(request.POST, instance=dev)
             if frm.is_valid():
                 ch_dev = frm.save()
-                if ch_dev.user_group:
+                if ch_dev.group:
                     messages.success(request, _('Device fixed'))
-                    return redirect('devapp:devs', ch_dev.user_group.pk)
+                    return redirect('devapp:devs', ch_dev.group.pk)
                 else:
-                    messages.error(request, _('Please attach user group for device'))
+                    messages.error(request, _('Please attach group for device'))
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         else:
@@ -478,6 +478,7 @@ def fix_onu(request):
             text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % \
                    (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
             for srcmac, snmpnum in ports:
+                # convert bytes mac address to str presentation mac address
                 real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
                 if mac == real_mac:
                     onu.snmp_item_num = snmpnum
@@ -497,13 +498,13 @@ def fix_onu(request):
 
 @login_required
 def fix_port_conflict(request, group_id, device_id, port_id):
-    user_group = get_object_or_404(AbonGroup, pk=group_id)
+    dev_group = get_object_or_404(Group, pk=group_id)
     device = get_object_or_404(Device, pk=device_id)
     port = get_object_or_404(Port, pk=port_id)
     abons = Abon.objects.filter(device__id=device_id, dev_port__id=port_id)
     return render(request, 'devapp/manage_ports/fix_abon_device.html', {
         'abons': abons,
-        'user_group': user_group,
+        'group': dev_group,
         'device': device,
         'port': port
     })
@@ -527,19 +528,14 @@ class OnDevDown(global_base_views.AllowedSubnetMixin, global_base_views.HashAuth
             if not bool(re.match(ip_addr_regex, dev_ip)):
                 return {'text': 'ip address %s is not valid' % dev_ip}
 
-            possible_devices = Device.objects.filter(ip_address=dev_ip)
-
-            if possible_devices.count() < 1:
-                return {
-                    'text': 'Devices with ip %s does not exist' % dev_ip
-                }
-            else:
-                device_down = possible_devices[0]
+            device_down = Device.objects.filter(ip_address=dev_ip).first()
+            if device_down is None:
+                return {'text': 'Devices with ip %s does not exist' % dev_ip}
 
             if not device_down.is_noticeable:
                 return {'text': 'Notification for %s is unnecessary' % device_down.ip_address}
 
-            recipients = device_down.user_group.profiles.all()
+            recipients = UserProfile.objects.get_profiles_by_group(device_down.group.pk)
             names = list()
 
             if dev_status == 'UP':

@@ -36,12 +36,12 @@
             {% bootstrap_field form.man_passw addon_before=ic %}
 
             <div class="form-group">
-                <label class="control-label" for="{{ form.user_group.id_for_label }}">{{ form.user_group.label }}</label>
-                <div class="input-group{% if not dev.user_group %} has-error{% endif %}">
+                <label class="control-label" for="{{ form.group.id_for_label }}">{{ form.group.label }}</label>
+                <div class="input-group{% if not dev.group %} has-error{% endif %}">
                     <span class="input-group-addon">
                         {% bootstrap_icon 'subscript' %}
                     </span>
-                    {{ form.user_group }}
+                    {{ form.group }}
                 </div>
             </div>
 

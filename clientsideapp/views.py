@@ -4,7 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
@@ -28,10 +28,10 @@ def pays(request):
 @login_required
 def services(request):
     try:
-        abon = Abon.objects.get(pk=request.user.pk)
-        all_tarifs = abon.group.tariffs.filter(is_admin=False)
+        abon = request.user
+        all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk)
         current_service = abon.active_tariff()
-    except:
+    except Abon.DoesNotExist:
         all_tarifs = None
         current_service = None
     return render(request, 'clientsideapp/services.html', {
@@ -43,13 +43,14 @@ def services(request):
 @login_required
 @transaction.atomic
 def buy_service(request, srv_id):
-    abon = get_object_or_404(Abon, pk=request.user.pk)
+    abon = request.user
     service = get_object_or_404(Tariff, pk=srv_id)
     try:
         current_service = abon.active_tariff()
         if request.method == 'POST':
-            abon.pick_tariff(service, request.user, _("Buy the service via user side, service '%s'")
+            abon.pick_tariff(service, None, _("Buy the service via user side, service '%s'")
                              % service)
+            abon.sync_with_nas(created=False)
             messages.success(request, _("The service '%s' wan successfully activated") % service.title)
         else:
             return render_to_text('clientsideapp/modal_service_buy.html', {
@@ -75,7 +76,7 @@ def debts_list(request):
 @transaction.atomic
 def debt_buy(request, d_id):
     debt = get_object_or_404(InvoiceForPayment, id=d_id)
-    abon = get_object_or_404(Abon, id=request.user.id)
+    abon = request.user
     if request.method == 'POST':
         try:
             sure = request.POST.get('sure')
@@ -84,9 +85,13 @@ def debt_buy(request, d_id):
             if abon.ballance < debt.amount:
                 raise LogicError(_('Your account have not enough money'))
 
-            abon.make_pay(request.user, debt.amount)
-            debt.set_ok()
+            amount = -debt.amount
+            abon.add_ballance(None, amount, comment=gettext('%(username)s paid the debt %(amount).2f') % {
+                'username': abon.get_full_name(),
+                'amount': amount
+            })
             abon.save(update_fields=['ballance'])
+            debt.set_ok()
             debt.save(update_fields=['status', 'date_pay'])
             return redirect('client_side:debts')
         except LogicError as e:

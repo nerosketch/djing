@@ -1,6 +1,5 @@
 {% load i18n %}
-
-<form role="form" action="{% url 'abonapp:abon_amount' abon_group.id abon.id %}" method="post"> {% csrf_token %}
+<form role="form" action="{% url 'abonapp:abon_amount' group_id abon.id %}" method="post"> {% csrf_token %}
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><span class="glyphicon glyphicon-shopping-cart"></span>{% trans 'Additional sum' %}</h4>

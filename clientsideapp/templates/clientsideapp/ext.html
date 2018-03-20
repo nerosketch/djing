@@ -60,7 +60,7 @@
                 </li>
             </ul>
             <span class="navbar-text">
-                {% blocktrans with ballance=subscriber.ballance|floatformat:2 %}Your balance is <b>{{ ballance }}</b>{% endblocktrans %} {% trans 'currency' %}
+                {% blocktrans with ballance=request.user.ballance|floatformat:2 %}Your balance is <b>{{ ballance }}</b>{% endblocktrans %} {% trans 'currency' %}
             </span>
         </div><!--/.nav-collapse -->
     </div>

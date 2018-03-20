@@ -5,8 +5,8 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
-        {% if dev.user_group %}
-            <li><a href="{% url 'devapp:devs' dev.user_group.pk %}">{{ dev.user_group.title }}</a></li>
+        {% if dev.group %}
+            <li><a href="{% url 'devapp:devs' dev.group.pk %}">{{ dev.group.title }}</a></li>
         {% else %}
             <li>{% trans 'Not assigned' %}</li>
         {% endif %}
@@ -21,7 +21,7 @@
 
     <ul class="nav nav-tabs">
 
-        {% url 'devapp:view' dev.user_group.pk|default:0 dev.pk as devapp_view %}
+        {% url 'devapp:view' dev.group.pk|default:0 dev.pk as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>
             <a href="{{ devapp_view }}">
                 {% trans 'Ports' %} {{ dev.ip_address }}
@@ -29,12 +29,12 @@
         </li>
 
         {% if perms.devapp.change_device %}
-            {% url 'devapp:edit' dev.user_group.pk|default:0 dev.pk as devapp_edit %}
+            {% url 'devapp:edit' dev.group.pk|default:0 dev.pk as devapp_edit %}
             <li{% if devapp_edit == request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_edit }}">{% trans 'Edit' %}</a>
             </li>
 
-            {% url 'devapp:manage_ports' dev.user_group.pk|default:0 dev.pk as devapp_mports %}
+            {% url 'devapp:manage_ports' dev.group.pk|default:0 dev.pk as devapp_mports %}
             <li{% if devapp_mports == request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_mports }}">{% trans 'Ports' %}</a>
             </li>

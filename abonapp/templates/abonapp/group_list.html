@@ -35,13 +35,6 @@
                     <td><a href="{% url 'abonapp:people_list' gr.pk %}">{{ gr.title }}</a></td>
                     <td class="hidden-xs">{{ gr.usercount }}</td>
                     <td class="btn-group">
-                        {% if perms.abonapp.delete_abongroup %}
-                            {% if gr.usercount == 0 %}
-                                <a href="{% url 'abonapp:del_group' %}?id={{ gr.pk }}" class="btn btn-sm btn-danger">
-                                    <span class="glyphicon glyphicon-remove-circle"></span>
-                                </a>
-                            {% endif %}
-                        {% endif %}
                         <a href="{% url 'abonapp:ch_group_tariff' gr.pk %}" class="btn btn-sm btn-default"
                            title="{% trans 'User groups' %}">
                             <span class="glyphicon glyphicon-cog"></span>
@@ -57,11 +50,6 @@
             <tfoot>
             <tr>
                 <td colspan="4" class="btn-group btn-group-sm">
-                    {% if perms.abonapp.add_abongroup %}
-                    <a href="{% url 'abonapp:add_group' %}" class="btn btn-success">
-			            <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add group' %}</span>
-                    </a>
-                    {% endif %}
                     {% if perms.abonapp.can_view_abonlog %}
                         <a href="{% url 'abonapp:log' %}" class="btn btn-default">
                             <span class="glyphicon glyphicon-record"></span> <span class="hidden-xs">{% trans 'Subscribers actions' %}</span>

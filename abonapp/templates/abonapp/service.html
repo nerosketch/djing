@@ -49,13 +49,13 @@
 
                     {% else %}
                         {% trans 'Subscriber has no service' %}.
-                        <a href="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}">
+                        <a href="{% url 'abonapp:pick_tariff' group.pk abon.pk %}">
                             {% trans 'Buy service' %}
                         </a>
                     {% endif %}
 
                     {% if abon_tariff %}
-                        <a href="{% url 'abonapp:unsubscribe_service' abon_group.pk abon.pk abon_tariff.pk %}" class="btn btn-sm btn-danger">
+                        <a href="{% url 'abonapp:unsubscribe_service' group.pk abon.pk abon_tariff.pk %}" class="btn btn-sm btn-danger">
                             <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
                         </a>
                     {% endif %}
@@ -82,7 +82,7 @@
                         {% with can_ch_trf=perms.tariff_app.change_tariff %}
                         {% for service in services %}
                         <tr>
-                            <td><a href="{% url 'abonapp:pick_tariff' abon_group.pk abon.pk %}?selected_tariff={{ service.pk }}"
+                            <td><a href="{% url 'abonapp:pick_tariff' group.pk abon.pk %}?selected_tariff={{ service.pk }}"
                                    class="btn btn-sm btn-default" title="{{ service.get_calc_type_display }}" data-toggle="tooltip"{% if abon_tariff %} disabled{% endif %}>
                                 <span class="glyphicon glyphicon-shopping-cart"></span>
                             </a></td>
@@ -100,7 +100,7 @@
                         {% empty %}
                         <tr><td colspan="5">
                             {% trans 'This group has no services' %}
-                            <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}">
+                            <a href="{% url 'abonapp:ch_group_tariff' group.pk %}" class="btn btn-sm btn-default" title="{% trans 'User groups' %}">
                                 <span class="glyphicon glyphicon-cog"></span> {% trans 'Tariffs in groups' %}
                             </a>
                         </td></tr>
@@ -108,7 +108,7 @@
                         {% endwith %}
                         </tbody>
                     </table>
-                    <a href="{% url 'abonapp:ch_group_tariff' abon_group.pk %}" class="btn btn-sm btn-primary" title="{% trans 'User groups' %}">
+                    <a href="{% url 'abonapp:ch_group_tariff' group.pk %}" class="btn btn-sm btn-primary" title="{% trans 'User groups' %}">
                         <span class="glyphicon glyphicon-cog"></span> {% trans 'Attach services to group' %}
                     </a>
                 </div>
@@ -131,11 +131,11 @@
                             <dt>{% trans 'Next time to pay' %}</dt>
                             <dd>{{ periodic_pay.next_pay|date:'d E Y' }}</dd>
                         </dl>
-                        <a href="{% url 'abonapp:del_periodic_pay' abon_group.pk abon.pk periodic_pay.pk %}" class="btn btn-sm btn-danger">
+                        <a href="{% url 'abonapp:del_periodic_pay' group.pk abon.pk periodic_pay.pk %}" class="btn btn-sm btn-danger">
                             <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Remove periodic pay' %}
                         </a>
                     {% else %}
-                        <a href="{% url 'abonapp:add_periodic_pay' abon_group.pk abon.pk %}" class="btn btn-primary btn-sm btn-modal">
+                        <a href="{% url 'abonapp:add_periodic_pay' group.pk abon.pk %}" class="btn btn-primary btn-sm btn-modal">
                             <span class="glyphicon glyphicon-plus"></span> {% trans 'Add periodic pay' %}
                         </a>
                     {% endif %}

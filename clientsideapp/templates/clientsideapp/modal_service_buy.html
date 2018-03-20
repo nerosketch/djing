@@ -12,7 +12,8 @@
 
         <p>{{ service.descr }}</p>
 
-        <!--<p>{% blocktrans with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}Inbound speed: {{ speedIn }} MBit/s<br>
+	<!--<p>{# {% blocktrans trimmed with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}
+		Inbound speed: {{ speedIn }} MBit/s<br>
 Outgoing speed: {{ speedOut }} MBit/s<br>
 Cost: {{ amount }} rubles.{% endblocktrans %}</p>-->
         <p>{% blocktrans with amount=service.amount|floatformat:2 %}The cost is {{ amount }}{% endblocktrans %} {% trans 'currency' %}</p>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-13 11:49+0300\n"
+"POT-Creation-Date: 2018-03-20 01:51+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -31,25 +31,26 @@ msgstr "Оплатить задолженность"
 msgid "Are you sure you want to spend a payment?"
 msgstr "Вы уверены что хотите провести платёж?"
 
-#: templates/clientsideapp/debt_buy.html:22
+#: templates/clientsideapp/debt_buy.html:21
+#, python-format
 msgid ""
 "From your account, they withdraw funds in <b>%(amount)s</b> rub.<br/> As a "
 "result, you will remain on your account %(ballance_after)s rubles.<br/> The "
 "administrator can immediately see that you shut down the debt."
 msgstr ""
-"С вашего счёта снимутся средства в размере <b>%(amount)s</b> руб.<br/>\n"
-"В результате у вас на счету останется %(ballance_after)s руб.<br/>\n"
-"Администратор сразу сможет видеть что у вас закрыта задолженность."
+"С вашего счёта снимутся средства в размере <b>%(amount)s</b> руб.<br/>В "
+"результате у вас на счету останется %(ballance_after)s руб.<br/"
+">Администратор сразу сможет видеть что у вас закрыта задолженность."
 
-#: templates/clientsideapp/debt_buy.html:28
+#: templates/clientsideapp/debt_buy.html:26
 msgid "Description of payment"
 msgstr "Описание платежа"
 
-#: templates/clientsideapp/debt_buy.html:36
+#: templates/clientsideapp/debt_buy.html:34
 msgid "Confirm"
 msgstr "Подтвердить"
 
-#: templates/clientsideapp/debt_buy.html:39
+#: templates/clientsideapp/debt_buy.html:37
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -82,7 +83,7 @@ msgid "Pay"
 msgstr "Оплатить"
 
 #: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:63
-#: templates/clientsideapp/modal_service_buy.html:18
+#: templates/clientsideapp/modal_service_buy.html:19
 #: templates/clientsideapp/services.html:26
 #: templates/clientsideapp/services.html:55
 msgid "currency"
@@ -151,28 +152,27 @@ msgid ""
 "Be careful, after purchasing the service you will <b>withdraw money</b>, and "
 "you will be able to use the purchased service."
 msgstr ""
-"Будте внимательны, после заказа услуги с вашего счёта <b>снимутся средства</b>, "
-"и вы сможете пользоваться купленной услугой."
+"Будте внимательны, после заказа услуги с вашего счёта <b>снимутся средства</"
+"b>, и вы сможете пользоваться купленной услугой."
 
 #: templates/clientsideapp/modal_service_buy.html:15
 #, python-format
 msgid ""
-"Inbound speed: %(speedIn)s MBit/s<br>\n"
-"Outgoing speed: %(speedOut)s MBit/s<br>\n"
-"Cost: %(amount)s rubles."
+"Inbound speed: %(speedIn)s MBit/s<br> Outgoing speed: %(speedOut)s MBit/"
+"s<br> Cost: %(amount)s rubles."
 msgstr ""
 
-#: templates/clientsideapp/modal_service_buy.html:18
+#: templates/clientsideapp/modal_service_buy.html:19
 #, python-format
 msgid "The cost is %(amount)s"
 msgstr "Стоимость %(amount)s"
 
-#: templates/clientsideapp/modal_service_buy.html:22
+#: templates/clientsideapp/modal_service_buy.html:23
 #: templates/clientsideapp/services.html:63
 msgid "Pick"
 msgstr "Заказать"
 
-#: templates/clientsideapp/modal_service_buy.html:24
+#: templates/clientsideapp/modal_service_buy.html:25
 msgid "Close"
 msgstr "Закрыть"
 
@@ -217,8 +217,8 @@ msgid ""
 "<strong>Attantion!</strong> You have not yet a service, for use the services "
 "please purchase service you want."
 msgstr ""
-"<strong>Внимание!</strong> У вас нет услуги, для использования ресурсов приобретите "
-"нужную услугу из представленных тут."
+"<strong>Внимание!</strong> У вас нет услуги, для использования ресурсов "
+"приобретите нужную услугу из представленных тут."
 
 #: templates/clientsideapp/services.html:46
 msgid "Services available for ordering"
@@ -233,15 +233,20 @@ msgstr "Нет доступных для заказа услуг"
 msgid "Buy the service via user side, service '%s'"
 msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
 
-#: views.py:53
+#: views.py:54
 #, python-format
 msgid "The service '%s' wan successfully activated"
 msgstr "Услуга '%s' успешно подключена"
 
-#: views.py:83
+#: views.py:84
 msgid "Are you not sure that you want buy the service?"
 msgstr "Вы не уверены что хотите оплатить долг?"
 
-#: views.py:85
+#: views.py:86
 msgid "Your account have not enough money"
 msgstr "Недостаточно средств на счету"
+
+#: views.py:89
+#, python-format
+msgid "%(username)s paid the debt %(amount).2f"
+msgstr "%(username)s заплатил долг в размере %(amount).2f"

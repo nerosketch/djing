@@ -23,7 +23,7 @@
                     </thead>
 
                     <tbody>
-                    {% with dip=dev.ip_address grp=dev.user_group.pk %}
+                    {% with dip=dev.ip_address grp=dev.group.pk %}
                     {% for port in ports %}
                         <tr>
                             <td>{% if port.st %}<span class="glyphicon glyphicon-ok text-success"></span>

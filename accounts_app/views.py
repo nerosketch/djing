@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import ListView
 from django.conf import settings
 
-from abonapp.models import AbonGroup
+from group_app.models import Group
 
 from photo_app.models import Photo
 from .models import UserProfile
@@ -86,29 +86,6 @@ def profile_show(request, uid=0):
     return render(request, 'accounts/index.html', {
         'uid': uid,
         'userprofile': usr
-    })
-
-
-@login_required
-@mydefs.only_admins
-def chgroup(request, uid):
-    uid = mydefs.safe_int(uid)
-    if uid == 0:
-        usr = request.user
-    else:
-        usr = get_object_or_404(UserProfile, id=uid)
-    if usr != request.user and not request.user.has_perm('accounts_app.change_userprofile', usr):
-        raise PermissionDenied
-    if request.method == 'POST':
-        ag = request.POST.getlist('ag')
-        usr.abon_groups.clear()
-        usr.abon_groups.add(*[int(d) for d in ag])
-        usr.save()
-    abongroups = AbonGroup.objects.only('pk', 'title')
-    return render(request, 'accounts/profile_chgroup.html', {
-        'uid': uid,
-        'userprofile': usr,
-        'abongroups': abongroups
     })
 
 
@@ -234,7 +211,7 @@ def perms(request, uid):
         raise PermissionDenied
     userprofile = get_object_or_404(UserProfile, id=uid)
     klasses = (
-        'abonapp.AbonGroup', 'abonapp.Abon', 'accounts_app.UserProfile',
+        'abonapp.Abon', 'accounts_app.UserProfile',
         'abonapp.AbonTariff', 'abonapp.AbonStreet', 'devapp.Device',
         'abonapp.PassportInfo', 'abonapp.AdditionalTelephone', 'tariff_app.PeriodicPay'
     )
@@ -303,22 +280,22 @@ def set_abon_groups_permission(request, uid):
         raise PermissionDenied
     userprofile = get_object_or_404(UserProfile, pk=uid)
 
-    picked_groups = get_objects_for_user(userprofile, 'abonapp.can_view_abongroup', accept_global_perms=False)
+    picked_groups = get_objects_for_user(userprofile, 'group_app.can_view_group', accept_global_perms=False)
     picked_groups = picked_groups.values_list('pk', flat=True)
 
     if request.method == 'POST':
-        checked_groups = [int(ag) for ag in request.POST.getlist('ag', default=0)]
-        for abon_group in AbonGroup.objects.all():
-            if abon_group.pk in checked_groups and abon_group.pk not in picked_groups:
-                assign_perm('abonapp.can_view_abongroup', userprofile, obj=abon_group)
-            elif abon_group.pk not in checked_groups and abon_group.pk in picked_groups:
-                remove_perm('abonapp.can_view_abongroup', userprofile, obj=abon_group)
+        checked_groups = [int(ag) for ag in request.POST.getlist('grp', default=0)]
+        for grp in Group.objects.all():
+            if grp.pk in checked_groups and grp.pk not in picked_groups:
+                assign_perm('groupapp.can_view_group', userprofile, obj=grp)
+            elif grp.pk not in checked_groups and grp.pk in picked_groups:
+                remove_perm('groupapp.can_view_group', userprofile, obj=grp)
         return redirect('acc_app:set_abon_groups_permission', uid)
-    abongroups = AbonGroup.objects.only('pk', 'title')
+    groups = Group.objects.only('pk', 'title')
 
     return render(request, 'accounts/set_abon_groups_permission.html', {
         'uid': uid,
         'userprofile': userprofile,
-        'abongroups': abongroups,
+        'groups': groups,
         'picked_groups_ids': picked_groups
     })

@@ -41,7 +41,7 @@
             </thead>
 
             <tbody>
-            {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device %}
+            {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device grpid=group.id %}
             {% for dev in devices %}
 
                 <tr>
@@ -57,19 +57,19 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td><a href="{% url 'devapp:view' dev.user_group.pk dev.pk %}">{{ dev.ip_address }}</a></td>
+                    <td><a href="{% url 'devapp:view' grpid dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
                     {# <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td> #}
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}
-                            <a href="{% url 'devapp:del' dev.user_group.pk dev.pk %}" class="btn btn-danger">
+                            <a href="{% url 'devapp:del' grpid dev.pk %}" class="btn btn-danger">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         {% endif %}
                         {% if can_ch_dev %}
-                            <a href="{% url 'devapp:edit' dev.user_group.pk dev.id %}" class="btn btn-default">
+                            <a href="{% url 'devapp:edit' grpid dev.id %}" class="btn btn-default">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
                         {% endif %}

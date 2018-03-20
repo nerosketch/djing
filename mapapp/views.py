@@ -9,12 +9,12 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 from django.views.generic import ListView
 from django.conf import settings
+from group_app.models import Group
 from .models import Dot
 from .forms import DotForm
 from mydefs import safe_int
 from devapp.models import Device
 from guardian.decorators import permission_required
-from abonapp.models import AbonGroup
 from json import dumps
 
 
@@ -28,10 +28,10 @@ def home(request):
     if not request.user.is_superuser:
         return redirect('/')
     dots = Dot.objects.all()
-    groups = AbonGroup.objects.all()
+    groups = Group.objects.all()
     return render(request, 'maps/ya_index.html', {
         'dots': dots,
-        'abon_groups': groups
+        'groups': groups
     })
 
 
@@ -144,8 +144,7 @@ def preload_devices(request):
         return HttpResponseForbidden('you have not super user')
     grp = request.GET.get('grp')
     dot = request.GET.get('dot')
-    #user_group = AbonGroup.objects.get(pk=grp)
-    all_devices = Device.objects.filter(user_group__id=grp)
+    all_devices = Device.objects.filter(group__id=grp)
     dot_devices = Device.objects.filter(dot__id=dot)
 
     dot_devices_ids = [dev.pk for dev in dot_devices]
@@ -179,7 +178,7 @@ def dot_tooltip(request):
 def add_dev(request, did):
     if not request.user.is_superuser:
         return redirect('/')
-    groups = AbonGroup.objects.all()
+    groups = Group.objects.all()
     dot = get_object_or_404(Dot, pk=did)
     param_user_group = safe_int(request.GET.get('grp'))
 
@@ -187,7 +186,7 @@ def add_dev(request, did):
         selected_devs = request.POST.getlist('dv')
         selected_user_group = safe_int(request.POST.get('selected_user_group'))
 
-        existing_devs = Device.objects.filter(user_group__id=selected_user_group or param_user_group)
+        existing_devs = Device.objects.filter(group__id=selected_user_group or param_user_group)
         if existing_devs.count() > 0:
             dot.devices.remove(*[dev.pk for dev in existing_devs])
         dot.devices.add(*selected_devs)
@@ -195,7 +194,7 @@ def add_dev(request, did):
         url = resolve_url('mapapp:add_dev', did=dot.pk)
         return HttpResponseRedirect("%s?grp=%d" % (url, selected_user_group or param_user_group))
     else:
-        existing_devs = Device.objects.filter(user_group=param_user_group)
+        existing_devs = Device.objects.filter(group=param_user_group)
     return render(request, 'maps/add_device.html', {
         'groups': groups,
         'dot': dot,
@@ -209,7 +208,7 @@ def add_dev(request, did):
 def resolve_dots_by_group(request, grp_id):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
-    devs = Device.objects.filter(user_group__id=grp_id)
+    devs = Device.objects.filter(group__id=grp_id)
     dots = Dot.objects.filter(devices__in=devs).annotate(devcount=Count('devices')).only('pk')
     res = [dot.pk for dot in dots]
     return HttpResponse(dumps(res), content_type='application/json')
