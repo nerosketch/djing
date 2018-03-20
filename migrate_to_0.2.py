@@ -6,6 +6,13 @@ import shutil
 from json import dump
 import django
 
+
+'''
+Some permissions is not migrates, all admins is superuser
+after migrate.
+'''
+
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 from django.db.models import fields as django_fields
 
@@ -64,13 +71,14 @@ def dump_groups():
 
 def dump_abonapp():
     from abonapp import models
-    # res += get_fixture_from_unchanget_model('abonapp.abonlog', models.AbonLog)
 
     res = get_fixture_from_unchanget_model('abonapp.abontariff', models.AbonTariff)
 
     res += get_fixture_from_unchanget_model('abonapp.abonstreet', models.AbonStreet)
 
     res += get_fixture_from_unchanget_model('abonapp.extrafieldsmodel', models.ExtraFieldsModel)
+
+    # res += get_fixture_from_unchanget_model('abonapp.abonlog', models.AbonLog)
 
     print('abonapp.abon')
     res += [{
@@ -109,7 +117,22 @@ def dump_abonapp():
 
 def dump_tariffs():
     from tariff_app import models
-    res = get_fixture_from_unchanget_model('tariff_app.tariff', models.Tariff)
+    from abonapp.models import AbonGroup
+    print('tariff_app.tariff')
+    res = [{
+        'model': 'tariff_app.tariff',
+        'pk': trf.pk,
+        'fields': {
+            'title': trf.title,
+            'descr': trf.descr,
+            'speedIn': trf.speedIn,
+            'speedOut': trf.speedOut,
+            'amount': trf.amount,
+            'calc_type': trf.calc_type,
+            'is_admin': trf.is_admin,
+            'groups': [ag.pk for ag in AbonGroup.objects.filter(tariffs__in=[trf])]
+        }
+    } for trf in models.Tariff.objects.all()]
 
     res += get_fixture_from_unchanget_model('tariff_app.periodicpay', models.PeriodicPay)
 
@@ -124,11 +147,15 @@ def dump_devs():
         'pk': dv.pk,
         'fields': {
             'ip_address': dv.ip_address,
-            'mac_addr': dv.mac_addr,
+            'mac_addr': str(dv.mac_addr) if dv.mac_addr else None,
+            'comment': dv.comment,
             'devtype': dv.devtype,
             'man_passw': dv.man_passw,
             'group': dv.user_group.pk if dv.user_group else None,
-            'parent_dev': dv.parent_dev.pk if dv.parent_dev else None
+            'parent_dev': dv.parent_dev.pk if dv.parent_dev else None,
+            'snmp_item_num': dv.snmp_item_num,
+            'status': dv.status,
+            'is_noticeable': dv.is_noticeable
         }
     } for dv in models.Device.objects.all()]
 
@@ -157,7 +184,8 @@ def dump_accounts():
             'is_admin': up.is_admin,
             'telephone': up.telephone,
             'password': up.password,
-            'last_login': up.last_login
+            'last_login': up.last_login,
+            'is_superuser': up.is_admin
         }
     } for up in models.UserProfile.objects.all()]
 
@@ -214,15 +242,38 @@ def dump_task_app():
 
 def dump_auth():
     from django.contrib.auth import models
-    res = get_fixture_from_unchanget_model('auth.group', models.Group)
+    from django.contrib.contenttypes.models import ContentType
+    res = get_fixture_from_unchanget_model('contenttypes.contenttype', ContentType)
+    res += get_fixture_from_unchanget_model('auth.group', models.Group)
     res += get_fixture_from_unchanget_model('auth.permission', models.Permission)
     return res
 
 
 def dump_guardian():
     from guardian import models
-    res = get_fixture_from_unchanget_model('guardian.groupobjectpermission', models.GroupObjectPermission)
-    res += get_fixture_from_unchanget_model('guardian.userobjectpermission', models.UserObjectPermission)
+    print('guardian.groupobjectpermission')
+    res = [{
+        'model': 'guardian.groupobjectpermission',
+        'pk': gp.pk,
+        'fields': {
+            'group': gp.group.pk,
+            'permission': gp.permission.pk,
+            'content_type': gp.content_type.pk,
+            'object_pk': str(gp.object_pk),
+            'content_object': gp.content_object.pk
+        }
+    } for gp in models.GroupObjectPermission.objects.all()]
+    print('guardian.userobjectpermission')
+    res += [{
+        'model': 'guardian.userobjectpermission',
+        'pk': up.pk,
+        'fields': {
+            'permission': up.permission.pk,
+            'content_type': up.content_type.pk,
+            'object_pk': str(up.object_pk),
+            'user': up.user.pk
+        }
+    } for up in models.UserObjectPermission.objects.all()]
     return res
 
 
@@ -252,8 +303,8 @@ def make_migration():
     appdump(['fixtures', 'chatbot', 'chatbot_fixture.json'], dump_chatbot)
     appdump(['fixtures', 'mapapp', 'map_fixture.json'], dump_map)
     appdump(['fixtures', 'taskapp', 'task_fixture.json'], dump_task_app)
-    appdump(['fixtures', 'accounts_app', 'auth_fixture.json'], dump_auth)
-    appdump(['fixtures', 'accounts_app', 'guardian_fixture.json'], dump_guardian)
+    # appdump(['fixtures', 'accounts_app', 'auth_fixture.json'], dump_auth)
+    # appdump(['fixtures', 'accounts_app', 'guardian_fixture.json'], dump_guardian)
 
 
 def move_to_fixtures_dirs():
@@ -273,21 +324,22 @@ def move_to_fixtures_dirs():
 def apply_fixtures():
     from django.core.management import execute_from_command_line
     from accounts_app.models import UserProfile
-    from django.contrib.auth import models
+    #from django.contrib.auth import models
 
     UserProfile.objects.filter(username='AnonymousUser').delete()
-    print('clearing auth.group')
-    models.Group.objects.all().delete()
-    print('clearing auth.permission')
-    models.Permission.objects.all().delete()
+    #print('clearing auth.group')
+    #models.Group.objects.all().delete()
+    #print('clearing auth.permission')
+    #models.Permission.objects.all().delete()
 
-    print('./manage.py loaddata -v2 ...')
-    execute_from_command_line([sys.argv[0], 'loaddata', '-v', '2',
+    fixtures_names = [
         'groups_fixture.json', 'tariffs_fixture.json', 'photos_fixture.json',
         'devs_fixture.json', 'accounts_fixture.json', 'abon_fixture.json',
-        'chatbot_fixture.json', 'map_fixture.json', 'task_fixture.json',
-        'auth_fixture.json', 'guardian_fixture.json'
-    ])
+        'chatbot_fixture.json', 'map_fixture.json', 'task_fixture.json'
+    ]
+    # 'auth_fixture.json', 'guardian_fixture.json'
+    print('./manage.py loaddata ' + ', '.join(fixtures_names))
+    execute_from_command_line([sys.argv[0], 'loaddata'] + fixtures_names)
 
 
 if __name__ == '__main__':
@@ -299,7 +351,7 @@ if __name__ == '__main__':
         django.setup()
         move_to_fixtures_dirs()
         apply_fixtures()
-        os.remove('fixtures')
+        shutil.rmtree('fixtures')
     elif choice == 'makedump':
         django.setup()
         make_migration()
