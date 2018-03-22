@@ -57,3 +57,5 @@ API_AUTH_SECRET = 'your api secret'
 # Allowed subnet for api
 API_AUTH_SUBNET = '127.0.0.0/8'
 
+# Company name
+COMPANY_NAME = 'Your company name'

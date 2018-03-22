@@ -6,16 +6,17 @@
     </div>
     <div class="modal-body">
         <h3>{% trans 'Are you sure you want to order the service?' %}</h3>
-        <p>Будте внимательны, после заказа услуги с вашего счёта <b>снимутся средства</b>, и вы сможете пользоваться купленной услугой.</p>
+        <p>{% trans 'Be careful, after purchasing the service you will <b>withdraw money</b>, and you will be able to use the purchased service.' %}</p>
 
         <h3>{{ service.title }}</h3>
 
         <p>{{ service.descr }}</p>
 
-        <!--<p>{% blocktrans with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}Inbound speed: {{ speedIn }} MBit/s<br>
+	<!--<p>{# {% blocktrans trimmed with speedIn=service.speedIn speedOut=service.speedOut amount=service.amount %}
+		Inbound speed: {{ speedIn }} MBit/s<br>
 Outgoing speed: {{ speedOut }} MBit/s<br>
 Cost: {{ amount }} rubles.{% endblocktrans %}</p>-->
-        <p>Стоимость {{ service.amount }} руб.</p>
+        <p>{% blocktrans with amount=service.amount|floatformat:2 %}The cost is {{ amount }}{% endblocktrans %} {% trans 'currency' %}</p>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-sm btn-primary">

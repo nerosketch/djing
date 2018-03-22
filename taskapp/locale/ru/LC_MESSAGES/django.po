@@ -34,7 +34,7 @@ msgstr "с. %s\n"
 msgid ""
 "address %(street)s %(house)s.\n"
 "telephone %(telephone)s\n"
-msgstr "по адресу %s %s тел. %s.\n"
+msgstr "по адресу %(street)s %(house)s тел. %(telephone)s.\n"
 
 #: handle.py:31 models.py:25
 msgid "not chosen"
@@ -456,3 +456,7 @@ msgstr "Исполнители"
 
 msgid "Author does not specified"
 msgstr "Автор не указан"
+
+msgid "Name and comment count"
+msgstr "Имя и количество комментов"
+

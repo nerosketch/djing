@@ -1138,3 +1138,6 @@ msgstr "Абоненты"
 
 msgid "Successfully saved"
 msgstr "Успешно сохранено"
+
+msgid "This user can not buy admin services"
+msgstr "Этот пользователь не может назначать административные услуги"

@@ -5,10 +5,6 @@ img.navbar-brand {
     margin: 0 15px 0 0;
 }
 
-body > .container {
-    padding: 60px 15px 0;
-}
-
 .table thead {
     background-color: #ddd;
 }
@@ -23,16 +19,4 @@ body > .container {
 .modal-header.warning {background-color: #d2322d;}
 .modal-header.success {background-color: #6ad245;}
 .modal-header.primary {background-color: #789cbb;}
-
-
-
-html{height: 100%;}
-body{
-    padding: 88px 15px 0;
-    background-image: url(../img/Transparent_snowman_PNG.png);
-    background-repeat: no-repeat;
-    background-position: bottom left;
-    background-attachment: fixed;
-}
-
 

@@ -33,7 +33,7 @@ class PaysListView(ListView):
 
 На примере *devapp/devices.html* можно рассмотреть такую сортировку.
 Там указан url с параметрами
-> {% url 'devapp:devs' group.pk %}?order_by=ip_address&dir={{ dir|default:'down' }}
+> \{\% url 'devapp:devs' group.pk \%\}?order_by=ip_address&dir=\{\{ dir|default:'down' \}\}
 
 Тут обратная сортировка по полю *ip_address*, со знаком -. То есть эквивалент будет выглядеть примерно так:
 > Device.objects.all().order_by('-ip_address')

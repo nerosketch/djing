@@ -6,7 +6,7 @@ from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, Http404
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -27,17 +27,17 @@ from statistics.models import getModel
 from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
-from djing.global_base_views import OrderingMixin
+from djing.global_base_views import OrderingMixin, BaseListWithFiltering
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
-class BaseAbonListView(ListView, OrderingMixin):
+class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class PeoplesListView(BaseAbonListView):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
@@ -45,7 +45,7 @@ class PeoplesListView(BaseAbonListView):
     def get_queryset(self):
         street_id = mydefs.safe_int(self.request.GET.get('street'))
         gid = mydefs.safe_int(self.kwargs.get('gid'))
-        peoples_list = models.Abon.objects.select_related('group', 'street')
+        peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
         if street_id > 0:
             peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
         else:
@@ -60,7 +60,11 @@ class PeoplesListView(BaseAbonListView):
                         pass
         except mydefs.LogicError as e:
             messages.warning(self.request, e)
-
+        ordering = self.get_ordering()
+        if ordering:
+            if isinstance(ordering, str):
+                ordering = (ordering,)
+                peoples_list = peoples_list.order_by(*ordering)
         return peoples_list
 
     def get_context_data(self, **kwargs):
@@ -79,6 +83,7 @@ class PeoplesListView(BaseAbonListView):
         return context
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class GroupListView(BaseAbonListView):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
@@ -186,6 +191,7 @@ def abonamount(request, gid, uid):
     }, request=request)
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(BaseAbonListView):
     context_object_name = 'invoices'
@@ -203,6 +209,7 @@ class DebtsListView(BaseAbonListView):
         return context
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(BaseAbonListView):
     context_object_name = 'pay_history'
@@ -211,7 +218,7 @@ class PayHistoryListView(BaseAbonListView):
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
         self.abon = abon
-        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
+        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-date')
         return pay_history
 
     def get_context_data(self, **kwargs):
@@ -402,8 +409,8 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
     try:
         abon = get_object_or_404(models.Abon, pk=uid)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
-        abon_tariff.delete()
         abon.sync_with_nas(created=False)
+        abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
@@ -545,7 +552,8 @@ def clear_dev(request, gid, uid):
     try:
         abon = models.Abon.objects.get(pk=uid)
         abon.device = None
-        abon.save(update_fields=['device'])
+        abon.dev_port = None
+        abon.save(update_fields=['device', 'dev_port'])
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -710,6 +718,7 @@ def abon_ping(request):
     }))
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class DialsListView(BaseAbonListView):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'

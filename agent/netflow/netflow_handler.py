@@ -4,6 +4,7 @@ import sys
 import os
 from importlib import import_module
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("File name of netflow required")
@@ -35,7 +36,7 @@ if __name__ == '__main__':
 
     sql = r'SELECT abonent.ip_address, acc.username ' \
           r'FROM abonent ' \
-          r'LEFT JOIN accounts_app_userprofile AS acc ON (acc.id = abonent.userprofile_ptr_id) ' \
+          r'LEFT JOIN base_accounts AS acc ON (acc.id = abonent.baseaccount_ptr_id) ' \
           r'WHERE abonent.ip_address != 0'
     ln = cursor.execute(sql)
     with open(tmp_ipuser_file, 'w') as f:
@@ -48,8 +49,8 @@ if __name__ == '__main__':
     db.close()
 
     os.system(
-        '/usr/bin/bash -c '
-        '"%(CUR_DIR)s/djing_flow %(TMP_IPUSER_FILE)s < %(TMP_DUMP)s | '
+        'bash -c "export LD_LIBRARY_PATH=. && '
+        '%(CUR_DIR)s/djing_flow %(TMP_IPUSER_FILE)s < %(TMP_DUMP)s | '
         '/usr/bin/mysql -u%(DB_USER)s -h %(HOST)s -p %(DB_NAME)s --password=%(DB_PASSW)s"' % {
             'CUR_DIR': cur_dir,
             'TMP_IPUSER_FILE': tmp_ipuser_file,

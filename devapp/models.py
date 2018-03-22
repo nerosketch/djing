@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
-from django.db import models
+from django.db import models, ProgrammingError
 from djing.fields import MACAddressField
 from .base_intr import DevBase
 from mydefs import MyGenericIPAddressField, MyChoicesAdapter, ip2int
@@ -76,7 +76,7 @@ class Device(models.Model):
         )
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
-        ordering = ['comment']
+        ordering = ['id']
 
     def get_abons(self):
         pass
@@ -107,6 +107,7 @@ class Device(models.Model):
     def update_dhcp(self):
         if self.devtype not in ('On','Dl'):
             return
+        #raise ProgrammingError('переделать это безобразие')
         # FIXME: переделать это безобразие
         grp = self.user_group.id
         code = ''

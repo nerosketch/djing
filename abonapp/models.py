@@ -191,7 +191,7 @@ class Abon(BaseAccount):
         AbonLog.objects.create(
             abon=self,
             amount=amount,
-            author=current_user,
+            author=current_user if isinstance(current_user, UserProfile) else None,
             comment=comment
         )
         self.ballance += amount
@@ -202,8 +202,11 @@ class Abon(BaseAccount):
 
         amount = round(tariff.amount, 2)
 
-        if not author.is_staff and tariff.is_admin:
-            raise LogicError(_('User that is no staff can not buy admin services'))
+        if tariff.is_admin:
+            if author is not None and not author.is_staff:
+                raise LogicError(_('User that is no staff can not buy admin services'))
+            else:
+                raise LogicError(_('This user can not buy admin services'))
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
@@ -347,7 +350,6 @@ class AllTimePayLogManager(models.Manager):
             r = cur.fetchone()
             if r is None: break
             summ, dat = r
-            print(summ, dat)
             yield {'summ': summ, 'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
 
 

@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
+{% load globaltags %}
 {% block main %}
 
     <ol class="breadcrumb">
@@ -28,7 +29,7 @@
                     {% else %}
                         <form role="form" action="{% url 'taskapp:add' %}" method="post" enctype="multipart/form-data">
                     {% endif %}
-                    {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{{ FILE_UPLOAD_MAX_MEMORY_SIZE }}"/>
+                    {% csrf_token %}<input type="hidden" name="MAX_FILE_SIZE" value="{% global_var 'FILE_UPLOAD_MAX_MEMORY_SIZE' %}"/>
 
                     {% bootstrap_icon 'tag' as ic %}
                     {% bootstrap_field form.descr addon_before=ic %}

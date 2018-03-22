@@ -29,6 +29,6 @@ if grep "${MAC}" "${DHCP_PATH}/${PART_CODE}.conf" > /dev/null; then
 else
   # add new mac
   echo "subclass \"${PART_CODE}\" \"${MAC}\";" >> "${DHCP_PATH}/${PART_CODE}.conf"
-  /usr/bin/sudo /usr/bin/systemctl restart dhcpd.service
+  sudo systemctl restart isc-dhcp-server.service
 fi
 

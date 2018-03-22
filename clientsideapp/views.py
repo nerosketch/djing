@@ -28,7 +28,7 @@ def pays(request):
 @login_required
 def services(request):
     try:
-        abon = Abon.objects.get(pk=request.user.pk)
+        abon = request.user
         all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk)
         current_service = abon.active_tariff()
     except Abon.DoesNotExist:
@@ -43,14 +43,14 @@ def services(request):
 @login_required
 @transaction.atomic
 def buy_service(request, srv_id):
-    abon = get_object_or_404(Abon, pk=request.user.pk)
+    abon = request.user
     service = get_object_or_404(Tariff, pk=srv_id)
     try:
         current_service = abon.active_tariff()
         if request.method == 'POST':
-            abon.pick_tariff(service, request.user, _("Buy the service via user side, service '%s'")
+            abon.pick_tariff(service, None, _("Buy the service via user side, service '%s'")
                              % service)
-            abon.abon.sync_with_nas(created=False)
+            abon.sync_with_nas(created=False)
             messages.success(request, _("The service '%s' wan successfully activated") % service.title)
         else:
             return render_to_text('clientsideapp/modal_service_buy.html', {
@@ -76,7 +76,7 @@ def debts_list(request):
 @transaction.atomic
 def debt_buy(request, d_id):
     debt = get_object_or_404(InvoiceForPayment, id=d_id)
-    abon = get_object_or_404(Abon, id=request.user.id)
+    abon = request.user
     if request.method == 'POST':
         try:
             sure = request.POST.get('sure')
@@ -86,7 +86,7 @@ def debt_buy(request, d_id):
                 raise LogicError(_('Your account have not enough money'))
 
             amount = -debt.amount
-            abon.add_ballance(request.user, amount, comment=gettext('%(username)s paid the debt %(amount).2f') % {
+            abon.add_ballance(None, amount, comment=gettext('%(username)s paid the debt %(amount).2f') % {
                 'username': abon.get_full_name(),
                 'amount': amount
             })

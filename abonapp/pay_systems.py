@@ -67,8 +67,7 @@ def allpay(request):
             if pays.count() > 0:
                 return bad_ret(-100)
 
-            # тут в author передаём учётку абонента, т.к. это он сам через терминал пополняет
-            abon.add_ballance(abon, pay_amount, comment='AllPay %.2f' % pay_amount)
+            abon.add_ballance(None, pay_amount, comment='AllPay %.2f' % pay_amount)
             abon.save(update_fields=['ballance'])
 
             AllTimePayLog.objects.create(

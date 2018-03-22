@@ -57,7 +57,7 @@ class MessageQueue(models.Model):
         ('r', 'Read')
     )
     status = models.CharField(_('Status of message'), max_length=1, choices=STATUSES, default='n')
-    # tag каждое приложение ставит своим чтоб делить сообщения между этими приложениями
+    # tag: each application puts its own to separate messages between these applications
     tag = models.CharField(_('App tag'), max_length=6, default='none')
 
     objects = MessageQueueManager()

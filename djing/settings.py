@@ -19,13 +19,14 @@ from django.urls import reverse_lazy
 SECRET_KEY = local_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = local_settings.DEBUG or False
+DEBUG = local_settings.DEBUG
 
 ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 
 # required for django-guardian
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # default
+    'djing.auth_backends.CustomAuthBackend',
+    #'django.contrib.auth.backends.ModelBackend', # default
     'guardian.backends.ObjectPermissionBackend'
 )
 
@@ -78,14 +79,16 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
+                #'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'taskapp.context_proc.get_active_tasks_count',
-                'global_context_processors.context_processor_additional_profile',
                 'msg_app.context_processors.get_new_messages_count'
             ],
+            'libraries': {
+                'globaltags': 'djing.templatetags.globaltags',
+            }
         },
     },
 ]
@@ -117,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SESSION_COOKIE_HTTPONLY = True
 
@@ -187,3 +190,6 @@ API_AUTH_SECRET = local_settings.API_AUTH_SECRET
 
 # Allowed subnet for api
 API_AUTH_SUBNET = local_settings.API_AUTH_SUBNET
+
+# Company name
+COMPANY_NAME = local_settings.COMPANY_NAME
