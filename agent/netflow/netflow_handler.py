@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     sql = r'SELECT abonent.ip_address, acc.username ' \
           r'FROM abonent ' \
-          r'LEFT JOIN accounts_app_userprofile AS acc ON (acc.id = abonent.userprofile_ptr_id) ' \
+          r'LEFT JOIN base_accounts AS acc ON (acc.id = abonent.baseaccount_ptr_id) ' \
           r'WHERE abonent.ip_address != 0'
     ln = cursor.execute(sql)
     with open(tmp_ipuser_file, 'w') as f:

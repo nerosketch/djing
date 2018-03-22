@@ -107,7 +107,7 @@ class Device(models.Model):
     def update_dhcp(self):
         if self.devtype not in ('On','Dl'):
             return
-        raise ProgrammingError('переделать это безобразие')
+        #raise ProgrammingError('переделать это безобразие')
         # FIXME: переделать это безобразие
         grp = self.user_group.id
         code = ''
