@@ -42,7 +42,7 @@ class Photo(models.Model):
             os.makedirs(path + '/min')
         im.save(fname)
         os.remove(self.image.path)
-        self.image = "%s.%s" % (hs, ext)
+        self.image = "media/%s.%s" % (hs, ext)
         super(Photo, self).save(*args, **kwargs)
 
         # class Meta:
