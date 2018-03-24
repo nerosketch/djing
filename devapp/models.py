@@ -109,7 +109,7 @@ class Device(models.Model):
             return
         #raise ProgrammingError('переделать это безобразие')
         # FIXME: переделать это безобразие
-        grp = self.user_group.id
+        grp = self.group.id
         code = ''
         if grp == 87:
             code = 'chk'
