@@ -159,76 +159,63 @@ from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 
 class LinuxTransmitter(BaseTransmitter):
 
-    def add_user_range(self, user_list):
+    @abstractmethod
+    def add_user_range(self, user_list: VectorAbon):
         """добавляем список абонентов в NAS"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def remove_user_range(self, users):
+    def remove_user_range(self, users: VectorAbon):
         """удаляем список абонентов"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def add_user(self, user, *args):
+    def add_user(self, user: AbonStruct, *args):
         """добавляем абонента"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def remove_user(self, user):
+    def remove_user(self, user: AbonStruct):
         """удаляем абонента"""
 
     @abstractmethod
-    @check_input_type(AbonStruct)
-    def update_user(self, user, *args):
-        """
-        Чтоб обновить абонента можно изменить всё кроме его uid, по uid абонент будет найден.
-        Это значит что вы можете передать объект user класса AbonStruct, где только uid будет указывать на абонента,
-        а остальные поля будут содержать новое значение.
-        """
+    def update_user(self, user: AbonStruct, *args):
+        """чтоб обновить абонента можно изменить всё кроме его uid, по uid абонент будет найден"""
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def add_tariff_range(self, tariff_list):
+    def add_tariff_range(self, tariff_list: VectorTariff):
         """
         Пока не используется, зарезервировано.
         Добавляет список тарифов в NAS
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def remove_tariff_range(self, tariff_list):
+    def remove_tariff_range(self, tariff_list: VectorTariff):
         """
         Пока не используется, зарезервировано.
         Удаляем список тарифов по уникальным идентификаторам
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def add_tariff(self, tariff):
+    def add_tariff(self, tariff: TariffStruct):
         """
         Пока не используется, зарезервировано.
-        Добавляем тариф
+        Добавляет тариф
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def update_tariff(self, tariff):
+    def update_tariff(self, tariff: TariffStruct):
         """
         Пока не используется, зарезервировано.
         Чтоб обновить тариф надо изменить всё кроме его tid, по tid тариф будет найден
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def remove_tariff(self, tid):
+    def remove_tariff(self, tid: int):
         """
         :param tid: id тарифа в среде NAS сервера чтоб удалить по этому номеру
         Пока не используется, зарезервировано.
         """
 
     @abstractmethod
-    @check_input_type(TariffStruct)
-    def ping(self, host, count=10):
+    def ping(self, host: str, count=10):
         """
         :param host: ip адрес в текстовом виде, например '192.168.0.1'
         :param count: количество пингов

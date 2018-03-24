@@ -1,5 +1,3 @@
-from django.contrib.auth.models import AnonymousUser
-
 from taskapp.models import Task
 from accounts_app.models import UserProfile
 

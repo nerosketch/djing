@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
+from typing import AnyStr
+
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from .base_intr import TariffBase, PeriodicPayCalcBase
 from calendar import monthrange
 
@@ -14,7 +16,7 @@ class TariffDefault(TariffBase):
         self.abon_tariff = abon_tariff
 
     # Базовый функционал считает стоимость пропорционально использованному времени
-    def calc_amount(self):
+    def calc_amount(self) -> float:
         # сейчас
         nw = timezone.now()
 
@@ -35,7 +37,7 @@ class TariffDefault(TariffBase):
         return float(res)
 
     # Тут мы расчитываем конец действия услуги, завершение будет в конце месяца
-    def calc_deadline(self):
+    def calc_deadline(self) -> datetime:
         nw = timezone.now()
         last_day = monthrange(nw.year, nw.month)[1]
         last_month_date = datetime(year=nw.year, month=nw.month, day=last_day,
@@ -43,7 +45,7 @@ class TariffDefault(TariffBase):
         return last_month_date
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         return _('Base calculate functionality')
 
 
@@ -51,17 +53,17 @@ class TariffDp(TariffDefault):
     # в IS снимается вся стоимость тарифа вне зависимости от времени использования
 
     # просто возвращаем всю стоимость тарифа
-    def calc_amount(self):
+    def calc_amount(self) -> float:
         return float(self.abon_tariff.tariff.amount)
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         return 'IS'
 
 
 # Как в IS только не на время, а на 10 лет
 class TariffCp(TariffDp):
-    def calc_deadline(self):
+    def calc_deadline(self) -> datetime:
         # делаем время окончания услуги на 10 лет вперёд
         nw = timezone.now()
         long_long_time = datetime(year=nw.year + 10, month=nw.month, day=nw.day,
@@ -69,7 +71,7 @@ class TariffCp(TariffDp):
         return long_long_time
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         return _('Private service')
 
 
@@ -82,20 +84,20 @@ TARIFF_CHOICES = (
 
 
 class PeriodicPayCalcDefault(PeriodicPayCalcBase):
-    def calc_amount(self, model_object):
+    def calc_amount(self, model_object) -> float:
         return model_object.amount
 
-    def get_next_time_to_pay(self, model_object, last_time_payment):
+    def get_next_time_to_pay(self, model_object, last_time_payment) -> datetime:
         # TODO: решить какой будет расёт периодических платежей
         return datetime.now() + timedelta(days=30)
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         return _('Default periodic pay')
 
 
 class PeriodicPayCalcCustom(PeriodicPayCalcDefault):
-    def calc_amount(self, model_object):
+    def calc_amount(self, model_object) -> float:
         """
         :param model_object: it is a instance of models.PeriodicPay model
         :return: float: amount for the service
@@ -103,7 +105,7 @@ class PeriodicPayCalcCustom(PeriodicPayCalcDefault):
         return uniform(1, 10)
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         return _('Custom periodic pay')
 
 

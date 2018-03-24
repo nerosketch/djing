@@ -3,13 +3,13 @@ import socket
 import binascii
 from abc import ABCMeta
 from hashlib import md5
+from typing import List, Iterable
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping, singleton
-from .structs import TariffStruct, AbonStruct, IpStruct
+from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings
 import re
-
 
 DEBUG = getattr(settings, 'DEBUG', False)
 
@@ -19,14 +19,16 @@ LIST_USERS_BLOCKED = 'DjingUsersBlocked'
 
 @singleton
 class ApiRos:
-    "Routeros api"
+    """Routeros api"""
     sk = None
     is_login = False
 
-    def __init__(self, ip, port):
+    def __init__(self, ip: str, port: int):
         if self.sk is None:
             sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sk.connect((ip, port or getattr(local_settings, 'NAS_PORT', 8728)))
+            if port is None:
+                port = local_settings.NAS_PORT
+            sk.connect((ip, port or 8728))
             self.sk = sk
 
         self.currenttag = 0
@@ -41,136 +43,145 @@ class ApiRos:
         md.update(b'\x00')
         md.update(bytes(pwd, 'utf-8'))
         md.update(chal)
-        for r in self.talk_iter(["/login", "=name=" + username,
-                                 "=response=00" + binascii.hexlify(md.digest()).decode('utf-8')]): pass
+        for _ in self.talk_iter(["/login", "=name=" + username,
+                                 "=response=00" + binascii.hexlify(md.digest()).decode('utf-8')]):
+            pass
         self.is_login = True
 
     def talk_iter(self, words):
-        if self.writeSentence(words) == 0: return
+        if self.write_sentence(words) == 0:
+            return
         while 1:
-            i = self.readSentence()
-            if len(i) == 0: continue
+            i = self.read_sentence()
+            if len(i) == 0:
+                continue
             reply = i[0]
             attrs = {}
             for w in i[1:]:
                 j = w.find('=', 1)
-                if (j == -1):
+                if j == -1:
                     attrs[w] = ''
                 else:
                     attrs[w[:j]] = w[j + 1:]
             yield (reply, attrs)
-            if reply == '!done': return
+            if reply == '!done':
+                return
 
-    def writeSentence(self, words):
+    def write_sentence(self, words):
         ret = 0
         for w in words:
-            self.writeWord(w)
+            self.write_word(w)
             ret += 1
-        self.writeWord('')
+        self.write_word('')
         return ret
 
-    def readSentence(self):
+    def read_sentence(self):
         r = []
         while 1:
-            w = self.readWord()
-            if w == '': return r
+            w = self.read_word()
+            if w == '':
+                return r
             r.append(w)
 
-    def writeWord(self, w):
+    def write_word(self, w):
         if DEBUG:
             print("<<< " + w)
         b = bytes(w, "utf-8")
-        self.writeLen(len(b))
-        self.writeBytes(b)
+        self.write_len(len(b))
+        self.write_bytes(b)
 
-    def readWord(self):
-        ret = self.readBytes(self.readLen()).decode('utf-8')
+    def read_word(self):
+        ret = self.read_bytes(self.read_len()).decode('utf-8')
         if DEBUG:
             print(">>> " + ret)
         return ret
 
-    def writeLen(self, l):
+    def write_len(self, l):
         if l < 0x80:
-            self.writeBytes(bytes([l]))
+            self.write_bytes(bytes([l]))
         elif l < 0x4000:
             l |= 0x8000
-            self.writeBytes(bytes([(l >> 8) & 0xff, l & 0xff]))
+            self.write_bytes(bytes([(l >> 8) & 0xff, l & 0xff]))
         elif l < 0x200000:
             l |= 0xC00000
-            self.writeBytes(bytes([(l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
+            self.write_bytes(bytes([(l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
         elif l < 0x10000000:
             l |= 0xE0000000
-            self.writeBytes(bytes([(l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
+            self.write_bytes(bytes([(l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
         else:
-            self.writeBytes(bytes([0xf0, (l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
+            self.write_bytes(bytes([0xf0, (l >> 24) & 0xff, (l >> 16) & 0xff, (l >> 8) & 0xff, l & 0xff]))
 
-    def readLen(self):
-        c = self.readBytes(1)[0]
+    def read_len(self):
+        c = self.read_bytes(1)[0]
         if (c & 0x80) == 0x00:
             pass
         elif (c & 0xC0) == 0x80:
             c &= ~0xC0
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
         elif (c & 0xE0) == 0xC0:
             c &= ~0xE0
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
         elif (c & 0xF0) == 0xE0:
             c &= ~0xF0
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
         elif (c & 0xF8) == 0xF0:
-            c = self.readBytes(1)[0]
+            c = self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
             c <<= 8
-            c += self.readBytes(1)[0]
+            c += self.read_bytes(1)[0]
         return c
 
-    def writeBytes(self, s):
+    def write_bytes(self, s):
         n = 0
         while n < len(s):
             r = self.sk.send(s[n:])
-            if r == 0: raise NasFailedResult("connection closed by remote end")
+            if r == 0:
+                raise NasFailedResult("connection closed by remote end")
             n += r
 
-    def readBytes(self, length):
+    def read_bytes(self, length):
         ret = b''
         while len(ret) < length:
             s = self.sk.recv(length - len(ret))
-            if len(s) == 0: raise NasFailedResult("connection closed by remote end")
+            if len(s) == 0:
+                raise NasFailedResult("connection closed by remote end")
             ret += s
         return ret
 
 
 class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
-
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or getattr(local_settings, 'NAS_IP')
-        if ip is None:
-            raise NasNetworkError('Не передан ip адрес NAS')
+        if ip is None or ip == '<NAS IP>':
+            raise NasNetworkError('Ip address of NAS does not specified')
         if not ping(ip):
-            raise NasNetworkError('NAS %s не пингуется' % ip)
+            raise NasNetworkError('NAS %(ip_addr)s does not pinged' % {
+                'ip_addr': ip
+            })
         try:
             self.ar = ApiRos(ip, port)
-            self.ar.login(login or getattr(local_settings, 'NAS_LOGIN'), password or getattr(local_settings, 'NAS_PASSW'))
+            self.ar.login(login or getattr(local_settings, 'NAS_LOGIN'),
+                          password or getattr(local_settings, 'NAS_PASSW'))
         except ConnectionRefusedError:
-            raise NasNetworkError('Подключение к %s отклонено (Connection Refused)' % ip)
+            raise NasNetworkError('Connection to %s is Refused' % ip)
 
     def __del__(self):
         if hasattr(self, 's'):
             self.s.close()
 
-    def _exec_cmd(self, cmd):
+    def _exec_cmd(self, cmd: list) -> list:
         if not isinstance(cmd, list):
             raise TypeError
         result_iter = self.ar.talk_iter(cmd)
@@ -181,7 +192,7 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
             res.append(rt[1])
         return res
 
-    def _exec_cmd_iter(self, cmd):
+    def _exec_cmd_iter(self, cmd: list) -> Iterable:
         if not isinstance(cmd, list):
             raise TypeError
         result_iter = self.ar.talk_iter(cmd)
@@ -192,8 +203,9 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
                 raise NasFailedResult(rt[1]['=message'])
             yield rt
 
-    # Строим объект ShapeItem из инфы, присланной из mikrotik'a
-    def _build_shape_obj(self, info):
+    # Build object ShapeItem from information from mikrotik
+    @staticmethod
+    def _build_shape_obj(info: dict) -> AbonStruct:
         # Переводим приставку скорости Mikrotik в Mbit/s
         def parse_speed(text_speed):
             text_speed_digit = float(text_speed[:-1] or 0.0)
@@ -228,13 +240,13 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
 
 class QueueManager(TransmitterManager, metaclass=ABCMeta):
-    # ищем правило по имени, и возвращаем всю инфу о найденном правиле
-    def find(self, name):
+    # Find queue by name
+    def find(self, name: str) -> AbonStruct:
         ret = self._exec_cmd(['/queue/simple/print', '?name=%s' % name])
         if len(ret) > 1:
             return self._build_shape_obj(ret[0])
 
-    def add(self, user):
+    def add(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
             raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
@@ -248,32 +260,30 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
                                '=burst-time=1/1'
                                ])
 
-    def remove(self, user):
+    def remove(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
             raise TypeError
         q = self.find('uid%d' % user.uid)
         if q is not None:
             return self._exec_cmd(['/queue/simple/remove', '=.id=' + getattr(q, 'queue_id', '')])
 
-    def remove_range(self, q_ids):
+    def remove_range(self, q_ids: List[str]):
         try:
-            #q_ids = [q.queue_id for q in q_ids]
+            # q_ids = [q.queue_id for q in q_ids]
             return self._exec_cmd(['/queue/simple/remove', '=numbers=' + ','.join(q_ids)])
         except TypeError as e:
             print(e)
 
-    def update(self, user):
+    def update(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
             raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
         queue = self.find('uid%d' % user.uid)
         if queue is None:
-            # не нашли запись в шейпере об абоненте, добавим
             return self.add(user)
         else:
             mk_id = getattr(queue, 'queue_id', '')
-            # обновляем шейпер абонента
             return self._exec_cmd(['/queue/simple/set', '=.id=' + mk_id,
                                    '=name=uid%d' % user.uid,
                                    '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
@@ -283,7 +293,6 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
                                    '=burst-time=1/1'
                                    ])
 
-    # читаем шейпер, возващаем записи о шейпере
     def read_queue_iter(self):
         for code, dat in self._exec_cmd_iter(['/queue/simple/print', '=detail']):
             if code == '!done':
@@ -292,14 +301,14 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             if sobj is not None:
                 yield sobj
 
-    # то же что и выше, только получаем только номера в микротике
     def read_mikroids_iter(self):
         queues = self._exec_cmd_iter(['/queue/simple/print', '=detail'])
         for queue in queues:
-            if queue[0] == '!done': return
+            if queue[0] == '!done':
+                return
             yield int(queue[1]['=.id'].replace('*', ''), base=16)
 
-    def disable(self, user):
+    def disable(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
             raise TypeError
         q = self.find('uid%d' % user.uid)
@@ -309,7 +318,7 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
         else:
             return self._exec_cmd(['/queue/simple/disable', '=.id=*' + getattr(q, 'queue_id', '')])
 
-    def enable(self, user):
+    def enable(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
             raise TypeError
         q = self.find('uid%d' % user.uid)
@@ -327,8 +336,7 @@ class IpAddressListObj(IpStruct):
 
 
 class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
-
-    def add(self, list_name, ip, timeout=None):
+    def add(self, list_name: str, ip: IpStruct, timeout=0):
         if not isinstance(ip, IpStruct):
             raise TypeError
         commands = [
@@ -336,7 +344,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             '=list=%s' % list_name,
             '=address=%s' % str(ip)
         ]
-        if type(timeout) is int:
+        if timeout > 0:
             commands.append('=timeout=%d' % timeout)
         return self._exec_cmd(commands)
 
@@ -354,7 +362,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             '=.id=*' + str(mk_id).replace('*', '')
         ])
 
-    def remove_range(self, items):
+    def remove_range(self, items: Iterable[IpAddressListObj]):
         ids = [ip.mk_id for ip in items if isinstance(ip, IpAddressListObj)]
         if len(ids) > 0:
             return self._exec_cmd([
@@ -362,7 +370,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
                 '=numbers=*%s' % ',*'.join(ids)
             ])
 
-    def find(self, ip, list_name):
+    def find(self, ip: IpStruct, list_name: str):
         if not isinstance(ip, IpStruct):
             raise TypeError
         return self._exec_cmd([
@@ -371,8 +379,8 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             '?address=%s' % str(ip)
         ])
 
-    def read_ips_iter(self, list_name):
-        ips = self._exec_cmd_iter([
+    def read_ips_iter(self, list_name: str):
+        ips: Iterable = self._exec_cmd_iter([
             '/ip/firewall/address-list/print', 'where',
             '?list=%s' % list_name,
             '?dynamic=no'
@@ -381,7 +389,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             if dat != {}:
                 yield IpAddressListObj(dat['=address'], dat['=.id'])
 
-    def disable(self, user):
+    def disable(self, user: AbonStruct):
         r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
         if len(r) > 1:
             mk_id = r[0]['=.id']
@@ -401,13 +409,12 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
 
 
 class MikrotikTransmitter(QueueManager, IpAddressListManager):
-
-    def add_user_range(self, user_list):
+    def add_user_range(self, user_list: VectorAbon):
         super(MikrotikTransmitter, self).add_user_range(user_list)
         for usr in user_list:
             self.add_user(usr)
 
-    def remove_user_range(self, users):
+    def remove_user_range(self, users: VectorAbon):
         super(MikrotikTransmitter, self).remove_user_range(users)
         queue_ids = [usr.queue_id for usr in users if usr is not None]
         QueueManager.remove_range(self, queue_ids)
@@ -417,7 +424,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             if ip_list_entity is not None and len(ip_list_entity) > 1:
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
-    def add_user(self, user, ip_timeout=None):
+    def add_user(self, user: AbonStruct, ip_timeout=None):
         super(MikrotikTransmitter, self).add_user(user, ip_timeout)
         if not isinstance(user.ip, IpStruct):
             raise TypeError
@@ -430,7 +437,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         if len(firewall_ip_list_obj) > 1:
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
-    def remove_user(self, user):
+    def remove_user(self, user: AbonStruct):
         super(MikrotikTransmitter, self).remove_user(user)
         QueueManager.remove(self, user)
         firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
@@ -438,7 +445,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     # обновляем основную инфу абонента
-    def update_user(self, user, ip_timeout=None):
+    def update_user(self, user: AbonStruct, ip_timeout=None):
         super(MikrotikTransmitter, self).update_user(user, ip_timeout)
         if not isinstance(user.ip, IpStruct):
             raise TypeError
@@ -495,22 +502,22 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         return received, sent
 
     # Тарифы хранить нам не надо, так что методы тарифов ниже не реализуем
-    def add_tariff_range(self, tariff_list):
+    def add_tariff_range(self, tariff_list: VectorTariff):
         pass
 
     # соответственно и удалять тарифы не надо
-    def remove_tariff_range(self, tariff_list):
+    def remove_tariff_range(self, tariff_list: VectorTariff):
         pass
 
     # и добавлять тоже
-    def add_tariff(self, tariff):
+    def add_tariff(self, tariff: TariffStruct):
         pass
 
     # и обновлять
-    def update_tariff(self, tariff):
+    def update_tariff(self, tariff: TariffStruct):
         pass
 
-    def remove_tariff(self, tid):
+    def remove_tariff(self, tid: int):
         pass
 
     def read_users(self):
