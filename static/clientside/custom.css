@@ -20,15 +20,3 @@ img.navbar-brand {
 .modal-header.success {background-color: #6ad245;}
 .modal-header.primary {background-color: #789cbb;}
 
-
-
-html{height: 100%;}
-body{
-    padding: 88px 15px 0;
-    background-image: url(../img/Transparent_snowman_PNG.png);
-    background-repeat: no-repeat;
-    background-position: bottom left;
-    background-attachment: fixed;
-}
-
-

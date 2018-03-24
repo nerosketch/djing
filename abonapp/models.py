@@ -191,7 +191,7 @@ class Abon(BaseAccount):
         AbonLog.objects.create(
             abon=self,
             amount=amount,
-            author=current_user,
+            author=current_user if isinstance(current_user, UserProfile) else None,
             comment=comment
         )
         self.ballance += amount

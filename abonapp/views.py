@@ -32,12 +32,12 @@ from djing.global_base_views import OrderingMixin, BaseListWithFiltering
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
     http_method_names = ['get']
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class PeoplesListView(BaseAbonListView):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
@@ -83,6 +83,7 @@ class PeoplesListView(BaseAbonListView):
         return context
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class GroupListView(BaseAbonListView):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
@@ -190,6 +191,7 @@ def abonamount(request, gid, uid):
     }, request=request)
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(BaseAbonListView):
     context_object_name = 'invoices'
@@ -207,6 +209,7 @@ class DebtsListView(BaseAbonListView):
         return context
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(BaseAbonListView):
     context_object_name = 'pay_history'
@@ -215,7 +218,7 @@ class PayHistoryListView(BaseAbonListView):
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
         self.abon = abon
-        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-id')
+        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-date')
         return pay_history
 
     def get_context_data(self, **kwargs):
@@ -715,6 +718,7 @@ def abon_ping(request):
     }))
 
 
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
 class DialsListView(BaseAbonListView):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
