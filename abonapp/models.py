@@ -279,7 +279,7 @@ class Abon(BaseAccount):
         super(Abon, self).save(*args, **kwargs)
 
     def sync_with_nas(self, created: bool) -> Optional[Union[Exception, bool]]:
-        timeout = None
+        timeout = 0
         if hasattr(self, 'is_dhcp') and self.is_dhcp:
             timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
         agent_abon = self.build_agent_struct()

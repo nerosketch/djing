@@ -460,3 +460,5 @@ msgstr "Автор не указан"
 msgid "Name and comment count"
 msgstr "Имя и количество комментов"
 
+msgid "None"
+msgstr "Нету"
