@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, timedelta, date, time
-from django.db import models, connection
+from django.db import models, connection, ProgrammingError
 from django.utils.timezone import now
 
 from mydefs import MyGenericIPAddressField
@@ -28,24 +28,29 @@ class StatManager(models.Manager):
         def avarage(elements):
             return sum(elements) / len(elements)
 
-        charts_data = self.filter(uname=username)
-        charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
-        charts_octets = [cd.octets for cd in charts_data]
-        if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
-            charts_octets = split_list(charts_octets, count_of_parts)
-            charts_octets = [byte_to_mbit(avarage(c)) for c in charts_octets]
+        try:
+            charts_data = self.filter(uname=username)
+            charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
+            charts_octets = [cd.octets for cd in charts_data]
+            if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
+                charts_octets = split_list(charts_octets, count_of_parts)
+                charts_octets = [byte_to_mbit(avarage(c)) for c in charts_octets]
 
-            charts_times = split_list(charts_times, count_of_parts)
-            charts_times = [avarage(t) for t in charts_times]
+                charts_times = split_list(charts_times, count_of_parts)
+                charts_times = [avarage(t) for t in charts_times]
 
-            charts_data = zip(charts_times, charts_octets)
-            charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
-            midnight = datetime.combine(want_date, time.min)
-            charts_data.append("{x:new Date(%d),y:0}" % (int(charts_times[-1:][0]) + 1))
-            charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
-            return charts_data
-        else:
-            return
+                charts_data = zip(charts_times, charts_octets)
+                charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
+                midnight = datetime.combine(want_date, time.min)
+                charts_data.append("{x:new Date(%d),y:0}" % (int(charts_times[-1:][0]) + 1))
+                charts_data.append("{x:new Date(%d),y:0}" % (int((midnight + timedelta(days=1)).timestamp()) * 1000))
+                return charts_data
+            else:
+                return
+        except ProgrammingError as e:
+            if "Table 'djing_db_n.flowstat" in str(e):
+                return
+
 
 
 class StatElem(models.Model):

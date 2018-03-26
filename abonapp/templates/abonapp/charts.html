@@ -11,14 +11,6 @@
                 <div class="panel-body">
                     {% if charts_data %}
                         <div id="chrt"></div>
-                        <form action="{% url 'abonapp:charts' group.pk abon.pk %}" method="get" class="input-group">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <span class="glyphicon glyphicon-calendar"></span> {% trans 'Show graph by date' %}
-                                </button>
-                            </span>
-                            <input type="text" class="form-control" placeholder="{% trans 'Choose a date' %}" id="date_choose" name="wantdate" value="{{ wantdate|date:'dmY' }}">
-                        </form>
                         <script type="text/javascript">
                             $(document).ready(function ($) {
                                 new Chartist.Line('#chrt', {
@@ -46,14 +38,26 @@
                                         tension: 0
                                     })
                                 });
-                                $('#date_choose').datetimepicker({
-                                    format: 'DDMMYYYY'
-                                });
                             });
                         </script>
                     {% else %}
                         <h2>{% trans 'Static info was Not found' %}</h2>
                     {% endif %}
+                    <form action="{% url 'abonapp:charts' group.pk abon.pk %}" method="get" class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-calendar"></span> {% trans 'Show graph by date' %}
+                            </button>
+                        </span>
+                        <input type="text" class="form-control" placeholder="{% trans 'Choose a date' %}" id="date_choose" name="wantdate" value="{{ wantdate|date:'dmY' }}">
+                    </form>
+                    <script type="text/javascript">
+                    $(document).ready(function ($) {
+                        $('#date_choose').datetimepicker({
+                            format: 'DDMMYYYY'
+                        });
+                    });
+                    </script>
                 </div>
             </div>
         </div>

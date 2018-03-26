@@ -579,21 +579,18 @@ def charts(request, gid, uid):
             abon.group = Group.objects.get(pk=gid)
             abon.save(update_fields=['group'])
 
-        if abon.ip_address is None:
-            charts_data = None
-        else:
-            charts_data = StatElem.objects.chart(
-                abon.username,
-                count_of_parts=30,
-                want_date=wandate
-            )
+        charts_data = StatElem.objects.chart(
+            abon.username,
+            count_of_parts=30,
+            want_date=wandate
+        )
 
-            abontariff = abon.active_tariff()
-            if abontariff is not None:
-                trf = abontariff.tariff
-                high = trf.speedIn + trf.speedOut
-                if high > 100:
-                    high = 100
+        abontariff = abon.active_tariff()
+        if abontariff is not None:
+            trf = abontariff.tariff
+            high = trf.speedIn + trf.speedOut
+            if high > 100:
+                high = 100
 
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
