@@ -47,7 +47,12 @@ class MyUserManager(BaseUserManager):
 
 
 class BaseAccount(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_('profile username'), max_length=127, unique=True)
+    username = models.CharField(
+        _('profile username'),
+        max_length=127,
+        unique=True,
+        validators=[RegexValidator(r'^\w{1,127}$')]
+    )
     fio = models.CharField(_('fio'), max_length=256)
     birth_day = models.DateField(_('birth day'), auto_now_add=True)
     is_active = models.BooleanField(_('Is active'), default=True)

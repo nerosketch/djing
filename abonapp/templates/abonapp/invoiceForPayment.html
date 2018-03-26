@@ -6,7 +6,7 @@
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' group.pk %}">{{ group.title }}</a></li>
-        <li><a href="{% url 'abonapp:abon_phistory' group.pk abon.pk %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:abon_phistory' group.pk abon.username %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Debts' %}</li>
     </ol>
 
@@ -57,7 +57,7 @@
                 <tfoot>
                 <tr>
                     <th colspan="7">
-                        <a href="{% url 'abonapp:add_invoice' group.id abon.id %}" class="btn btn-success btn-sm">
+                        <a href="{% url 'abonapp:add_invoice' group.id abon.username %}" class="btn btn-success btn-sm">
                             <span class="glyphicon glyphicon-plus"></span> {% trans 'Add debt' %}
                         </a>
                     </th>

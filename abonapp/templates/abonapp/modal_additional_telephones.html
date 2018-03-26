@@ -1,5 +1,4 @@
 {% load i18n %}
-
 <div class="modal-header primary">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h4 class="modal-title"><span class="glyphicon glyphicon-earphone"></span>{% trans 'Additional telephones' %}</h4>
@@ -21,7 +20,7 @@
                 <td>{{ t.owner_name }}</td>
                 <td><a href="sip:{{ t.telephone }}" class="btn btn-link">{{ t.telephone }}</a></td>
                 <td>
-                    <a href="{% url 'abonapp:telephone_del' gid uid %}?tid={{ t.pk }}" class="btn btn-default btn-sm" title="{% trans 'Delete' %}">
+                    <a href="{% url 'abonapp:telephone_del' gid uname %}?tid={{ t.pk }}" class="btn btn-default btn-sm" title="{% trans 'Delete' %}">
                         <span class="glyphicon glyphicon-remove-circle"></span>
                     </a>
                 </td>

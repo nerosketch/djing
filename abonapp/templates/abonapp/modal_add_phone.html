@@ -1,5 +1,5 @@
 {% load i18n %}
-<form role="form" action="{% url 'abonapp:telephone_new' gid uid %}" method="post"> {% csrf_token %}
+<form role="form" action="{% url 'abonapp:telephone_new' gid uname %}" method="post"> {% csrf_token %}
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title"><span class="glyphicon glyphicon-earphone"></span>{% trans 'Add telephone' %}</h4>

@@ -54,7 +54,7 @@ def to_abon(request, tel):
         return redirect('dialapp:home')
     abon = abon[0]
     if abon.group:
-        return redirect('abonapp:abon_home', gid=abon.group.pk, uid=abon.pk)
+        return redirect('abonapp:abon_home', gid=abon.group.pk, uname=abon.username)
     else:
         return redirect('abonapp:group_list')
 

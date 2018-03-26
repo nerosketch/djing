@@ -28,7 +28,7 @@
             {% for invoice in invoices %}
                 <tr>
                     <td>{{ invoice.id }}</td>
-                    <td><a href="{% url 'abonapp:abon_home' invoice.abon.group.id invoice.abon.id %}"
+                    <td><a href="{% url 'abonapp:abon_home' invoice.abon.group.id invoice.abon.username %}"
                            target="_blank">{{ invoice.abon.username }}</a></td>
                     <td>{{ invoice.amount }}</td>
                     <td>{{ invoice.comment }}</td>

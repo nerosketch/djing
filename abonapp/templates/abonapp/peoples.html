@@ -77,7 +77,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'abonapp:abon_home' human.group.pk human.pk %}">{{ human.username }}</a>
+                            <a href="{% url 'abonapp:abon_home' human.group.pk human.username %}">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
                             {% if human.stat_cache %}

@@ -32,7 +32,7 @@
                     {% endif %} {{ l.amount }}</td>
                     <td>
                     {% if l.abon.group %}
-                        <a href="{% url 'abonapp:abon_home' l.abon.group.pk l.abon.pk %}">{{ l.abon.username }}</a>
+                        <a href="{% url 'abonapp:abon_home' l.abon.group.pk l.abon.username %}">{{ l.abon.username }}</a>
                     {% else %}
                         {{ l.abon.username }}
                     {% endif %}

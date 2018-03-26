@@ -10,7 +10,7 @@
                     <h3 class="panel-title">{% trans 'Change subscriber' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form autocomplete="off" class="form-horizontal" action="{% url 'abonapp:abon_home' group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form autocomplete="off" class="form-horizontal" action="{% url 'abonapp:abon_home' group.pk abon.username %}" method="post">{% csrf_token %}
 
                         {% bootstrap_field form.username label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
                         {% bootstrap_field form.fio label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
@@ -24,10 +24,10 @@
                                         <a href="sip:{{ form.telephone.value }}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Call to' %}">
                                             <span class="glyphicon glyphicon-earphone"></span>
                                         </a>
-                                        <a href="{% url 'abonapp:telephones' group.pk abon.pk %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Additional telephones' %}">
+                                        <a href="{% url 'abonapp:telephones' group.pk abon.username %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Additional telephones' %}">
                                             <span class="glyphicon glyphicon-list"></span>
                                         </a>
-                                        <a href="{% url 'abonapp:telephone_new' group.pk abon.pk %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Add telephone' %}">
+                                        <a href="{% url 'abonapp:telephone_new' group.pk abon.username %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Add telephone' %}">
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     </span>
@@ -41,7 +41,7 @@
                                 <div class="input-group input-group-sm">
                                     <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="{% trans 'Not assigned' %}" id="ipfield" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"{% if abon.is_dynamic_ip %} disabled{% endif %}/>
                                     <span class="input-group-btn">
-                                        <a href="{% url 'abonapp:reset_ip' group.pk abon.pk %}" class="btn btn-default btn-cmd" data-toggle="tooltip" title="{% trans 'Reset ip' %}" onclick="$('#ipfield').val('');">
+                                        <a href="{% url 'abonapp:reset_ip' group.pk abon.username %}" class="btn btn-default btn-cmd" data-toggle="tooltip" title="{% trans 'Reset ip' %}" onclick="$('#ipfield').val('');">
                                             <span class="glyphicon glyphicon-refresh"></span>
                                         </a>
                                     </span>
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="panel-body">
-                    <form class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form class="form-horizontal" action="{% url 'abonapp:save_user_dev_port' group.pk abon.username %}" method="post">{% csrf_token %}
 
                         <div class="form-group-sm">
                         <label for="id_method" class="col-sm-4 control-label">{% trans 'Device' %}</label>
@@ -125,11 +125,11 @@
                                     <a href="{% url 'devapp:view' group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %}: {{ device.mac_addr|default:_('Not assigned') }}">
                                         <span class="glyphicon glyphicon-hdd"></span> <span class="hidden-md">{{ device.comment|truncatechars:11 }} {{ device.ip_address }}</span>
                                     </a>
-                                    <a href="{% url 'abonapp:clear_dev' group.pk abon.pk %}" class="btn btn-sm btn-danger">
+                                    <a href="{% url 'abonapp:clear_dev' group.pk abon.username %}" class="btn btn-sm btn-danger">
 					                    <span class="glyphicon glyphicon-remove-circle"></span> <span class="hidden-xs hidden-lg">{% trans 'Remove clutch' %}</span>
                                     </a>
                                 {% else %}
-                                    <a href="{% url 'abonapp:dev' group.pk abon.pk %}" class="btn btn-success btn-sm btn-modal">
+                                    <a href="{% url 'abonapp:dev' group.pk abon.username %}" class="btn btn-success btn-sm btn-modal">
                                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Add clutch' %}
                                     </a>
                                 {% endif %}
@@ -177,7 +177,7 @@
                     <h3 class="panel-title">{% trans 'Extra fields' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal" action="{% url 'abonapp:extra_field_edit' group.pk abon.pk %}" method="post">{% csrf_token %}
+                    <form class="form-horizontal" action="{% url 'abonapp:extra_field_edit' group.pk abon.username %}" method="post">{% csrf_token %}
 
                         {% for ef in abon.extra_fields.all %}
                         <div class="form-group-sm">
@@ -188,7 +188,7 @@
                                     <input type="text" value="{{ ef.data|default:_('Not assigned') }}" class="form-control" pattern="{{ ef.get_regexp }}" name="ex">
                                     <input type="hidden" value="{{ ef.pk }}" name="ed">
                                     <span class="input-group-btn">
-                                        <a href="{% url 'abonapp:extra_field_delete' group.pk abon.pk ef.pk %}" class="btn btn-danger" title="{% trans 'Delete' %}">
+                                        <a href="{% url 'abonapp:extra_field_delete' group.pk abon.username ef.pk %}" class="btn btn-danger" title="{% trans 'Delete' %}">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     </span>
@@ -202,7 +202,7 @@
 
                         <div class="form-group-sm">
                             <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                <a href="{% url 'abonapp:extra_field' group.pk abon.pk %}" class="btn btn-success btn-modal" title="{% trans 'Add extra field' %}">
+                                <a href="{% url 'abonapp:extra_field' group.pk abon.username %}" class="btn btn-success btn-modal" title="{% trans 'Add extra field' %}">
                                     <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
                                 </a>
 
@@ -227,7 +227,7 @@
                 </div>
                 <div class="panel-footer">
                     <div class="btn-group">
-                        <a href="{% url 'abonapp:markers_edit' group.pk abon.pk %}" class="btn btn-default btn-modal">
+                        <a href="{% url 'abonapp:markers_edit' group.pk abon.username %}" class="btn btn-default btn-modal">
                             <span class="glyphicon glyphicon-edit"></span> {% trans 'Edit' %}
                         </a>
                     </div>

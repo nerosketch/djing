@@ -36,7 +36,7 @@
         <tr>
             <td colspan="4" class="btn-group btn-group-sm">
                 {% if perms.abonapp.can_add_ballance %}
-                    <a href="{% url 'abonapp:abon_amount' group.pk abon.pk %}" class="btn btn-default btn-modal">
+                    <a href="{% url 'abonapp:abon_amount' group.pk abon.username %}" class="btn btn-default btn-modal">
                         <span class="glyphicon glyphicon-credit-card"></span> {% trans 'Fill account' %}
                     </a>
                 {% else %}
@@ -44,7 +44,7 @@
                         <span class="glyphicon glyphicon-credit-card"></span> {% trans 'Fill account' %}
                     </a>
                 {% endif %}
-                <a href="{% url 'abonapp:abon_debts' group.pk abon.pk %}" class="btn btn-default">
+                <a href="{% url 'abonapp:abon_debts' group.pk abon.username %}" class="btn btn-default">
                     <span class="glyphicon glyphicon-gbp"></span> {% trans 'Debts' %}
                 </a>
             </td>

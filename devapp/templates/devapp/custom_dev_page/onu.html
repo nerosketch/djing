@@ -21,7 +21,7 @@
                         {% for da in dev_accs %}
                             <li class="list-group-item">{% trans 'Attached user' %}:
                                 {% if da.group %}
-                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.pk %}"
+                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.username %}"
                                        target="_blank">{{ da.get_full_name }}</a>
                                 {% else %}
                                     {{ da.get_full_name }}

@@ -26,7 +26,7 @@
         </div>
         <div class="list-group">
             {% for abon in abons %}
-                <a href="{% url 'abonapp:abon_home' abon.group.pk abon.pk %}" class="list-group-item">{{ abon.get_full_name }}</a>
+                <a href="{% url 'abonapp:abon_home' abon.group.pk abon.username %}" class="list-group-item">{{ abon.get_full_name }}</a>
             {% empty %}
             {% trans 'Abons not found' %}
             {% endfor %}

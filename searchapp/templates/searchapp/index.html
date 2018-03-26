@@ -22,7 +22,7 @@
             </form>
             <div class="list-group">
                 {% for ab in abons %}
-                    <a href="{% url 'abonapp:abon_home' ab.group.id ab.id %}" target="_blank" class="list-group-item">
+                    <a href="{% url 'abonapp:abon_home' ab.group.id ab.username %}" target="_blank" class="list-group-item">
                         <h4 class="list-group-item-heading">{{ ab.username|safe }}</h4>
 
                         <p class="list-group-item-text">

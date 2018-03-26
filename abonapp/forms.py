@@ -49,13 +49,13 @@ class AbonForm(forms.ModelForm):
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
                                widget=forms.TextInput(attrs={
                                    'placeholder': _('login'),
-                                   'class': "form-control",
-                                   'required': ''
+                                   'required': '',
+                                   'pattern': r'^\w{1,127}$'
                                }))
 
-    password = forms.CharField(max_length=64, initial=generate_random_password,
-                               widget=forms.TextInput(
-                                   attrs={'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'}))
+    password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
+                                   'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
+                               }))
 
     class Meta:
         model = models.Abon
@@ -102,9 +102,9 @@ class PassportForm(forms.ModelForm):
         model = models.PassportInfo
         exclude = ['abon']
         widgets = {
-            'series': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'pattern': '^\d{4}$'}),
-            'number': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'pattern': '^\d{6}$'}),
-            'distributor': forms.TextInput(attrs={'class': 'form-control', 'required': ''}),
+            'series': forms.TextInput(attrs={'required': '', 'pattern': '^\d{4}$'}),
+            'number': forms.TextInput(attrs={'required': '', 'pattern': '^\d{6}$'}),
+            'distributor': forms.TextInput(attrs={'required': ''}),
             'date_of_acceptance': forms.DateInput(attrs={'class': 'form-control', 'required': ''})
         }
         initials = {

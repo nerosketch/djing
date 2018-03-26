@@ -297,9 +297,9 @@ class Abon(BaseAccount):
 
 
 class PassportInfo(models.Model):
-    series = models.CharField(max_length=4, validators=[validators.integer_validator])
-    number = models.CharField(max_length=6, validators=[validators.integer_validator])
-    distributor = models.CharField(max_length=64)
+    series = models.CharField(_('Pasport serial'), max_length=4, validators=[validators.integer_validator])
+    number = models.CharField(_('Pasport number'), max_length=6, validators=[validators.integer_validator])
+    distributor = models.CharField(_('Distributor'), max_length=64)
     date_of_acceptance = models.DateField()
     abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
 

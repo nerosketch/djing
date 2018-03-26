@@ -50,7 +50,7 @@
                             {% endif %}
                         {% endif %}
 
-                        <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}">
+                        <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.username %}">
                             {{ task.abon.get_full_name }}
                         </a>
                         {% if task.comment_count > 0 %}({{ task.comment_count }}){% endif %}

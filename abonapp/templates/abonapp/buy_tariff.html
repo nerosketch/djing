@@ -6,7 +6,7 @@
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' group.pk %}">{{ group.title }}</a></li>
-        <li><a href="{% url 'abonapp:abon_home' group.pk abon.pk %}">{{ abon.fio }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' group.pk abon.username %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Pick a service' %}</li>
     </ol>
 
@@ -15,11 +15,11 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Pick a service for' %}
-                <a href="{% url 'abonapp:abon_home' group.pk abon.pk %}"><u>{% trans 'Sub' %}</u></a>
+                <a href="{% url 'abonapp:abon_home' group.pk abon.username %}"><u>{% trans 'Sub' %}</u></a>
             </h3>
         </div>
         <div class="panel-body">
-            <form role="form" action="{% url 'abonapp:pick_tariff' group.pk abon.pk %}"
+            <form role="form" action="{% url 'abonapp:pick_tariff' group.pk abon.username %}"
                   method="post">{% csrf_token %}
                 <div class="form-group">
                     {% if tariffs %}

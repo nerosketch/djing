@@ -116,7 +116,7 @@ def addabon(request, gid):
                 assign_perm('abonapp.can_add_ballance', request.user, abon)
                 abon.sync_with_nas(created=True)
                 messages.success(request, _('create abon success msg'))
-                return redirect('abonapp:abon_home', group.id, abon.pk)
+                return redirect('abonapp:abon_home', group.id, abon.username)
             else:
                 messages.error(request, _('fix form errors'))
 
@@ -167,17 +167,17 @@ def del_abon(request):
 @login_required
 @permission_required('abonapp.can_add_ballance')
 @transaction.atomic
-def abonamount(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def abonamount(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         if request.method == 'POST':
-            abonid = mydefs.safe_int(request.POST.get('abonid'))
-            if abonid == int(uid):
+            abonuname = request.POST.get('abonuname')
+            if abonuname == uname:
                 amnt = mydefs.safe_float(request.POST.get('amount'))
                 abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
                 abon.save(update_fields=['ballance'])
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
-                return redirect('abonapp:abon_phistory', gid=gid, uid=uid)
+                return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
             else:
                 messages.error(request, _('I not know the account id'))
     except (NasNetworkError, NasFailedResult) as e:
@@ -198,7 +198,7 @@ class DebtsListView(BaseAbonListView):
     template_name = 'abonapp/invoiceForPayment.html'
 
     def get_queryset(self):
-        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
         self.abon = abon
         return models.InvoiceForPayment.objects.filter(abon=abon)
 
@@ -216,7 +216,7 @@ class PayHistoryListView(BaseAbonListView):
     template_name = 'abonapp/payHistory.html'
 
     def get_queryset(self):
-        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
         self.abon = abon
         pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-date')
         return pay_history
@@ -230,15 +230,15 @@ class PayHistoryListView(BaseAbonListView):
 
 @login_required
 @mydefs.only_admins
-def abon_services(request, gid, uid):
+def abon_services(request, gid, uname):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.can_view_group', grp):
         raise PermissionDenied
-    abon = get_object_or_404(models.Abon, pk=uid)
+    abon = get_object_or_404(models.Abon, username=uname)
 
     if abon.group != grp:
         messages.warning(request, _("User group id is not matches with group in url"))
-        return redirect('abonapp:abon_services', abon.group.id, abon.id)
+        return redirect('abonapp:abon_services', abon.group.id, abon.username)
 
     try:
         periodic_pay = models.PeriodicPayForId.objects.get(account=abon)
@@ -256,8 +256,8 @@ def abon_services(request, gid, uid):
 
 @login_required
 @mydefs.only_admins
-def abonhome(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def abonhome(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     group = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.can_view_group', group):
         raise PermissionDenied
@@ -325,9 +325,8 @@ def terminal_pay(request):
 
 @login_required
 @permission_required('abonapp.add_invoiceforpayment')
-def add_invoice(request, gid, uid):
-    uid = mydefs.safe_int(uid)
-    abon = get_object_or_404(models.Abon, pk=uid)
+def add_invoice(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     grp = get_object_or_404(Group, pk=gid)
 
     try:
@@ -346,7 +345,7 @@ def add_invoice(request, gid, uid):
             newinv.author = request.user
             newinv.save()
             messages.success(request, _('Receipt has been created'))
-            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+            return redirect('abonapp:abon_home', gid=gid, username=uname)
 
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
@@ -364,9 +363,9 @@ def add_invoice(request, gid, uid):
 @mydefs.only_admins
 @permission_required('abonapp.can_buy_tariff')
 @transaction.atomic
-def pick_tariff(request, gid, uid):
+def pick_tariff(request, gid, uname):
     grp = get_object_or_404(Group, pk=gid)
-    abon = get_object_or_404(models.Abon, pk=uid)
+    abon = get_object_or_404(models.Abon, username=uname)
     tariffs = Tariff.objects.get_tariffs_by_group(grp.pk)
     try:
         if request.method == 'POST':
@@ -383,12 +382,12 @@ def pick_tariff(request, gid, uid):
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
             abon.sync_with_nas(created=False)
             messages.success(request, _('Tariff has been picked'))
-            return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
+            return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
     except (mydefs.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
-        return redirect('abonapp:abon_services', gid=gid, uid=abon.id)
+        return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
     except Tariff.DoesNotExist:
         messages.error(request, _('Tariff your picked does not exist'))
     except mydefs.MultipleException as errs:
@@ -407,9 +406,9 @@ def pick_tariff(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.delete_abontariff')
-def unsubscribe_service(request, gid, uid, abon_tariff_id):
+def unsubscribe_service(request, gid, uname, abon_tariff_id):
     try:
-        abon = get_object_or_404(models.Abon, pk=uid)
+        abon = get_object_or_404(models.Abon, username=uname)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
         abon.sync_with_nas(created=False)
         abon_tariff.delete()
@@ -421,7 +420,7 @@ def unsubscribe_service(request, gid, uid, abon_tariff_id):
     except mydefs.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
-    return redirect('abonapp:abon_services', gid=gid, uid=uid)
+    return redirect('abonapp:abon_services', gid=gid, uname=uname)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -453,7 +452,7 @@ class TaskLogListView(ListView):
     template_name = 'abonapp/task_log.html'
 
     def get_queryset(self):
-        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
         self.abon = abon
         return Task.objects.filter(abon=abon)
 
@@ -466,8 +465,8 @@ class TaskLogListView(ListView):
 
 @login_required
 @permission_required('abonapp.can_view_passport')
-def passport_view(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def passport_view(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         if request.method == 'POST':
             try:
@@ -480,7 +479,7 @@ def passport_view(request, gid, uid):
                 pi.abon = abon
                 pi.save()
                 messages.success(request, _('Passport information has been saved'))
-                return redirect('abonapp:passport_view', gid=gid, uid=uid)
+                return redirect('abonapp:passport_view', gid=gid, uname=uname)
             else:
                 messages.error(request, _('fix form errors'))
         else:
@@ -523,16 +522,16 @@ def chgroup_tariff(request, gid):
 
 @login_required
 @permission_required('abonapp.change_abon')
-def dev(request, gid, uid):
+def dev(request, gid, uname):
     abon_dev = None
     try:
-        abon = models.Abon.objects.get(pk=uid)
+        abon = models.Abon.objects.get(username=uname)
         if request.method == 'POST':
             dev = Device.objects.get(pk=request.POST.get('dev'))
             abon.device = dev
             abon.save(update_fields=['device'])
             messages.success(request, _('Device has successfully attached'))
-            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+            return redirect('abonapp:abon_home', gid=gid, uname=uname)
         else:
             abon_dev = abon.device
     except Device.DoesNotExist:
@@ -543,16 +542,16 @@ def dev(request, gid, uid):
     return render(request, 'abonapp/modal_dev.html', {
         'devices': Device.objects.filter(group=gid),
         'dev': abon_dev,
-        'gid': gid, 'uid': uid
+        'gid': gid, 'uname': uname
     })
 
 
 @login_required
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def clear_dev(request, gid, uid):
+def clear_dev(request, gid, uname):
     try:
-        abon = models.Abon.objects.get(pk=uid)
+        abon = models.Abon.objects.get(username=uname)
         abon.device = None
         abon.dev_port = None
         abon.save(update_fields=['device', 'dev_port'])
@@ -560,12 +559,12 @@ def clear_dev(request, gid, uid):
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+    return redirect('abonapp:abon_home', gid=gid, uname=uname)
 
 
 @login_required
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def charts(request, gid, uid):
+def charts(request, gid, uname):
     high = 100
 
     wandate = request.GET.get('wantdate')
@@ -576,7 +575,7 @@ def charts(request, gid, uid):
 
     try:
         StatElem = getModel(wandate)
-        abon = models.Abon.objects.get(pk=uid)
+        abon = models.Abon.objects.get(username=uname)
         if abon.group is None:
             abon.group = Group.objects.get(pk=gid)
             abon.save(update_fields=['group'])
@@ -602,7 +601,7 @@ def charts(request, gid, uid):
         return redirect('abonapp:group_list')
     except ProgrammingError as e:
         messages.error(request, e)
-        return redirect('abonapp:abon_home', gid=gid, uid=uid)
+        return redirect('abonapp:abon_home', gid=gid, uname=uname)
 
     return render(request, 'abonapp/charts.html', {
         'group': abon.group,
@@ -615,8 +614,8 @@ def charts(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.add_extrafieldsmodel')
-def make_extra_field(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def make_extra_field(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         if request.method == 'POST':
             frm = forms.ExtraFieldForm(request.POST)
@@ -626,7 +625,7 @@ def make_extra_field(request, gid, uid):
                 messages.success(request, _('Extra field successfully created'))
             else:
                 messages.error(request, _('fix form errors'))
-            return redirect('abonapp:abon_home', gid=gid, uid=uid)
+            return redirect('abonapp:abon_home', gid=gid, username=uname)
         else:
             frm = forms.ExtraFieldForm()
 
@@ -646,7 +645,7 @@ def make_extra_field(request, gid, uid):
 
 @login_required
 @permission_required('abonapp.change_extra_fields_model')
-def extra_field_change(request, gid, uid):
+def extra_field_change(request, gid, uname):
     extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
     try:
         for ex in extras:
@@ -656,13 +655,13 @@ def extra_field_change(request, gid, uid):
         messages.success(request, _("Extra fields has been saved"))
     except models.ExtraFieldsModel.DoesNotExist:
         messages.error(request, _('One or more extra fields has not been saved'))
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+    return redirect('abonapp:abon_home', gid=gid, username=uname)
 
 
 @login_required
 @permission_required('abonapp.delete_extra_fields_model')
-def extra_field_delete(request, gid, uid, fid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def extra_field_delete(request, gid, uname, fid):
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         extra_field = models.ExtraFieldsModel.objects.get(pk=fid)
         abon.extra_fields.remove(extra_field)
@@ -670,7 +669,7 @@ def extra_field_delete(request, gid, uid, fid):
         messages.success(request, _('Extra field successfully deleted'))
     except models.ExtraFieldsModel.DoesNotExist:
         messages.warning(request, _('Extra field does not exist'))
-    return redirect('abonapp:abon_home', gid=gid, uid=uid)
+    return redirect('abonapp:abon_home', gid=gid, uname=uname)
 
 
 @login_required
@@ -723,7 +722,7 @@ class DialsListView(BaseAbonListView):
     template_name = 'abonapp/dial_log.html'
 
     def get_queryset(self):
-        abon = get_object_or_404(models.Abon, pk=self.kwargs.get('uid'))
+        abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
         if not self.request.user.has_perm('group_app.can_view_group', abon.group):
             raise PermissionDenied
         self.abon = abon
@@ -744,7 +743,7 @@ class DialsListView(BaseAbonListView):
 
     def render_to_response(self, context, **response_kwargs):
         if hasattr(self.abon.group, 'pk') and self.abon.group.pk != int(self.kwargs.get('gid')):
-            return redirect('abonapp:dials', self.abon.group.pk, self.abon.pk)
+            return redirect('abonapp:dials', self.abon.group.pk, self.abon.username)
         return super(DialsListView, self).render_to_response(context, **response_kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -754,19 +753,19 @@ class DialsListView(BaseAbonListView):
             messages.error(request, e)
             return redirect('abonapp:abon_home',
                             self.kwargs.get('gid'),
-                            self.kwargs.get('uid'))
+                            self.kwargs.get('uname'))
 
 
 @login_required
 @permission_required('abonapp.change_abon')
-def save_user_dev_port(request, gid, uid):
+def save_user_dev_port(request, gid, uname):
     if request.method != 'POST':
         messages.error(request, _('Method is not POST'))
-        return redirect('abonapp:abon_home', gid, uid)
+        return redirect('abonapp:abon_home', gid, uname)
     user_port = mydefs.safe_int(request.POST.get('user_port'))
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
     try:
-        abon = models.Abon.objects.get(pk=uid)
+        abon = models.Abon.objects.get(username=uname)
         if user_port == 0:
             port = None
         else:
@@ -775,13 +774,13 @@ def save_user_dev_port(request, gid, uid):
                 try:
                     other_abon = models.Abon.objects.get(device=abon.device, dev_port=port)
                     if other_abon != abon:
-                        user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.id)
+                        user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.username)
                         messages.error(request, _(
                             "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
                                            'user_url': user_url,
                                            'user_name': other_abon.get_full_name()
                                        })
-                        return redirect('abonapp:abon_home', gid, uid)
+                        return redirect('abonapp:abon_home', gid, uname)
                 except models.Abon.DoesNotExist:
                     pass
                 except models.Abon.MultipleObjectsReturned:
@@ -802,7 +801,7 @@ def save_user_dev_port(request, gid, uid):
         messages.error(request, _('Selected port does not exist'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('User does not exist'))
-    return redirect('abonapp:abon_home', gid, uid)
+    return redirect('abonapp:abon_home', gid, uname)
 
 
 @login_required
@@ -865,28 +864,28 @@ def street_del(request, gid, sid):
 @login_required
 @permission_required('abonapp.can_view_additionaltelephones')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def tels(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def tels(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     telephones = abon.additional_telephones.all()
     return render_to_text('abonapp/modal_additional_telephones.html', {
         'telephones': telephones,
         'gid': gid,
-        'uid': uid
+        'uname': uname
     }, request=request)
 
 
 @login_required
 @permission_required('abnapp.add_additionaltelephone')
-def tel_add(request, gid, uid):
+def tel_add(request, gid, uname):
     if request.method == 'POST':
         frm = forms.AdditionalTelephoneForm(request.POST)
         if frm.is_valid():
             new_tel = frm.save(commit=False)
-            abon = get_object_or_404(models.Abon, pk=uid)
+            abon = get_object_or_404(models.Abon, username=uname)
             new_tel.abon = abon
             new_tel.save()
             messages.success(request, _('New telephone has been saved'))
-            return redirect('abonapp:abon_home', gid, uid)
+            return redirect('abonapp:abon_home', gid, uname)
         else:
             messages.error(request, _('fix form errors'))
     else:
@@ -894,13 +893,13 @@ def tel_add(request, gid, uid):
     return render_to_text('abonapp/modal_add_phone.html', {
         'form': frm,
         'gid': gid,
-        'uid': uid
+        'uname': uname
     }, request=request)
 
 
 @login_required
 @permission_required('abnapp.delete_additionaltelephone')
-def tel_del(request, gid, uid):
+def tel_del(request, gid, uname):
     try:
         tid = mydefs.safe_int(request.GET.get('tid'))
         tel = models.AdditionalTelephone.objects.get(pk=tid)
@@ -908,7 +907,7 @@ def tel_del(request, gid, uid):
         messages.success(request, _('Additional telephone successfully deleted'))
     except models.AdditionalTelephone.DoesNotExist:
         messages.error(request, _('Telephone not found'))
-    return redirect('abonapp:abon_home', gid, uid)
+    return redirect('abonapp:abon_home', gid, uname)
 
 
 @login_required
@@ -971,8 +970,8 @@ def abon_export(request, gid):
 @login_required
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def reset_ip(request, gid, uid):
-    abon = get_object_or_404(models.Abon, pk=uid)
+def reset_ip(request, gid, uname):
+    abon = get_object_or_404(models.Abon, username=uname)
     abon.ip_address = None
     abon.save(update_fields=['ip_address'])
     return HttpResponse(dumps({
@@ -1001,7 +1000,7 @@ def fin_report(request):
 
 @login_required
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def add_edit_periodic_pay(request, gid, uid, periodic_pay_id=0):
+def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
     if periodic_pay_id == 0:
         if not request.user.has_perm('abonapp.add_periodicpayforid'):
             raise PermissionDenied
@@ -1013,33 +1012,33 @@ def add_edit_periodic_pay(request, gid, uid, periodic_pay_id=0):
     if request.method == 'POST':
         frm = forms.PeriodicPayForIdForm(request.POST, instance=periodic_pay_instance)
         if frm.is_valid():
-            abon = get_object_or_404(models.Abon, pk=uid)
+            abon = get_object_or_404(models.Abon, username=uname)
             inst = frm.save(commit=False)
             inst.account = abon
             inst.save()
             messages.success(request, _('Periodic pays has been designated'))
         else:
             messages.error(request, _('Something wrong in form'))
-        return redirect('abonapp:abon_services', gid, uid)
+        return redirect('abonapp:abon_services', gid, uname)
     else:
         frm = forms.PeriodicPayForIdForm(instance=periodic_pay_instance)
     return render_to_text('abonapp/modal_periodic_pay.html', {
         'form': frm,
         'gid': gid,
-        'uid': uid
+        'uname': uname
     }, request=request)
 
 
 @login_required
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 @permission_required('abonapp.delete_periodicpayforid')
-def del_periodic_pay(request, gid, uid, periodic_pay_id):
+def del_periodic_pay(request, gid, uname, periodic_pay_id):
     periodic_pay_instance = get_object_or_404(models.PeriodicPayForId, pk=periodic_pay_id)
-    if periodic_pay_instance.account.id != uid:
-        uid = periodic_pay_instance.account.id
+    if periodic_pay_instance.account.username != uname:
+        uname = periodic_pay_instance.account.username
     periodic_pay_instance.delete()
     messages.success(request, _('Periodic pay successfully deleted'))
-    return redirect('abonapp:abon_services', gid, uid)
+    return redirect('abonapp:abon_services', gid, uname)
 
 
 @method_decorator([login_required, mydefs.only_admins], name='dispatch')
@@ -1049,16 +1048,16 @@ class EditSibscriberMarkers(UpdateView):
     form_class = forms.MarkersForm
 
     def get_object(self, queryset=None):
-        obj = models.Abon.objects.get(pk=self.kwargs.get('uid'))
+        obj = models.Abon.objects.get(username=self.kwargs.get('uname'))
         return obj
 
     def get_success_url(self):
-        return resolve_url('abonapp:abon_home', self.kwargs.get('gid'), self.kwargs.get('uid'))
+        return resolve_url('abonapp:abon_home', self.kwargs.get('gid'), self.kwargs.get('uname'))
 
     def get_context_data(self, **kwargs):
         context = super(EditSibscriberMarkers, self).get_context_data(**kwargs)
         context['gid'] = self.kwargs.get('gid')
-        context['uid'] = self.kwargs.get('uid')
+        context['uname'] = self.kwargs.get('uname')
         return context
 
     def form_invalid(self, form):

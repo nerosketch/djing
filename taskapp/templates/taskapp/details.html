@@ -28,7 +28,7 @@
         {% trans 'Condition' %}: {{ task.get_state_display }}<br>
         {% trans 'Subscriber' %}
         {% if task.abon %}
-            <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.pk %}" target="_blank">{{ task.abon.get_full_name }}</a>
+            <a href="{% url 'abonapp:abon_home' task.abon.group.pk task.abon.username %}" target="_blank">{{ task.abon.get_full_name }}</a>
         {% else %}
             <i>{% trans 'Not assigned' %}</i>
         {% endif %}<br>
