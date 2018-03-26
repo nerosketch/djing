@@ -380,7 +380,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         ])
 
     def read_ips_iter(self, list_name: str):
-        ips: Iterable = self._exec_cmd_iter([
+        ips = self._exec_cmd_iter([
             '/ip/firewall/address-list/print', 'where',
             '?list=%s' % list_name,
             '?dynamic=no'
@@ -424,7 +424,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             if ip_list_entity is not None and len(ip_list_entity) > 1:
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
-    def add_user(self, user: AbonStruct, ip_timeout=None):
+    def add_user(self, user: AbonStruct, ip_timeout=0):
         super(MikrotikTransmitter, self).add_user(user, ip_timeout)
         if not isinstance(user.ip, IpStruct):
             raise TypeError
@@ -445,7 +445,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     # обновляем основную инфу абонента
-    def update_user(self, user: AbonStruct, ip_timeout=None):
+    def update_user(self, user: AbonStruct, ip_timeout=0):
         super(MikrotikTransmitter, self).update_user(user, ip_timeout)
         if not isinstance(user.ip, IpStruct):
             raise TypeError
