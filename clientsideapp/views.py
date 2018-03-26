@@ -29,7 +29,7 @@ def pays(request):
 def services(request):
     try:
         abon = request.user
-        all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk)
+        all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk).filter(is_admin=False)
         current_service = abon.active_tariff()
     except Abon.DoesNotExist:
         all_tarifs = None

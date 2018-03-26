@@ -6,7 +6,7 @@ from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -273,7 +273,9 @@ def abonhome(request, gid, uid):
                 if newip:
                     abon.ip_address = newip
                 abon = frm.save()
-                abon.sync_with_nas(created=False)
+                res = abon.sync_with_nas(created=False)
+                if isinstance(res, Exception):
+                    messages.warning(request, res)
                 messages.success(request, _('edit abon success msg'))
             else:
                 messages.warning(request, _('fix form errors'))

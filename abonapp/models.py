@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core import validators
@@ -277,7 +278,7 @@ class Abon(BaseAccount):
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
 
-    def sync_with_nas(self, created: bool):
+    def sync_with_nas(self, created: bool) -> Optional[Union[Exception, bool]]:
         timeout = None
         if hasattr(self, 'is_dhcp') and self.is_dhcp:
             timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
@@ -292,7 +293,7 @@ class Abon(BaseAccount):
                 tm.update_user(agent_abon, ip_timeout=timeout)
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
-            return True
+            return e
 
 
 class PassportInfo(models.Model):

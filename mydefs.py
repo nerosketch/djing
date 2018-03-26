@@ -124,7 +124,7 @@ def only_admins(fn):
     return wrapped
 
 
-def ping(hostname, count=1):
+def ping(hostname: str, count=1):
     response = os.system("`which ping` -4Anq -c%d -W1 %s > /dev/null" % (count, hostname))
     return True if response == 0 else False
 

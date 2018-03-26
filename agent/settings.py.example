@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-
-
-# Для установки модуля NAS смотрите в __init__
+# Setting NAS module in __init__.py
 
 # Certificates
-CERTFILE = "/etc/ssl/server.crt"
-KEYFILE = "/etc/ssl/server.key"
+#CERTFILE = "/etc/ssl/server.crt"
+#KEYFILE = "/etc/ssl/server.key"
 
-# Использовать-ли при передаче инфы между NAS и основным сервером SSL
-IS_USE_SSL = False
+#IS_USE_SSL = False
 
-# Адрес, порт, логин и пароль сервера NAS
+# information for access on NAS server
 NAS_IP = '<NAS IP>'
 NAS_LOGIN = 'admin'
 NAS_PASSW = '<PASSWORD>'
