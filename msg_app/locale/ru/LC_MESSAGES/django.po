@@ -159,3 +159,6 @@ msgstr "Беседа создана"
 #: views.py:29 views.py:48
 msgid "fix form errors"
 msgstr "заполните все поля в соответствии с их форматом"
+
+msgid "Enter to conversation by clicking to it"
+msgstr "Войдите в беседу кликнув по ней"
