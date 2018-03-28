@@ -28,7 +28,7 @@ def home(request):
 
     for abn in abons:
         abn.fio = replace_without_case(escape(abn.fio), s, "<b>%s</b>" % s)
-        abn.username = replace_without_case(escape(abn.username), s, "<b>%s</b>" % s)
+        abn.username_display = replace_without_case(escape(abn.username), s, "<b>%s</b>" % s)
         abn.telephone = replace_without_case(escape(abn.telephone), s, "<b>%s</b>" % s)
 
     return render(request, 'searchapp/index.html', {
