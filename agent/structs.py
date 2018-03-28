@@ -93,8 +93,8 @@ class TariffStruct(BaseStruct):
 # Абонент из базы
 class AbonStruct(BaseStruct):
 
-    def __init__(self, uid=None, ip=None, tariff=None, is_active=True):
-        self.uid = int(uid)
+    def __init__(self, uid=0, ip=None, tariff=None, is_active=True):
+        self.uid = int(uid or 0)
         self.ip = IpStruct(ip)
         self.tariff = tariff
         self.is_active = is_active
