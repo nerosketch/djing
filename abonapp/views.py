@@ -61,10 +61,9 @@ class PeoplesListView(BaseAbonListView):
         except mydefs.LogicError as e:
             messages.warning(self.request, e)
         ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-                peoples_list = peoples_list.order_by(*ordering)
+        if ordering and isinstance(ordering, str):
+            ordering = (ordering,)
+            peoples_list = peoples_list.order_by(*ordering)
         return peoples_list
 
     def get_context_data(self, **kwargs):

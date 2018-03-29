@@ -203,11 +203,9 @@ class Abon(BaseAccount):
 
         amount = round(tariff.amount, 2)
 
-        if tariff.is_admin:
-            if author is not None and not author.is_staff:
+        if tariff.is_admin and author is not None:
+            if not author.is_staff:
                 raise LogicError(_('User that is no staff can not buy admin services'))
-            else:
-                raise LogicError(_('This user can not buy admin services'))
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
