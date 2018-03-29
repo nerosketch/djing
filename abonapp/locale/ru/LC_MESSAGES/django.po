@@ -206,12 +206,6 @@ msgstr "Абонент"
 msgid "Abons"
 msgstr "Абоненты"
 
-#: models.py:230
-msgid "User that is no staff can not buy admin services"
-msgstr ""
-"Пользователь, который не является персоналом не может покупать услуги для "
-"внутренних нужд"
-
 #: models.py:235
 msgid "That service already activated"
 msgstr "Эта услуга уже подключена"
