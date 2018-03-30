@@ -55,6 +55,10 @@
                     {% endfor %}
 
                 </div>
+                <div class="panel-footer">
+                    {% trans 'Parent device' %}
+                    <a href="{% url 'devapp:view' dev.group.pk dev.pk %}" title="{{ dev.ip_address }}" data-toggle="tooltip">{{ dev.comment }}</a>
+                </div>
             </div>
         </div>
     </div>

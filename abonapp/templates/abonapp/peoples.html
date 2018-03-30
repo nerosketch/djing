@@ -133,21 +133,23 @@
                     </tbody>
                 </table>
                 </div>
-                <div class="panel-footer btn-group btn-group-sm">
-                    {% if perms.abonapp.add_abon %}
-                        <a href="{% url 'abonapp:add_abon' group.pk %}" class="btn btn-default" title="{% trans 'Add' %}" data-toggle="tooltip">
-                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
+                <div class="panel-footer">
+                    <div class="btn-group btn-group-sm">
+                        {% if perms.abonapp.add_abon %}
+                            <a href="{% url 'abonapp:add_abon' group.pk %}" class="btn btn-default" title="{% trans 'Add' %}" data-toggle="tooltip">
+                                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add abon' %}
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'abonapp:ch_group_tariff' group.pk %}" class="btn btn-default" title="{% trans 'User groups' %}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-subscript"></span> {% trans 'Tariffs in groups' %}
                         </a>
-                    {% endif %}
-                    <a href="{% url 'abonapp:ch_group_tariff' group.pk %}" class="btn btn-default" title="{% trans 'User groups' %}" data-toggle="tooltip">
-                        <span class="glyphicon glyphicon-subscript"></span> {% trans 'Tariffs in groups' %}
-                    </a>
-                    <a href="{% url 'abonapp:phonebook' group.pk %}" class="btn btn-default btn-modal">
-                        <span class="glyphicon glyphicon-earphone"></span> {% trans 'Phonebook' %}
-                    </a>
-                    <a href="{% url 'abonapp:abon_export' group.pk %}" class="btn btn-default btn-modal">
-                        <span class="glyphicon glyphicon-export"></span> {% trans 'Export users' %}
-                    </a>
+                        <a href="{% url 'abonapp:phonebook' group.pk %}" class="btn btn-default btn-modal">
+                            <span class="glyphicon glyphicon-earphone"></span> {% trans 'Phonebook' %}
+                        </a>
+                        <a href="{% url 'abonapp:abon_export' group.pk %}" class="btn btn-default btn-modal">
+                            <span class="glyphicon glyphicon-export"></span> {% trans 'Export users' %}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
