@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import django
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from django.utils import timezone
@@ -13,7 +14,7 @@ from mydefs import LogicError
 
 def main():
     signals.pre_delete.disconnect(abontariff_pre_delete, sender=AbonTariff)
-    # AbonTariff.objects.filter(abon=None).delete()
+    AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
     fields = ('id', 'tariff__title', 'abon__id')
     expired_services = AbonTariff.objects.filter(deadline__lt=now).exclude(abon=None)
@@ -37,7 +38,7 @@ def main():
     # sync subscribers on NAS
     try:
         tm = Transmitter()
-        users = Abon.objects.filter(is_dynamic_ip=False, is_active=True).exclude(current_tariff=None)
+        users = Abon.objects.filter(is_active=True).exclude(current_tariff=None)
         tm.sync_nas(users)
     except NasNetworkError as e:
         print('NetworkTrouble:', e)

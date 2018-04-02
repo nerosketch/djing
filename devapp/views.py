@@ -366,7 +366,7 @@ def devview(request, device_id):
             if dev.man_passw:
                 manager = dev.get_manager_object()
                 ports = manager.get_ports()
-                if isinstance(ports[0], Exception):
+                if len(ports) > 0 and isinstance(ports[0], Exception):
                     messages.error(request, ports[0])
                     ports = ports[1]
                 template_name = manager.get_template_name()
