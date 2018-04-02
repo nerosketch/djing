@@ -247,7 +247,9 @@ class Abon(BaseAccount):
             abon_tariff.delete()
 
     # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
-    def is_access(self):
+    def is_access(self) -> bool:
+        if not self.is_active:
+            return False
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
             return False
@@ -257,16 +259,15 @@ class Abon(BaseAccount):
 
     # make subscriber from agent structure
     def build_agent_struct(self):
+        if not self.is_access():
+            return
         if self.ip_address:
             user_ip = ip2int(self.ip_address)
         else:
             return
         abon_tariff = self.active_tariff()
-        if abon_tariff is None:
-            agent_trf = None
-        else:
-            trf = abon_tariff.tariff
-            agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
+        trf = abon_tariff.tariff
+        agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
     def save(self, *args, **kwargs):
@@ -276,19 +277,16 @@ class Abon(BaseAccount):
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)
 
-    def sync_with_nas(self, created: bool) -> Optional[Union[Exception, bool]]:
-        timeout = 0
-        if hasattr(self, 'is_dhcp') and self.is_dhcp:
-            timeout = getattr(settings, 'DHCP_TIMEOUT', 14400)
+    def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()
         if agent_abon is None:
-            return True
+            return
         try:
             tm = Transmitter()
             if created:
-                tm.add_user(agent_abon, ip_timeout=timeout)
+                tm.add_user(agent_abon)
             else:
-                tm.update_user(agent_abon, ip_timeout=timeout)
+                tm.update_user(agent_abon)
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
