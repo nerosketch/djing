@@ -74,7 +74,9 @@
                     </div>
                 </div>
             </div>
-            {% include 'clientsideapp/custom_pages/service.htm' with active_service=current_service %}
+            {% if current_service %}
+                {% include 'clientsideapp/custom_pages/service.htm' with active_service=current_service %}
+            {% endif %}
         </div>
     </div>
 
