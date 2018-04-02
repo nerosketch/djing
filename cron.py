@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import django
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from django.utils import timezone
@@ -13,7 +14,7 @@ from mydefs import LogicError
 
 def main():
     signals.pre_delete.disconnect(abontariff_pre_delete, sender=AbonTariff)
-    # AbonTariff.objects.filter(abon=None).delete()
+    AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
     fields = ('id', 'tariff__title', 'abon__id')
     expired_services = AbonTariff.objects.filter(deadline__lt=now).exclude(abon=None)
@@ -35,15 +36,18 @@ def main():
     signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
 
     # sync subscribers on NAS
-    tm = Transmitter()
-    users = Abon.objects.filter(is_dynamic_ip=False, is_active=True).exclude(current_tariff=None)
-    tm.sync_nas(users)
+    try:
+        tm = Transmitter()
+        users = Abon.objects.filter(is_active=True).exclude(current_tariff=None)
+        tm.sync_nas(users)
+    except NasNetworkError as e:
+        print('NetworkTrouble:', e)
 
     # manage periodic pays
-    ppays = PeriodicPayForId.objects.filter(next_pay__lt=timezone.now())\
+    ppays = PeriodicPayForId.objects.filter(next_pay__lt=now)\
                                     .prefetch_related('account', 'periodic_pay')
     for pay in ppays:
-        pay.payment_for_service()
+        pay.payment_for_service(now=now)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from mydefs import RuTimedelta, safe_int
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
-from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError
+from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
 
 
 class DLinkPort(BasePort):
@@ -40,7 +40,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def reboot(self):
         return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
 
-    def get_ports(self):
+    def get_ports(self) -> ListOrError:
         interfaces_count = safe_int(self.get_item('.1.3.6.1.2.1.2.1.0'))
         nams = list(self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3'))
         stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
@@ -59,7 +59,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
                 self))
             return res
         except IndexError:
-            raise DeviceImplementationError('Dlink port index error')
+            return DeviceImplementationError('Dlink port index error'), res
 
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.1.0')
@@ -114,23 +114,28 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def reboot(self):
         pass
 
-    def get_ports(self):
+    def get_ports(self) -> ListOrError:
         nms = self.get_list('.1.3.6.1.4.1.3320.101.10.1.1.79')
 
         res = []
-        for nm in nms:
-            n = int(nm)
-            status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % n)
-            signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % n)
-            onu = ONUdev(
-                num=n,
-                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
-                status=True if status == '3' else False,
-                mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
-                speed=0,
-                signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-            snmpWorker=self)
-            res.append(onu)
+        try:
+            for nm in nms:
+                n = int(nm)
+                status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % n)
+                signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % n)
+                onu = ONUdev(
+                    num=n,
+                    name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
+                    status=True if status == '3' else False,
+                    mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
+                    speed=0,
+                    signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+                snmpWorker=self)
+                res.append(onu)
+        except EasySNMPTimeoutError as e:
+            return EasySNMPTimeoutError(
+                "%s (%s)" % (gettext('wait for a reply from the SNMP Timeout'), e)
+            ), res
         return res
 
     def get_device_name(self):
@@ -166,8 +171,8 @@ class OnuDevice(DevBase, SNMPBaseWorker):
     def reboot(self):
         pass
 
-    def get_ports(self):
-        pass
+    def get_ports(self) -> ListOrError:
+        return []
 
     def get_device_name(self):
         pass
@@ -239,7 +244,7 @@ class EltexSwitch(DLinkDevice):
     def description():
         return _('Eltex switch')
 
-    def get_ports(self):
+    def get_ports(self) -> ListOrError:
         #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
         stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
         oper_stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.8'))

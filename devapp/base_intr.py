@@ -1,5 +1,14 @@
 from abc import ABCMeta, abstractmethod
+from datetime import timedelta
+from typing import Union, Iterable, AnyStr, Generator
+
 from easysnmp import Session
+
+
+ListOrError = Union[
+    Iterable,
+    Union[Exception, Iterable]
+]
 
 
 class DeviceImplementationError(Exception):
@@ -12,7 +21,7 @@ class DevBase(object, metaclass=ABCMeta):
         self.db_instance = dev_instance
 
     @staticmethod
-    def description():
+    def description() -> AnyStr:
         pass
 
     @abstractmethod
@@ -20,29 +29,29 @@ class DevBase(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_ports(self):
+    def get_ports(self) -> ListOrError:
         pass
 
     @abstractmethod
-    def get_device_name(self):
+    def get_device_name(self) -> AnyStr:
         """Return device name by snmp"""
 
     @abstractmethod
-    def uptime(self):
+    def uptime(self) -> timedelta:
         pass
 
     @abstractmethod
-    def get_template_name(self):
+    def get_template_name(self) -> AnyStr:
         """Return path to html template for device"""
 
     @staticmethod
     @abstractmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber() -> bool:
         """Can connect device to subscriber"""
 
     @staticmethod
     @abstractmethod
-    def is_use_device_port():
+    def is_use_device_port() -> bool:
         """True if used device port while opt82 authorization"""
 
 
@@ -62,7 +71,7 @@ class BasePort(object, metaclass=ABCMeta):
     def enable(self):
         pass
 
-    def mac(self):
+    def mac(self) -> str:
         return ':'.join(['%x' % ord(i) for i in self._mac])
 
 
@@ -75,11 +84,11 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
     def set_int_value(self, oid, value):
         return self.ses.set(oid, value, 'i')
 
-    def get_list(self, oid):
+    def get_list(self, oid) -> Generator:
         for v in self.ses.walk(oid):
             yield v.value
 
-    def get_list_keyval(self, oid):
+    def get_list_keyval(self, oid) -> Generator:
         for v in self.ses.walk(oid):
             snmpnum = v.oid.split('.')[-1:]
             yield v.value, snmpnum[0] if len(snmpnum) > 0 else None

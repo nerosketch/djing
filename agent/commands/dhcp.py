@@ -4,14 +4,15 @@ from abonapp.models import Abon
 from devapp.models import Device, Port
 
 
-def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
+def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: int) -> None:
     try:
         dev = Device.objects.get(mac_addr=switch_mac)
         mngr_class = dev.get_manager_klass()
 
         if mngr_class.is_use_device_port():
-            port = Port.objects.get(device=dev, num=switch_port)
-            abon = Abon.objects.get(dev_port=port, device=dev)
+            abon = Abon.objects.get(dev_port__device=dev,
+                                    dev_port__num=switch_port,
+                                    device=dev)
         else:
             abon = Abon.objects.get(device=dev)
         if not abon.is_dynamic_ip:
@@ -33,7 +34,7 @@ def dhcp_commit(client_ip, client_mac, switch_mac, switch_port):
             'switch_mac': switch_mac
         })
     except MultipleObjectsReturned as e:
-        print('E:', 'MultipleObjectsReturned:', type(e), e, port, dev)
+        print('E:', 'MultipleObjectsReturned:', type(e), e, switch_port, dev)
 
 
 def dhcp_expiry(client_ip):

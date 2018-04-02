@@ -763,6 +763,7 @@ def save_user_dev_port(request, gid, uname):
         return redirect('abonapp:abon_home', gid, uname)
     user_port = mydefs.safe_int(request.POST.get('user_port'))
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
+    is_dynamic_ip = True if is_dynamic_ip == 'on' else False
     try:
         abon = models.Abon.objects.get(username=uname)
         if user_port == 0:
@@ -788,10 +789,7 @@ def save_user_dev_port(request, gid, uname):
 
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
-            if is_dynamic_ip == 'on':
-                abon.is_dynamic_ip = True
-            else:
-                abon.is_dynamic_ip = False
+            abon.is_dynamic_ip = is_dynamic_ip
             abon.save(update_fields=['dev_port', 'is_dynamic_ip'])
         else:
             abon.save(update_fields=['dev_port'])

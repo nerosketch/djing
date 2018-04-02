@@ -1,96 +1,86 @@
-# -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
-from typing import Iterator, Any, Tuple
+from typing import Iterator, Any, Tuple, Optional, Iterable
 
 from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
 
 
-# Всплывает если из NAS вернулся не удачный результат
+# Raised if NAS has returned failed result
 class NasFailedResult(Exception):
     pass
 
 
-# Всплывает когда нет связи с сервером доступа к инету (NAS)
+# Raised when is no connection to the NAS
 class NasNetworkError(Exception):
     pass
 
 
-# Общается с NAS'ом
+# Communicate with NAS
 class BaseTransmitter(metaclass=ABCMeta):
     @abstractmethod
     def add_user_range(self, user_list: VectorAbon):
-        """добавляем список абонентов в NAS"""
+        """add subscribers list to NAS"""
 
     @abstractmethod
     def remove_user_range(self, users: VectorAbon):
-        """удаляем список абонентов"""
+        """remove subscribers list"""
 
     @abstractmethod
     def add_user(self, user: AbonStruct, *args):
-        """добавляем абонента"""
+        """add subscriber"""
 
     @abstractmethod
     def remove_user(self, user: AbonStruct):
-        """удаляем абонента"""
+        """remove subscriber"""
 
     @abstractmethod
     def update_user(self, user: AbonStruct, *args):
-        """чтоб обновить абонента можно изменить всё кроме его uid, по uid абонент будет найден"""
+        """
+        Update subscriber by uid, you can change everything except its uid.
+        Subscriber will found by UID.
+        """
 
     @abstractmethod
     def add_tariff_range(self, tariff_list: VectorTariff):
-        """
-        Пока не используется, зарезервировано.
-        Добавляет список тарифов в NAS
-        """
+        """Add services list to NAS."""
 
     @abstractmethod
     def remove_tariff_range(self, tariff_list: VectorTariff):
-        """
-        Пока не используется, зарезервировано.
-        Удаляем список тарифов по уникальным идентификаторам
-        """
+        """Remove tariff list by unique id list."""
 
     @abstractmethod
     def add_tariff(self, tariff: TariffStruct):
-        """
-        Пока не используется, зарезервировано.
-        Добавляет тариф
-        """
+        pass
 
     @abstractmethod
     def update_tariff(self, tariff: TariffStruct):
         """
-        Пока не используется, зарезервировано.
-        Чтоб обновить тариф надо изменить всё кроме его tid, по tid тариф будет найден
+        Update tariff by uid, you can change everything except its uid.
+        Tariff will found by UID.
         """
 
     @abstractmethod
     def remove_tariff(self, tid: int):
         """
-        :param tid: id тарифа в среде NAS сервера чтоб удалить по этому номеру
-        Пока не используется, зарезервировано.
+        :param tid: unique id of tariff.
         """
 
     @abstractmethod
-    def ping(self, host: str, count=10):
+    def ping(self, host: str, count=10) -> Optional[Tuple[int, int]]:
         """
-        :param host: ip адрес в текстовом виде, например '192.168.0.1'
-        :param count: количество пингов
-        :return: None если не пингуется, иначе кортеж, в котором (сколько вернулось, сколько было отправлено)
+        :param host: ip address in text view, for example '192.168.0.1'
+        :param count: count of ping queries
+        :return: None if not response, else tuple it contains count returned and count sent
+        for example (received, sent) -> (7, 10).
         """
 
     @abstractmethod
-    def read_users(self):
-        """
-        Читаем пользователей с NAS
-        :return: список AbonStruct
-        """
+    def read_users(self) -> Iterable[AbonStruct]:
+        pass
 
     def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:
         """
-        :param users_from_db: QuerySet всех абонентов у которых может быть обслуживание
-        :return: на выходе получаем абонентов которых надо добавить в nas и которых надо удалить
+        :param users_from_db: QuerySet of all subscribers that can have service
+        :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
         users_struct_list = [ab.build_agent_struct() for ab in users_from_db if ab.is_access()]
         users_struct_set = set([ab for ab in users_struct_list if ab is not None and ab.tariff is not None])
