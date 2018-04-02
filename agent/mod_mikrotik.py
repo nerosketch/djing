@@ -3,7 +3,7 @@ import socket
 import binascii
 from abc import ABCMeta
 from hashlib import md5
-from typing import List, Iterable
+from typing import List, Iterable, Optional, Tuple
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
 from mydefs import ping, singleton
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
@@ -336,7 +336,7 @@ class IpAddressListObj(IpStruct):
 
 
 class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
-    def add(self, list_name: str, ip: IpStruct, timeout=0):
+    def add(self, list_name: str, ip: IpStruct):
         if not isinstance(ip, IpStruct):
             raise TypeError
         commands = [
@@ -344,17 +344,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
             '=list=%s' % list_name,
             '=address=%s' % str(ip)
         ]
-        if timeout > 0:
-            commands.append('=timeout=%d' % timeout)
         return self._exec_cmd(commands)
-
-    def _edit(self, mk_id, timeout=None):
-        if timeout is not None:
-            commands = [
-                '/ip/firewall/address-list/set', '=.id=' + str(mk_id),
-                                                 '=timeout=%d' % timeout
-            ]
-            return self._exec_cmd(commands)
 
     def remove(self, mk_id):
         return self._exec_cmd([
@@ -410,12 +400,10 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
 
 class MikrotikTransmitter(QueueManager, IpAddressListManager):
     def add_user_range(self, user_list: VectorAbon):
-        super(MikrotikTransmitter, self).add_user_range(user_list)
         for usr in user_list:
             self.add_user(usr)
 
     def remove_user_range(self, users: VectorAbon):
-        super(MikrotikTransmitter, self).remove_user_range(users)
         queue_ids = [usr.queue_id for usr in users if usr is not None]
         QueueManager.remove_range(self, queue_ids)
         ips = [user.ip for user in users if isinstance(user, AbonStruct)]
@@ -424,34 +412,30 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             if ip_list_entity is not None and len(ip_list_entity) > 1:
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
-    def add_user(self, user: AbonStruct, ip_timeout=0):
-        super(MikrotikTransmitter, self).add_user(user, ip_timeout)
+    def add_user(self, user: AbonStruct, *args):
         if not isinstance(user.ip, IpStruct):
             raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
         QueueManager.add(self, user)
-        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
-        # удаляем из списка заблокированных абонентов
+        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+        # remove user from denied user list
         firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_BLOCKED)
         if len(firewall_ip_list_obj) > 1:
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     def remove_user(self, user: AbonStruct):
-        super(MikrotikTransmitter, self).remove_user(user)
         QueueManager.remove(self, user)
         firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
         if firewall_ip_list_obj is not None and len(firewall_ip_list_obj) > 1:
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
-    # обновляем основную инфу абонента
-    def update_user(self, user: AbonStruct, ip_timeout=0):
-        super(MikrotikTransmitter, self).update_user(user, ip_timeout)
+    def update_user(self, user: AbonStruct, *args):
         if not isinstance(user.ip, IpStruct):
             raise TypeError
 
-        # ищем ip абонента в списке ip
         find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
+        queue = QueueManager.find(self, 'uid%d' % user.uid)
 
         if not user.is_active:
             # если не активен - то и обновлять не надо
@@ -459,11 +443,12 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             if len(find_res) > 1:
                 # и если найден был - то удалим ip из разрешённых
                 IpAddressListManager.remove(self, find_res[0]['=.id'])
+            if queue is not None:
+                QueueManager.remove(self, user)
             return
 
         # если нет услуги то её не должно быть и в nas
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
-            queue = QueueManager.find(self, 'uid%d' % user.uid)
             if queue is not None:
                 QueueManager.remove(self, user)
             return
@@ -471,22 +456,17 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         # если не найден (mikrotik возвращает пустой словарь в списке если ничего нет)
         if len(find_res) < 2:
             # добавим запись об абоненте
-            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip, ip_timeout)
-        else:
-            mk_id = find_res[0]['=.id']
-            # то обновляем запись в mikrotik
-            IpAddressListManager._edit(self, mk_id, ip_timeout)
+            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
 
         # Проверяем шейпер
-        queue = QueueManager.find(self, 'uid%d' % user.uid)
+
         if queue is None:
             QueueManager.add(self, user)
             return
         if queue != user:
             QueueManager.update(self, user)
 
-    def ping(self, host, count=10):
-        super(MikrotikTransmitter, self).ping(host)
+    def ping(self, host, count=10) -> Optional[Tuple[int, int]]:
         r = self._exec_cmd([
             '/ip/arp/print',
             '?address=%s' % host
@@ -520,7 +500,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
     def remove_tariff(self, tid: int):
         pass
 
-    def read_users(self):
+    def read_users(self) -> Iterable[AbonStruct]:
         # shapes is ShapeItem
         allowed_ips = set(IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED))
         queues = set(q for q in QueueManager.read_queue_iter(self) if q.ip in allowed_ips)

@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 
 from devapp.base_intr import DeviceImplementationError
 from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
@@ -30,13 +30,13 @@ from .forms import DeviceForm, PortForm
 from mydefs import safe_int
 
 
-class BaseDeviceListView(ListView):
+class BaseDeviceListView(global_base_views.BaseListWithFiltering):
     http_method_names = ['get']
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
-class DevicesListView(BaseDeviceListView, global_base_views.OrderingMixin):
+class DevicesListView(global_base_views.OrderingMixin, BaseDeviceListView):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
 
@@ -63,7 +63,7 @@ class DevicesListView(BaseDeviceListView, global_base_views.OrderingMixin):
 
 
 @method_decorator([login_required, only_admins], name='dispatch')
-class DevicesWithoutGroupsListView(BaseDeviceListView, global_base_views.OrderingMixin):
+class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceListView):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
     queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
@@ -366,6 +366,9 @@ def devview(request, device_id):
             if dev.man_passw:
                 manager = dev.get_manager_object()
                 ports = manager.get_ports()
+                if isinstance(ports[0], Exception):
+                    messages.error(request, ports[0])
+                    ports = ports[1]
                 template_name = manager.get_template_name()
             else:
                 messages.warning(request, _('Not Set snmp device password'))
@@ -377,8 +380,8 @@ def devview(request, device_id):
             'dev_accs': Abon.objects.filter(device=dev),
             'dev_manager': manager
         })
-    except EasySNMPError:
-        messages.error(request, _('SNMP error on device'))
+    except EasySNMPError as e:
+        messages.error(request, "%s: %s" % (gettext('SNMP error on device'), e))
     except (DeviceDBException, DeviceImplementationError) as e:
         messages.error(request, e)
     return render(request, 'devapp/custom_dev_page/' + template_name, {
