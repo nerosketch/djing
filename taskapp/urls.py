@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^own$', views.OwnTaskListView.as_view(), name='own_tasks'),
     url(r'^my$', views.MyTaskListView.as_view(), name='my_tasks'),
     url(r'^all$', views.AllTasksListView.as_view(), name='all_tasks'),
+    url(r'^empty$', views.EmptyTasksListView.as_view(), name='empty_tasks'),
     url(r'^check_news$', views.check_news, name='check_news')
 ]

@@ -7,11 +7,13 @@
         <li class="active">{% trans 'Tasks' %}</li>
     </ol>
 
-
     {% include 'message_block.html' %}
 
     <div class="page-header">
-        <h2>{% trans 'Tasks to be performed' %}</h2>
+        <h2>{% block pagetitle %}
+            {% trans 'Tasks to be performed' %}
+            {% endblock %}
+        </h2>
     </div>
 
     <ul class="nav nav-tabs">

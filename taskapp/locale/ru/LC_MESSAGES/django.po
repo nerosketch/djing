@@ -462,3 +462,12 @@ msgstr "Имя и количество комментов"
 
 msgid "None"
 msgstr "Нету"
+
+msgid "View empty tasks"
+msgstr "Задачи без получателей"
+
+msgid "Tasks in which no recipients"
+msgstr "Задачи, в которых нет получателей"
+
+msgid "Tasks in which was trouble while at runtime"
+msgstr "Задачи в которых возникли проблемы во время выполнения"

@@ -91,6 +91,13 @@ class AllTasksListView(BaseTaskListView):
                            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
+class EmptyTasksListView(NewTasksView):
+    template_name = 'taskapp/tasklist_empty.html'
+
+    def get_queryset(self):
+        return Task.objects.annotate(reccount=Count('recipients')).filter(reccount__lt=1)
+
+
 @login_required
 @permission_required('taskapp.delete_task')
 def task_delete(request, task_id):
