@@ -141,8 +141,9 @@ class TaskUpdateView(UpdateView):
     def form_valid(self, form):
         try:
             self.object = form.save()
-            self.object.author = self.request.user
-            self.object.save(update_fields=['author'])
+            if self.object.author is None:
+                self.object.author = self.request.user
+                self.object.save(update_fields=['author'])
             task_id = safe_int(self.kwargs.get('task_id', 0))
             if task_id == 0:
                 log_text = _('Task has successfully created')
