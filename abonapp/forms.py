@@ -63,7 +63,6 @@ class AbonForm(forms.ModelForm):
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),
-                'class': "form-control",
                 'required': ''
             }),
             'telephone': forms.TextInput(attrs={
@@ -72,10 +71,7 @@ class AbonForm(forms.ModelForm):
                 'required': '',
                 'class': 'form-control'
             }),
-            'group': forms.Select(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': '4'}),
-            'street': forms.Select(attrs={'class': 'form-control'}),
-            'house': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': '4'}),
             'is_active': forms.NullBooleanSelect(attrs={'class': 'form-control'})
         }
 

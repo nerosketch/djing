@@ -1,5 +1,6 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
+{% load bootstrap3 %}
 {% block main %}
 
     <ol class="breadcrumb">
@@ -17,60 +18,26 @@
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'abonapp:add_abon' group.id %}" method="post">{% csrf_token %}
-                <div class="form-group">
-                    <label for="login">{% trans 'login' %}</label>
+                {% bootstrap_icon 'user' as ic %}
+                {% bootstrap_field form.username addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                        {{ form.username }}{{ form.username.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="fio">{% trans 'Long name' %}</label>
+                {% bootstrap_icon 'bookmark' as ic %}
+                {% bootstrap_field form.fio addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-bookmark"></span></span>
-                        {{ form.fio }}{{ form.fio.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="telephone">{% trans 'Telephone' %}</label>
+                {% bootstrap_icon 'phone' as ic %}
+                {% bootstrap_field form.telephone addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
-                        {{ form.telephone }}{{ form.telephone.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="grp">{% trans 'User group' %}</label>
+                {% bootstrap_icon 'grain' as ic %}
+                {% bootstrap_field form.group addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
-                        {{ form.group }}{{ form.group.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_description">{% trans 'Comment' %}</label>
+                {% bootstrap_icon 'comment' as ic %}
+                {% bootstrap_field form.description addon_before=ic %}
 
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
-                    {{ form.description }}{{ form.description.errors }}
-                </div>
-                <div class="form-group">
-                    <label for="id_street">{% trans 'Street' %}</label>
+                {% bootstrap_icon 'road' as ic %}
+                {% bootstrap_field form.street addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-road"></span></span>
-                        {{ form.street }}{{ form.street.errors }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_house">{% trans 'Apartment' %}</label>
-
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-home"></span></span>
-                        {{ form.house }}{{ form.house.errors }}
-                    </div>
-                </div>
+                {% bootstrap_icon 'home' as ic %}
+                {% bootstrap_field form.house addon_before=ic %}
 
                 <div class="form-group">
                     <label for="id_password">{% trans 'Password' %}</label>

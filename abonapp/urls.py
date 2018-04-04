@@ -35,7 +35,7 @@ subscriber_patterns = [
 
 group_patterns = [
     url(r'^$', views.PeoplesListView.as_view(), name='people_list'),
-    url(r'^addabon$', views.addabon, name='add_abon'),
+    url(r'^addabon$', views.AbonCreateView.as_view(), name='add_abon'),
     url(r'^services$', views.chgroup_tariff, name='ch_group_tariff'),
     url(r'^phonebook$', views.phonebook, name='phonebook'),
     url(r'^export$', views.abon_export, name='abon_export'),

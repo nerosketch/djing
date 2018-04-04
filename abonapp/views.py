@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from json import dumps
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError, transaction
@@ -10,8 +8,9 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, CreateView
 from django.conf import settings
+from jsonview.decorators import json_view
 
 from statistics.models import StatCache
 from tariff_app.models import Tariff
@@ -95,47 +94,60 @@ class GroupListView(BaseAbonListView):
         return queryset
 
 
-@login_required
-@permission_required('abonapp.add_abon')
-def addabon(request, gid):
-    frm = None
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator(permission_required('abonapp.add_abon'), name='dispatch')
+class AbonCreateView(CreateView):
     group = None
-    try:
-        group = get_object_or_404(Group, pk=gid)
+    abon = None
+    form_class = forms.AbonForm
+    template_name = 'abonapp/addAbon.html'
+    context_object_name = 'group'
+
+    def get_success_url(self):
+        return resolve_url('abonapp:abon_home', self.group.id, self.abon.username)
+
+    def dispatch(self, request, *args, **kwargs):
+        group = get_object_or_404(Group, pk=self.kwargs.get('gid'))
         if not request.user.has_perm('group_app.can_view_group', group):
             raise PermissionDenied
-        if request.method == 'POST':
-            frm = forms.AbonForm(request.POST, initial={'group': group})
-            if frm.is_valid():
-                abon = frm.save()
-                assign_perm("abonapp.change_abon", request.user, abon)
-                assign_perm("abonapp.delete_abon", request.user, abon)
-                assign_perm("abonapp.can_buy_tariff", request.user, abon)
-                assign_perm("abonapp.can_view_passport", request.user, abon)
-                assign_perm('abonapp.can_add_ballance', request.user, abon)
-                abon.sync_with_nas(created=True)
-                messages.success(request, _('create abon success msg'))
-                return redirect('abonapp:abon_home', group.id, abon.username)
-            else:
-                messages.error(request, _('fix form errors'))
+        self.group = group
+        return super(AbonCreateView, self).dispatch(request, *args, **kwargs)
 
-    except (IntegrityError, NasFailedResult, NasNetworkError, mydefs.LogicError) as e:
-        messages.error(request, e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.error(request, err)
-
-    if not frm:
-        frm = forms.AbonForm(initial={
-            'group': group,
+    def get_initial(self):
+        return {
+            'group': self.group,
             'address': _('Address'),
             'is_active': False
-        })
+        }
 
-    return render(request, 'abonapp/addAbon.html', {
-        'form': frm,
-        'group': group
-    })
+    def get_context_data(self, **kwargs):
+        context = super(AbonCreateView, self).get_context_data(**kwargs)
+        context['group'] = self.group
+        return context
+
+    def form_valid(self, form):
+        try:
+            abon = form.save()
+            me = self.request.user
+            assign_perm("abonapp.change_abon", me, abon)
+            assign_perm("abonapp.delete_abon", me, abon)
+            assign_perm("abonapp.can_buy_tariff", me, abon)
+            assign_perm("abonapp.can_view_passport", me, abon)
+            assign_perm('abonapp.can_add_ballance', me, abon)
+            abon.sync_with_nas(created=True)
+            messages.success(self.request, _('create abon success msg'))
+            self.abon = abon
+            return super(AbonCreateView, self).form_valid(form)
+        except (IntegrityError, NasFailedResult, NasNetworkError, mydefs.LogicError) as e:
+            messages.error(self.request, e)
+        except mydefs.MultipleException as errs:
+            for err in errs.err_list:
+                messages.error(self.request, err)
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('fix form errors'))
+        return super(AbonCreateView, self).form_invalid(form)
 
 
 @login_required
@@ -673,6 +685,7 @@ def extra_field_delete(request, gid, uname, fid):
 
 @login_required
 @permission_required('abonapp.can_ping')
+@json_view
 def abon_ping(request):
     ip = request.GET.get('cmd_param')
     status = False
@@ -709,10 +722,10 @@ def abon_ping(request):
     except NasNetworkError as e:
         messages.warning(request, e)
 
-    return HttpResponse(dumps({
+    return {
         'status': 0 if status else 1,
         'dat': text
-    }))
+    }
 
 
 @method_decorator([login_required, mydefs.only_admins], name='dispatch')
@@ -967,14 +980,15 @@ def abon_export(request, gid):
 @login_required
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
+@json_view
 def reset_ip(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     abon.ip_address = None
     abon.save(update_fields=['ip_address'])
-    return HttpResponse(dumps({
+    return {
         'status': 0,
         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
-    }))
+    }
 
 
 @login_required
@@ -1068,7 +1082,7 @@ class EditSibscriberMarkers(UpdateView):
 
 
 # API's
-
+@json_view
 def abons(request):
     ablist = [{
         'id': abn.pk,
@@ -1088,11 +1102,12 @@ def abons(request):
         'tariffs': tarlist
     }
     del ablist, tarlist
-    return HttpResponse(dumps(data))
+    return data
 
 
+@json_view
 def search_abon(request):
     word = request.GET.get('s')
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results]
-    return HttpResponse(dumps(results, ensure_ascii=False))
+    return results
