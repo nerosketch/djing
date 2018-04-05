@@ -511,3 +511,6 @@ msgstr "Показать абонента на порту"
 
 msgid "Subscribers on port does not exist"
 msgstr "Абоненты на порту не найдены"
+
+msgid "Export to nagios objects"
+msgstr "Экспортировать конфиг для nagios"

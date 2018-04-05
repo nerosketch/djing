@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from devapp.base_intr import DeviceImplementationError
 from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
@@ -573,3 +573,35 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
             return {
                 'text': str(e)
             }
+
+
+@login_required
+@only_admins
+def nagios_objects_conf(request):
+    from transliterate import translit
+    confs = list()
+
+    def templ(host_name, host_addr, parent_host_name):
+        return '\n'.join([
+            "define host{",
+            "\tuse				generic-switch",
+            "\thost_name		%s" % host_name,
+            "\taddress			%s" % host_addr,
+            "\tparents			%s" % parent_host_name if parent_host_name is not None else '',
+            "}\n"
+        ])
+
+    def norm_name(name: str, replreg=re.compile(r'\W+', re.IGNORECASE)):
+        return replreg.sub('', name)
+
+    for dev in Device.objects.exclude(devtype='On').select_related('parent_dev').only('ip_address', 'comment', 'parent_dev'):
+        conf = templ(host_name=norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True))),
+                     host_addr=dev.ip_address,
+                     parent_host_name=norm_name("%d%s" % (dev.parent_dev.pk,
+                                                          translit(dev.parent_dev.comment, language_code='ru',
+                                                                   reversed=True))) if dev.parent_dev else None,
+                     )
+        confs.append(conf)
+    response = HttpResponse(''.join(confs), content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename="objects.cfg"'
+    return response

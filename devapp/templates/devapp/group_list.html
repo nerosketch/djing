@@ -27,9 +27,12 @@
             </tbody>
             <tfoot>
             <tr>
-                <td>
-                    <a href="{% url 'devapp:devices_null_group' %}" class="btn btn-primary btn-sm">
+                <td class="btn-group btn-group-sm">
+                    <a href="{% url 'devapp:devices_null_group' %}" class="btn btn-primary">
                         <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Devices without group' %}
+                    </a>
+                    <a href="{% url 'devapp:nagios_objects_conf' %}" class="btn btn-default" target="_blank">
+                        <span class="glyphicon glyphicon-export"></span> {% trans 'Export to nagios objects' %}
                     </a>
                 </td>
             </tr>

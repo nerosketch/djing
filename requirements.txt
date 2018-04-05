@@ -22,3 +22,4 @@ webdavclient
 pyst2
 django-jsonview
 django-bitfield
+transliterate
