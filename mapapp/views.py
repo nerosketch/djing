@@ -177,7 +177,6 @@ def dot_tooltip(request):
     try:
         dot = Dot.objects.get(id=d)
         devs = dot.devices.all()
-        devs = Device.objects.wrap_monitoring_info(devs)
     except Dot.DoesNotExist:
         pass
     return render_to_text('maps/map_tooltip.html', {

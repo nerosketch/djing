@@ -3,9 +3,9 @@
 <div class="list-group">
     {% for dev in devs %}
         <a class="list-group-item" href="{% url 'devapp:view' dev.group.pk dev.pk %}" target="_blank" title="{{ dev.mon.plugin_output }}">
-            {% if dev.mon.current_state == '0' %}
+            {% if dev.status == 'up' %}
                 <span class="glyphicon glyphicon-ok-circle text-success"></span>
-            {% else %}
+            {% elif dev.status == 'dwn' or dev.status == 'unr' %}
                 <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
             {% endif %}
             <b>{{ dev.comment }}</b> {{ dev.mon.plugin_output }}

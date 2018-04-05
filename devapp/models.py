@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-import requests
-from django.db import models, ProgrammingError
+from django.db import models
 from djing.fields import MACAddressField
 from .base_intr import DevBase
-from mydefs import MyGenericIPAddressField, MyChoicesAdapter, ip2int
+from mydefs import MyGenericIPAddressField, MyChoicesAdapter
 from . import dev_types
 from subprocess import run
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from json.decoder import JSONDecodeError
 from group_app.models import Group
 
 
@@ -26,24 +24,6 @@ class DeviceDBException(Exception):
 
 class DeviceMonitoringException(Exception):
     pass
-
-
-class DeviceManager(models.Manager):
-    @staticmethod
-    def wrap_monitoring_info(devices_queryset):
-        nag_url = getattr(settings, 'NAGIOS_URL', None)
-        if nag_url is not None:
-            addrs = ['h=%s' % hex(ip2int(dev.ip_address))[2:] for dev in devices_queryset]
-            url = '%s/host/status/arr?%s' % (nag_url, '&'.join(addrs))
-            try:
-                res = requests.get(url).json()
-            except (requests.exceptions.ConnectionError, JSONDecodeError) as e:
-                raise DeviceMonitoringException(e)
-            for dev in devices_queryset:
-                inf = [x for x in res if x.get('address') == dev.ip_address]
-                if len(inf) > 0:
-                    setattr(dev, 'mon', inf[0].get('current_status'))
-        return devices_queryset
 
 
 class Device(models.Model):
@@ -66,8 +46,6 @@ class Device(models.Model):
     status = models.CharField(_('Status'), max_length=3, choices=NETWORK_STATES, default='und')
 
     is_noticeable = models.BooleanField(_('Send notify when monitoring state changed'), default=False)
-
-    objects = DeviceManager()
 
     class Meta:
         db_table = 'dev'
@@ -159,6 +137,3 @@ class Port(models.Model):
         )
         verbose_name = _('Port')
         verbose_name_plural = _('Ports')
-
-
-
