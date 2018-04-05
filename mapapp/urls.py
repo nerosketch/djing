@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from django.conf.urls import url
 
 from . import views
@@ -19,6 +18,7 @@ urlpatterns = [
 
     url(r'^modal_add_dot$', views.modal_add_dot, name='modal_add_dot'),
     url(r'^j_dot_tooltip$', views.dot_tooltip, name='dot_tooltip'),
-    url(r'^resolve_dots_by_group(?P<grp_id>\d+)$', views.resolve_dots_by_group, name='resolve_dots_by_group')
+    url(r'^resolve_dots_by_group(?P<grp_id>\d+)$', views.resolve_dots_by_group, name='resolve_dots_by_group'),
 
+    url(r'^to_single_dev/$', views.to_single_dev, name='to_single_dev')
 ]

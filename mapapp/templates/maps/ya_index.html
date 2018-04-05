@@ -17,26 +17,47 @@
         plcmrk.properties.set('balloonContent', html);
     }
 
+    function open_in_new_window(e){
+        var data = e.get('target').properties._data;
+        var win = window.open("{% url 'mapapp:to_single_dev' %}?dot_id=" + data.dot_id, '_blank');
+        if (win)
+            win.focus();
+        else
+            showErr("{% trans 'Please allow popups for this website' %}");
+    }
+
     function load_dots(r){
         for(let e of r){
-            var iconname='flag_black.png';
-            if(e.devcount > 0)
-                iconname='dev_ok.png';
+            var iconname = 'dev.png';;
+            var click_callback = placemark_click;
+            if(e.devcount > 1){
+                iconname='relay_rack.png';
+            }else if(e.devcount == 1){
+                var dev = e.device;
+                console.log(dev.status);
+                if(dev.status == 'unr' || dev.status == 'dwn')
+                    iconname='dev_bug.png';
+                else if(dev.status == 'up')
+                    iconname='dev_ok.png';
+                click_callback = open_in_new_window;
+            }else{
+                iconname='flag_black.png';
+            }
             dot_place([e.latitude, e.longitude], {
                 hintContent: e.title,
                 dot_id: e.pk
-            }, iconname);
+            }, click_callback, iconname);
         }
     }
 
-    function dot_place(pos, opts, icon_name='dev_ok.png'){
+    function dot_place(pos, opts, click_callback, icon_name='dev_ok.png'){
         var dot = new ymaps.Placemark(pos, opts, {
             iconLayout: 'default#image',
             iconImageHref: '/static/img/gmarkers/'+icon_name,
             iconImageSize: [32, 48],
             iconImageOffset: [-16, -48]
         });
-        dot.events.add('click', placemark_click);
+        dot.events.add('click', click_callback);
         myMap.geoObjects.add(dot);
     }
 
@@ -52,7 +73,7 @@
         dot_place([d.latitude, d.longitude], {
             hintContent: d.title,
             dot_id: d.pk
-        });
+        }, placemark_click);
     }
 
     function add_dot(e){
@@ -142,7 +163,10 @@
 
     <div class="panel panel-default hidden-sm hidden-xs" id="yapanel">
         <div class="panel-heading">
-            <h4 class="modal-title">{% trans 'Layers' %}</h4>
+            <h4 class="modal-title">
+                {% trans 'Layers' %}
+                <a href="https://github.com/nerosketch/djing/blob/master/docs/map.md" title="{% trans 'Help' %}" target="_blank" data-toggle="tooltip">?</a>
+            </h4>
         </div>
         <div class="list-group">
             {% for grp in groups %}

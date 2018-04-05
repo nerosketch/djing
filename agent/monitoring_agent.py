@@ -43,7 +43,7 @@ def validate_status(text):
 
 def send_request(ip, status, sign):
     r = requests.get(
-        "%(domain)s/dev/on_device_down/" % {'domain': SERVER_DOMAIN},
+        "%(domain)s/dev/on_device_event/" % {'domain': SERVER_DOMAIN},
         params={
             'ip': ip,
             'status': status,

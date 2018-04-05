@@ -26,5 +26,5 @@ urlpatterns = [
     url(r'^search_dev$', views.search_dev),
 
     # Monitoring api
-    url(r'^on_device_down/$', views.OnDevDown.as_view())
+    url(r'^on_device_event/$', views.OnDeviceMonitoringEvent.as_view())
 ]

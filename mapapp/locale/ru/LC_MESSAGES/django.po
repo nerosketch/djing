@@ -165,3 +165,9 @@ msgstr "Геоточка не найдена"
 #, python-format
 msgid "Map point '%(title)s' has been deleted"
 msgstr "Геоточка '%(title)s' была удалена"
+
+msgid "Please allow popups for this website"
+msgstr "Разрешите сайту открывать всплывающие окна"
+
+msgid "Help"
+nsgstr "Справка"

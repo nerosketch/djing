@@ -2,20 +2,21 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from django.utils.decorators import method_decorator
 from django.db.models import Count
 from django.views.generic import ListView
 from django.conf import settings
+from jsonview.decorators import json_view
+
 from group_app.models import Group
 from .models import Dot
 from .forms import DotForm
 from mydefs import safe_int
 from devapp.models import Device
 from guardian.decorators import permission_required
-from json import dumps
 
 
 class BaseListView(ListView):
@@ -45,6 +46,7 @@ class OptionsListView(BaseListView):
         if not request.user.is_superuser:
             return redirect('/')
         return super(OptionsListView, self).get(request, *args, **kwargs)
+
 
 @login_required
 def dot(request, did=0):
@@ -95,18 +97,27 @@ def remove(request, did):
 
 
 @login_required
+@json_view
 def get_dots(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
-    dots = Dot.objects.all().annotate(devcount=Count('devices'))
+    dots = Dot.objects.prefetch_related('devices').annotate(devcount=Count('devices')).defer('attachment')
+
+    def fill_dev(dev):
+        return {
+            'status': dev.status,
+            'comment': dev.comment
+        } if dev is not None else None
+
     res = [{
         'devcount': e.devcount,
         'latitude': e.latitude,
         'longitude': e.longitude,
         'title': e.title,
-        'pk': e.pk
+        'pk': e.pk,
+        'device': fill_dev(e.devices.first())
     } for e in dots]
-    return HttpResponse(dumps(res), content_type='application/json')
+    return res
 
 
 @login_required
@@ -127,6 +138,7 @@ def modal_add_dot(request):
             res = {
                 'error': _('fix form errors')
             }
+        from json import dumps
         return HttpResponse(dumps(res))
     else:
         coords = request.GET.get('coords')
@@ -205,10 +217,24 @@ def add_dev(request, did):
 
 
 @login_required
+@json_view
 def resolve_dots_by_group(request, grp_id):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
     devs = Device.objects.filter(group__id=grp_id)
-    dots = Dot.objects.filter(devices__in=devs).annotate(devcount=Count('devices')).only('pk')
-    res = [dot.pk for dot in dots]
-    return HttpResponse(dumps(res), content_type='application/json')
+    dots = Dot.objects.filter(devices__in=devs).only('pk').values_list('pk')
+    res = [dot[0] for dot in dots]
+    return res
+
+
+@login_required
+def to_single_dev(request):
+    dot_id = safe_int(request.GET.get('dot_id'))
+    if dot_id <= 0:
+        return HttpResponseBadRequest
+    dev = Device.objects.filter(dot__id=dot_id).first()
+    if dev is None:
+        messages.error(request, gettext('Devices is not found on the dot'))
+        return redirect('mapapp:edit_dot', dot_id)
+    grp_id = dev.group.pk
+    return redirect('devapp:view', grp_id, dev.pk)

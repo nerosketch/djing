@@ -513,7 +513,7 @@ def fix_port_conflict(request, group_id, device_id, port_id):
     })
 
 
-class OnDevDown(global_base_views.AllowedSubnetMixin, global_base_views.HashAuthView):
+class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_views.HashAuthView):
     #
     # Api view for monitoring devices
     #
@@ -535,12 +535,6 @@ class OnDevDown(global_base_views.AllowedSubnetMixin, global_base_views.HashAuth
             if device_down is None:
                 return {'text': 'Devices with ip %s does not exist' % dev_ip}
 
-            if not device_down.is_noticeable:
-                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address}
-
-            recipients = UserProfile.objects.get_profiles_by_group(device_down.group.pk)
-            names = list()
-
             if dev_status == 'UP':
                 device_down.status = 'up'
                 notify_text = 'Device %(device_name)s is up'
@@ -553,7 +547,14 @@ class OnDevDown(global_base_views.AllowedSubnetMixin, global_base_views.HashAuth
             else:
                 device_down.status = 'und'
                 notify_text = 'Device %(device_name)s getting undefined status code'
+
             device_down.save(update_fields=['status'])
+
+            if not device_down.is_noticeable:
+                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address}
+
+            recipients = UserProfile.objects.get_profiles_by_group(device_down.group.pk)
+            names = list()
 
             for recipient in recipients:
                 send_notify(
