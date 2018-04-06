@@ -109,14 +109,29 @@ def get_dots(request):
             'comment': dev.comment
         } if dev is not None else None
 
-    res = [{
-        'devcount': e.devcount,
-        'latitude': e.latitude,
-        'longitude': e.longitude,
-        'title': e.title,
-        'pk': e.pk,
-        'device': fill_dev(e.devices.first())
-    } for e in dots]
+    is_obtain_pk = request.GET.get('is_obtain_pk')
+
+    if is_obtain_pk == 'on':
+        res = dict()
+        for e in dots:
+            res[str(e.pk)] = {
+                'devcount': e.devcount,
+                'latitude': e.latitude,
+                'longitude': e.longitude,
+                'title': e.title,
+                'pk': e.pk,
+                'device': fill_dev(e.devices.first())
+            }
+    else:
+        res = [{
+            'devcount': e.devcount,
+            'latitude': e.latitude,
+            'longitude': e.longitude,
+            'title': e.title,
+            'pk': e.pk,
+            'device': fill_dev(e.devices.first())
+        } for e in dots]
+
     return res
 
 

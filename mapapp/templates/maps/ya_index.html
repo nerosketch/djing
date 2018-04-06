@@ -117,7 +117,7 @@
     }
 
     function get_placemark_states(){
-        $.getJSON("{% url 'mapapp:get_dots' %}", update_placemark_states);
+        $.getJSON("{% url 'mapapp:get_dots' %}?is_obtain_pk=on", update_placemark_states);
     }
 
     /*
@@ -132,7 +132,8 @@
             if(server_info === undefined)
                 continue;
             var r = get_params_for_placemark(server_info);
-            placemark.events.remove('click');
+            placemark.events.remove('click', open_in_new_window);
+            placemark.events.remove('click', placemark_click);
             placemark.events.add('click', r[1]);
             placemark.options.set({'iconImageHref': '/static/img/gmarkers/' + r[0]});
         }
