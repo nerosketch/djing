@@ -57,7 +57,13 @@
                 </div>
                 <div class="panel-footer">
                     {% trans 'Parent device' %}
-                    <a href="{% url 'devapp:view' dev.group.pk dev.pk %}" title="{{ dev.ip_address }}" data-toggle="tooltip">{{ dev.comment }}</a>
+                    {% with pdev=dev.parent_dev %}
+                        {% if pdev %}
+                            <a href="{% url 'devapp:view' pdev.group.pk pdev.pk %}" title="{{ pdev.ip_address }}" data-toggle="tooltip">{{ pdev.comment }}</a>
+                        {% else %}
+                            {% trans 'Not assigned' %}
+                        {% endif %}
+                    {% endwith %}
                 </div>
             </div>
         </div>

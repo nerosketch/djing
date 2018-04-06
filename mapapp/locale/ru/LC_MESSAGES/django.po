@@ -170,7 +170,7 @@ msgid "Please allow popups for this website"
 msgstr "Разрешите сайту открывать всплывающие окна"
 
 msgid "Help"
-nsgstr "Справка"
+msgstr "Справка"
 
 msgid "Update states"
 msgstr "Обновить состояния"
