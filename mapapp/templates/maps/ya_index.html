@@ -3,6 +3,26 @@
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
     <script type="text/javascript">
+    /*
+     * Data format for struct ServerInfo:
+     * {
+     *    "1": {
+     *        "device": {
+     *            "status": "und|unr|up|dwn",
+     *            "comment": "title of the device"
+     *        }
+     *        "devcount": 23,
+     *        "latitude": 86.123123,
+     *        "longitude": 23.234234,
+     *        "title": "some descriptive",
+     *        "pk": 1
+     *    }
+     * }
+     * Where:
+     *   dot_id - int, id of dot
+     *   device - single device info on the dot, if devcount is 1
+     *   devcount - count of devices on the dot
+     */
     ymaps.ready(init);
     var myMap;
 
@@ -26,27 +46,38 @@
             showErr("{% trans 'Please allow popups for this website' %}");
     }
 
+    /*
+     * db_info is a struct ServerInfo
+     */
+    function get_params_for_placemark(db_info){
+        var iconname = 'dev.png';
+        var click_callback = placemark_click;
+        if(db_info.devcount > 1){
+            iconname='relay_rack.png';
+        }else if(db_info.devcount == 1){
+            var dev = db_info.device;
+            if(dev.status == 'unr' || dev.status == 'dwn')
+                iconname='dev_bug.png';
+            else if(dev.status == 'up')
+                iconname='dev_ok.png';
+            click_callback = open_in_new_window;
+        }else
+            iconname='flag_black.png';
+        return [iconname, click_callback];
+    }
+
     function load_dots(r){
         for(let e of r){
-            var iconname = 'dev.png';;
-            var click_callback = placemark_click;
-            if(e.devcount > 1){
-                iconname='relay_rack.png';
-            }else if(e.devcount == 1){
-                var dev = e.device;
-                console.log(dev.status);
-                if(dev.status == 'unr' || dev.status == 'dwn')
-                    iconname='dev_bug.png';
-                else if(dev.status == 'up')
-                    iconname='dev_ok.png';
-                click_callback = open_in_new_window;
-            }else{
-                iconname='flag_black.png';
-            }
+            var params_from_db = get_params_for_placemark(e);
+
+            var stat = '';
+            if(e.device != null)
+                stat = e.device.status;
+
             dot_place([e.latitude, e.longitude], {
-                hintContent: e.title,
+                hintContent: e.title + stat,
                 dot_id: e.pk
-            }, click_callback, iconname);
+            }, params_from_db[1], params_from_db[0]);
         }
     }
 
@@ -83,6 +114,28 @@
             $('.form-ajax').ajform({'on_response': on_success_add_dot});
         });
         e.preventDefault();
+    }
+
+    function get_placemark_states(){
+        $.getJSON("{% url 'mapapp:get_dots' %}", update_placemark_states);
+    }
+
+    /*
+     * states is a associated array of structs ServerInfo
+     */
+    function update_placemark_states(states){
+        var it = myMap.geoObjects.getIterator(), placemark;
+        while(placemark = it.getNext()){
+            if(placemark.properties === undefined)
+                break;
+            var server_info = states[placemark.properties._data.dot_id];
+            if(server_info === undefined)
+                continue;
+            var r = get_params_for_placemark(server_info);
+            placemark.events.remove('click');
+            placemark.events.add('click', r[1]);
+            placemark.options.set({'iconImageHref': '/static/img/gmarkers/' + r[0]});
+        }
     }
 
     function init(){
@@ -125,6 +178,9 @@
             $('.mapbtns').removeClass('active');
             $(this).addClass('active');
         });
+
+        // Two time per minute update placemarks
+        var inttime = setInterval(get_placemark_states, 30*1000);
 
     }
     function showAll(){
@@ -174,9 +230,14 @@
             {% endfor %}
         </div>
         <div class="panel-footer">
-            <a href="#" onclick="showAll();" class="btn btn-default">
-                <span class="glyphicon glyphicon-eye-open"></span> {% trans 'Show all' %}
-            </a>
+            <div class="btn-group-vertical btn-group-sm">
+                <a href="#" onclick="showAll();" class="btn btn-default">
+                    <span class="glyphicon glyphicon-eye-open"></span> {% trans 'Show all' %}
+                </a>
+                <a href="#" onclick="get_placemark_states();" class="btn btn-default">
+                    <span class="glyphicon glyphicon-refresh"></span> {% trans 'Update states' %}
+                </a>
+            </div>
         </div>
     </div>
 

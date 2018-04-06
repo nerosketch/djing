@@ -594,7 +594,7 @@ def nagios_objects_conf(request):
     def norm_name(name: str, replreg=re.compile(r'\W+', re.IGNORECASE)):
         return replreg.sub('', name)
 
-    for dev in Device.objects.exclude(devtype='On').select_related('parent_dev').only('ip_address', 'comment', 'parent_dev'):
+    for dev in Device.objects.exclude(devtype='On', ip_address='127.0.0.1').select_related('parent_dev').only('ip_address', 'comment', 'parent_dev'):
         conf = templ(host_name=norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True))),
                      host_addr=dev.ip_address,
                      parent_host_name=norm_name("%d%s" % (dev.parent_dev.pk,

@@ -171,3 +171,6 @@ msgstr "Разрешите сайту открывать всплывающие 
 
 msgid "Help"
 nsgstr "Справка"
+
+msgid "Update states"
+msgstr "Обновить состояния"

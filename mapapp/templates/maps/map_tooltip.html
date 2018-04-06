@@ -12,12 +12,12 @@
         </a>
 
     {% empty %}
-        <li class="list-group-item">{% trans 'Pinned devices not found' %}</li>
+        <a class="list-group-item">{% trans 'Pinned devices not found' %}</a>
     {% endfor %}
 
 </div>
 
 {% if dot.attachment %}
     <span class="glyphicon glyphicon-file"></span>
-    <a href="{{ dot.attachment.url }}" class="btn btn-xs btn-dfault" target="_blank">{{ dot.attachment.name }}</a>
+    <a href="{{ dot.attachment.url }}" class="btn btn-xs btn-default" target="_blank">{{ dot.attachment.name }}</a>
 {% endif %}
