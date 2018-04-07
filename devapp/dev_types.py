@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.translation import gettext_lazy as _, gettext
 from mydefs import RuTimedelta, safe_int
 from datetime import timedelta
@@ -7,20 +6,17 @@ from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationEr
 
 
 class DLinkPort(BasePort):
-
     def __init__(self, num, name, status, mac, speed, snmpWorker):
         BasePort.__init__(self, num, name, status, mac, speed)
-        if not issubclass(snmpWorker.__class__ , SNMPBaseWorker):
+        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmpWorker
 
-    # выключаем этот порт
     def disable(self):
         self.snmp_worker.set_int_value(
             "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num), 2
         )
 
-    # включаем этот порт
     def enable(self):
         self.snmp_worker.set_int_value(
             "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num), 1
@@ -28,7 +24,6 @@ class DLinkPort(BasePort):
 
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
-
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
@@ -51,12 +46,12 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
             for n in range(interfaces_count):
                 status = True if int(stats[n]) == 1 else False
                 res.append(DLinkPort(
-                    n+1,
+                    n + 1,
                     nams[n] if len(nams) > 0 else '',
                     status,
                     macs[n] if len(macs) > 0 else _('does not fetch the mac'),
                     int(speeds[n]) if len(speeds) > 0 else 0,
-                self))
+                    self))
             return res
         except IndexError:
             return DeviceImplementationError('Dlink port index error'), res
@@ -64,9 +59,9 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.1.0')
 
-    def uptime(self):
+    def uptime(self) -> timedelta:
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.8.0'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
     def get_template_name(self):
@@ -89,11 +84,9 @@ class ONUdev(BasePort):
         self.snmp_worker = snmpWorker
         self.signal = signal
 
-    # выключаем этот порт
     def disable(self):
         pass
 
-    # включаем этот порт
     def enable(self):
         pass
 
@@ -102,7 +95,6 @@ class ONUdev(BasePort):
 
 
 class OLTDevice(DevBase, SNMPBaseWorker):
-
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
@@ -130,7 +122,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
                     signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-                snmpWorker=self)
+                    snmpWorker=self)
                 res.append(onu)
         except EasySNMPTimeoutError as e:
             return EasySNMPTimeoutError(
@@ -143,7 +135,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
     def uptime(self):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.9.1.4.1'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
     def get_template_name(self):
@@ -159,7 +151,6 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 
 class OnuDevice(DevBase, SNMPBaseWorker):
-
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
@@ -214,23 +205,19 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
 
-
 class EltexPort(BasePort):
-
     def __init__(self, snmpWorker, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
         if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmpWorker
 
-    # выключаем этот порт
     def disable(self):
         self.snmp_worker.set_int_value(
             "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num),
             2
         )
 
-    # включаем этот порт
     def enable(self):
         self.snmp_worker.set_int_value(
             "%s.%d" % ('.1.3.6.1.2.1.2.2.1.7', self.num),
@@ -239,26 +226,21 @@ class EltexPort(BasePort):
 
 
 class EltexSwitch(DLinkDevice):
-
     @staticmethod
     def description():
         return _('Eltex switch')
 
     def get_ports(self) -> ListOrError:
-        #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
-        stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
-        oper_stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.8'))
-        #macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
-        speeds = list(self.get_list('.1.3.6.1.2.1.31.1.1.1.15'))
         res = []
-        for n in range(28):
+        for i, n in enumerate(range(49, 77), 1):
+            speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
             res.append(EltexPort(self,
-                n+1,
-                '',#nams[n] if len(nams) > 0 else _('does not fetch the name'),
-                True if int(stats[n]) == 1 else False,
-                '',#macs[n] if len(macs) > 0 else _('does not fetch the mac'),
-                int(speeds[n]) if len(speeds) > 0 and int(oper_stats[n]) == 1 else 0,
-            ))
+                                 i,
+                                 self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
+                                 self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
+                                 self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
+                                 int(speed),
+                                 ))
         return res
 
     def get_device_name(self):
@@ -266,7 +248,7 @@ class EltexSwitch(DLinkDevice):
 
     def uptime(self):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
     @staticmethod

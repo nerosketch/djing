@@ -111,7 +111,7 @@
                         {% for port in ports %}
                             <tr>
                                 <td>{{ port.num }}</td>
-                                <td>{{ port.nm|default:_('Not assigned') }}</td>
+                                <td>{{ port.nm|default:'-' }}</td>
                             </tr>
                         {% empty %}
                             <tr>
