@@ -278,20 +278,26 @@ msgstr "Учётная запись удалена"
 msgid "Permissions has successfully updated"
 msgstr "Права успешно обновлены"
 
-#~ msgid "The responsibility of the administrator of the group of subscribers"
-#~ msgstr "Ответственность администратора за группы абонентов"
+msgid "The responsibility of the administrator of the group of subscribers"
+msgstr "Ответственность администратора за группы абонентов"
 
-#~ msgid "Administrator"
-#~ msgstr "Администратор"
+msgid "Administrator"
+msgstr "Администратор"
 
-#~ msgid "Options"
-#~ msgstr "Настройки"
+msgid "Options"
+msgstr "Настройки"
 
-#~ msgid "Change self onfo"
-#~ msgstr "Изменить инфу о себе"
+msgid "Change self onfo"
+msgstr "Изменить инфу о себе"
 
-#~ msgid "Edit"
-#~ msgstr "Редактировать"
+msgid "Edit"
+msgstr "Редактировать"
 
-#~ msgid "Access to groups"
-#~ msgstr "Доступ к группам"
+msgid "Access to groups"
+msgstr "Доступ к группам"
+
+msgid "Manage responsibility groups"
+msgstr "Группы администратора"
+
+msgid "Responsibilities has been updated"
+msgstr "Ответственность за группы обновлена"

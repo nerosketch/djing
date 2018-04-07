@@ -1,0 +1,25 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <legend>{% trans 'The responsibility of the administrator of the group of subscribers' %}</legend>
+    <form action="{% url 'acc_app:manage_responsibility_groups' userprofile.pk %}" method="post" role="form">{% csrf_token %}
+        {% for grp in groups %}
+            <div class="checkbox">
+                <label>
+                    {% if grp.pk in existing_groups %}
+                        <input name="grp" type="checkbox" value="{{ grp.pk }}" checked/>
+                    {% else %}
+                        <input name="grp" type="checkbox" value="{{ grp.pk }}"/>
+                    {% endif %}
+                    {{ grp.title }}
+                </label>
+            </div>
+        {% endfor %}
+        <div class="btn-group">
+            <input type="submit" class="btn btn-primary" value="{% trans 'Save' %}">
+            <input type="reset" class="btn btn-default" value="{% trans 'Reset' %}">
+        </div>
+    </form>
+
+{% endblock %}

@@ -75,11 +75,11 @@
                 </div>
             </div>
             {% if current_service %}
-                {% include 'clientsideapp/custom_pages/service.htm' with active_service=current_service %}
+                {% include 'custom_pages/service.htm' with active_service=current_service %}
             {% endif %}
         </div>
     </div>
 
-    {% include 'clientsideapp/custom_pages/service_bottom.htm' %}
+    {% include 'custom_pages/service_bottom.htm' %}
 
 {% endblock %}

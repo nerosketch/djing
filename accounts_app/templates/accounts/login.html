@@ -1,4 +1,4 @@
-{% load i18n %}<!DOCTYPE html>
+<!DOCTYPE html>{% load i18n %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -65,13 +65,12 @@
     </div>
 
     <footer class="footer">
-      <div class="container">
-        <p class="text-muted">
-            {% trans 'Contact us' %} <i>is-ttk@ya.ru</i>.
-	</p>
-      </div>
+        <div class="container">
+            <p class="text-muted">
+                {% include 'custom_pages/footer.htm' %}
+            </p>
+        </div>
     </footer>
-</div>
 
 </body>
 </html>

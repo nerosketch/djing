@@ -53,6 +53,14 @@
                         {% trans 'Administrator' %}
                     </a>
                 </li>
+
+                {% url 'acc_app:manage_responsibility_groups' uid as manrespgr %}
+                <li{% if manrespgr == request.path %} class="active"{% endif %}>
+                    <a href="{{ manrespgr }}">
+                        {% trans 'Manage responsibility groups' %}
+                    </a>
+                </li>
+
                 {% if request.user.is_superuser %}
                 {% url 'acc_app:set_abon_groups_permission' uid as set_ag_perm %}
                 <li{% if set_ag_perm == request.path %} class="active"{% endif %}>

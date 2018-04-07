@@ -2,12 +2,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import PermissionDenied
-from django.urls import NoReverseMatch
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import NoReverseMatch, reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView, RedirectView
 from django.conf import settings
 
 from group_app.models import Group
@@ -22,12 +23,6 @@ from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 class BaseAccListView(ListView):
     http_method_names = ['get']
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-
-
-@login_required
-@mydefs.only_admins
-def home(request):
-    return redirect('acc_app:profile')
 
 
 def to_signin(request):
@@ -58,9 +53,12 @@ def to_signin(request):
         return redirect('acc_app:profile')
 
 
-def sign_out(request):
-    logout(request)
-    return redirect('acc_app:login')
+class SignOut(RedirectView):
+    url = reverse_lazy('acc_app:login')
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super(SignOut, self).get(request, *args, **kwargs)
 
 
 @login_required
@@ -299,3 +297,35 @@ def set_abon_groups_permission(request, uid):
         'groups': groups,
         'picked_groups_ids': picked_groups
     })
+
+
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class ManageResponsibilityGroups(ListView):
+    http_method_names = ['get', 'post']
+    template_name = 'accounts/manage_responsibility_groups.html'
+    context_object_name = 'groups'
+    queryset = Group.objects.only('pk', 'title')
+
+    def get_success_url(self):
+        return resolve_url('acc_app:manage_responsibility_groups', self.kwargs.get('uid'))
+
+    def dispatch(self, request, *args, **kwargs):
+        uid = self.kwargs.get('uid')
+        self.object = get_object_or_404(UserProfile, pk=uid)
+        return super(ManageResponsibilityGroups, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ManageResponsibilityGroups, self).get_context_data(**kwargs)
+        context['uid'] = self.kwargs.get('uid')
+        context['userprofile'] = self.object
+        context['existing_groups'] = [g.get('pk') for g in self.object.responsibility_groups.only('pk').values('pk')]
+        return context
+
+    def post(self, request, *args, **kwargs):
+        checked_groups = [int(ag) for ag in request.POST.getlist('grp', default=0)]
+        profile = self.object
+        profile.responsibility_groups.clear()
+        profile.responsibility_groups.add(*[int(g) for g in checked_groups])
+        profile.save()
+        messages.success(request, _('Responsibilities has been updated'))
+        return HttpResponseRedirect(self.get_success_url())
