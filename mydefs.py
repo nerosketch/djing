@@ -4,7 +4,6 @@ from json import dumps
 import socket
 import struct
 from collections import Iterator
-import os
 from functools import wraps
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -116,11 +115,6 @@ def only_admins(fn):
             return redirect('client_side:home')
 
     return wrapped
-
-
-def ping(hostname: str, count=1):
-    response = os.system("`which ping` -4Anq -c%d -W1 %s > /dev/null" % (count, hostname))
-    return True if response == 0 else False
 
 
 # Русифицированный вывод timedelta

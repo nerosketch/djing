@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+import re
 import socket
 import binascii
 from abc import ABCMeta
 from hashlib import md5
 from typing import List, Iterable, Optional, Tuple
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
-from mydefs import ping, singleton
+from mydefs import singleton
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings
-import re
+from djing import ping
 
 DEBUG = getattr(settings, 'DEBUG', False)
 

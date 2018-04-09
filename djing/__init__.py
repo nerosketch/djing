@@ -1,3 +1,5 @@
+import os
+import re
 import importlib
 from netaddr import mac_unix, mac_eui48
 
@@ -41,3 +43,11 @@ else:
     __version__ = _dist.version
 VERSION = __version__  # synonym
 default_app_config = 'abonapp.apps.AbonappConfig'
+
+
+def ping(ip_addr: str, count=1):
+    if re.match(IP_ADDR_REGEX, ip_addr):
+        response = os.system("`which ping` -4Anq -c%d -W1 %s > /dev/null" % (count, ip_addr))
+        return True if response == 0 else False
+    else:
+        return False
