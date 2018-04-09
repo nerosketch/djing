@@ -1,6 +1,8 @@
 import os
 import re
 import importlib
+
+from django.shortcuts import _get_queryset
 from netaddr import mac_unix, mac_eui48
 
 MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
@@ -51,3 +53,17 @@ def ping(ip_addr: str, count=1):
         return True if response == 0 else False
     else:
         return False
+
+
+def get_object_or_None(klass, *args, **kwargs):
+    queryset = _get_queryset(klass)
+    try:
+        return queryset.get(*args, **kwargs)
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_404() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
+    except queryset.model.DoesNotExist:
+        return
