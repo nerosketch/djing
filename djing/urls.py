@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.conf import settings
-#from django.contrib import admin
+# from django.contrib import admin
 
 from .views import home
 
@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'^msg/', include('msg_app.urls', namespace='msg_app')),
     url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
     url(r'^groups/', include('group_app.urls', namespace='group_app')),
-    #url(r'^admin/', admin.site.urls)
+    # url(r'^admin/', admin.site.urls)
 
 ]
 

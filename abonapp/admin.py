@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from . import models
 
-
 admin.site.register(models.Abon)
 admin.site.register(models.InvoiceForPayment)
 admin.site.register(models.AbonLog)

@@ -5,13 +5,11 @@ from .models import Abon, AllTimePayLog
 from django.db import DatabaseError
 from django.conf import settings
 
-
 SECRET = getattr(settings, 'PAY_SECRET')
 SERV_ID = getattr(settings, 'PAY_SERV_ID')
 
 
 def allpay(request):
-
     def bad_ret(err_id, err_description=None):
         current_date = timezone.now()
         res = [
@@ -49,16 +47,16 @@ def allpay(request):
             ballance = float(abon.ballance)
             current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
             return "<?xml version='1.0' encoding='UTF-8'?>\n" \
-                    "<pay-response>\n" \
-                    "  <balance>%.2f</balance>\n" % ballance +\
-                    "  <name>%s</name>\n" % fio +\
-                    "  <account>%d</account>\n" % pay_account +\
-                    "  <service_id>%s</service_id>\n" % SERV_ID +\
-                    "  <min_amount>10.0</min_amount>\n" \
-                    "  <max_amount>50000</max_amount>\n" \
-                    "  <status_code>21</status_code>\n" \
-                    "  <time_stamp>%s</time_stamp>\n" % current_date +\
-                    "</pay-response>"
+                   "<pay-response>\n" \
+                   "  <balance>%.2f</balance>\n" % ballance + \
+                   "  <name>%s</name>\n" % fio + \
+                   "  <account>%d</account>\n" % pay_account + \
+                   "  <service_id>%s</service_id>\n" % SERV_ID + \
+                   "  <min_amount>10.0</min_amount>\n" \
+                   "  <max_amount>50000</max_amount>\n" \
+                   "  <status_code>21</status_code>\n" \
+                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
+                   "</pay-response>"
         elif act == 4:
             trade_point = safe_int(request.GET.get('TRADE_POINT'))
             receipt_num = safe_int(request.GET.get('RECEIPT_NUM'))
@@ -79,12 +77,12 @@ def allpay(request):
             )
             current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
             return "<?xml version='1.0' encoding='UTF-8'?>" \
-                   "<pay-response>\n" +\
-                   "  <pay_id>%s</pay_id>\n" % pay_id +\
-                   "  <service_id>%s</service_id>\n" % serv_id +\
-                   "  <amount>%.2f</amount>\n" % pay_amount +\
-                   "  <status_code>22</status_code>\n" +\
-                   "  <time_stamp>%s</time_stamp>\n" % current_date +\
+                   "<pay-response>\n" + \
+                   "  <pay_id>%s</pay_id>\n" % pay_id + \
+                   "  <service_id>%s</service_id>\n" % serv_id + \
+                   "  <amount>%.2f</amount>\n" % pay_amount + \
+                   "  <status_code>22</status_code>\n" + \
+                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
                    "</pay-response>"
         elif act == 7:
             pay = AllTimePayLog.objects.get(pay_id=pay_id)
@@ -92,13 +90,13 @@ def allpay(request):
             return "<?xml version='1.0' encoding='UTF-8'?>\n" \
                    "<pay-response>\n" \
                    "  <status_code>11</status_code>\n" \
-                   "  <time_stamp>%s</time_stamp>\n" % current_date +\
+                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
                    "  <transaction>\n" \
-                   "    <pay_id>%s</pay_id>\n" % pay_id +\
-                   "    <service_id>%s</service_id>\n" % serv_id +\
-                   "    <amount>%.2f</amount>\n" % float(pay.summ) +\
-                   "    <status>111</status>\n" +\
-                   "    <time_stamp>%s</time_stamp>\n" % current_date +\
+                   "    <pay_id>%s</pay_id>\n" % pay_id + \
+                   "    <service_id>%s</service_id>\n" % serv_id + \
+                   "    <amount>%.2f</amount>\n" % float(pay.summ) + \
+                   "    <status>111</status>\n" + \
+                   "    <time_stamp>%s</time_stamp>\n" % current_date + \
                    "  </transaction>\n" \
                    "</pay-response>"
         else:

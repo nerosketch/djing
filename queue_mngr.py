@@ -4,9 +4,9 @@ from pickle import loads
 from pid.decorator import pidfile
 import socket
 import django
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 from mydefs import LogicError
-
 
 '''
 obj = {
@@ -57,5 +57,5 @@ if __name__ == '__main__':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
     django.setup()
     from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
-    serve()
 
+    serve()

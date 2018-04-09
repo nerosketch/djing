@@ -2,7 +2,6 @@
 
 
 class SmsBase(object):
-
     def __init__(self):
         self.udh = None
         self.number = None

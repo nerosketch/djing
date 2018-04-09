@@ -12,7 +12,6 @@ import re
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -27,20 +26,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Abon',
             fields=[
-                ('baseaccount_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='accounts_app.BaseAccount')),
+                ('baseaccount_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='accounts_app.BaseAccount')),
                 ('ballance', models.FloatField(default=0.0)),
                 ('ip_address', mydefs.MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='Comment')),
                 ('house', models.CharField(blank=True, max_length=12, null=True, verbose_name='House')),
                 ('is_dynamic_ip', models.BooleanField(default=False)),
-                ('markers', bitfield.models.BitField((('icon_donkey', 'Donkey'), ('icon_fire', 'Fire'), ('icon_ok', 'Ok'), ('icon_king', 'King'), ('icon_tv', 'TV'), ('icon_smile', 'Smile'), ('icon_dollar', 'Dollar'), ('icon_service', 'Service'), ('icon_mrk', 'Marker')), default=0)),
+                ('markers', bitfield.models.BitField((('icon_donkey', 'Donkey'), ('icon_fire', 'Fire'),
+                                                      ('icon_ok', 'Ok'), ('icon_king', 'King'), ('icon_tv', 'TV'),
+                                                      ('icon_smile', 'Smile'), ('icon_dollar', 'Dollar'),
+                                                      ('icon_service', 'Service'), ('icon_mrk', 'Marker')), default=0)),
             ],
             options={
                 'verbose_name': 'Abon',
                 'verbose_name_plural': 'Abons',
                 'db_table': 'abonent',
                 'ordering': ['fio'],
-                'permissions': (('can_buy_tariff', 'Buy service perm'), ('can_view_passport', 'Can view passport'), ('can_add_ballance', 'fill account'), ('can_ping', 'Can ping')),
+                'permissions': (('can_buy_tariff', 'Buy service perm'), ('can_view_passport', 'Can view passport'),
+                                ('can_add_ballance', 'fill account'), ('can_ping', 'Can ping')),
             },
             bases=('accounts_app.baseaccount',),
         ),
@@ -78,7 +83,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('time_start', models.DateTimeField(blank=True, default=None, null=True)),
                 ('deadline', models.DateTimeField(blank=True, default=None, null=True)),
-                ('tariff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='linkto_tariff', to='tariff_app.Tariff')),
+                ('tariff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='linkto_tariff',
+                                             to='tariff_app.Tariff')),
             ],
             options={
                 'verbose_name': 'Abon service',
@@ -92,7 +98,8 @@ class Migration(migrations.Migration):
             name='AdditionalTelephone',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('telephone', models.CharField(max_length=16, validators=[django.core.validators.RegexValidator('^\\+[7,8,9,3]\\d{10,11}$')], verbose_name='Telephone')),
+                ('telephone', models.CharField(max_length=16, validators=[
+                    django.core.validators.RegexValidator('^\\+[7,8,9,3]\\d{10,11}$')], verbose_name='Telephone')),
                 ('owner_name', models.CharField(max_length=127)),
             ],
             options={
@@ -122,7 +129,8 @@ class Migration(migrations.Migration):
                 ('pay_id', models.CharField(max_length=36, primary_key=True, serialize=False, unique=True)),
                 ('date_add', models.DateTimeField(auto_now_add=True)),
                 ('summ', models.FloatField(default=0.0)),
-                ('trade_point', models.CharField(blank=True, default=None, max_length=20, null=True, verbose_name='Trade point')),
+                ('trade_point',
+                 models.CharField(blank=True, default=None, max_length=20, null=True, verbose_name='Trade point')),
                 ('receipt_num', models.BigIntegerField(default=0, verbose_name='Receipt number')),
             ],
             options={
@@ -135,7 +143,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(default='no title', max_length=16)),
-                ('field_type', models.CharField(choices=[('int', 'Digital field'), ('str', 'Text field'), ('dbl', 'Floating field'), ('ipa', 'Ip Address')], default='str', max_length=3)),
+                ('field_type', models.CharField(
+                    choices=[('int', 'Digital field'), ('str', 'Text field'), ('dbl', 'Floating field'),
+                             ('ipa', 'Ip Address')], default='str', max_length=3)),
                 ('data', models.CharField(blank=True, max_length=64, null=True)),
             ],
             options={
@@ -164,8 +174,12 @@ class Migration(migrations.Migration):
             name='PassportInfo',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('series', models.CharField(max_length=4, validators=[django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z', 32), code='invalid', message='Enter a valid integer.')])),
-                ('number', models.CharField(max_length=6, validators=[django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z', 32), code='invalid', message='Enter a valid integer.')])),
+                ('series', models.CharField(max_length=4, validators=[
+                    django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z', 32), code='invalid',
+                                                          message='Enter a valid integer.')])),
+                ('number', models.CharField(max_length=6, validators=[
+                    django.core.validators.RegexValidator(re.compile('^-?\\d+\\Z', 32), code='invalid',
+                                                          message='Enter a valid integer.')])),
                 ('distributor', models.CharField(max_length=64)),
                 ('date_of_acceptance', models.DateField()),
             ],
@@ -189,7 +203,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AbonRawPassword',
             fields=[
-                ('account', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='abonapp.Abon')),
+                ('account',
+                 models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False,
+                                      to='abonapp.Abon')),
                 ('passw_text', models.CharField(max_length=64)),
             ],
             options={
@@ -199,17 +215,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='periodicpayforid',
             name='account',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='abonapp.Abon', verbose_name='Account'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='abonapp.Abon',
+                                    verbose_name='Account'),
         ),
         migrations.AddField(
             model_name='periodicpayforid',
             name='periodic_pay',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tariff_app.PeriodicPay', verbose_name='Periodic pay'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tariff_app.PeriodicPay',
+                                    verbose_name='Periodic pay'),
         ),
         migrations.AddField(
             model_name='passportinfo',
             name='abon',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.Abon'),
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                       to='abonapp.Abon'),
         ),
         migrations.AddField(
             model_name='invoiceforpayment',
@@ -219,17 +238,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='invoiceforpayment',
             name='author',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    related_name='+', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='alltimepaylog',
             name='abon',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='abonapp.Abon'),
+            field=models.ForeignKey(blank=True, default=None, null=True,
+                                    on_delete=django.db.models.deletion.SET_DEFAULT, to='abonapp.Abon'),
         ),
         migrations.AddField(
             model_name='additionaltelephone',
             name='abon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='additional_telephones', to='abonapp.Abon'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='additional_telephones',
+                                    to='abonapp.Abon'),
         ),
         migrations.AddField(
             model_name='abonlog',
@@ -239,22 +261,26 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='abonlog',
             name='author',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='+', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='abon',
             name='current_tariff',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.AbonTariff'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='abonapp.AbonTariff'),
         ),
         migrations.AddField(
             model_name='abon',
             name='dev_port',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='devapp.Port'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='devapp.Port'),
         ),
         migrations.AddField(
             model_name='abon',
             name='device',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='devapp.Device'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='devapp.Device'),
         ),
         migrations.AddField(
             model_name='abon',
@@ -264,11 +290,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='abon',
             name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='group_app.Group', verbose_name='User group'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='group_app.Group', verbose_name='User group'),
         ),
         migrations.AddField(
             model_name='abon',
             name='street',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='abonapp.AbonStreet', verbose_name='Street'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='abonapp.AbonStreet', verbose_name='Street'),
         ),
     ]

@@ -73,7 +73,7 @@
                             <a href="{% url 'devapp:view' 0 dev.pk %}">{{ dev.comment }}</a>
                         {% endif %}
                     </td>
-                    <td>{{ dev.ip_address }}</td>
+                    <td>{{ dev.ip_address|default:'-' }}</td>
                     <td>{{ dev.get_comment_display }}</td>
                     <td>
                         {% if dev.group %}

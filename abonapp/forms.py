@@ -8,7 +8,6 @@ from string import digits, ascii_lowercase
 from . import models
 from django.conf import settings
 
-
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
@@ -54,8 +53,8 @@ class AbonForm(forms.ModelForm):
                                }))
 
     password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
-                                   'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
-                               }))
+        'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
+    }))
 
     class Meta:
         model = models.Abon

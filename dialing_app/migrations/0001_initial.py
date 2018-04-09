@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -30,7 +29,9 @@ class Migration(migrations.Migration):
                 ('start', models.DateTimeField(blank=True, default=None, null=True)),
                 ('answer', models.DateTimeField(blank=True, default=None, null=True)),
                 ('end', models.DateTimeField(blank=True, default=None, null=True)),
-                ('disposition', models.CharField(choices=[('NO ANSWER', 'No answer'), ('FAILED', 'Failed'), ('BUSY', 'Busy'), ('ANSWERED', 'Answered'), ('UNKNOWN', 'Unknown')], default='', max_length=45)),
+                ('disposition', models.CharField(
+                    choices=[('NO ANSWER', 'No answer'), ('FAILED', 'Failed'), ('BUSY', 'Busy'),
+                             ('ANSWERED', 'Answered'), ('UNKNOWN', 'Unknown')], default='', max_length=45)),
                 ('amaflags', models.IntegerField(default=0)),
                 ('accountcode', models.CharField(default='', max_length=20)),
                 ('userfield', models.CharField(default='', max_length=255)),
@@ -66,7 +67,9 @@ class Migration(migrations.Migration):
                 ('when', models.DateTimeField(auto_now_add=True, verbose_name='When')),
                 ('dst', models.CharField(max_length=16, verbose_name='Telephone')),
                 ('text', models.CharField(max_length=255, verbose_name='Text')),
-                ('status', models.CharField(choices=[('nw', 'New'), ('st', 'Sent'), ('fd', 'Failed')], default='nw', max_length=2, verbose_name='Status')),
+                ('status',
+                 models.CharField(choices=[('nw', 'New'), ('st', 'Sent'), ('fd', 'Failed')], default='nw', max_length=2,
+                                  verbose_name='Status')),
             ],
             options={
                 'verbose_name': 'Out SMS',

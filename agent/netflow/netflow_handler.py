@@ -4,7 +4,6 @@ import sys
 import os
 from importlib import import_module
 
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("File name of netflow required")

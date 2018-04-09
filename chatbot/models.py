@@ -10,7 +10,7 @@ class ChatException(Exception):
 
 
 class TelegramBot(models.Model):
-    user = models.ForeignKey(AUTH_USER_MODEL, models.CASCADE,  verbose_name=_('Employee'))
+    user = models.ForeignKey(AUTH_USER_MODEL, models.CASCADE, verbose_name=_('Employee'))
     chat_id = models.PositiveIntegerField(_('Telegram chat id'), default=0)
 
     def __str__(self):
@@ -37,7 +37,6 @@ class MessageHistory(models.Model):
 
 
 class MessageQueueManager(models.Manager):
-
     def pop(self, user, tag='none'):
         msgs = self.filter(target_employee=user, status='n', tag=tag)[:1].only('message').values('id', 'message')
         if len(msgs) > 0:

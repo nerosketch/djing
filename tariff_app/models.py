@@ -10,7 +10,6 @@ from jsonfield import JSONField
 
 
 class TariffManager(models.Manager):
-
     def get_tariffs_by_group(self, group_id):
         return self.filter(groups__id__in=[group_id])
 

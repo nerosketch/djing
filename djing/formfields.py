@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from netaddr import EUI, AddrFormatError
 from . import MAC_ADDR_REGEX
 
-
 mac_address_validator = RegexValidator(
     _lazy_re_compile(MAC_ADDR_REGEX),
     message=_('Enter a valid integer.'),

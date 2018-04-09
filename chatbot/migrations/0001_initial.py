@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -35,9 +34,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('message', models.CharField(max_length=255, verbose_name='Message')),
-                ('status', models.CharField(choices=[('n', 'New'), ('r', 'Read')], default='n', max_length=1, verbose_name='Status of message')),
+                ('status', models.CharField(choices=[('n', 'New'), ('r', 'Read')], default='n', max_length=1,
+                                            verbose_name='Status of message')),
                 ('tag', models.CharField(default='none', max_length=6, verbose_name='App tag')),
-                ('target_employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Target employee')),
+                ('target_employee',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                                   verbose_name='Target employee')),
             ],
             options={
                 'verbose_name': 'Message queue',
@@ -50,7 +52,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('chat_id', models.PositiveIntegerField(default=0, verbose_name='Telegram chat id')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Employee')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL,
+                                           verbose_name='Employee')),
             ],
             options={
                 'verbose_name': 'Telegram bot',

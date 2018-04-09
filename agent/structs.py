@@ -19,7 +19,6 @@ class BaseStruct(object, metaclass=ABCMeta):
 
 
 class IpStruct(BaseStruct):
-
     def __init__(self, ip):
         if type(ip) is int:
             self.__ip = ip
@@ -55,7 +54,6 @@ class IpStruct(BaseStruct):
 
 # Как обслуживается абонент
 class TariffStruct(BaseStruct):
-
     def __init__(self, tariff_id=0, speedIn=None, speedOut=None):
         self.tid = int(tariff_id)
         self.speedIn = float(speedIn if speedIn is not None else 0.001)
@@ -92,7 +90,6 @@ class TariffStruct(BaseStruct):
 
 # Абонент из базы
 class AbonStruct(BaseStruct):
-
     def __init__(self, uid=0, ip=None, tariff=None, is_active=True):
         self.uid = int(uid or 0)
         self.ip = IpStruct(ip)
@@ -143,7 +140,7 @@ class ShapeItem(BaseStruct):
     def serialize(self):
         abon_pack = self.abon.serialize()
         dt = pack('!L', self.sid)
-        return dt+abon_pack
+        return dt + abon_pack
 
     def deserialize(self, data, *args):
         sz = calcsize('!L')

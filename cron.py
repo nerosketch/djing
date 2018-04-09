@@ -44,8 +44,8 @@ def main():
         print('NetworkTrouble:', e)
 
     # manage periodic pays
-    ppays = PeriodicPayForId.objects.filter(next_pay__lt=now)\
-                                    .prefetch_related('account', 'periodic_pay')
+    ppays = PeriodicPayForId.objects.filter(next_pay__lt=now) \
+        .prefetch_related('account', 'periodic_pay')
     for pay in ppays:
         pay.payment_for_service(now=now)
 

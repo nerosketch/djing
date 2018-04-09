@@ -12,7 +12,7 @@ def abon_if_telephone(value):
     """Возвращаем ссыль на абонента если передали номер телефона"""
     if re.match(r'^\+?\d+$', value):
         if value[0] != '+':
-            value = '+'+value
+            value = '+' + value
         url = resolve_url('dialapp:to_abon', tel=value)
         a = '<a href="%s" target="_blank">%s</a>' % (url, value)
         return a

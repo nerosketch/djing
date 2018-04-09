@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*
 import os
 
-
 try:
     from . import local_settings
 except ImportError:
     raise ImportError("You must create config file local_settings.py from template")
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,14 +24,14 @@ ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 # required for django-guardian
 AUTHENTICATION_BACKENDS = (
     'djing.auth_backends.CustomAuthBackend',
-    #'django.contrib.auth.backends.ModelBackend', # default
+    # 'django.contrib.auth.backends.ModelBackend', # default
     'guardian.backends.ObjectPermissionBackend'
 )
 
 # Application definition
 
 INSTALLED_APPS = [
-    #'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -79,7 +77,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                #'django.template.context_processors.debug',
+                # 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -95,12 +93,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djing.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = local_settings.DATABASES
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -145,14 +141,12 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 4096000
 # time to session live, 1 day
 SESSION_COOKIE_AGE = 60 * 60 * 24
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
 if DEBUG:
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-
 
 # Example output: 16 september 2018
 DATE_FORMAT = 'd E Y'

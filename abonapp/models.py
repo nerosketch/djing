@@ -19,7 +19,6 @@ from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
-
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
 
@@ -129,7 +128,6 @@ class ExtraFieldsModel(models.Model):
 
 
 class AbonManager(MyUserManager):
-
     def get_queryset(self):
         return super(MyUserManager, self).get_queryset().filter(is_admin=False)
 
@@ -184,7 +182,7 @@ class Abon(BaseAccount):
             ('can_ping', _('Can ping'))
         )
         # TODO: Fix when duplicates already in database
-        #unique_together = ('device', 'dev_port')
+        # unique_together = ('device', 'dev_port')
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
         ordering = ['fio']
@@ -273,7 +271,8 @@ class Abon(BaseAccount):
 
     def save(self, *args, **kwargs):
         # check if ip address already busy
-        if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(pk=self.pk).count() > 0:
+        if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
+                pk=self.pk).count() > 0:
             self.is_bad_ip = True
             raise LogicError(_('Ip address already exist'))
         super(Abon, self).save(*args, **kwargs)

@@ -44,7 +44,6 @@ class TaskFrm(forms.ModelForm):
 
 
 class ExtraCommentForm(forms.ModelForm):
-
     def make_save(self, author, task: Task):
         comment = super(ExtraCommentForm, self).save(commit=False)
         comment.author = author

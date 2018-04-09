@@ -8,7 +8,6 @@ from django.conf import settings
 from photo_app.models import Photo
 from group_app.models import Group
 
-
 DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
@@ -39,7 +38,7 @@ class MyUserManager(BaseUserManager):
         user = self.create_user(telephone,
                                 password=password,
                                 username=username
-        )
+                                )
         user.is_admin = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -60,7 +59,7 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
     telephone = models.CharField(
         max_length=16,
         verbose_name=_('Telephone'),
-        #unique=True,
+        # unique=True,
         validators=[RegexValidator(TELEPHONE_REGEXP)]
     )
 
@@ -90,7 +89,6 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfileManager(MyUserManager):
-
     def get_profiles_by_group(self, group_id):
         return self.filter(responsibility_groups__id__in=[group_id], is_admin=True, is_active=True)
 

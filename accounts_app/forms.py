@@ -4,7 +4,6 @@ from guardian.shortcuts import assign_perm, remove_perm
 
 
 class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
-
     def save_obj_perms(self):
         """
         Saves selected object permissions by creating new ones and removing

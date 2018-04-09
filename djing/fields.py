@@ -13,10 +13,10 @@ class MACAddressField(models.Field):
     description = "A MAC address validated by netaddr.EUI"
     empty_strings_allowed = False
     dialect = None
-    
+
     def __init__(self, *args, **kwargs):
         self.integer = kwargs.pop('integer', True)
-        if not self.integer: # If storing MAC address as string, set max_length to default (17) or use supplied kwarg value.
+        if not self.integer:  # If storing MAC address as string, set max_length to default (17) or use supplied kwarg value.
             kwargs['max_length'] = kwargs.get('max_length', 17)
         super(MACAddressField, self).__init__(*args, **kwargs)
 
@@ -63,7 +63,7 @@ class MACAddressField(models.Field):
 
     def from_db_value(self, value, expression, connection, context):
         return self.to_python(value)
-            
+
     def to_python(self, value):
         if value is None:
             return value
@@ -103,6 +103,7 @@ class MACAddressField(models.Field):
 
 try:
     from south.modelsinspector import add_introspection_rules
+
     add_introspection_rules([], ["^macaddress\.fields\.MACAddressField"])
 except ImportError:
     pass

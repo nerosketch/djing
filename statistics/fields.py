@@ -8,7 +8,6 @@ import django.db.models as models
 
 
 class UnixDateTimeField(models.DateTimeField):
-
     # TODO(niklas9):
     # * should we take care of transforming between time zones in any way here ?
     # * get default datetime format from settings ?
@@ -16,7 +15,7 @@ class UnixDateTimeField(models.DateTimeField):
     TZ_CONST = '+'
     # TODO(niklas9):
     # * metaclass below just for Django < 1.9, fix a if stmt for it?
-    #__metaclass__ = models.SubfieldBase
+    # __metaclass__ = models.SubfieldBase
     description = "Unix timestamp integer to datetime object"
 
     def get_internal_type(self):

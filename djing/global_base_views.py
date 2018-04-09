@@ -23,7 +23,6 @@ class RedirectWhenError(Exception):
 
 
 class HashAuthView(View):
-
     @staticmethod
     def calc_hash(data):
         if type(data) is str:
@@ -60,7 +59,6 @@ class HashAuthView(View):
 
 
 class AllowedSubnetMixin(object):
-
     def dispatch(self, request, *args, **kwargs):
         """
         Check if user ip in allowed subnet.
@@ -80,6 +78,7 @@ class OrderingMixin(object):
     @dir - direction of ordering. down or up.
     @order_by - ordering field name
     """
+
     def get_context_data(self, **kwargs):
         context = super(OrderingMixin, self).get_context_data(**kwargs)
         context['order_by'] = self.request.GET.get('order_by')
@@ -104,7 +103,6 @@ class OrderingMixin(object):
 
 
 class RedirectWhenErrorMixin(object):
-
     def get(self, request, *args, **kwargs):
         try:
             return super(RedirectWhenErrorMixin, self).get(request, *args, **kwargs)

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -21,7 +20,8 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=127, verbose_name='Map point title')),
                 ('latitude', models.FloatField(verbose_name='Latitude')),
                 ('longitude', models.FloatField(verbose_name='Longitude')),
-                ('attachment', models.FileField(blank=True, null=True, upload_to='map_attachments/%Y_%m_%d', verbose_name='Attachment')),
+                ('attachment', models.FileField(blank=True, null=True, upload_to='map_attachments/%Y_%m_%d',
+                                                verbose_name='Attachment')),
                 ('devices', models.ManyToManyField(db_table='dot_device', to='devapp.Device', verbose_name='Devices')),
             ],
             options={

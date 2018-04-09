@@ -3,7 +3,6 @@ from . import dev_types
 
 
 class DevTest(TestCase):
-
     def setUp(self):
         pass
 

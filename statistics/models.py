@@ -14,23 +14,22 @@ def get_dates():
 
 
 class StatManager(models.Manager):
-
     def chart(self, username, count_of_parts=12, want_date=date.today()):
         def byte_to_mbit(x):
-            return ((x/60)*8)/2**20
+            return ((x / 60) * 8) / 2 ** 20
 
         def split_list(lst, chunk_count):
             chunk_size = len(lst) // chunk_count
             if chunk_size == 0:
                 chunk_size = 1
-            return [lst[i:i+chunk_size] for i in range(0, len(lst), chunk_size)]
+            return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
 
         def avarage(elements):
             return sum(elements) / len(elements)
 
         try:
             charts_data = self.filter(uname=username)
-            charts_times = [cd.cur_time.timestamp()*1000 for cd in charts_data]
+            charts_times = [cd.cur_time.timestamp() * 1000 for cd in charts_data]
             charts_octets = [cd.octets for cd in charts_data]
             if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
                 charts_octets = split_list(charts_octets, count_of_parts)
@@ -50,7 +49,6 @@ class StatManager(models.Manager):
         except ProgrammingError as e:
             if "Table 'djing_db_n.flowstat" in str(e):
                 return
-
 
 
 class StatElem(models.Model):
@@ -81,7 +79,7 @@ class StatElem(models.Model):
         cursor.execute(sql)
 
     @staticmethod
-    def percentile(N, percent, key=lambda x:x):
+    def percentile(N, percent, key=lambda x: x):
         """
         Find the percentile of a list of values.
 
@@ -93,25 +91,25 @@ class StatElem(models.Model):
         """
         if not N:
             return None
-        k = (len(N)-1) * percent
+        k = (len(N) - 1) * percent
         f = math.floor(k)
         c = math.ceil(k)
         if f == c:
             return key(N[int(k)])
-        d0 = key(N[int(f)]) * (c-k)
-        d1 = key(N[int(c)]) * (k-f)
-        return d0+d1
+        d0 = key(N[int(f)]) * (c - k)
+        d1 = key(N[int(c)]) * (k - f)
+        return d0 + d1
 
     class Meta:
         abstract = True
 
 
 def getModel(want_date=now()):
-
     class DynamicStatElem(StatElem):
         class Meta:
             db_table = 'flowstat_%s' % want_date.strftime("%d%m%Y")
             abstract = False
+
     return DynamicStatElem
 
 

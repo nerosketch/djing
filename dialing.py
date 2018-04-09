@@ -2,6 +2,7 @@
 import os, signal
 from pid.decorator import pidfile
 import django
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from messaging.sms import SmsSubmit, SmsDeliver
@@ -11,13 +12,11 @@ from time import sleep
 from dialing_app.models import SMSModel, SMSOut
 from django.conf import settings
 
-
 ASTERISK_MANAGER_AUTH = getattr(settings, 'ASTERISK_MANAGER_AUTH', {
     'username': 'admin',
     'password': 'admin',
     'host': '127.0.0.1'
 })
-
 
 outbox_messages = False
 
@@ -146,7 +145,7 @@ def main():
 
         # register some callbacks
         manager.register_event('Shutdown', handle_shutdown)
-        manager.register_event('DongleNewCMGR', handle_inbox_long_sms_message)           # PDU Here
+        manager.register_event('DongleNewCMGR', handle_inbox_long_sms_message)  # PDU Here
 
         # get a status report
         response = manager.status()

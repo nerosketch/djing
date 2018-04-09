@@ -6,12 +6,10 @@ import shutil
 from json import dump
 import django
 
-
 '''
 Some permissions is not migrates, all admins is superuser
 after migrate.
 '''
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 from django.db.models import fields as django_fields
@@ -29,14 +27,16 @@ def get_fixture_from_unchanget_model(model_name: str, model_class):
     def get_fields(obj):
         fields = dict()
         for field in obj._meta.get_fields():
-            if isinstance(field, (django_fields.reverse_related.ManyToOneRel, django_fields.reverse_related.ManyToManyRel)):
+            if isinstance(field,
+                          (django_fields.reverse_related.ManyToOneRel, django_fields.reverse_related.ManyToManyRel)):
                 continue
             field_val = getattr(obj, field.name)
             if field_val is None:
                 continue
             if isinstance(field, django_fields.related.ManyToManyField):
                 fields[field.name] = [f.pk for f in field_val.all()]
-            elif isinstance(field, (django_fields.related.ForeignKey, django.contrib.contenttypes.fields.GenericForeignKey)):
+            elif isinstance(field,
+                            (django_fields.related.ForeignKey, django.contrib.contenttypes.fields.GenericForeignKey)):
                 fields[field.name] = field_val.pk
             elif isinstance(field, django_fields.FloatField):
                 fields[field.name] = float(field_val)
@@ -324,13 +324,13 @@ def move_to_fixtures_dirs():
 def apply_fixtures():
     from django.core.management import execute_from_command_line
     from accounts_app.models import UserProfile
-    #from django.contrib.auth import models
+    # from django.contrib.auth import models
 
     UserProfile.objects.filter(username='AnonymousUser').delete()
-    #print('clearing auth.group')
-    #models.Group.objects.all().delete()
-    #print('clearing auth.permission')
-    #models.Permission.objects.all().delete()
+    # print('clearing auth.group')
+    # models.Group.objects.all().delete()
+    # print('clearing auth.permission')
+    # models.Permission.objects.all().delete()
 
     fixtures_names = [
         'groups_fixture.json', 'tariffs_fixture.json', 'photos_fixture.json',

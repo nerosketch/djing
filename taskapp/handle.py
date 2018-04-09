@@ -28,7 +28,7 @@ def handle(task, author, recipients, abon_group):
             fulltext += _('locality %s.\n') % abon_group.title
             if task.abon:
                 fulltext += _('address %(street)s %(house)s.\ntelephone %(telephone)s\n') % {
-                    'street': task.abon.street.name if task.abon.street is not None else '<'+_('not chosen')+'>',
+                    'street': task.abon.street.name if task.abon.street is not None else '<' + _('not chosen') + '>',
                     'house': task.abon.house,
                     'telephone': task.abon.telephone
                 }

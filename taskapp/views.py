@@ -38,8 +38,8 @@ class NewTasksView(BaseTaskListView):
 
     def get_queryset(self):
         return Task.objects.filter(recipients=self.request.user, state='S') \
-                           .annotate(comment_count=Count('extracomment')) \
-                           .select_related('abon', 'abon__street', 'abon__group', 'author')
+            .annotate(comment_count=Count('extracomment')) \
+            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 class FailedTasksView(NewTasksView):
@@ -51,7 +51,7 @@ class FailedTasksView(NewTasksView):
 
     def get_queryset(self):
         return Task.objects.filter(recipients=self.request.user, state='C') \
-                           .select_related('abon', 'abon__street', 'abon__group', 'author')
+            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 class FinishedTaskListView(NewTasksView):
@@ -59,7 +59,7 @@ class FinishedTaskListView(NewTasksView):
 
     def get_queryset(self):
         return Task.objects.filter(recipients=self.request.user, state='F') \
-                           .select_related('abon', 'abon__street', 'abon__group', 'author')
+            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 class OwnTaskListView(NewTasksView):
@@ -67,9 +67,9 @@ class OwnTaskListView(NewTasksView):
 
     def get_queryset(self):
         # Attached and not finished tasks
-        return Task.objects.filter(author=self.request.user)\
-                           .exclude(state='F')\
-                           .select_related('abon', 'abon__street', 'abon__group')
+        return Task.objects.filter(author=self.request.user) \
+            .exclude(state='F') \
+            .select_related('abon', 'abon__street', 'abon__group')
 
 
 class MyTaskListView(NewTasksView):
@@ -78,7 +78,7 @@ class MyTaskListView(NewTasksView):
     def get_queryset(self):
         # Tasks in which I participated
         return Task.objects.filter(recipients=self.request.user) \
-                           .select_related('abon', 'abon__street', 'abon__group', 'author')
+            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 @method_decorator([login_required, permission_required('taskapp.can_viewall')], name='dispatch')
@@ -88,7 +88,7 @@ class AllTasksListView(BaseTaskListView):
 
     def get_queryset(self):
         return Task.objects.annotate(comment_count=Count('extracomment')) \
-                           .select_related('abon', 'abon__street', 'abon__group', 'author')
+            .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
 class EmptyTasksListView(NewTasksView):

@@ -102,11 +102,13 @@ class DjingTelebot(helper.ChatHandler):
                     chat_id=self._chat_id
                 )
         except UserProfile.DoesNotExist:
-            self._question(_("You are not found in the database, check that it correctly pointed out its LOGIN. Try again"),
-                           self.question_name)
+            self._question(
+                _("You are not found in the database, check that it correctly pointed out its LOGIN. Try again"),
+                self.question_name)
             return
-        self._sent_reply(_("Yes, it's nice to meet %(username)s, I will notify you about events in billing. Successful work ;)")
-                         % {'username': profile.get_full_name()})
+        self._sent_reply(
+            _("Yes, it's nice to meet %(username)s, I will notify you about events in billing. Successful work ;)")
+            % {'username': profile.get_full_name()})
 
     # заканчивается время диалога
     # ex - время ожидания (timeout=ex в pave_event_space)

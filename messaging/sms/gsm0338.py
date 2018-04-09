@@ -31,9 +31,9 @@ def_regular_decode_dict = {
     '\x07': u'\u00EC',  # LATIN SMALL LETTER I WITH GRAVE
     '\x08': u'\u00F2',  # LATIN SMALL LETTER O WITH GRAVE
     '\x09': u'\u00C7',  # LATIN CAPITAL LETTER C WITH CEDILLA
-                        # The Unicode page suggests this is a mistake: but
-                        # it's still in the latest version of the spec and
-                        # our implementation has to be exact.
+    # The Unicode page suggests this is a mistake: but
+    # it's still in the latest version of the spec and
+    # our implementation has to be exact.
 
     '\x0A': u'\u000A',  # LINE FEED
     '\x0B': u'\u00D8',  # LATIN CAPITAL LETTER O WITH STROKE
@@ -222,7 +222,7 @@ def encode(input_, errors='strict'):
                     raise UnicodeError("Invalid GSM character")
                 elif errors == 'replace':
                     result.append(
-                                def_replace_encode_dict.get(c, QUESTION_MARK))
+                        def_replace_encode_dict.get(c, QUESTION_MARK))
                 elif errors == 'ignore':
                     pass
                 else:
@@ -274,6 +274,7 @@ def getregentry(encoding):
         return codecs.CodecInfo(name='gsm0338',
                                 encode=encode,
                                 decode=decode)
+
 
 # Codec registration
 codecs.register(getregentry)

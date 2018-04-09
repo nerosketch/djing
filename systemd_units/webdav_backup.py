@@ -3,7 +3,6 @@ from sys import argv
 from datetime import datetime, timedelta
 import webdav.client as wc
 
-
 options = {
     'webdav_hostname': "https://webdav.yandex.ru/",
     'webdav_login': "YANDEX USERNAME",
@@ -11,13 +10,13 @@ options = {
 }
 
 
-def remove_old_files(border_time : datetime, client):
+def remove_old_files(border_time: datetime, client):
     # files that older than border_time will be removed
     for file in client.list('ISBackups'):
         fdate = datetime.strptime(file, 'djing%Y-%m-%d_%H.%M.%S.sql.gz')
         if fdate < border_time:
             del_fname = 'ISBackups/%' % file
-            client.clean( del_fname )
+            client.clean(del_fname)
             print("rm %s" % del_fname)
 
 
@@ -32,4 +31,3 @@ if __name__ == '__main__':
             client.upload_sync(remote_path="ISBackups/%s" % reqfile, local_path="/var/backups/%s" % reqfile)
     except wc.WebDavException as we:
         print(we, type(we))
-

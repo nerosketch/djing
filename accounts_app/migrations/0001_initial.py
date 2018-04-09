@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -24,13 +23,16 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+                ('is_superuser', models.BooleanField(default=False,
+                                                     help_text='Designates that this user has all permissions without explicitly assigning them.',
+                                                     verbose_name='superuser status')),
                 ('username', models.CharField(max_length=127, unique=True, verbose_name='profile username')),
                 ('fio', models.CharField(max_length=256, verbose_name='fio')),
                 ('birth_day', models.DateField(auto_now_add=True, verbose_name='birth day')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
                 ('is_admin', models.BooleanField(default=False)),
-                ('telephone', models.CharField(max_length=16, validators=[django.core.validators.RegexValidator('^\\+[7,8,9,3]\\d{10,11}$')], verbose_name='Telephone')),
+                ('telephone', models.CharField(max_length=16, validators=[
+                    django.core.validators.RegexValidator('^\\+[7,8,9,3]\\d{10,11}$')], verbose_name='Telephone')),
             ],
             options={
                 'db_table': 'base_accounts',
@@ -39,10 +41,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserProfile',
             fields=[
-                ('baseaccount_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='accounts_app.BaseAccount')),
+                ('baseaccount_ptr',
+                 models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
+                                      primary_key=True, serialize=False, to='accounts_app.BaseAccount')),
                 ('email', models.EmailField(default='admin@example.ru', max_length=254)),
-                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='photo_app.Photo')),
-                ('responsibility_groups', models.ManyToManyField(blank=True, to='group_app.Group', verbose_name='Responsibility groups')),
+                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                             to='photo_app.Photo')),
+                ('responsibility_groups',
+                 models.ManyToManyField(blank=True, to='group_app.Group', verbose_name='Responsibility groups')),
             ],
             options={
                 'verbose_name': 'Staff account profile',
@@ -55,11 +61,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='baseaccount',
             name='groups',
-            field=models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups'),
+            field=models.ManyToManyField(blank=True,
+                                         help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+                                         related_name='user_set', related_query_name='user', to='auth.Group',
+                                         verbose_name='groups'),
         ),
         migrations.AddField(
             model_name='baseaccount',
             name='user_permissions',
-            field=models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions'),
+            field=models.ManyToManyField(blank=True, help_text='Specific permissions for this user.',
+                                         related_name='user_set', related_query_name='user', to='auth.Permission',
+                                         verbose_name='user permissions'),
         ),
     ]

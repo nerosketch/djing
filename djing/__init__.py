@@ -1,7 +1,6 @@
 import importlib
 from netaddr import mac_unix, mac_eui48
 
-
 MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
 IP_ADDR_REGEX = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
@@ -40,5 +39,5 @@ except DistributionNotFound:
     __version__ = 'Please install this project with setup.py'
 else:
     __version__ = _dist.version
-VERSION = __version__   # synonym
+VERSION = __version__  # synonym
 default_app_config = 'abonapp.apps.AbonappConfig'

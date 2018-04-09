@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
+from django.utils.translation import gettext
 from typing import Union, Iterable, AnyStr, Generator
 
 from easysnmp import Session
-
 
 ListOrError = Union[
     Iterable,
@@ -16,7 +16,6 @@ class DeviceImplementationError(Exception):
 
 
 class DevBase(object, metaclass=ABCMeta):
-
     def __init__(self, dev_instance=None):
         self.db_instance = dev_instance
 
@@ -78,10 +77,12 @@ class BasePort(object, metaclass=ABCMeta):
 class SNMPBaseWorker(object, metaclass=ABCMeta):
     ses = None
 
-    def __init__(self, ip, community='public', ver=2):
+    def __init__(self, ip: str, community='public', ver=2):
+        if ip is None:
+            raise DeviceImplementationError(gettext('Ip address is required'))
         self.ses = Session(hostname=ip, community=community, version=ver)
 
-    def set_int_value(self, oid, value):
+    def set_int_value(self, oid: str, value):
         return self.ses.set(oid, value, 'i')
 
     def get_list(self, oid) -> Generator:

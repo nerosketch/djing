@@ -8,7 +8,6 @@ import statistics.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -19,7 +18,8 @@ class Migration(migrations.Migration):
             name='StatCache',
             fields=[
                 ('last_time', statistics.fields.UnixDateTimeField()),
-                ('ip', mydefs.MyGenericIPAddressField(max_length=8, primary_key=True, protocol='ipv4', serialize=False)),
+                (
+                'ip', mydefs.MyGenericIPAddressField(max_length=8, primary_key=True, protocol='ipv4', serialize=False)),
                 ('octets', models.PositiveIntegerField(default=0)),
                 ('packets', models.PositiveIntegerField(default=0)),
             ],

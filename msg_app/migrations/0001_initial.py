@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -35,10 +34,16 @@ class Migration(migrations.Migration):
             name='ConversationMembership',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('adm', 'Admin'), ('gst', 'Guest'), ('ban', 'Banned user'), ('inv', 'Inviter')], default='gst', max_length=3)),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships', to=settings.AUTH_USER_MODEL)),
-                ('conversation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='msg_app.Conversation')),
-                ('who_invite_that_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='self_conversations', to=settings.AUTH_USER_MODEL)),
+                ('status', models.CharField(
+                    choices=[('adm', 'Admin'), ('gst', 'Guest'), ('ban', 'Banned user'), ('inv', 'Inviter')],
+                    default='gst', max_length=3)),
+                ('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships',
+                                              to=settings.AUTH_USER_MODEL)),
+                ('conversation',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='msg_app.Conversation')),
+                ('who_invite_that_user',
+                 models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                   related_name='self_conversations', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Conversation membership',
@@ -66,9 +71,12 @@ class Migration(migrations.Migration):
             name='MessageStatus',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('state', models.CharField(choices=[('new', 'New'), ('old', 'Seen'), ('del', 'Deleted')], default='new', max_length=3)),
-                ('msg', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='msg_statuses', to='msg_app.Message')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='usr_msg_status', to=settings.AUTH_USER_MODEL)),
+                ('state', models.CharField(choices=[('new', 'New'), ('old', 'Seen'), ('del', 'Deleted')], default='new',
+                                           max_length=3)),
+                ('msg', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='msg_statuses',
+                                          to='msg_app.Message')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='usr_msg_status',
+                                           to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Message status',
@@ -84,17 +92,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='message',
             name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages',
+                                    to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='message',
             name='conversation',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='msg_app.Conversation', verbose_name='Conversation'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='msg_app.Conversation',
+                                    verbose_name='Conversation'),
         ),
         migrations.AddField(
             model_name='conversation',
             name='participants',
-            field=models.ManyToManyField(related_name='conversations', through='msg_app.ConversationMembership', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(related_name='conversations', through='msg_app.ConversationMembership',
+                                         to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterUniqueTogether(
             name='messagestatus',

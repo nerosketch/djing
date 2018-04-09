@@ -10,7 +10,7 @@ class MessageError(Exception):
 
 
 class MessageStatus(models.Model):
-    msg = models.ForeignKey('Message', models.CASCADE,  related_name='msg_statuses')
+    msg = models.ForeignKey('Message', models.CASCADE, related_name='msg_statuses')
     user = models.ForeignKey(UserProfile, models.CASCADE, related_name='usr_msg_status')
     MESSAGE_STATES = (
         ('new', _('New')),
@@ -82,7 +82,8 @@ class ConversationMembership(models.Model):
         ('inv', _('Inviter'))
     )
     status = models.CharField(max_length=3, choices=PARTICIPANT_STATUS, default='gst')
-    who_invite_that_user = models.ForeignKey(UserProfile, models.CASCADE, null=True, blank=True, related_name='self_conversations')
+    who_invite_that_user = models.ForeignKey(UserProfile, models.CASCADE, null=True, blank=True,
+                                             related_name='self_conversations')
 
     def __str__(self):
         return "%s < %s" % (self.conversation, self.account)
@@ -103,7 +104,6 @@ def id_to_userprofile(acc):
 
 
 class ConversationManager(models.Manager):
-
     def create_conversation(self, author, other_participants, title=None):
         other_participants = [id_to_userprofile(acc) for acc in other_participants]
         if not title:

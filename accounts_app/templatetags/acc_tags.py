@@ -2,8 +2,8 @@ from django import template
 from django.db.models import Model
 from django.apps import apps
 from six import string_types, class_types
-register = template.Library()
 
+register = template.Library()
 
 
 @register.simple_tag

@@ -2,7 +2,6 @@
 
 
 class PortAddress(object):
-
     def __init__(self, dest_port, orig_port, eight_bits):
         self.dest_port = dest_port
         self.orig_port = orig_port
@@ -14,7 +13,6 @@ class PortAddress(object):
 
 
 class ConcatReference(object):
-
     def __init__(self, ref, cnt, seq, eight_bits):
         self.ref = ref
         self.cnt = cnt
@@ -27,7 +25,6 @@ class ConcatReference(object):
 
 
 class UserDataHeader(object):
-
     def __init__(self):
         self.concat = None
         self.ports = None

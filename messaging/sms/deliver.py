@@ -142,7 +142,7 @@ class SmsDeliver(SmsBase):
         if (tz & 0x08):
             offset = offset * -1
 
-        #  02/08/26 19:37:41
+        # 02/08/26 19:37:41
         datestr = "%s%s/%s%s/%s%s %s%s:%s%s:%s%s" % tuple(date)
         outputfmt = '%y/%m/%d %H:%M:%S'
 
@@ -174,7 +174,7 @@ class SmsDeliver(SmsBase):
         if self.fmt == 0x00:
             # XXX: Use unpack_msg2
             data = data[ud_len:].tolist()
-            #self.text = unpack_msg2(data).decode("gsm0338")
+            # self.text = unpack_msg2(data).decode("gsm0338")
             self.text = unpack_msg(msg)[headlen:msgl].decode("gsm0338")
 
         elif self.fmt == 0x04:
@@ -183,7 +183,7 @@ class SmsDeliver(SmsBase):
         elif self.fmt == 0x08:
             data = data[ud_len:].tolist()
             _bytes = [int("%02X%02X" % (data[i], data[i + 1]), 16)
-                            for i in range(0, len(data), 2)]
+                      for i in range(0, len(data), 2)]
             self.text = ''.join(list(map(chr, _bytes)))
 
     pdu = property(lambda self: self._pdu, _set_pdu)
@@ -252,7 +252,7 @@ class SmsDeliver(SmsBase):
 
         self.number = sender
         self.text = "|".join(msg_l)
-        self.fmt = 0x08   # UCS2
+        self.fmt = 0x08  # UCS2
         self.type = 0x03  # status report
 
         self.sr = {
@@ -261,4 +261,3 @@ class SmsDeliver(SmsBase):
             'dt': dt,
             'status': _status
         }
-

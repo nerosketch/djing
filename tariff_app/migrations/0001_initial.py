@@ -7,7 +7,6 @@ import jsonfield.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -21,7 +20,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=64, verbose_name='Periodic pay name')),
                 ('when_add', models.DateTimeField(auto_now_add=True, verbose_name='When pay created')),
-                ('calc_type', models.CharField(choices=[('df', 'Default periodic pay'), ('cs', 'Custom periodic pay')], default='df', max_length=2, verbose_name='Script type for calculations')),
+                ('calc_type',
+                 models.CharField(choices=[('df', 'Default periodic pay'), ('cs', 'Custom periodic pay')], default='df',
+                                  max_length=2, verbose_name='Script type for calculations')),
                 ('amount', models.FloatField(verbose_name='Total amount')),
                 ('extra_info', jsonfield.fields.JSONField()),
             ],
@@ -42,7 +43,9 @@ class Migration(migrations.Migration):
                 ('speedIn', models.FloatField(default=0.0, verbose_name='Speed In')),
                 ('speedOut', models.FloatField(default=0.0, verbose_name='Speed Out')),
                 ('amount', models.FloatField(default=0.0, verbose_name='Price')),
-                ('calc_type', models.CharField(choices=[('Df', 'Base calculate functionality'), ('Dp', 'IS'), ('Cp', 'Private service')], default='Df', max_length=2, verbose_name='Script')),
+                ('calc_type', models.CharField(
+                    choices=[('Df', 'Base calculate functionality'), ('Dp', 'IS'), ('Cp', 'Private service')],
+                    default='Df', max_length=2, verbose_name='Script')),
                 ('is_admin', models.BooleanField(default=False, verbose_name='Tech service')),
                 ('groups', models.ManyToManyField(blank=True, to='group_app.Group')),
             ],
