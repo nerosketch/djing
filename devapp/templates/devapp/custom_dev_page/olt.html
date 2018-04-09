@@ -6,7 +6,7 @@
         <div class="col-sm-12">
             <div class="table-responsive">
                 {% with uptime=dev_manager.uptime %}
-		        {% if uptime %}
+                {% if uptime %}
                     {% trans 'Uptime' %} {{ uptime }}
                 {% endif %}
                 {% endwith %}
@@ -14,7 +14,7 @@
                     <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
-			<th class="col-xs-1">{% trans 'SNMP Num' %}</th>
+                        <th class="col-xs-1">{% trans 'SNMP Num' %}</th>
                         <th class="col-xs-4">{% trans 'Name' %}</th>
                         <th class="col-xs-3">{% trans 'Mac' %}</th>
                         <th class="col-xs-2">{% trans 'Signal' %}</th>
@@ -30,12 +30,12 @@
                                 {% else %}<span class="glyphicon glyphicon-warning-sign text-danger"></span>
                                 {% endif %}
                             </td>
-			                <td>{{ port.num }}</td>
+                            <td>{{ port.num }}</td>
                             <td>{{ port.nm }}</td>
                             <td>{{ port.mac }}</td>
                             <td>{{ port.signal }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}{% if dev.ip_address %}&ip={{ dev.ip_address }}{% endif %}&n={{ port.num }}" title="{% trans 'Create device' %}">
+                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}&pdev={{ dev.pk }}&n={{ port.num }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>

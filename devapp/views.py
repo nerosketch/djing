@@ -24,7 +24,7 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing import global_base_views, IP_ADDR_REGEX, ping
+from djing import global_base_views, IP_ADDR_REGEX, ping, get_object_or_None
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
 
@@ -142,10 +142,12 @@ def dev(request, group_id, device_id=0):
             frm = DeviceForm(instance=devinst)
 
     if devinst is None:
+        parent_device_id = request.GET.get('pdev')
         return render(request, 'devapp/add_dev.html', {
             'form': frm,
             'group': device_group,
-            'already_dev': already_dev
+            'already_dev': already_dev,
+            'selected_parent_dev': get_object_or_None(Device, pk=parent_device_id)
         })
     else:
         return render(request, 'devapp/dev.html', {
