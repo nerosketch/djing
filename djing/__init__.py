@@ -14,7 +14,7 @@ class mac_linux(mac_unix):
     word_fmt = '%x'
 
 
-def default_dialect():
+def default_dialect(*args):
     return mac_linux
 
 
