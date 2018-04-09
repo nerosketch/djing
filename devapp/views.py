@@ -14,7 +14,7 @@ from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from django.views.generic import DetailView
 
 from devapp.base_intr import DeviceImplementationError
-from mydefs import res_success, res_error, only_admins, ping
+from mydefs import res_success, res_error, only_admins, safe_int
 from abonapp.models import Abon
 from group_app.models import Group
 from accounts_app.models import UserProfile
@@ -24,10 +24,9 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing import global_base_views, IP_ADDR_REGEX
+from djing import global_base_views, IP_ADDR_REGEX, ping
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
-from mydefs import safe_int
 
 
 class BaseDeviceListView(global_base_views.BaseListWithFiltering):
@@ -124,7 +123,7 @@ def dev(request, group_id, device_id=0):
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         except IntegrityError as e:
-            if 'unique constraint' in e.message:
+            if 'unique constraint' in str(e):
                 messages.error(request, _('Duplicate user and port: %s') % e)
             else:
                 messages.error(request, e)
@@ -362,18 +361,18 @@ def devview(request, device_id):
 
     template_name = 'ports.html'
     try:
-        if ping(dev.ip_address):
-            if dev.man_passw:
-                manager = dev.get_manager_object()
-                ports = manager.get_ports()
-                if len(ports) > 0 and isinstance(ports[0], Exception):
-                    messages.error(request, ports[0])
-                    ports = ports[1]
-                template_name = manager.get_template_name()
-            else:
-                messages.warning(request, _('Not Set snmp device password'))
+        if dev.ip_address:
+            if not ping(dev.ip_address):
+                messages.error(request, _('Dot was not pinged'))
+        if dev.man_passw:
+            manager = dev.get_manager_object()
+            ports = manager.get_ports()
+            if len(ports) > 0 and isinstance(ports[0], Exception):
+                messages.error(request, ports[0])
+                ports = ports[1]
+            template_name = manager.get_template_name()
         else:
-            messages.error(request, _('Dot was not pinged'))
+            messages.warning(request, _('Not Set snmp device password'))
         return render(request, 'devapp/custom_dev_page/' + template_name, {
             'dev': dev,
             'ports': ports,
@@ -437,7 +436,7 @@ def search_dev(request):
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
-        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address, dev.comment)} for dev in results]
+        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results]
     return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
 
 
@@ -594,7 +593,8 @@ def nagios_objects_conf(request):
     def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
         return replreg.sub('', name)
 
-    for dev in Device.objects.exclude(devtype='On', ip_address='127.0.0.1').select_related('parent_dev').only('ip_address', 'comment', 'parent_dev'):
+    for dev in Device.objects.exclude(devtype='On', ip_address='127.0.0.1').select_related('parent_dev').only(
+            'ip_address', 'comment', 'parent_dev'):
         conf = templ(host_name=norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True))),
                      host_addr=dev.ip_address,
                      parent_host_name=norm_name("%d%s" % (dev.parent_dev.pk,

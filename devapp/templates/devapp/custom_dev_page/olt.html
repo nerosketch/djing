@@ -23,19 +23,19 @@
                     </thead>
 
                     <tbody>
-                    {% with dip=dev.ip_address grp=dev.group.pk %}
+                    {% with grp=dev.group.pk %}
                     {% for port in ports %}
                         <tr>
                             <td>{% if port.st %}<span class="glyphicon glyphicon-ok text-success"></span>
                                 {% else %}<span class="glyphicon glyphicon-warning-sign text-danger"></span>
                                 {% endif %}
                             </td>
-			    <td>{{ port.num }}</td>
+			                <td>{{ port.num }}</td>
                             <td>{{ port.nm }}</td>
                             <td>{{ port.mac }}</td>
                             <td>{{ port.signal }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}&ip={{ dip }}&n={{ port.num }}" title="{% trans 'Create device' %}">
+                                <a href="{% url 'devapp:add' grp %}?mac={{ port.mac }}&t=On&c={{ port.nm }}{% if dev.ip_address %}&ip={{ dev.ip_address }}{% endif %}&n={{ port.num }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>

@@ -9,7 +9,6 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from group_app.models import Group
 
-
 DEVICE_TYPES = (
     ('Dl', dev_types.DLinkDevice),
     ('Pn', dev_types.OLTDevice),
@@ -27,13 +26,15 @@ class DeviceMonitoringException(Exception):
 
 
 class Device(models.Model):
-    ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'))
+    ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     comment = models.CharField(_('Comment'), max_length=256)
-    devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0], choices=MyChoicesAdapter(DEVICE_TYPES))
+    devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
+                               choices=MyChoicesAdapter(DEVICE_TYPES))
     man_passw = models.CharField(_('SNMP password'), max_length=16, null=True, blank=True)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Device group'))
-    parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True, on_delete=models.SET_NULL)
+    parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True,
+                                   on_delete=models.SET_NULL)
 
     snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0, blank=True)
 
@@ -70,22 +71,22 @@ class Device(models.Model):
                 return res
         return
 
-    def get_manager_object(self):
+    def get_manager_object(self) -> DevBase:
         man_klass = self.get_manager_klass()
         return man_klass(self)
 
-    # Можно-ли подключать устройство к абоненту
+    # Can attach device to subscriber in subscriber page
     def has_attachable_to_subscriber(self):
         mngr_class = self.get_manager_klass()
         return mngr_class.has_attachable_to_subscriber()
 
     def __str__(self):
-        return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address, self.mac_addr or '')
+        return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
     def update_dhcp(self):
-        if self.devtype not in ('On','Dl'):
+        if self.devtype not in ('On', 'Dl'):
             return
-        #raise ProgrammingError('переделать это безобразие')
+        # raise ProgrammingError('переделать это безобразие')
         # FIXME: переделать это безобразие
         grp = self.group.id
         code = ''

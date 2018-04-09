@@ -41,7 +41,7 @@
             {% with can_del_dev=perms.devapp.delete_device can_change_dev=perms.devapp.change_device %}
             {% for dev in devices %}
                 <tr>
-                    <td><a href="{% url 'devapp:view' 0 dev.pk %}">{{ dev.ip_address }}</a></td>
+                    <td><a href="{% url 'devapp:view' 0 dev.pk %}">{{ dev.ip_address|default:'-' }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-sm">

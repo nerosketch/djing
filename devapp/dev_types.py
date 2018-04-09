@@ -1,7 +1,9 @@
-from django.utils.translation import gettext_lazy as _, gettext
-from mydefs import RuTimedelta, safe_int
+from typing import AnyStr
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
+from django.utils.translation import gettext_lazy as _, gettext
+
+from mydefs import RuTimedelta, safe_int
 from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
 
 
@@ -153,11 +155,20 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 class OnuDevice(DevBase, SNMPBaseWorker):
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
-        SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
+        dev_ip_addr = None
+        if dev_instance.ip_address:
+            dev_ip_addr = dev_instance.ip_address
+        else:
+            parent_device = dev_instance.parent_dev
+            if parent_device is not None and parent_device.ip_address:
+                dev_ip_addr = parent_device.ip_address
+        if dev_ip_addr is None:
+            raise DeviceImplementationError('Ip address or parent device with ip address required for ONU device')
+        SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
 
     @staticmethod
-    def description():
-        return _('PON ONU')
+    def description() -> AnyStr:
+        return gettext('PON ONU')
 
     def reboot(self):
         pass
@@ -193,7 +204,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = ':'.join(['%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)])
-            uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
+            # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
             return {
                 'status': status,
                 'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,

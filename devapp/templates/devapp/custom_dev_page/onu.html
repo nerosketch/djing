@@ -15,7 +15,7 @@
                 </div>
                 <div class="panel-body">
                     <ul class="list-group">
-                        <li class="list-group-item">{% trans 'Ip address' %}: {{ dev.ip_address }}</li>
+                        <li class="list-group-item">{% trans 'Ip address' %}: {{ dev.ip_address|default:'-' }}</li>
                         <li class="list-group-item">{% trans 'Mac' %}: {{ dev.mac_addr }}</li>
                         <li class="list-group-item">{% trans 'Description' %}: {{ dev.comment }}</li>
                         {% for da in dev_accs %}
@@ -33,7 +33,7 @@
                                 {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.group %}
                                     {% trans 'Parent device' %}:<a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}"
                                                                    title="{{ pdev.mac_addr|default:'' }}"
-                                                                   target="_blank">{{ pdev.ip_address }} {{ pdev.comment }}</a>
+                                                                   target="_blank">{{ pdev.ip_address|default:'-' }} {{ pdev.comment }}</a>
                                 {% endwith %}
                             </li>
                         {% endif %}

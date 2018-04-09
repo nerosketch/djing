@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 from django.utils.translation import gettext
-from typing import Union, Iterable, AnyStr, Generator
+from typing import Union, Iterable, AnyStr, Generator, Optional
 
 from easysnmp import Session
 
@@ -77,8 +77,8 @@ class BasePort(object, metaclass=ABCMeta):
 class SNMPBaseWorker(object, metaclass=ABCMeta):
     ses = None
 
-    def __init__(self, ip: str, community='public', ver=2):
-        if ip is None:
+    def __init__(self, ip: Optional[str], community='public', ver=2):
+        if ip is None or ip == '':
             raise DeviceImplementationError(gettext('Ip address is required'))
         self.ses = Session(hostname=ip, community=community, version=ver)
 
