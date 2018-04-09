@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 
 from . import models
-from mydefs import ip_addr_regex
-from djing import MAC_ADDR_REGEX
+from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 
 
 class DeviceForm(forms.ModelForm):
@@ -22,7 +20,7 @@ class DeviceForm(forms.ModelForm):
         exclude = ['map_dot', 'status']
         widgets = {
             'ip_address': forms.TextInput(attrs={
-                'pattern': ip_addr_regex,
+                'pattern': IP_ADDR_REGEX,
                 'placeholder': '192.168.0.100'
             }),
             'comment': forms.TextInput(attrs={

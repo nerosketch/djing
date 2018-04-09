@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from django.conf import settings
 from django.core import validators
@@ -14,7 +14,8 @@ from django.utils.translation import ugettext_lazy as _, gettext
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
-from mydefs import MyGenericIPAddressField, ip2int, LogicError, ip_addr_regex
+from mydefs import MyGenericIPAddressField, ip2int, LogicError
+from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
@@ -105,7 +106,7 @@ class ExtraFieldsModel(models.Model):
         elif self.field_type == 'str':
             return r'^[a-zA-ZА-Яа-я0-9]+$'
         elif self.field_type == 'ipa':
-            return ip_addr_regex
+            return IP_ADDR_REGEX
 
     def clean(self):
         d = self.data

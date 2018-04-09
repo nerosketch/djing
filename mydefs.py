@@ -11,13 +11,7 @@ from django.shortcuts import redirect
 from django.db import models
 from django.conf import settings
 
-PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 DEBUG = getattr(settings, 'DEBUG', False)
-
-ip_addr_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 
 def ip2int(addr):

@@ -11,10 +11,10 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
 
 from devapp.base_intr import DeviceImplementationError
-from mydefs import res_success, res_error, only_admins, ping, ip_addr_regex
+from mydefs import res_success, res_error, only_admins, ping
 from abonapp.models import Abon
 from group_app.models import Group
 from accounts_app.models import UserProfile
@@ -24,7 +24,7 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing import global_base_views
+from djing import global_base_views, IP_ADDR_REGEX
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
 from mydefs import safe_int
@@ -528,7 +528,7 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
             if dev_ip is None or dev_ip == '':
                 return {'text': 'ip does not passed'}
 
-            if not bool(re.match(ip_addr_regex, dev_ip)):
+            if not bool(re.match(IP_ADDR_REGEX, dev_ip)):
                 return {'text': 'ip address %s is not valid' % dev_ip}
 
             device_down = Device.objects.filter(ip_address=dev_ip).first()

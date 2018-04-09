@@ -4,12 +4,18 @@ from netaddr import mac_unix, mac_eui48
 
 MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
+IP_ADDR_REGEX = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
+                r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+
+
 class mac_linux(mac_unix):
     """MAC format with zero-padded all upper-case hex and colon separated"""
     word_fmt = '%x'
 
 
-def default_dialect(eui_obj=None):
+def default_dialect():
     return mac_linux
 
 
