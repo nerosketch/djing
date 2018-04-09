@@ -3,7 +3,8 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.utils.html import escape
 from abonapp.models import Abon
-from mydefs import ip_addr_regex
+from devapp.models import Device
+from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 from django.contrib.auth.decorators import login_required
 
 
@@ -17,21 +18,32 @@ def home(request):
     s = s.replace('+', '')
 
     if s:
-        if bool(re.match(ip_addr_regex, s)):
+        if re.match(IP_ADDR_REGEX, s):
             abons = Abon.objects.filter(ip_address=s)
+            devices = Device.objects.filter(ip_address=s)
         else:
             abons = Abon.objects.filter(
                 Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s)
             )
+            if re.match(MAC_ADDR_REGEX, s):
+                devices = Device.objects.filter(mac_addr=s)
+            else:
+                devices = Device.objects.filter(comment__icontains=s)
+
     else:
         abons = []
+        devices = []
 
     for abn in abons:
         abn.fio = replace_without_case(escape(abn.fio), s, "<b>%s</b>" % s)
         abn.username_display = replace_without_case(escape(abn.username), s, "<b>%s</b>" % s)
         abn.telephone = replace_without_case(escape(abn.telephone), s, "<b>%s</b>" % s)
 
+    for dev in devices:
+        dev.comment = replace_without_case(escape(dev.comment), s, "<b>%s</b>" % s)
+
     return render(request, 'searchapp/index.html', {
         'abons': abons,
+        'devices': devices,
         's': s
     })

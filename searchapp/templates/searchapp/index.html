@@ -1,19 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block main %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Поиск по &quot;{{ s }}&quot;</h3>
+            <h3 class="panel-title">
+                {% blocktrans trimmed with searchstring=s %}
+                    Search by {{ searchstring }}
+                {% endblocktrans %}
+            </h3>
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'searchapp:home' %}" method="get">
                 <div class="form-group">
-                    <label for="srfield">Измените тут строку поиска</label>
+                    <label for="srfield">{% trans 'Change search string there' %}</label>
 
                     <div class="input-group">
                     <span class="input-group-btn">
                         <button class="btn btn-default">
-                            <span class="glyphicon glyphicon-search"></span> Найти
+                            <span class="glyphicon glyphicon-search"></span> {% trans 'Find' %}
                         </button>
                     </span>
                         <input id="srfield" name="s" type="text" value="{{ s }}" class="form-control">
@@ -22,8 +27,11 @@
             </form>
             <div class="list-group">
                 {% for ab in abons %}
-                <a href="{% url 'abonapp:abon_home' ab.group.id ab.username %}" target="_blank" class="list-group-item">
-                        <h4 class="list-group-item-heading">{{ ab.username_display|safe }}</h4>
+                    <a href="{% url 'abonapp:abon_home' ab.group.id ab.username %}" target="_blank" class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                            <span class="glyphicon glyphicon-user"></span>
+                            {{ ab.username_display|safe }}
+                        </h4>
 
                         <p class="list-group-item-text">
                         {{ ab.fio|safe }}
@@ -35,10 +43,45 @@
                     </a>
                 {% empty %}
                     <a class="list-group-item">
-                        <h4 class="list-group-item-heading">Ничего не найдено</h4>
+                        <h4 class="list-group-item-heading">
+                            <span class="glyphicon glyphicon-user"></span>
+                            {% trans 'Nothing to found' %}
+                        </h4>
 
                         <p class="list-group-item-text">
-                            Результат поиска пуст, попробуйте изменить строку поиска, и попробуйте найти ещё раз.
+                            {% trans 'You can change search string and try again' %}
+                        </p>
+                    </a>
+                {% endfor %}
+                {% for dev in devices %}
+                    <a href="{% url 'devapp:view' dev.group.id dev.pk %}" target="_blank" class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                            <span class="glyphicon glyphicon-hdd"></span>
+                            {{ dev.comment|safe }}
+                        </h4>
+
+                        <p class="list-group-item-text">
+                            {% if dev.ip_address %}
+                                <span>{{ dev.ip_address }}</span>,
+                            {% endif %}
+                            {% if dev.mac_addr %}
+                                <span>{{ dev.mac_addr }}</span>,
+                            {% endif %}
+                            {{ dev.get_devtype_display }},
+                            {% blocktrans trimmed with netw_status=dev.get_status_display %}
+                                Network state is {{ netw_status }}
+                            {% endblocktrans %}
+                        </p>
+                    </a>
+                {% empty %}
+                    <a class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                            <span class="glyphicon glyphicon-hdd"></span>
+                            {% trans 'Nothing to found' %}
+                        </h4>
+
+                        <p class="list-group-item-text">
+                            {% trans 'You can change search string and try again' %}
                         </p>
                     </a>
                 {% endfor %}

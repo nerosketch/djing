@@ -1,0 +1,44 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-04-09 11:15+0300\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: templates/searchapp/index.html:8
+#, python-format
+msgid "Search by %(searchstring)s"
+msgstr "Поиск по %(searchstring)s"
+
+#: templates/searchapp/index.html:16
+msgid "Change search string there"
+msgstr "Измените строку поиска"
+
+#: templates/searchapp/index.html:21
+msgid "Find"
+msgstr "Найти"
+
+#: templates/searchapp/index.html:46 templates/searchapp/index.html:75
+msgid "Nothing to found"
+msgstr "Ничего не найдено"
+
+#: templates/searchapp/index.html:49 templates/searchapp/index.html:78
+msgid "You can change search string and try again"
+msgstr "Вы можете изменить строку поиска и попробовать ещё раз"
+
+#: templates/searchapp/index.html:68
+#, python-format
+msgid "Network state is %(netw_status)s"
+msgstr "Сетевой статус: %(netw_status)s"
