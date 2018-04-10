@@ -56,11 +56,14 @@
 
             {% bootstrap_field form.is_noticeable %}
 
-            <div class="btn-group">
-                <button type="submit" class="btn btn-sm btn-primary">
+            <div class="btn-group btn-group-sm">
+                <button type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
-                <button type="reset" class="btn btn-sm btn-default">
+                <a href="{% url 'devapp:del' group.pk|default:0 dev.pk %}" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Delete' %}
+                </a>
+                <button type="reset" class="btn btn-default">
                     <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                 </button>
             </div>
