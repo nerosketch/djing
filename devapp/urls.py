@@ -29,5 +29,5 @@ urlpatterns = [
     url(r'^on_device_event/$', views.OnDeviceMonitoringEvent.as_view()),
 
     # Nagios mon generate
-    url(r'^nagios/hosts/$', views.nagios_objects_conf, name='nagios_objects_conf')
+    url(r'^nagios/hosts/$', views.NagiosObjectsConfView.as_view(), name='nagios_objects_conf')
 ]

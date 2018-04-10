@@ -66,6 +66,9 @@ if __name__ == '__main__':
     dev_ip = validate(IP_REGEXP, sys.argv[1])
     status = validate_status(sys.argv[2])
 
-    sign = calc_hash('_'.join((dev_ip, status, API_AUTH_SECRET)))
+    vars_to_hash = [dev_ip, status]
+    vars_to_hash.sort()
+    vars_to_hash.append(API_AUTH_SECRET)
+    sign = calc_hash('_'.join(vars_to_hash))
 
     send_request(dev_ip, status, sign)

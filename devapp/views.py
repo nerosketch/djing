@@ -576,13 +576,42 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
             }
 
 
-@login_required
-@only_admins
-def nagios_objects_conf(request):
-    from transliterate import translit
-    confs = list()
+class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
+    http_method_names = ['get']
 
-    def templ(host_name, host_addr, parent_host_name):
+    def get(self, request, *args, **kwargs):
+        from transliterate import translit
+        confs = list()
+
+        def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
+            return replreg.sub('', name)
+
+        for dev in Device.objects.exclude(Q(ip_address=None) | Q(ip_address='127.0.0.1')) \
+                .select_related('parent_dev') \
+                .only('ip_address', 'comment', 'parent_dev'):
+            host_name = norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True)))
+            conf = None
+            if dev.devtype == 'On':
+                if dev.parent_dev:
+                    host_addr = dev.parent_dev.ip_address
+                    conf = self.templ_onu(host_name, host_addr, snmp_item=dev.snmp_item_num or None)
+                else:
+                    if dev.ip_address:
+                        host_addr = dev.ip_address
+                        conf = self.templ_onu(host_name, host_addr, snmp_item=dev.snmp_item_num or None)
+            else:
+                parent_host_name = norm_name("%d%s" % (
+                    dev.parent_dev.pk, translit(dev.parent_dev.comment, language_code='ru', reversed=True)
+                )) if dev.parent_dev else None
+                conf = self.templ(host_name, host_addr=dev.ip_address, parent_host_name=parent_host_name)
+            if conf is not None:
+                confs.append(conf)
+        response = HttpResponse(''.join(confs), content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="objects.cfg"'
+        return response
+
+    @staticmethod
+    def templ(host_name: str, host_addr: str, parent_host_name: str):
         return '\n'.join([
             "define host{",
             "\tuse				generic-switch",
@@ -592,19 +621,13 @@ def nagios_objects_conf(request):
             "}\n"
         ])
 
-    def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
-        return replreg.sub('', name)
-
-    for dev in Device.objects.exclude(Q(ip_address=None) | Q(ip_address='127.0.0.1'))\
-                             .select_related('parent_dev')\
-                             .only('ip_address', 'comment', 'parent_dev'):
-        conf = templ(host_name=norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True))),
-                     host_addr=dev.ip_address,
-                     parent_host_name=norm_name("%d%s" % (dev.parent_dev.pk,
-                                                          translit(dev.parent_dev.comment, language_code='ru',
-                                                                   reversed=True))) if dev.parent_dev else None,
-                     )
-        confs.append(conf)
-    response = HttpResponse(''.join(confs), content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename="objects.cfg"'
-    return response
+    @staticmethod
+    def templ_onu(host_name: str, host_addr: str, snmp_item: int):
+        return '\n'.join([
+            "define host{",
+            "\tuse				device-onu",
+            "\thost_name		%s" % host_name,
+            "\taddress			%s" % host_addr,
+            "\t_snmp_item		%d" % snmp_item if snmp_item is not None else '',
+            "}\n"
+        ])

@@ -51,11 +51,25 @@ class HashAuthView(View):
         # Transmittent get list without sign
         get_values = request.GET.copy()
         del get_values['sign']
-        heshable = (get_values.get('ip'), get_values.get('status'), API_AUTH_SECRET)
-        if HashAuthView.check_sign(heshable, sign):
+        values_list = [l for l in get_values.values() if l]
+        values_list.sort()
+        values_list.append(API_AUTH_SECRET)
+        if self.check_sign(values_list, sign):
             return super(HashAuthView, self).dispatch(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('Access Denied')
+
+
+class AuthenticatedOrHashAuthView(HashAuthView):
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            if request.user.is_admin:
+                return View.dispatch(self, request, *args, **kwargs)
+            else:
+                return HttpResponseRedirect('client_side:home')
+        else:
+            return HashAuthView.dispatch(self, request, *args, **kwargs)
 
 
 class AllowedSubnetMixin(object):
