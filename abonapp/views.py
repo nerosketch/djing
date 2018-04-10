@@ -1083,6 +1083,8 @@ class EditSibscriberMarkers(UpdateView):
 
 
 # API's
+@login_required
+@mydefs.only_admins
 @json_view
 def abons(request):
     ablist = [{
@@ -1106,9 +1108,13 @@ def abons(request):
     return data
 
 
+@login_required
+@mydefs.only_admins
 @json_view
 def search_abon(request):
     word = request.GET.get('s')
+    if not word:
+        return None
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results]
     return results
