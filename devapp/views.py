@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 import re
+from typing import Optional
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
@@ -24,7 +24,7 @@ from guardian.shortcuts import get_objects_for_user
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
-from djing import global_base_views, IP_ADDR_REGEX, ping, get_object_or_None
+from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm
 
@@ -523,18 +523,18 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
     @method_decorator(json_view)
     def get(self, request):
         try:
-            dev_ip = request.GET.get('ip')
+            dev_mac = request.GET.get('mac')
             dev_status = request.GET.get('status')
 
-            if dev_ip is None or dev_ip == '':
-                return {'text': 'ip does not passed'}
+            if dev_mac is None or dev_mac == '':
+                return {'text': 'mac does not passed'}
 
-            if not bool(re.match(IP_ADDR_REGEX, dev_ip)):
-                return {'text': 'ip address %s is not valid' % dev_ip}
+            if not re.match(MAC_ADDR_REGEX, dev_mac):
+                return {'text': 'mac address %s is not valid' % dev_mac}
 
-            device_down = Device.objects.filter(ip_address=dev_ip).first()
+            device_down = Device.objects.filter(mac_addr=dev_mac).first()
             if device_down is None:
-                return {'text': 'Devices with ip %s does not exist' % dev_ip}
+                return {'text': 'Devices with mac %s does not exist' % dev_mac}
 
             if dev_status == 'UP':
                 device_down.status = 'up'
@@ -552,7 +552,7 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
             device_down.save(update_fields=['status'])
 
             if not device_down.is_noticeable:
-                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address}
+                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address or device_down.comment}
 
             recipients = UserProfile.objects.get_profiles_by_group(device_down.group.pk)
             names = list()
@@ -560,7 +560,11 @@ class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_
             for recipient in recipients:
                 send_notify(
                     msg_text=gettext(notify_text) % {
-                        'device_name': "%s %s" % (device_down.ip_address, device_down.comment)
+                        'device_name': "%s(%s) %s" % (
+                            device_down.ip_address,
+                            device_down.mac_addr,
+                            device_down.comment
+                        )
                     },
                     account=recipient,
                     tag='devmon'
@@ -586,24 +590,25 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
         def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
             return replreg.sub('', name)
 
-        for dev in Device.objects.exclude(Q(ip_address=None) | Q(ip_address='127.0.0.1')) \
+        for dev in Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
                 .select_related('parent_dev') \
                 .only('ip_address', 'comment', 'parent_dev'):
             host_name = norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True)))
             conf = None
+            mac_addr = dev.mac_addr
             if dev.devtype == 'On':
                 if dev.parent_dev:
                     host_addr = dev.parent_dev.ip_address
-                    conf = self.templ_onu(host_name, host_addr, snmp_item=dev.snmp_item_num or None)
+                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=dev.snmp_item_num or None)
                 else:
                     if dev.ip_address:
                         host_addr = dev.ip_address
-                        conf = self.templ_onu(host_name, host_addr, snmp_item=dev.snmp_item_num or None)
+                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=dev.snmp_item_num or None)
             else:
                 parent_host_name = norm_name("%d%s" % (
                     dev.parent_dev.pk, translit(dev.parent_dev.comment, language_code='ru', reversed=True)
                 )) if dev.parent_dev else None
-                conf = self.templ(host_name, host_addr=dev.ip_address, parent_host_name=parent_host_name)
+                conf = self.templ(host_name, host_addr=dev.ip_address, mac=mac_addr, parent_host_name=parent_host_name)
             if conf is not None:
                 confs.append(conf)
         response = HttpResponse(''.join(confs), content_type='text/plain')
@@ -611,23 +616,27 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
         return response
 
     @staticmethod
-    def templ(host_name: str, host_addr: str, parent_host_name: str):
-        return '\n'.join([
+    def templ(host_name: str, host_addr: str, mac: Optional[str], parent_host_name: Optional[str]):
+        r = [
             "define host{",
             "\tuse				generic-switch",
             "\thost_name		%s" % host_name,
             "\taddress			%s" % host_addr,
             "\tparents			%s" % parent_host_name if parent_host_name is not None else '',
+            "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
-        ])
+        ]
+        return '\n'.join(i for i in r if i)
 
     @staticmethod
-    def templ_onu(host_name: str, host_addr: str, snmp_item: int):
-        return '\n'.join([
+    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: int):
+        r = [
             "define host{",
             "\tuse				device-onu",
             "\thost_name		%s" % host_name,
             "\taddress			%s" % host_addr,
             "\t_snmp_item		%d" % snmp_item if snmp_item is not None else '',
+            "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
-        ])
+        ]
+        return '\n'.join(i for i in r if i)

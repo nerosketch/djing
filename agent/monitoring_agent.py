@@ -8,10 +8,7 @@ API_AUTH_SECRET = 'your api key'
 
 SERVER_DOMAIN = 'http://localhost:8000'
 
-IP_REGEXP = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-            r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-            r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-            r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
 
 def calc_hash(data):
@@ -29,22 +26,22 @@ def check_sign(get_list, sign):
 
 
 def validate(regexp, string):
-    if not bool(re.match(regexp, string)):
+    if not re.match(regexp, string):
         raise ValueError
     return string
 
 
 def validate_status(text):
-    if not text in ('UP', 'DOWN', 'UNREACHABLE'):
+    if text not in ('UP', 'DOWN', 'UNREACHABLE'):
         raise ValueError
     return text
 
 
-def send_request(ip, status, sign):
+def send_request(mac, status, sign):
     r = requests.get(
         "%(domain)s/dev/on_device_event/" % {'domain': SERVER_DOMAIN},
         params={
-            'ip': ip,
+            'mac': mac,
             'status': status,
             'sign': sign
         })
@@ -57,18 +54,18 @@ def send_request(ip, status, sign):
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print('You forget parameters, example of usage:\n'
-              '$ python3 ./monitoring_agent.py 192.168.0.100 DOWN|UP|UNREACHABLE')
+              '$ python3 ./monitoring_agent.py a2:c3:12:46:1f:92 DOWN|UP|UNREACHABLE')
         exit(0)
 
     if API_AUTH_SECRET == 'your api key':
         raise NotImplementedError('You must specified secret api key')
 
-    dev_ip = validate(IP_REGEXP, sys.argv[1])
+    dev_mac = validate(MAC_ADDR_REGEX, sys.argv[1])
     status = validate_status(sys.argv[2])
 
-    vars_to_hash = [dev_ip, status]
+    vars_to_hash = [dev_mac, status]
     vars_to_hash.sort()
     vars_to_hash.append(API_AUTH_SECRET)
     sign = calc_hash('_'.join(vars_to_hash))
 
-    send_request(dev_ip, status, sign)
+    send_request(dev_mac, status, sign)
