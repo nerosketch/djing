@@ -60,9 +60,15 @@
                 <button type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
-                <a href="{% url 'devapp:del' group.pk|default:0 dev.pk %}" class="btn btn-danger">
-                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Delete' %}
-                </a>
+                {% if perms.devapp.delete_device %}
+                    <a href="{% url 'devapp:del' group.pk|default:0 dev.pk %}" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-danger disabled" title="{% trans 'Permission denied' %}" data-toggle="tooltip">
+                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                    </a>
+                {% endif %}
                 <button type="reset" class="btn btn-default">
                     <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                 </button>
