@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from guardian.forms import UserObjectPermissionsForm
 from guardian.shortcuts import assign_perm, remove_perm
+from django import forms
+from .models import UserProfile
 
 
 class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
@@ -21,3 +23,9 @@ class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
 
         for perm in perms - init_perms:
             assign_perm(perm, self.user, self.obj)
+
+
+class AvatarChangeForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']

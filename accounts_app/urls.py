@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^add$', views.create_profile, name='create_profile'),
 
     url(r'^settings$', views.ch_info, name='setup_info'),
-    url(r'^settings/change_ava$', views.ch_ava, name='setup_avatar'),
+    url(r'^settings/change_ava$', views.AvatarUpdateView.as_view(), name='setup_avatar'),
 
     url(r'^(?P<uid>\d+)$', views.profile_show, name='other_profile'),
     url(r'^(?P<uid>\d+)/perms$', views.perms, name='setup_perms'),

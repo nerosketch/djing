@@ -13,13 +13,9 @@
     <div class="row">
         <div class="col-sm-3">
             <div class="thumbnail">
-                {% if userprofile.avatar %}
-                    <a href="{{ userprofile.get_big_ava }}" class="thumbnail" target="_blank">
-                        <img alt="ava" src="{{ userprofile.get_min_ava }}"/>
-                    </a>
-                {% else %}
-                    <img alt="ava" src="/static/img/user_ava.gif"/>
-                {% endif %}
+                <a href="{{ userprofile.get_big_ava }}" class="thumbnail" target="_blank">
+                    <img alt="ava" src="{{ userprofile.get_min_ava }}"/>
+                </a>
                 <div class="caption btn-group btn-group-sm">
                     {% if userprofile == request.user %}
                         <a href="{% url 'acc_app:setup_info' %}" class="btn btn-primary">

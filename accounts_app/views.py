@@ -13,8 +13,8 @@ from django.conf import settings
 
 from group_app.models import Group
 
-from photo_app.models import Photo
 from .models import UserProfile
+from .forms import AvatarChangeForm
 import mydefs
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
@@ -87,28 +87,16 @@ def profile_show(request, uid=0):
     })
 
 
-@login_required
-@mydefs.only_admins
-def ch_ava(request):
-    if request.method == 'POST':
-        phname = request.FILES.get('avatar')
-        if phname is None:
-            messages.error(request, _('Please select an image'))
-        else:
-            user = request.user
-            if user.avatar:
-                user.avatar.delete()
-            photo = Photo()
-            photo.image = phname
-            photo.save()
-            user.avatar = photo
-            user.save(update_fields=['avatar'])
-            request.user = user
-            messages.success(request, _('Avatar successfully changed'))
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+class AvatarUpdateView(UpdateView):
+    form_class = AvatarChangeForm
+    template_name = 'accounts/settings/ch_info.html'
 
-    return render(request, 'accounts/settings/ch_info.html', {
-        'user': request.user
-    })
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_success_url(self):
+        return resolve_url('acc_app:other_profile', uid=self.request.user.id)
 
 
 @login_required

@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 import os
+from PIL import Image
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from photo_app.models import Photo
 from group_app.models import Group
 
 DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
@@ -94,32 +94,20 @@ class UserProfileManager(MyUserManager):
 
 
 class UserProfile(BaseAccount):
-    avatar = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL)
+    avatar = models.ImageField(_('Avatar'), upload_to=os.path.join('user', 'avatar'), null=True, default=None)
     email = models.EmailField(default='admin@example.ru')
     responsibility_groups = models.ManyToManyField(Group, blank=True, verbose_name=_('Responsibility groups'))
 
     objects = UserProfileManager()
 
     def get_big_ava(self):
-        if self.avatar:
-            path = self.avatar.big()
-            if os.path.exists(path):
-                return path
-            else:
-                return DEFAULT_PICTURE
+        if self.avatar and os.path.isfile(self.avatar.path):
+            return self.avatar.url
         else:
             return DEFAULT_PICTURE
 
     def get_min_ava(self):
-        if self.avatar:
-            url_path = self.avatar.min()
-            real_path = url_path[1:]
-            if os.path.exists(real_path):
-                return url_path
-            else:
-                return DEFAULT_PICTURE
-        else:
-            return DEFAULT_PICTURE
+        return self.get_big_ava()
 
     class Meta:
         permissions = (
@@ -128,3 +116,13 @@ class UserProfile(BaseAccount):
         verbose_name = _('Staff account profile')
         verbose_name_plural = _('Staff account profiles')
         ordering = ['fio']
+
+    def _thumbnail_avatar(self):
+        if os.path.isfile(self.avatar.path):
+            im = Image.open(self.avatar)
+            im.thumbnail((200, 121), Image.ANTIALIAS)
+            im.save(self.avatar.path)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._thumbnail_avatar()

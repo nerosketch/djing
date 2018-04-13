@@ -301,3 +301,6 @@ msgstr "Группы администратора"
 
 msgid "Responsibilities has been updated"
 msgstr "Ответственность за группы обновлена"
+
+msgid "Avatar"
+msgstr "Аватар"
