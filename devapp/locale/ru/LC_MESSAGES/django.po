@@ -517,3 +517,7 @@ msgstr "Экспортировать конфиг для nagios"
 
 msgid "Ip address or parent device with ip address required for ONU device"
 msgstr "Ip-адрес или родительское устройство с ip-адресом, необходимым для устройства ONU"
+
+msgid "Device group"
+msgstr "Группа устройства"
+

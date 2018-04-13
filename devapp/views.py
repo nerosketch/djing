@@ -617,6 +617,8 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
 
     @staticmethod
     def templ(host_name: str, host_addr: str, mac: Optional[str], parent_host_name: Optional[str]):
+        if not host_addr:
+            return
         r = [
             "define host{",
             "\tuse				generic-switch",
@@ -630,6 +632,8 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
 
     @staticmethod
     def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: int):
+        if not host_addr:
+            return
         r = [
             "define host{",
             "\tuse				device-onu",

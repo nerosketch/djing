@@ -54,7 +54,12 @@
                     </a>
                 {% endfor %}
                 {% for dev in devices %}
-                    <a href="{% url 'devapp:view' dev.group.id dev.pk %}" target="_blank" class="list-group-item">
+                    {% if dev.group %}
+                        {% url 'devapp:view' dev.group.id dev.pk as devviewlink %}
+                    {% else %}
+                        {% url 'devapp:fix_device_group' dev.pk as devviewlink %}
+                    {% endif %}
+                    <a href="{{ devviewlink }}" target="_blank" class="list-group-item">
                         <h4 class="list-group-item-heading">
                             <span class="glyphicon glyphicon-hdd"></span>
                             {{ dev.comment|safe }}
