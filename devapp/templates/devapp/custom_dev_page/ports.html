@@ -59,7 +59,11 @@
                     {% trans 'Parent device' %}
                     {% with pdev=dev.parent_dev %}
                         {% if pdev %}
-                            <a href="{% url 'devapp:view' pdev.group.pk pdev.pk %}" title="{{ pdev.ip_address|default:'-' }}" data-toggle="tooltip">{{ pdev.comment }}</a>
+                            {% if pdev.group %}
+                                <a href="{% url 'devapp:view' pdev.group.pk pdev.pk %}" title="{{ pdev.ip_address|default:'-' }}" data-toggle="tooltip">{{ pdev.comment }}</a>
+                            {% else %}
+                                <a href="{% url 'devapp:fix_device_group' pdev.pk %}" title="{{ pdev.ip_address|default:'-' }}" data-toggle="tooltip">{{ pdev.comment }}</a>
+                            {% endif %}
                         {% else %}
                             {% trans 'Not assigned' %}
                         {% endif %}

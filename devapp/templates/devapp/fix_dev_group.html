@@ -35,15 +35,8 @@
             {% bootstrap_icon 'lock' as ic %}
             {% bootstrap_field form.man_passw addon_before=ic %}
 
-            <div class="form-group">
-                <label class="control-label" for="{{ form.group.id_for_label }}">{{ form.group.label }}</label>
-                <div class="input-group{% if not dev.group %} has-error{% endif %}">
-                    <span class="input-group-addon">
-                        {% bootstrap_icon 'subscript' %}
-                    </span>
-                    {{ form.group }}
-                </div>
-            </div>
+            {% bootstrap_icon 'subscript' as ic %}
+            {% bootstrap_field form.group addon_before=ic %}
 
             <div class="form-group">
                 <label for="id_parent_dev">{% trans 'Parent device' %}</label>
