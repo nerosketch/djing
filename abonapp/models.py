@@ -258,8 +258,6 @@ class Abon(BaseAccount):
 
     # make subscriber from agent structure
     def build_agent_struct(self):
-        if not self.is_access():
-            return
         if self.ip_address:
             user_ip = ip2int(self.ip_address)
         else:
