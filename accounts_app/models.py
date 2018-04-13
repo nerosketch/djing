@@ -118,7 +118,7 @@ class UserProfile(BaseAccount):
         ordering = ['fio']
 
     def _thumbnail_avatar(self):
-        if os.path.isfile(self.avatar.path):
+        if self.avatar and os.path.isfile(self.avatar.path):
             im = Image.open(self.avatar)
             im.thumbnail((200, 121), Image.ANTIALIAS)
             im.save(self.avatar.path)

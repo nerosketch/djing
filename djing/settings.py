@@ -152,8 +152,7 @@ if DEBUG:
 DATE_FORMAT = 'd E Y'
 
 MEDIA_URL = '/media/'
-if DEBUG:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_PICTURE = '/static/img/user_ava.gif'
 AUTH_USER_MODEL = 'accounts_app.UserProfile'

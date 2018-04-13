@@ -118,6 +118,8 @@ class Device(models.Model):
             code = 'lzk'
         elif grp == 51:
             code = 'sad'
+        elif grp == 46:
+            code = 'zhem'
         newmac = str(self.mac_addr)
         run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
 
