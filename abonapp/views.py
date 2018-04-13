@@ -1,3 +1,4 @@
+from typing import Dict, Optional
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, ProgrammingError, transaction
@@ -12,6 +13,7 @@ from django.views.generic import ListView, UpdateView, CreateView
 from django.conf import settings
 from jsonview.decorators import json_view
 
+from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
 from statistics.models import StatCache
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
@@ -26,8 +28,7 @@ from statistics.models import getModel
 from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
-from djing.global_base_views import OrderingMixin, BaseListWithFiltering
-from djing import ping
+from djing.global_base_views import OrderingMixin, BaseListWithFiltering, HashAuthView, AllowedSubnetMixin
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
@@ -697,7 +698,7 @@ def abon_ping(request):
         tm = Transmitter()
         ping_result = tm.ping(ip)
         if ping_result is None:
-            if ping(ip, 10):
+            if mydefs.ping(ip, 10):
                 status = True
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
         else:
@@ -1118,3 +1119,46 @@ def search_abon(request):
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
     results = [{'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results]
     return results
+
+
+class DhcpLever(AllowedSubnetMixin, HashAuthView):
+    #
+    # Api view for dhcp event
+    #
+    http_method_names = ['get']
+
+    @method_decorator(json_view)
+    def get(self, request, *args, **kwargs):
+        data = request.GET.copy()
+        r = self.on_dhcp_event(data)
+        if r is not None:
+            return {'text': r}
+        return {'status': 'ok'}
+
+    @staticmethod
+    def on_dhcp_event(data: Dict) -> Optional[str]:
+        '''
+        data = {
+            'client_ip': ip2int('127.0.0.1'),
+            'client_mac': 'aa:bb:cc:dd:ee:ff',
+            'switch_mac': 'aa:bb:cc:dd:ee:ff',
+            'switch_port': 3,
+            'cmd': 'commit'
+        }
+        '''
+        r = None
+        try:
+            action = data['cmd']
+            if action == 'commit':
+                r = dhcp_commit(
+                    data['client_ip'], data['client_mac'],
+                    data['switch_mac'], data['switch_port']
+                )
+            elif action == 'expiry':
+                r = dhcp_expiry(data['client_ip'])
+            elif action == 'release':
+                r = dhcp_release(data['client_ip'])
+        except mydefs.LogicError as e:
+            print('LogicError', e)
+            r = str(e)
+        return r

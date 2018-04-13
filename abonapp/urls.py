@@ -65,5 +65,6 @@ urlpatterns = [
 
     # Api's
     url(r'^api/abons$', views.abons),
-    url(r'^api/abon_filter$', views.search_abon)
+    url(r'^api/abon_filter$', views.search_abon),
+    url(r'^api/dhcp_lever/$', views.DhcpLever.as_view())
 ]

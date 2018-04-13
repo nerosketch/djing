@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 import sys
-import socket
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import urlopen
+from hashlib import sha256
+
+API_AUTH_SECRET = 'your api key'
+SERVER_DOMAIN = 'http://localhost:8000'
 
 
 def die(text):
@@ -19,21 +25,46 @@ obj = {
 '''
 
 
-def send_to(data, addr='127.0.0.1', port=5436):
-    from pickle import dumps
+def calc_hash(data):
+    if type(data) is str:
+        result_data = data.encode('utf-8')
+    else:
+        result_data = bytes(data)
+    return sha256(result_data).hexdigest()
+
+
+def make_sign(data: dict):
+    vars_to_hash = [str(v) for v in data.values()]
+    vars_to_hash.sort()
+    vars_to_hash.append(API_AUTH_SECRET)
+    return calc_hash('_'.join(vars_to_hash))
+
+
+def send_to(data, server=SERVER_DOMAIN):
+    sign = make_sign(data)
+    data.update({'sign': sign})
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((addr, port))
-            data = dumps(data)
-            s.send(data)
+        with urlopen("%s/abons/api/dhcp_lever/?%s" % (server, urlencode(data))) as r:
+            html = r.read()
+        print(html)
     except ConnectionRefusedError:
         print('ERROR: connection refused')
+    except HTTPError as e:
+        print('ERROR:', e)
 
 
 if __name__ == "__main__":
     argv = sys.argv
     if len(argv) < 3:
-        die('Too few arguments, exiting...')
+        die(
+            'Too few arguments, exiting...\n'
+            'Usage:\n'
+            'COMMIT: ./dhcp_lever.py commit 192.168.1.100 ff:12:c5:9f:12:56 98:45:28:85:25:1a 3\n'
+            'EXPIRY or RELEASE: ./dhcp_lever.py [release |commit]'
+        )
+    if API_AUTH_SECRET == 'your api key':
+        raise NotImplementedError('You must specified secret api key')
+
     action = argv[1]
     if action == 'commit':
         if len(argv) < 6:
