@@ -29,6 +29,7 @@ from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing.global_base_views import OrderingMixin, BaseListWithFiltering, HashAuthView, AllowedSubnetMixin
+from djing import ping
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
@@ -698,7 +699,7 @@ def abon_ping(request):
         tm = Transmitter()
         ping_result = tm.ping(ip)
         if ping_result is None:
-            if mydefs.ping(ip, 10):
+            if ping(ip, 10):
                 status = True
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
         else:
