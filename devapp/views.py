@@ -514,7 +514,7 @@ def fix_port_conflict(request, group_id, device_id, port_id):
     })
 
 
-class OnDeviceMonitoringEvent(global_base_views.AllowedSubnetMixin, global_base_views.HashAuthView):
+class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
     #
     # Api view for monitoring devices
     #

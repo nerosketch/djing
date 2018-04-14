@@ -92,6 +92,10 @@ class AllowedSubnetMixin(object):
         return HttpResponseForbidden('Access Denied')
 
 
+class SecureApiView(AllowedSubnetMixin, HashAuthView):
+    pass
+
+
 class OrderingMixin(object):
     """
     Ordering result object list by @order_by variable in get request.

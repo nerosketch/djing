@@ -1,24 +1,51 @@
 #!/usr/bin/env python3
-import os, signal
-from pid.decorator import pidfile
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
-django.setup()
-from messaging.sms import SmsSubmit, SmsDeliver
+from typing import Dict, Optional, AnyStr
 import re
-import asterisk.manager
+import signal
 from time import sleep
-from dialing_app.models import SMSModel, SMSOut
-from django.conf import settings
+from urllib.parse import urlencode
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from hashlib import sha256
 
-ASTERISK_MANAGER_AUTH = getattr(settings, 'ASTERISK_MANAGER_AUTH', {
+from pid.decorator import pidfile
+from messaging.sms import SmsSubmit, SmsDeliver
+from asterisk import manager as ast_mngr
+
+
+ASTERISK_MANAGER_AUTH = {
     'username': 'admin',
-    'password': 'admin',
+    'password': 'password',
     'host': '127.0.0.1'
-})
+}
+
+API_AUTH_SECRET = 'your api secret'
+SERVER_DOMAIN = 'http://localhost:8000'
 
 outbox_messages = False
+
+
+def calc_hash(data):
+    if type(data) is str:
+        result_data = data.encode('utf-8')
+    else:
+        result_data = bytes(data)
+    return sha256(result_data).hexdigest()
+
+
+def secure_request(data: Dict) -> Optional[AnyStr]:
+    vars_to_hash = [str(v) for v in data.values()]
+    vars_to_hash.sort()
+    vars_to_hash.append(API_AUTH_SECRET)
+    sign = calc_hash('_'.join(vars_to_hash))
+    data.update({'sign': sign})
+    try:
+        with urlopen("%s/dialing/api/sms?%s" % (SERVER_DOMAIN, urlencode(data))) as r:
+            return r.read()
+    except ConnectionRefusedError:
+        print('ERROR: connection refused')
+    except HTTPError as e:
+        print('ERROR:', e)
 
 
 class SMS(object):
@@ -45,7 +72,7 @@ class ChunkedMsg(object):
         self.sms = sms
 
 
-class MyAstManager(asterisk.manager.Manager):
+class MyAstManager(ast_mngr.Manager):
     sms_chunks = list()
 
     def new_chunked_sms(self, count, ref, sms):
@@ -57,11 +84,14 @@ class MyAstManager(asterisk.manager.Manager):
         print('Inbox %s:' % sms.who, sms.text)
         if not isinstance(sms, SMS):
             raise TypeError
-        SMSModel.objects.create(
-            who=sms.who,
-            dev=sms.dev,
-            text=sms.text
-        )
+        response = secure_request({
+            'who': sms.who,
+            'dev': sms.dev,
+            'text': sms.text,
+            'cmd': 'save_sms'
+        })
+        if response is not None:
+            print(response)
 
     def send_sms(self, dev, recipient, utext):
         if not validate_tel(recipient):
@@ -88,13 +118,19 @@ class MyAstManager(asterisk.manager.Manager):
             self.new_chunked_sms(cnt, ref, sms)
 
     def send_from_outbox(self):
-        messages = SMSOut.objects.filter(status='nw')
+        messages = secure_request({'cmd': 'get_new'})
         for msg in messages:
             if self.send_sms(dev='sim_8318999', recipient=msg.dst, utext=msg.text):
-                msg.status = 'st'
+                msg_status = 'st'
             else:
-                msg.status = 'fd'
-            msg.save(update_fields=['status'])
+                msg_status = 'fd'
+            result = secure_request({
+                'cmd': 'update_status',
+                'mid': msg.pk,
+                'status': msg_status
+            })
+            if result is not None:
+                print(result)
 
 
 manager = MyAstManager()
@@ -104,10 +140,10 @@ def validate_tel(tel, reg=re.compile(r'^\+7978\d{7}$')):
     return bool(re.match(reg, tel))
 
 
-def handle_shutdown(event, manager):
-    print("Recieved shutdown event")
-    manager.close()
-    # we could analize the event and reconnect here
+def handle_shutdown(event, mngr):
+    print("Received shutdown event")
+    mngr.close()
+    # we could analyze the event and reconnect here
 
 
 def signal_handler(signum, frame):
@@ -159,11 +195,11 @@ def main():
                 manager.send_from_outbox()
             sleep(5)
 
-    except asterisk.manager.ManagerSocketException as e:
+    except ast_mngr.ManagerSocketException as e:
         print("Error connecting to the manager: ", e)
-    except asterisk.manager.ManagerAuthException as e:
+    except ast_mngr.ManagerAuthException as e:
         print("Error logging in to the manager: ", e)
-    except asterisk.manager.ManagerException as e:
+    except ast_mngr.ManagerException as e:
         print("Error: ", e)
     finally:
         manager.logoff()
