@@ -11,10 +11,13 @@ from django.views.generic import ListView
 from guardian.decorators import permission_required_or_403 as permission_required
 from django.db.models import Q
 from django.conf import settings
+from jsonview.decorators import json_view
 
 from abonapp.models import Abon
-from mydefs import only_admins
-from .models import AsteriskCDR, SMSModel
+from djing.global_base_views import SecureApiView
+from djing import JSONType
+from mydefs import only_admins, safe_int
+from .models import AsteriskCDR, SMSModel, SMSOut
 from .forms import SMSOutForm
 
 
@@ -151,3 +154,54 @@ def send_sms(request):
         'form': frm,
         'path': path
     }, request=request)
+
+
+class SmsManager(SecureApiView):
+    #
+    # Api view for management sms from dongle
+    #
+    http_method_names = ['get']
+
+    @staticmethod
+    def bad_cmd(**kwargs) -> JSONType:
+        return {'text': 'Command is not allowed'}
+
+    @method_decorator(json_view)
+    def get(self, request, *args, **kwargs):
+        cmd = request.GET.get('cmd')
+        data = request.GET.dict()
+        handler = getattr(self, cmd.lower(), self.bad_cmd)
+        del data['cmd']
+        del data['sign']
+        return handler(**data)
+
+    @staticmethod
+    def save_sms(**kwargs) -> JSONType:
+        sms = SMSModel.objects.create(
+            who=kwargs.get('who'),
+            dev=kwargs.get('dev'),
+            text=kwargs.get('text')
+        )
+        return {'status': 'ok', 'sms_id': sms.pk}
+
+    @staticmethod
+    def update_status(**kwargs) -> JSONType:
+        msg_id = safe_int(kwargs.get('mid'))
+        if msg_id != 0:
+            status = kwargs.get('status')
+            update_count = SMSOut.objects.filter(pk=msg_id).update(status=status)
+            return {
+                'text': 'Status updated',
+                'update_count': update_count
+            }
+        return {'text': 'Bad mid parameter'}
+
+    @staticmethod
+    def get_new(**kwargs) -> JSONType:
+        msgs = SMSOut.objects.filter(status='nw').defer('status')
+        res = [{
+            'when': round(m.timestamp),
+            'dst': m.dst,
+            'text': m.text
+        } for m in msgs]
+        return res

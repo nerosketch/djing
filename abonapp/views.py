@@ -28,7 +28,7 @@ from statistics.models import getModel
 from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
-from djing.global_base_views import OrderingMixin, BaseListWithFiltering, HashAuthView, AllowedSubnetMixin
+from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
@@ -1121,7 +1121,7 @@ def search_abon(request):
     return results
 
 
-class DhcpLever(AllowedSubnetMixin, HashAuthView):
+class DhcpLever(SecureApiView):
     #
     # Api view for dhcp event
     #
