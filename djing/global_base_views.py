@@ -79,10 +79,17 @@ class AllowedSubnetMixin(object):
         Return 403 denied otherwise.
         """
         ip = IPAddress(request.META.get('REMOTE_ADDR'))
-        if ip in IPNetwork(API_AUTH_SUBNET):
-            return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
-        else:
-            return HttpResponseForbidden('Access Denied')
+        if type(API_AUTH_SUBNET) is str:
+            if ip in IPNetwork(API_AUTH_SUBNET):
+                return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
+        try:
+            for subnet in API_AUTH_SUBNET:
+                if ip in IPNetwork(subnet):
+                    return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
+        except TypeError:
+            if ip in IPNetwork(str(API_AUTH_SUBNET)):
+                return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden('Access Denied')
 
 
 class OrderingMixin(object):

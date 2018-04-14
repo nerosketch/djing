@@ -52,6 +52,7 @@ ASTERISK_MANAGER_AUTH = {
 API_AUTH_SECRET = 'your api secret'
 
 # Allowed subnet for api
+# Fox example: API_AUTH_SUBNET = ('127.0.0.0/8', '10.0.0.0/8', '192.168.0.0/16')
 API_AUTH_SUBNET = '127.0.0.0/8'
 
 # Company name
