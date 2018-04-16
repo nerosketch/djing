@@ -1,11 +1,11 @@
 ## Сервисы
 &mdash; это скрипты которые, зачастую, оформлены в юниты systemd.
 Сейчас есть такие сервисы:
-* [dhcp_lever](#markdown-header-dhcp_lever)
-* [dialing](#markdown-header-dialing)
-* [telebot](#markdown-header-telebot)
-* [monitoring_agent](#markdown-header-monitoring_agent)
-* [periodic](#markdown-header-periodic)
+* [dhcp_lever](#dhcp_lever)
+* [dialing](#dialing)
+* [telebot](#telebot)
+* [monitoring_agent](#monitoring_agent)
+* [periodic](#periodic)
 
 
 ### dhcp_lever
