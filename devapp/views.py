@@ -644,3 +644,22 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             "}\n"
         ]
         return '\n'.join(i for i in r if i)
+
+
+class DevicesGetListView(global_base_views.SecureApiView):
+    http_method_names = ['get']
+
+    @method_decorator(json_view)
+    def get(self, request, *args, **kwargs):
+        from netaddr import EUI
+        device_type = request.GET.get('type')
+        dev_types = [dt[0] for dt in Device.DEVICE_TYPES]
+        if device_type not in dev_types:
+            devs = Device.objects.all()
+        else:
+            devs = Device.objects.filter(devtype=device_type)
+        res = devs.defer('man_passw', 'group', 'parent_dev').values()
+        for r in res:
+            if isinstance(r['mac_addr'], EUI):
+                r['mac_addr'] = int(r['mac_addr'])
+        return list(res)
