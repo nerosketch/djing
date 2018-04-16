@@ -3,7 +3,7 @@ Description=A job for djing
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 cron.py
+ExecStart=/usr/bin/python3 periodic.py
 WorkingDirectory=/srv/http/djing
 User=http
 Group=http

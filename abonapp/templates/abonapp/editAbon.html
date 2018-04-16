@@ -112,7 +112,13 @@
             {% if perms.abonapp.change_abon %}
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'Select the device' %}</h3>
+                    <h3 class="panel-title">
+                        {% if device %}
+                            {% trans 'Device' %}
+                        {% else %}
+                            {% trans 'Select the device' %}
+                        {% endif %}
+                    </h3>
                 </div>
 
                 <div class="panel-body">
