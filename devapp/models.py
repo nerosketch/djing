@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from djing.fields import MACAddressField
 from .base_intr import DevBase
@@ -8,13 +7,6 @@ from subprocess import run
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from group_app.models import Group
-
-DEVICE_TYPES = (
-    ('Dl', dev_types.DLinkDevice),
-    ('Pn', dev_types.OLTDevice),
-    ('On', dev_types.OnuDevice),
-    ('Ex', dev_types.EltexSwitch)
-)
 
 
 class DeviceDBException(Exception):
@@ -29,6 +21,12 @@ class Device(models.Model):
     ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     comment = models.CharField(_('Comment'), max_length=256)
+    DEVICE_TYPES = (
+        ('Dl', dev_types.DLinkDevice),
+        ('Pn', dev_types.OLTDevice),
+        ('On', dev_types.OnuDevice),
+        ('Ex', dev_types.EltexSwitch)
+    )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
                                choices=MyChoicesAdapter(DEVICE_TYPES))
     man_passw = models.CharField(_('SNMP password'), max_length=16, null=True, blank=True)
@@ -64,7 +62,7 @@ class Device(models.Model):
         return self.status
 
     def get_manager_klass(self):
-        klasses = [kl for kl in DEVICE_TYPES if kl[0] == self.devtype]
+        klasses = [kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype]
         if len(klasses) > 0:
             res = klasses[0][1]
             if issubclass(res, DevBase):
