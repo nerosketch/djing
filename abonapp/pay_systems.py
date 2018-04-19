@@ -30,6 +30,9 @@ def allpay(request):
         pay_amount = safe_float(request.GET.get('PAY_AMOUNT'))
         sign = request.GET.get('SIGN').lower()
 
+        if act <= 0: return bad_ret(-101, 'ACT less than zero')
+        if pay_account == 0: return bad_ret(-40, 'PAY_ACCOUNT is not passed')
+
         # check sign
         md = md5()
         s = '_'.join((str(act), str(pay_account), serv_id or '', pay_id, SECRET))
@@ -37,9 +40,6 @@ def allpay(request):
         our_sign = md.hexdigest()
         if our_sign != sign:
             return bad_ret(-101)
-
-        if act <= 0: return bad_ret(-101, 'ACT less than zero')
-        if pay_account == 0: return bad_ret(-40, 'PAY_ACCOUNT is not passed')
 
         if act == 1:
             abon = Abon.objects.get(username=pay_account)
