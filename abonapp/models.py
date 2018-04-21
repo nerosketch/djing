@@ -263,6 +263,8 @@ class Abon(BaseAccount):
         else:
             return
         abon_tariff = self.active_tariff()
+        if abon_tariff is None:
+            return
         trf = abon_tariff.tariff
         agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
