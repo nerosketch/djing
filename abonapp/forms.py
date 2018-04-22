@@ -58,7 +58,7 @@ class AbonForm(forms.ModelForm):
 
     class Meta:
         model = models.Abon
-        fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active']
+        fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'ip_address']
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),

@@ -268,66 +268,83 @@ def abon_services(request, gid, uname):
     })
 
 
-@login_required
-@mydefs.only_admins
-def abonhome(request, gid, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    group = get_object_or_404(Group, pk=gid)
-    if not request.user.has_perm('group_app.can_view_group', group):
-        raise PermissionDenied
-    frm = None
-    passw = None
-    try:
-        if request.method == 'POST':
-            if not request.user.has_perm('abonapp.change_abon'):
-                raise PermissionDenied
-            frm = forms.AbonForm(request.POST, instance=abon)
-            if frm.is_valid():
-                newip = request.POST.get('ip')
-                if newip:
-                    abon.ip_address = newip
-                abon = frm.save()
-                res = abon.sync_with_nas(created=False)
-                if isinstance(res, Exception):
-                    messages.warning(request, res)
-                messages.success(request, _('edit abon success msg'))
-            else:
-                messages.warning(request, _('fix form errors'))
-        else:
-            passw = models.AbonRawPassword.objects.get(account=abon).passw_text
-            frm = forms.AbonForm(instance=abon, initial={'password': passw})
-            if abon.device is None:
-                messages.warning(request, _('User device was not found'))
-    except mydefs.LogicError as e:
-        messages.error(request, e)
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator(permission_required('abonapp.change_abon'), name='post')
+class AbonHomeUpdateView(UpdateView):
+    model = models.Abon
+    form_class = forms.AbonForm
+    slug_field = 'username'
+    slug_url_kwarg = 'uname'
+    template_name = 'abonapp/editAbon.html'
+    context_object_name = 'abon'
+    group = None
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(AbonHomeUpdateView, self).dispatch(request, *args, **kwargs)
+        except mydefs.LogicError as e:
+            messages.error(request, e)
+        except (NasFailedResult, NasNetworkError) as e:
+            messages.error(request, e)
+        except models.AbonRawPassword.DoesNotExist:
+            messages.warning(request, _('User has not have password, and cannot login'))
+        except mydefs.MultipleException as errs:
+            for err in errs.err_list:
+                messages.error(request, err)
+        return self.render_to_response(self.get_context_data())
+
+    def get_object(self, queryset=None):
+        gid = self.kwargs.get('gid')
+        self.group = get_object_or_404(Group, pk=gid)
+        if not self.request.user.has_perm('group_app.can_view_group', self.group):
+            raise PermissionDenied
+        return super(AbonHomeUpdateView, self).get_object(queryset)
+
+    def form_valid(self, form):
+        r = super(AbonHomeUpdateView, self).form_valid(form)
+        abon = self.object
+        res = abon.sync_with_nas(created=False)
+        if isinstance(res, Exception):
+            messages.warning(self.request, res)
+        messages.success(self.request, _('edit abon success msg'))
+        return r
+
+    def form_invalid(self, form):
+        messages.warning(self.request, _('fix form errors'))
+        return super(AbonHomeUpdateView, self).form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        r = super(AbonHomeUpdateView, self).get(request, *args, **kwargs)
+        abon = self.object
+        if abon.device is None:
+            messages.warning(request, _('User device was not found'))
+        return r
+
+    def get_initial(self):
+        abon = self.object
         passw = models.AbonRawPassword.objects.get(account=abon).passw_text
-        frm = forms.AbonForm(instance=abon, initial={'password': passw})
+        return {
+            'password': passw
+        }
 
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except models.AbonRawPassword.DoesNotExist:
-        messages.warning(request, _('User has not have password, and cannot login'))
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.error(request, err)
-
-    if request.user.has_perm('abonapp.change_abon'):
-        return render(request, 'abonapp/editAbon.html', {
-            'form': frm or forms.AbonForm(instance=abon, initial={'password': passw}),
-            'abon': abon,
-            'group': group,
-            'ip': abon.ip_address,
+    def get_context_data(self, **kwargs):
+        abon = self.object
+        dev = getattr(abon, 'device')
+        context = {
+            'group': self.group,
             'is_bad_ip': getattr(abon, 'is_bad_ip', False),
-            'device': abon.device,
-            'dev_ports': DevPort.objects.filter(device=abon.device) if abon.device else None
-        })
-    else:
-        return render(request, 'abonapp/viewAbon.html', {
-            'abon': abon,
-            'group': group,
-            'ip': abon.ip_address,
-            'passw': passw
-        })
+            'device': dev,
+            'dev_ports': DevPort.objects.filter(device=dev) if dev else None
+        }
+        context.update(kwargs)
+        return super(AbonHomeUpdateView, self).get_context_data(**context)
+
+    def get_success_url(self):
+        abon = self.object
+        return resolve_url('abonapp:abon_home',
+            gid=getattr(abon.group, 'pk', 0),
+            uname=abon.username
+        )
 
 
 @transaction.atomic
