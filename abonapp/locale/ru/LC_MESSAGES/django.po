@@ -876,10 +876,6 @@ msgstr "Нет исполнителей"
 msgid "Tasks not found"
 msgstr "Нет задач"
 
-#: templates/abonapp/viewAbon.html:10
-msgid "View the subscriber"
-msgstr "Просмотр абонента"
-
 #: templates/abonapp/viewAbon.html:24
 msgid "yes,no"
 msgstr "Да,Нет"

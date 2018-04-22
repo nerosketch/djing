@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
@@ -7,6 +6,7 @@ from random import choice
 from string import digits, ascii_lowercase
 from . import models
 from django.conf import settings
+from djing import IP_ADDR_REGEX
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
@@ -55,6 +55,10 @@ class AbonForm(forms.ModelForm):
     password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
         'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
     }))
+
+    ip_address = forms.CharField(widget=forms.TextInput(attrs={
+        'pattern': IP_ADDR_REGEX
+    }), label=_('Ip Address'))
 
     class Meta:
         model = models.Abon

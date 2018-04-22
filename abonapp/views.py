@@ -332,7 +332,6 @@ class AbonHomeUpdateView(UpdateView):
         dev = getattr(abon, 'device')
         context = {
             'group': self.group,
-            'is_bad_ip': getattr(abon, 'is_bad_ip', False),
             'device': dev,
             'dev_ports': DevPort.objects.filter(device=dev) if dev else None
         }
@@ -810,9 +809,9 @@ def save_user_dev_port(request, gid, uname):
                         user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.username)
                         messages.error(request, _(
                             "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
-                                           'user_url': user_url,
-                                           'user_name': other_abon.get_full_name()
-                                       })
+                                'user_url': user_url,
+                                'user_name': other_abon.get_full_name()
+                            })
                         return redirect('abonapp:abon_home', gid, uname)
                 except models.Abon.DoesNotExist:
                     pass
