@@ -53,11 +53,11 @@ class AbonForm(forms.ModelForm):
                                    'placeholder': _('login'),
                                    'required': '',
                                    'pattern': r'^\w{1,127}$'
-                               }))
+                               }), label=_('login'))
 
     password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
-        'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
-    }))
+        'type': 'password', 'autocomplete': 'new-password'
+    }), label=_('Password'))
 
     ip_address = forms.CharField(widget=forms.TextInput(attrs={
         'pattern': IP_ADDR_REGEX

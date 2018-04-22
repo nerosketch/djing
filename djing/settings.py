@@ -184,3 +184,13 @@ API_AUTH_SUBNET = local_settings.API_AUTH_SUBNET
 
 # Company name
 COMPANY_NAME = local_settings.COMPANY_NAME
+
+
+# bootstrap3 settings
+BOOTSTRAP3 = {
+    # Label class to use in horizontal forms
+    'horizontal_label_class': 'col-md-3',
+
+    # Field class to use in horizontal forms
+    'horizontal_field_class': 'col-md-9',
+}
