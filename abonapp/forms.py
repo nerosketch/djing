@@ -36,14 +36,17 @@ def generate_random_password():
 class AbonForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AbonForm, self).__init__(*args, **kwargs)
-        if self.instance is not None and self.instance.group is not None:
-            abon_group_queryset = models.AbonStreet.objects.filter(group=self.instance.group)
+        instance = getattr(self, 'instance')
+        if instance is not None and instance.group is not None:
+            abon_group_queryset = models.AbonStreet.objects.filter(group=instance.group)
         elif 'group' in self.initial.keys() and self.initial['group'] is not None:
             abon_group_queryset = models.AbonStreet.objects.filter(group=self.initial['group'])
         else:
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
+        if instance is not None and instance.is_dynamic_ip:
+            self.fields['ip_address'].widget.attrs['readonly'] = True
 
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
                                widget=forms.TextInput(attrs={
