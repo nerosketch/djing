@@ -1,0 +1,18 @@
+{% load i18n %}
+<form role="form" action="{% url 'abonapp:del_abon' abon.group.pk abon.username %}" method="post">{% csrf_token %}
+    <div class="modal-header warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-earphone"></span>{% trans 'Remove subscriber' %}</h4>
+    </div>
+
+    <div class="modal-body">
+
+        <h4>{% trans 'Are you sure about them?' %}</h4>
+
+        <button type="submit" class="btn btn-danger" value="DELETE">
+            <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+        </button>
+
+    </div>
+
+</form>

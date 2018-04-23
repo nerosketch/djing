@@ -1131,3 +1131,9 @@ msgstr "Успешно сохранено"
 
 msgid "This user can not buy admin services"
 msgstr "Этот пользователь не может назначать административные услуги"
+
+msgid "Remove subscriber"
+msgstr "Удаление абонента"
+
+msgid "Are you sure about them?"
+msgstr "Вы уверены в этом?"

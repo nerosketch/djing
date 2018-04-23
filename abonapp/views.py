@@ -5,11 +5,12 @@ from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, UpdateView, CreateView
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from django.conf import settings
 from jsonview.decorators import json_view
 
@@ -153,29 +154,37 @@ class AbonCreateView(CreateView):
         return super(AbonCreateView, self).form_invalid(form)
 
 
-@login_required
-@mydefs.only_admins
-def del_abon(request):
-    uid = request.GET.get('id')
-    try:
-        abon = get_object_or_404(models.Abon, pk=uid)
-        if not request.user.has_perm('abonapp.delete_abon') or not request.user.has_perm(
-                'group_app.can_view_group', abon.group):
-            raise PermissionDenied
-        gid = abon.group.id
-        abon.delete()
-        abon.sync_with_nas(created=False)
-        messages.success(request, _('delete abon success msg'))
-        return mydefs.res_success(request, resolve_url('abonapp:people_list', gid=gid))
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator(permission_required('abonapp.delete_abon'), name='dispatch')
+class DelAbonDeleteView(DeleteView):
+    model = models.Abon
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
+    success_url = reverse_lazy('abonapp:group_list')
+    context_object_name = 'abon'
 
-    except NasNetworkError as e:
-        messages.error(request, e)
-    except NasFailedResult as e:
-        messages.error(request, _("NAS says: '%s'") % e)
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.error(request, err)
-    return redirect('abonapp:group_list')
+    def get_object(self, queryset=None):
+        abon = super(DelAbonDeleteView, self).get_object(queryset)
+        if not self.request.user.has_perm('group_app.can_view_group', abon.group):
+            raise PermissionDenied
+        return abon
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            abon = self.get_object()
+            gid = abon.group.id
+            abon.delete()
+            abon.sync_with_nas(created=False)
+            messages.success(request, _('delete abon success msg'))
+            return redirect('abonapp:people_list', gid=gid)
+        except NasNetworkError as e:
+            messages.error(self.request, e)
+        except NasFailedResult as e:
+            messages.error(self.request, _("NAS says: '%s'") % e)
+        except mydefs.MultipleException as errs:
+            for err in errs.err_list:
+                messages.error(self.request, err)
+        return HttpResponseRedirect(self.success_url)
 
 
 @login_required
