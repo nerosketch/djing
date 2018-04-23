@@ -61,7 +61,7 @@ class AbonForm(forms.ModelForm):
 
     ip_address = forms.CharField(widget=forms.TextInput(attrs={
         'pattern': IP_ADDR_REGEX
-    }), label=_('Ip Address'))
+    }), label=_('Ip Address'), required=False)
 
     class Meta:
         model = models.Abon
