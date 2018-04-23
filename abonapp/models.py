@@ -136,7 +136,7 @@ class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
-    ip_address = MyGenericIPAddressField(blank=True, null=True)
+    ip_address = MyGenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
@@ -263,17 +263,18 @@ class Abon(BaseAccount):
         else:
             return
         abon_tariff = self.active_tariff()
+        if abon_tariff is None:
+            return
         trf = abon_tariff.tariff
         agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         # check if ip address already busy
         if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
                 pk=self.pk).count() > 0:
-            self.is_bad_ip = True
-            raise LogicError(_('Ip address already exist'))
-        super(Abon, self).save(*args, **kwargs)
+            raise ValidationError({'ip_address': [gettext('Ip address already exist')]})
+        return super(Abon, self).clean()
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()

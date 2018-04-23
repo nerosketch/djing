@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from django import forms
@@ -7,6 +6,7 @@ from random import choice
 from string import digits, ascii_lowercase
 from . import models
 from django.conf import settings
+from djing import IP_ADDR_REGEX
 
 TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
 
@@ -36,29 +36,36 @@ def generate_random_password():
 class AbonForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AbonForm, self).__init__(*args, **kwargs)
-        if self.instance is not None and self.instance.group is not None:
-            abon_group_queryset = models.AbonStreet.objects.filter(group=self.instance.group)
+        instance = getattr(self, 'instance')
+        if instance is not None and instance.group is not None:
+            abon_group_queryset = models.AbonStreet.objects.filter(group=instance.group)
         elif 'group' in self.initial.keys() and self.initial['group'] is not None:
             abon_group_queryset = models.AbonStreet.objects.filter(group=self.initial['group'])
         else:
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
+        if instance is not None and instance.is_dynamic_ip:
+            self.fields['ip_address'].widget.attrs['readonly'] = True
 
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
                                widget=forms.TextInput(attrs={
                                    'placeholder': _('login'),
                                    'required': '',
                                    'pattern': r'^\w{1,127}$'
-                               }))
+                               }), label=_('login'))
 
     password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
-        'class': 'form-control', 'type': 'password', 'autocomplete': 'new-password'
-    }))
+        'type': 'password', 'autocomplete': 'new-password'
+    }), label=_('Password'))
+
+    ip_address = forms.CharField(widget=forms.TextInput(attrs={
+        'pattern': IP_ADDR_REGEX
+    }), label=_('Ip Address'), required=False)
 
     class Meta:
         model = models.Abon
-        fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active']
+        fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'ip_address']
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),

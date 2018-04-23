@@ -172,7 +172,7 @@ DEFAULT_SNMP_PASSWORD = local_settings.DEFAULT_SNMP_PASSWORD
 
 TELEGRAM_BOT_TOKEN = local_settings.TELEGRAM_BOT_TOKEN
 
-TELEPHONE_REGEXP = r'^\+[7,8,9,3]\d{10,11}$'
+TELEPHONE_REGEXP = local_settings.TELEPHONE_REGEXP
 
 ASTERISK_MANAGER_AUTH = local_settings.ASTERISK_MANAGER_AUTH
 
@@ -184,3 +184,13 @@ API_AUTH_SUBNET = local_settings.API_AUTH_SUBNET
 
 # Company name
 COMPANY_NAME = local_settings.COMPANY_NAME
+
+
+# bootstrap3 settings
+BOOTSTRAP3 = {
+    # Label class to use in horizontal forms
+    'horizontal_label_class': 'col-md-3',
+
+    # Field class to use in horizontal forms
+    'horizontal_field_class': 'col-md-9',
+}

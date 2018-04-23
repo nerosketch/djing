@@ -5,7 +5,7 @@ from . import views
 app_name = 'abonapp'
 
 subscriber_patterns = [
-    url(r'^$', views.abonhome, name='abon_home'),
+    url(r'^$', views.AbonHomeUpdateView.as_view(), name='abon_home'),
     url(r'^services/$', views.abon_services, name='abon_services'),
     url(r'^amount/$', views.abonamount, name='abon_amount'),
     url(r'^debts/$', views.DebtsListView.as_view(), name='abon_debts'),

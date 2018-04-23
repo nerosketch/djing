@@ -28,6 +28,7 @@ from statistics.models import getModel
 from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
+from djing import ping
 from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -267,66 +268,82 @@ def abon_services(request, gid, uname):
     })
 
 
-@login_required
-@mydefs.only_admins
-def abonhome(request, gid, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    group = get_object_or_404(Group, pk=gid)
-    if not request.user.has_perm('group_app.can_view_group', group):
-        raise PermissionDenied
-    frm = None
-    passw = None
-    try:
-        if request.method == 'POST':
-            if not request.user.has_perm('abonapp.change_abon'):
-                raise PermissionDenied
-            frm = forms.AbonForm(request.POST, instance=abon)
-            if frm.is_valid():
-                newip = request.POST.get('ip')
-                if newip:
-                    abon.ip_address = newip
-                abon = frm.save()
-                res = abon.sync_with_nas(created=False)
-                if isinstance(res, Exception):
-                    messages.warning(request, res)
-                messages.success(request, _('edit abon success msg'))
-            else:
-                messages.warning(request, _('fix form errors'))
-        else:
-            passw = models.AbonRawPassword.objects.get(account=abon).passw_text
-            frm = forms.AbonForm(instance=abon, initial={'password': passw})
-            if abon.device is None:
-                messages.warning(request, _('User device was not found'))
-    except mydefs.LogicError as e:
-        messages.error(request, e)
+@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator(permission_required('abonapp.change_abon'), name='post')
+class AbonHomeUpdateView(UpdateView):
+    model = models.Abon
+    form_class = forms.AbonForm
+    slug_field = 'username'
+    slug_url_kwarg = 'uname'
+    template_name = 'abonapp/editAbon.html'
+    context_object_name = 'abon'
+    group = None
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(AbonHomeUpdateView, self).dispatch(request, *args, **kwargs)
+        except mydefs.LogicError as e:
+            messages.error(request, e)
+        except (NasFailedResult, NasNetworkError) as e:
+            messages.error(request, e)
+        except models.AbonRawPassword.DoesNotExist:
+            messages.warning(request, _('User has not have password, and cannot login'))
+        except mydefs.MultipleException as errs:
+            for err in errs.err_list:
+                messages.error(request, err)
+        return self.render_to_response(self.get_context_data())
+
+    def get_object(self, queryset=None):
+        gid = self.kwargs.get('gid')
+        self.group = get_object_or_404(Group, pk=gid)
+        if not self.request.user.has_perm('group_app.can_view_group', self.group):
+            raise PermissionDenied
+        return super(AbonHomeUpdateView, self).get_object(queryset)
+
+    def form_valid(self, form):
+        r = super(AbonHomeUpdateView, self).form_valid(form)
+        abon = self.object
+        res = abon.sync_with_nas(created=False)
+        if isinstance(res, Exception):
+            messages.warning(self.request, res)
+        messages.success(self.request, _('edit abon success msg'))
+        return r
+
+    def form_invalid(self, form):
+        messages.warning(self.request, _('fix form errors'))
+        return super(AbonHomeUpdateView, self).form_invalid(form)
+
+    def get(self, request, *args, **kwargs):
+        r = super(AbonHomeUpdateView, self).get(request, *args, **kwargs)
+        abon = self.object
+        if abon.device is None:
+            messages.warning(request, _('User device was not found'))
+        return r
+
+    def get_initial(self):
+        abon = self.object
         passw = models.AbonRawPassword.objects.get(account=abon).passw_text
-        frm = forms.AbonForm(instance=abon, initial={'password': passw})
+        return {
+            'password': passw
+        }
 
-    except (NasFailedResult, NasNetworkError) as e:
-        messages.error(request, e)
-    except models.AbonRawPassword.DoesNotExist:
-        messages.warning(request, _('User has not have password, and cannot login'))
-    except mydefs.MultipleException as errs:
-        for err in errs.err_list:
-            messages.error(request, err)
+    def get_context_data(self, **kwargs):
+        abon = self.object
+        dev = getattr(abon, 'device')
+        context = {
+            'group': self.group,
+            'device': dev,
+            'dev_ports': DevPort.objects.filter(device=dev) if dev else None
+        }
+        context.update(kwargs)
+        return super(AbonHomeUpdateView, self).get_context_data(**context)
 
-    if request.user.has_perm('abonapp.change_abon'):
-        return render(request, 'abonapp/editAbon.html', {
-            'form': frm or forms.AbonForm(instance=abon, initial={'password': passw}),
-            'abon': abon,
-            'group': group,
-            'ip': abon.ip_address,
-            'is_bad_ip': getattr(abon, 'is_bad_ip', False),
-            'device': abon.device,
-            'dev_ports': DevPort.objects.filter(device=abon.device) if abon.device else None
-        })
-    else:
-        return render(request, 'abonapp/viewAbon.html', {
-            'abon': abon,
-            'group': group,
-            'ip': abon.ip_address,
-            'passw': passw
-        })
+    def get_success_url(self):
+        abon = self.object
+        return resolve_url('abonapp:abon_home',
+            gid=getattr(abon.group, 'pk', 0),
+            uname=abon.username
+        )
 
 
 @transaction.atomic
@@ -698,7 +715,7 @@ def abon_ping(request):
         tm = Transmitter()
         ping_result = tm.ping(ip)
         if ping_result is None:
-            if mydefs.ping(ip, 10):
+            if ping(ip, 10):
                 status = True
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok')
         else:
@@ -792,9 +809,9 @@ def save_user_dev_port(request, gid, uname):
                         user_url = resolve_url('abonapp:abon_home', other_abon.group.id, other_abon.username)
                         messages.error(request, _(
                             "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this device") % {
-                                           'user_url': user_url,
-                                           'user_name': other_abon.get_full_name()
-                                       })
+                                'user_url': user_url,
+                                'user_name': other_abon.get_full_name()
+                            })
                         return redirect('abonapp:abon_home', gid, uname)
                 except models.Abon.DoesNotExist:
                     pass
