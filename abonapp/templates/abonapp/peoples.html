@@ -113,7 +113,7 @@
                         </td>
                         <td class="hidden-xs">
                             {% if can_del_abon %}
-                                <a href="{% url 'abonapp:del_abon' %}?id={{ human.pk }}" class="btn btn-danger btn-sm">
+                                <a href="{% url 'abonapp:del_abon' group.pk human.username %}" class="btn btn-danger btn-sm btn-modal">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </a>
                             {% endif %}

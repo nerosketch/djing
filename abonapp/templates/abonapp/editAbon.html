@@ -10,86 +10,99 @@
                     <h3 class="panel-title">{% trans 'Change subscriber' %}</h3>
                 </div>
                 <div class="panel-body">
-                    <form autocomplete="off" class="form-horizontal" action="{% url 'abonapp:abon_home' group.pk abon.username %}" method="post">{% csrf_token %}
 
-                        {% bootstrap_field form.username label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-                        {% bootstrap_field form.fio label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
+                    {% if perms.abonapp.change_abon %}
+                        {% url 'abonapp:abon_home' group.pk abon.username as ahlink %}
+                    {% endif %}
+
+                    <form autocomplete="off" class="form-horizontal" action="{{ ahlink|default:'#' }}" method="post">{% csrf_token %}
+
+                        {% bootstrap_field form.username form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.fio form_group_class='form-group-sm' %}
+
+
+                        {# telephone field #}
+                        {% trans 'Call to' as tx %}
+                        {% bootstrap_button '' button_type='link' icon='earphone' button_class='btn-default' title=tx href='sip:'|add:form.telephone.value size='sm' as btn_call %}
+
+                        {% trans 'Additional telephones' as tx %}
+                        {% url 'abonapp:telephones' group.pk abon.username as url %}
+                        {% bootstrap_button '' button_type='link' icon='list' button_class='btn-default btn-modal' title=tx href=url size='sm' as btn_teleph_list %}
+
+                        {% trans 'Add telephone' as tx %}
+                        {% url 'abonapp:telephone_new' group.pk abon.username as url %}
+                        {% bootstrap_button '' button_type='link' icon='plus' button_class='btn-default btn-modal' title=tx href=url size='sm' as btn_teleph_add %}
+
+                        {% with ''|add:btn_call|add:btn_teleph_list|add:btn_teleph_add as bt %}
+                            {% bootstrap_field form.telephone form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
+                        {% endwith %}
+
+
+                        {# Ip address field #}
+                        {% trans 'Reset ip' as tx %}
+                        {% url 'abonapp:reset_ip' group.pk abon.username as url %}
+                        {% bootstrap_button '' button_type='link' icon='refresh' button_class='btn-default btn-cmd' id='iprefreshbtn' href=url size='sm' title=tx as bt %}
+                        {% bootstrap_field form.ip_address form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
+
+
+                        {% bootstrap_field form.street form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.house form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.is_active form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.group form_group_class='form-group-sm' %}
+
+
+                        {# password field #}
+                        {% bootstrap_button '' button_type='button' icon='eye-open' button_class='btn-default' id='passwdtoggler' size='sm' as bt %}
+                        {% bootstrap_field form.password form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
+
+
+                        <script type="text/javascript">
+                            $(function () {
+                                $("#iprefreshbtn").on('click', function(){
+                                    $("#{{ form.ip_address.id_for_label }}").val('');
+                                });
+                                $('#passwdtoggler').on('mousedown', function(){
+                                    document.getElementById("{{ form.password.id_for_label }}").type='text';
+                                }).on('mouseup', function(){
+                                    document.getElementById("{{ form.password.id_for_label }}").type='password';
+                                });
+                            });
+                        </script>
+
+                        {% bootstrap_field form.description form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
-                            <label for="id_telephone" class="col-sm-4 control-label">{% trans 'Telephone' %}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group input-group-sm">
-                                    {{ form.telephone }}{{ form.telephone.errors }}
-                                    <span class="input-group-btn">
-                                        <a href="sip:{{ form.telephone.value }}" class="btn btn-default" data-toggle="tooltip" title="{% trans 'Call to' %}">
-                                            <span class="glyphicon glyphicon-earphone"></span>
-                                        </a>
-                                        <a href="{% url 'abonapp:telephones' group.pk abon.username %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Additional telephones' %}">
-                                            <span class="glyphicon glyphicon-list"></span>
-                                        </a>
-                                        <a href="{% url 'abonapp:telephone_new' group.pk abon.username %}" class="btn btn-default btn-modal" data-toggle="tooltip" title="{% trans 'Add telephone' %}">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group-sm{% if is_bad_ip %} has-error{% endif %}">
-                            <label for="id_ip" class="col-sm-4 control-label">{% trans 'Ip Address' %}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" value="{{ ip|default:'' }}" class="form-control" name="ip" placeholder="{% trans 'Not assigned' %}" id="ipfield" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"{% if abon.is_dynamic_ip %} disabled{% endif %}/>
-                                    <span class="input-group-btn">
-                                        <a href="{% url 'abonapp:reset_ip' group.pk abon.username %}" class="btn btn-default btn-cmd" data-toggle="tooltip" title="{% trans 'Reset ip' %}" onclick="$('#ipfield').val('');">
-                                            <span class="glyphicon glyphicon-refresh"></span>
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {% bootstrap_field form.street label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-                        {% bootstrap_field form.house label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-                        {% bootstrap_field form.is_active label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-                        {% bootstrap_field form.group label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-
-                        <div class="form-group-sm">
-                            <label for="id_password" class="col-sm-4 control-label">{% trans 'Password' %}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group input-group-sm">
-                                    {{ form.password }}{{ form.password.errors }}
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" onmousedown="document.getElementById('id_password').type='text'" onmouseup="document.getElementById('id_password').type='password'">
-                                            <span class="glyphicon glyphicon-eye-open"></span>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {% bootstrap_field form.description label_class='col-sm-4' field_class='col-sm-8' form_group_class='form-group-sm' %}
-
-                        <div class="form-group-sm">
-                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
+                            <div class="btn-group btn-group-sm">
 
                                 {% trans 'Save' as tx %}
-                                {% bootstrap_button tx button_type='submit' icon='floppy-disk' button_class='btn-primary' %}
+                                {% if perms.abonapp.change_abon %}
+                                    {% bootstrap_button tx button_type='submit' icon='floppy-disk' button_class='btn-primary' %}
+                                {% else %}
+                                    {% bootstrap_button tx button_type='button' icon='floppy-disk' button_class='btn-primary disabled' %}
+                                {% endif %}
 
                                 {% if perms.taskapp.add_task %}
                                     <a href="{% url 'taskapp:add' %}?uid={{ abon.username }}" class="btn btn-success" title="{% trans 'Add new task' %}">
-					                    <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add new task' %}</span>
+					                    <span class="glyphicon glyphicon-plus"></span>
+                                        {% trans 'Add new task' %}
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-success disabled" title="{% trans 'Permission denied' %}">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                        {% trans 'Add new task' %}
                                     </a>
                                 {% endif %}
-                            </div>
-                        </div>
 
-                        <div class="form-group-sm">
-                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                {% if ip and perms.abonapp.can_ping %}
-                                    <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ ip }}">
-                                        <span class="glyphicon glyphicon-flash"></span> Ping
-                                    </a>
+                                {% if form.ip_address.value %}
+                                    {% if perms.abonapp.can_ping %}
+                                        <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ form.ip_address.value }}">
+                                            <span class="glyphicon glyphicon-flash"></span> Ping
+                                        </a>
+                                    {% else %}
+                                        <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
+                                            <span class="glyphicon glyphicon-flash"></span> Ping
+                                        </a>
+                                    {% endif %}
                                 {% else %}
                                     <a href="#" class="btn btn-default disabled">
                                         <span class="glyphicon glyphicon-flash"></span> {% trans 'No have ip' %}
@@ -98,6 +111,10 @@
 
                                 {% if perms.dialing_app.can_send_sms %}
                                     <a href="{% url 'dialapp:send_sms' %}?path={{ request.path|urlencode }}&dst={{ form.telephone.value|urlencode }}" class="btn btn-default btn-modal">
+                                        <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
                                         <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
                                     </a>
                                 {% endif %}

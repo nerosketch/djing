@@ -1,4 +1,5 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load globaltags %}
 {% load i18n %}
 {% block main %}
 
@@ -62,7 +63,7 @@
 
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
-                                <input id="tel" type="tel" pattern="\+[7,8,9,3]\d{10,11}" name="telephone"
+                                <input id="tel" type="tel" pattern="{% global_var 'TELEPHONE_REGEXP' %}" name="telephone"
                                        placeholder="{% trans '+[7,8,9,3] and 10,11 digits' %}" value="{{ newuser.telephone }}"
                                        class="form-control" required>
                             </div>

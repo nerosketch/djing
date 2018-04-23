@@ -25,21 +25,20 @@ def allpay(request):
     try:
         serv_id = request.GET.get('SERVICE_ID')
         act = safe_int(request.GET.get('ACT'))
-        pay_account = safe_int(request.GET.get('PAY_ACCOUNT'))
+        pay_account = request.GET.get('PAY_ACCOUNT')
         pay_id = request.GET.get('PAY_ID')
         pay_amount = safe_float(request.GET.get('PAY_AMOUNT'))
         sign = request.GET.get('SIGN').lower()
 
+        if act <= 0: return bad_ret(-101, 'ACT less than zero')
+
         # check sign
         md = md5()
-        s = '_'.join((str(act), str(pay_account), serv_id or '', pay_id, SECRET))
+        s = '_'.join((str(act), pay_account or '', serv_id or '', pay_id, SECRET))
         md.update(bytes(s, 'utf-8'))
         our_sign = md.hexdigest()
         if our_sign != sign:
             return bad_ret(-101)
-
-        if act <= 0: return bad_ret(-101, 'ACT less than zero')
-        if pay_account == 0: return bad_ret(-40, 'PAY_ACCOUNT is not passed')
 
         if act == 1:
             abon = Abon.objects.get(username=pay_account)
@@ -50,7 +49,7 @@ def allpay(request):
                    "<pay-response>\n" \
                    "  <balance>%.2f</balance>\n" % ballance + \
                    "  <name>%s</name>\n" % fio + \
-                   "  <account>%d</account>\n" % pay_account + \
+                   "  <account>%s</account>\n" % pay_account + \
                    "  <service_id>%s</service_id>\n" % SERV_ID + \
                    "  <min_amount>10.0</min_amount>\n" \
                    "  <max_amount>50000</max_amount>\n" \

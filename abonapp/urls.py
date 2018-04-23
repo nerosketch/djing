@@ -5,7 +5,7 @@ from . import views
 app_name = 'abonapp'
 
 subscriber_patterns = [
-    url(r'^$', views.abonhome, name='abon_home'),
+    url(r'^$', views.AbonHomeUpdateView.as_view(), name='abon_home'),
     url(r'^services/$', views.abon_services, name='abon_services'),
     url(r'^amount/$', views.abonamount, name='abon_amount'),
     url(r'^debts/$', views.DebtsListView.as_view(), name='abon_debts'),
@@ -21,6 +21,7 @@ subscriber_patterns = [
     url(r'^extra_field/edit$', views.extra_field_change, name='extra_field_edit'),
     url(r'^unsubscribe_service(?P<abon_tariff_id>\d+)/$', views.unsubscribe_service, name='unsubscribe_service'),
     url(r'^dev/$', views.dev, name='dev'),
+    url(r'^del$', views.DelAbonDeleteView.as_view(), name='del_abon'),
     url(r'^clear_dev/$', views.clear_dev, name='clear_dev'),
     url(r'^task_log/$', views.TaskLogListView.as_view(), name='task_log'),
     url(r'^user_dev/$', views.save_user_dev_port, name='save_user_dev_port'),
@@ -54,8 +55,6 @@ urlpatterns = [
     url(r'^(?P<gid>\d+)/', include(group_patterns)),
 
     url(r'^log$', views.LogListView.as_view(), name='log'),
-
-    url(r'^del$', views.del_abon, name='del_abon'),
 
     url(r'^pay$', views.terminal_pay, name='terminal_pay'),
 
