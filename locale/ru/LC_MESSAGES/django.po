@@ -107,3 +107,6 @@ msgstr "Звонки"
 #: templates/base.html:85
 msgid "Devices"
 msgstr "Устройства"
+
+msgid "Language"
+msgstr "Язык"

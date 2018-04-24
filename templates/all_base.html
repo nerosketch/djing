@@ -1,5 +1,5 @@
 <!DOCTYPE html>{% load globaltags %}{% load i18n %}
-<html lang="ru_RU">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <title>{% global_var 'COMPANY_NAME' %} - {% trans 'Admin side' %}</title>
     <meta charset="UTF-8">
@@ -50,6 +50,21 @@
                     {% url 'mapapp:home' as map_url %}
                     <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">{% trans 'Map page' %}</a></li>
                 {% endif %}
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Language' %} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+
+                        {% url 'set_language' as set_language_url %}
+                        {% for lang in LANGUAGES %}
+                        <li><a href="#" id="langfrm_{{ lang.0 }}" onclick="document.setLang{{ lang.0 }}.submit();">{{ lang.1 }}</a></li>
+                        <form name="setLang{{ lang.0}}" action="{{ set_language_url }}" method="POST" class="hidden">{% csrf_token %}
+                            <input type="hidden" name="language" value="{{ lang.0 }}">
+                        </form>
+                        {% endfor %}
+
+                    </ul>
+                </li>
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
