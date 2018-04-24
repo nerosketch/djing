@@ -295,8 +295,6 @@ class AbonHomeUpdateView(UpdateView):
             messages.error(request, e)
         except (NasFailedResult, NasNetworkError) as e:
             messages.error(request, e)
-        except models.AbonRawPassword.DoesNotExist:
-            messages.warning(request, _('User has not have password, and cannot login'))
         except mydefs.MultipleException as errs:
             for err in errs.err_list:
                 messages.error(request, err)
@@ -331,10 +329,16 @@ class AbonHomeUpdateView(UpdateView):
 
     def get_initial(self):
         abon = self.object
-        passw = models.AbonRawPassword.objects.get(account=abon).passw_text
-        return {
-            'password': passw
-        }
+        if self.initial:
+            return self.initial
+        try:
+            passw = models.AbonRawPassword.objects.get(account=abon).passw_text
+            return {
+                'password': passw
+            }
+        except models.AbonRawPassword.DoesNotExist:
+            messages.warning(self.request, _('User has not have password, and cannot login'))
+        return {'password': ''}
 
     def get_context_data(self, **kwargs):
         abon = self.object
