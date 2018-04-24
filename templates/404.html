@@ -1,16 +1,17 @@
+{% load i18n %}
 {% if request.is_ajax %}
     {% if exception %}
         {{ exception }}
     {% else %}
-        <h4>Страница не найдена</h4>
-        <p>Такого пути '{{ request_path }}' нет на сервере</p>
+        <h4>{% trans 'Page does not exist' %}</h4>
+        <p>{% blocktrans with pth=request_path %}The page '{{ pth }}' was not found{% endblocktrans %}</p>
     {% endif %}
 {% else %}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head lang="ru">
     <meta charset="UTF-8">
-    <title>Страница не найдена</title>
+    <title>{% trans 'Page does not exist' %}</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="shortcut icon" href="/static/img/favicon_m.ico">
@@ -44,14 +45,14 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <div align="center"><h1>404 - Страница не найдена</h1></div>
+            <div align="center"><h1>404 - {% trans 'Page does not exist' %}</h1></div>
             <div align="center">
                 {% if exception %}
                     {{ exception }}
                 {% else %}
-                    <p>Такого пути '{{ request_path }}' нет на сервере</p>
+                    <p>{% blocktrans with pth=request_path %}The page '{{ pth }}' was not found{% endblocktrans %}</p>
                 {% endif %}
-                <a href="/accounts/">На главную</a>
+                <a href="/accounts/">{% trans 'To main' %}</a>
             </div>
         </div>
     </div>

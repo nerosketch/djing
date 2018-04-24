@@ -5,10 +5,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-03 00:12+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-04-24 23:27+0300\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,159 +15,168 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: models.py:7
+#: mapapp/models.py:7
 msgid "Map point title"
 msgstr "Название точки"
 
-#: models.py:8
+#: mapapp/models.py:8 mapapp/templates/maps/options.html:20
 msgid "Latitude"
 msgstr "Широта"
 
-#: models.py:9 templates/maps/options.html.py:18
+#: mapapp/models.py:9 mapapp/templates/maps/options.html:19
 msgid "Longitude"
 msgstr "Долгота"
 
-#: models.py:10 templates/maps/dot.html.py:63
+#: mapapp/models.py:10 mapapp/templates/maps/dot.html:64
 msgid "Devices"
 msgstr "Устройства"
 
-#: models.py:11
+#: mapapp/models.py:11
 msgid "Attachment"
 msgstr "Приложение"
 
-#: models.py:15
+#: mapapp/models.py:15 mapapp/templates/maps/dot.html:27
+#: mapapp/templates/maps/options.html:13
 msgid "Map point"
 msgstr "Геоточка"
 
-#: models.py:16
+#: mapapp/models.py:16
 msgid "Map points"
 msgstr "Геоточки"
 
-#: models.py:18
+#: mapapp/models.py:18
 msgid "Can view"
 msgstr "Может просматривать"
 
-#: templates/maps/add_device.html:8 templates/maps/dot.html.py:8
-#: templates/maps/options.html:7
+#: mapapp/templates/maps/add_device.html:8 mapapp/templates/maps/dot.html:9
+#: mapapp/templates/maps/options.html:7
 msgid "Map settings"
 msgstr "Настройки карты"
 
-#: templates/maps/add_device.html:10
+#: mapapp/templates/maps/add_device.html:10
 msgid "Add devices"
 msgstr "Добавить устройства"
 
-#: templates/maps/add_device.html:24
+#: mapapp/templates/maps/add_device.html:24
 msgid "Pick the group"
 msgstr "Выбрать группу"
 
-#: templates/maps/add_device.html:55
+#: mapapp/templates/maps/add_device.html:55
 msgid "Select the devices"
 msgstr "Выбрать устройства"
 
-#: templates/maps/add_device.html:62 templates/maps/dot.html.py:49
-#: templates/maps/modal_add_device.html:15 templates/maps/modal_add_dot.html:25
+#: mapapp/templates/maps/add_device.html:62 mapapp/templates/maps/dot.html:50
+#: mapapp/templates/maps/modal_add_device.html:15
+#: mapapp/templates/maps/modal_add_dot.html:25
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/maps/dot.html:13
+#: mapapp/templates/maps/dot.html:14
 msgid "Add new point"
 msgstr "Добавить новую точку"
 
-#: templates/maps/dot.html:52
+#: mapapp/templates/maps/dot.html:53
 msgid "Reset"
 msgstr "Сбросить"
 
-#: templates/maps/dot.html:83
+#: mapapp/templates/maps/dot.html:84
 msgid "User group has no attached"
 msgstr "Группа абонентов не привязана"
 
-#: templates/maps/dot.html:89
+#: mapapp/templates/maps/dot.html:90
 msgid "Devices not found"
 msgstr "Устройства не найдены"
 
-#: templates/maps/dot.html:94
+#: mapapp/templates/maps/dot.html:95
 msgid "Add"
 msgstr "Добавить"
 
-#: templates/maps/map_tooltip.html:15
+#: mapapp/templates/maps/map_tooltip.html:15
 msgid "Pinned devices not found"
 msgstr "Привязанные устройства не найдены"
 
-#: templates/maps/modal_add_device.html:5
+#: mapapp/templates/maps/modal_add_device.html:5
 msgid "Add device"
 msgstr "Добавить устройство"
 
-#: templates/maps/modal_add_device.html:17
+#: mapapp/templates/maps/modal_add_device.html:17
 msgid "Close"
 msgstr "Закрыть"
 
-#: templates/maps/modal_add_dot.html:6
+#: mapapp/templates/maps/modal_add_dot.html:6
 msgid "Add point"
 msgstr "Добавить точку"
 
-#: templates/maps/modal_add_dot.html:9
+#: mapapp/templates/maps/modal_add_dot.html:9
 #, python-format
 msgid "Coords: %(coords)s"
 msgstr "Координаты %(coords)s"
 
-#: templates/maps/options.html:17
+#: mapapp/templates/maps/options.html:18
 msgid "Title"
 msgstr "Название"
 
-#: templates/maps/options.html:32
+#: mapapp/templates/maps/options.html:34
 msgid "Edit"
 msgstr "Изменить"
 
-#: templates/maps/options.html:39
+#: mapapp/templates/maps/options.html:41
 msgid "Delete"
 msgstr "Удалить"
 
-#: templates/maps/options.html:49
+#: mapapp/templates/maps/options.html:53
 msgid "You have not created map points yet"
 msgstr "Вы ещё не создали ни одной геоточки"
 
-#: templates/maps/options.html:49
+#: mapapp/templates/maps/options.html:54
 msgid "Create"
 msgstr "Создать"
 
-#: templates/maps/preload_devices_tmpl.html:7
+#: mapapp/templates/maps/preload_devices_tmpl.html:7
 msgid "no devices found"
 msgstr "нет усройств"
 
-#: templates/maps/ya_index.html:11
+#: mapapp/templates/maps/ya_index.html:31
 msgid "Loading.."
 msgstr "Загрузка.."
 
-#: templates/maps/ya_index.html:144
+#: mapapp/templates/maps/ya_index.html:46
+msgid "Please allow popups for this website"
+msgstr "Разрешите сайту открывать всплывающие окна"
+
+#: mapapp/templates/maps/ya_index.html:224
 msgid "Layers"
 msgstr "Слои"
 
-#: templates/maps/ya_index.html:153
+#: mapapp/templates/maps/ya_index.html:225
+msgid "Help"
+msgstr "Справка"
+
+#: mapapp/templates/maps/ya_index.html:236
 msgid "Show all"
 msgstr "Показать всё"
 
-#: views.py:53
+#: mapapp/templates/maps/ya_index.html:239
+msgid "Update states"
+msgstr "Обновить состояния"
+
+#: mapapp/views.py:69
 msgid "Map point has been saved"
 msgstr "Геоточка сохранена"
 
-#: views.py:56 views.py:111
+#: mapapp/views.py:72 mapapp/views.py:154
 msgid "fix form errors"
 msgstr "исправте ошибки формы"
 
-#: views.py:66 views.py:79
+#: mapapp/views.py:82 mapapp/views.py:95
 msgid "Map point does not exist"
 msgstr "Геоточка не найдена"
 
-#: views.py:77
+#: mapapp/views.py:93
 #, python-format
 msgid "Map point '%(title)s' has been deleted"
 msgstr "Геоточка '%(title)s' была удалена"
 
-msgid "Please allow popups for this website"
-msgstr "Разрешите сайту открывать всплывающие окна"
-
-msgid "Help"
-msgstr "Справка"
-
-msgid "Update states"
-msgstr "Обновить состояния"
+#: mapapp/views.py:251
+msgid "Devices is not found on the dot"
+msgstr "На точке не найдены устройства"

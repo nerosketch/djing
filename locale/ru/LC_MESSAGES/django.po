@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-26 02:06+0300\n"
+"POT-Creation-Date: 2018-04-24 23:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -17,14 +17,6 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
-
-#: djing/formfields.py:13
-msgid "Enter a valid integer."
-msgstr "Введите число"
-
-#: djing/formfields.py:22
-msgid "Enter a valid MAC Address."
-msgstr "Введите мак адрес"
 
 #: templates/403.html:5
 msgid "Permission denied"
@@ -42,6 +34,43 @@ msgstr "У вас нет прав просматривать эту страни
 #: templates/403_for_modal.html:11
 msgid "Close"
 msgstr "Закрыть"
+
+#: templates/404.html:6 templates/404.html:14 templates/404.html:48
+msgid "Page does not exist"
+msgstr "Страница не найдена"
+
+#: templates/404.html:7 templates/404.html:53
+#, python-format
+msgid "The page '%(pth)s' was not found"
+msgstr "Страница по адресу '%(pth)s' не найдена"
+
+#: templates/404.html:55
+msgid "To main"
+msgstr "На главную"
+
+#: templates/all_base.html:4
+msgid "Admin side"
+msgstr "Админка"
+
+#: templates/all_base.html:47
+msgid "Main page"
+msgstr "Главная"
+
+#: templates/all_base.html:51
+msgid "Map page"
+msgstr "Карта"
+
+#: templates/all_base.html:55
+msgid "Other"
+msgstr "Другое"
+
+#: templates/all_base.html:57
+msgid "Settings"
+msgstr "Настройки"
+
+#: templates/all_base.html:58
+msgid "Exit"
+msgstr "Выйти"
 
 #: templates/base.html:28
 msgid "Administrators"
@@ -71,9 +100,10 @@ msgstr "Настройки карты"
 msgid "Messages"
 msgstr "Сообщения"
 
+#: templates/base.html:78
+msgid "Dialing"
+msgstr "Звонки"
+
 #: templates/base.html:85
 msgid "Devices"
-msgstr "Устрофства"
-
-#~ msgid "Service '%(service_name)s' has expired"
-#~ msgstr "Срок действия услуги '%(service_name)s' истёк"
+msgstr "Устройства"

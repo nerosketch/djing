@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-15 13:44+0300\n"
+"POT-Creation-Date: 2018-04-24 23:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
-"Language: \n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,119 +19,193 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: tariff_app/templates/tariff_app/modal_del_warning.html:23
-msgid "Delete"
-msgstr "Удалить"
-
-#: tariff_app/templates/tariff_app/modal_del_warning.html:26
-msgid "Reset"
-msgstr "Сбросить"
-
-msgid "Tarifs"
-msgstr "Тарифы"
-
-msgid "Add"
-msgstr "Добавить"
-
-msgid "Edit"
-msgstr "Редактировать"
-
-msgid "Create"
-msgstr "Создать"
-
-msgid "tariff"
-msgstr "тариф"
-
-msgid "Service title"
-msgstr "Название тарифа"
-
-msgid "Service description"
-msgstr "Описание тарифа"
-
-msgid "Speed In"
-msgstr "Входящая скорость"
-
-msgid "Speed Out"
-msgstr "Исходящая скорость"
-
-msgid "Price"
-msgstr "Стоимость"
-
-msgid "Script"
-msgstr "Скрипт"
-
-msgid "Tech service"
-msgstr "Административный тариф"
-
-msgid "Save"
-msgstr "Сохранить"
-
-msgid "Service list"
-msgstr "Список тарифов"
-
-msgid "Services does not exist yet"
-msgstr "Ещё нет созданных тарифов"
-
+#: tariff_app/custom_tariffs.py:49
 msgid "Base calculate functionality"
 msgstr "Базовый расчётный функционал"
 
+#: tariff_app/custom_tariffs.py:75
 msgid "Private service"
 msgstr "Для внутреннего пользования"
 
-msgid "Service has been saved"
-msgstr "Тариф успешно сохранён"
-
-msgid "Some fields were filled incorrect, please try again"
-msgstr "Не все поля заполнены правильно, проверте и попробуйте ещё раз"
-
-msgid "Service has been deleted"
-msgstr "Тарифный план успешно удалён"
-
-msgid "Not have a confirmations of delete"
-msgstr "Нет подтверждения удаления"
-
-msgid "Delete service"
-msgstr "Удалить тарифный план"
-
-msgid "Attention"
-msgstr "Внимание"
-
-msgid ""
-"after delete the tariff, subscribers who use that tariff will be disconnected from it."
-msgstr ""
-"После того как вы удалите тарифный план то абоненты, подписанные на него, сразу потеряют услугу по этому тарифу. "
-"Так что сначала убедитесь что уже никто не пользуется тарифом, и только после этого удалите его."
-
-msgid "Services"
-msgstr "Тарифы"
-
-msgid "Periodic pays"
-msgstr "Периодические платежи"
-
-msgid "Periodic pay name"
-msgstr "Название"
-
-msgid "When pay created"
-msgstr "Когда создан"
-
-msgid "Script type for calculations"
-msgstr "Алгоритм расчёта"
-
-msgid "Total amount"
-msgstr "Стоимость"
-
-msgid "Pay details"
-msgstr "Подробности платежа"
-
+#: tariff_app/custom_tariffs.py:96
 msgid "Default periodic pay"
 msgstr "Логика по умолчанию"
 
+#: tariff_app/custom_tariffs.py:109
 msgid "Custom periodic pay"
 msgstr "Пробная логика"
 
-msgid "Add new periodic pay"
-msgstr "Добавить периодический платёж"
+#: tariff_app/models.py:18
+msgid "Service title"
+msgstr "Название тарифа"
 
+#: tariff_app/models.py:19
+msgid "Service description"
+msgstr "Описание тарифа"
+
+#: tariff_app/models.py:20 tariff_app/templates/tariff_app/tarifs.html:17
+msgid "Speed In"
+msgstr "Входящая скорость"
+
+#: tariff_app/models.py:21 tariff_app/templates/tariff_app/tarifs.html:23
+msgid "Speed Out"
+msgstr "Исходящая скорость"
+
+#: tariff_app/models.py:22 tariff_app/templates/tariff_app/tarifs.html:29
+msgid "Price"
+msgstr "Стоимость"
+
+#: tariff_app/models.py:23 tariff_app/templates/tariff_app/tarifs.html:33
+msgid "Script"
+msgstr "Скрипт"
+
+#: tariff_app/models.py:25
+msgid "Tech service"
+msgstr "Административный тариф"
+
+#: tariff_app/models.py:55
 msgid "Service"
 msgstr "Услуга"
 
+#: tariff_app/models.py:56 tariff_app/templates/tariff_app/ext.html:7
+#: tariff_app/templates/tariff_app/ext.html:17
+#: tariff_app/templates/tariff_app/periodic_pays/add_edit.html:8
+msgid "Services"
+msgstr "Тарифы"
+
+#: tariff_app/models.py:60
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:9
+msgid "Periodic pay name"
+msgstr "Название"
+
+#: tariff_app/models.py:61
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:10
+msgid "When pay created"
+msgstr "Когда создан"
+
+#: tariff_app/models.py:62
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:11
+msgid "Script type for calculations"
+msgstr "Алгоритм расчёта"
+
+#: tariff_app/models.py:64
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:12
+msgid "Total amount"
+msgstr "Стоимость"
+
+#: tariff_app/models.py:103
+msgid "Can view periodic pay"
+msgstr "Может смотреть периодические платежи"
+
+#: tariff_app/models.py:105
+msgid "Periodic pay"
+msgstr "Периодический платёж"
+
+#: tariff_app/models.py:106 tariff_app/templates/tariff_app/ext.html:24
+msgid "Periodic pays"
+msgstr "Периодические платежи"
+
+#: tariff_app/templates/tariff_app/editTarif.html:8
+msgid "Tarifs"
+msgstr "Тарифы"
+
+#: tariff_app/templates/tariff_app/editTarif.html:11
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:50
+#: tariff_app/templates/tariff_app/tarifs.html:77
+msgid "Add"
+msgstr "Добавить"
+
+#: tariff_app/templates/tariff_app/editTarif.html:13
+#: tariff_app/templates/tariff_app/editTarif.html:22
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:17
+msgid "Edit"
+msgstr "Редактировать"
+
+#: tariff_app/templates/tariff_app/editTarif.html:22
+#: tariff_app/templates/tariff_app/tarifs.html:64
+msgid "Create"
+msgstr "Создать"
+
+#: tariff_app/templates/tariff_app/editTarif.html:22
+#: tariff_app/templates/tariff_app/tarifs.html:11
+msgid "tariff"
+msgstr "тариф"
+
+#: tariff_app/templates/tariff_app/editTarif.html:49
+#: tariff_app/templates/tariff_app/periodic_pays/add_edit.html:44
+msgid "Save"
+msgstr "Сохранить"
+
+#: tariff_app/templates/tariff_app/editTarif.html:52
+#: tariff_app/templates/tariff_app/modal_del_warning.html:25
+msgid "Reset"
+msgstr "Сбросить"
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:6
+msgid "Delete service"
+msgstr "Удалить тарифный план"
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:13
+msgid "Attention"
+msgstr "Внимание"
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:14
+msgid ""
+"after delete the tariff, subscribers who use that tariff will be "
+"disconnected from it."
+msgstr ""
+"После того как вы удалите тарифный план то абоненты, подписанные на него, "
+"сразу потеряют услугу по этому тарифу. Так что сначала убедитесь что уже "
+"никто не пользуется тарифом, и только после этого удалите его."
+
+#: tariff_app/templates/tariff_app/modal_del_warning.html:22
+msgid "Delete"
+msgstr "Удалить"
+
+#: tariff_app/templates/tariff_app/periodic_pays/add_edit.html:10
+msgid "Change periodic pay"
+msgstr "Может редактировать периодический платёж"
+
+#: tariff_app/templates/tariff_app/periodic_pays/add_edit.html:12
+msgid "Add new periodic pay"
+msgstr "Добавить периодический платёж"
+
+#: tariff_app/templates/tariff_app/periodic_pays/add_edit.html:29
+msgid "Pay details"
+msgstr "Подробности платежа"
+
+#: tariff_app/templates/tariff_app/periodic_pays/list.html:39
+msgid "The list is empty"
+msgstr "Список пуст"
+
+#: tariff_app/templates/tariff_app/tarifs.html:50
+msgid "currency"
+msgstr "руб."
+
+#: tariff_app/templates/tariff_app/tarifs.html:62
+msgid "Services does not exist yet"
+msgstr "Ещё нет созданных тарифов"
+
+#: tariff_app/views.py:51
+msgid "Service has been saved"
+msgstr "Тариф успешно сохранён"
+
+#: tariff_app/views.py:54 tariff_app/views.py:106
+msgid "Some fields were filled incorrect, please try again"
+msgstr "Не все поля заполнены правильно, проверте и попробуйте ещё раз"
+
+#: tariff_app/views.py:70
+msgid "Service has been deleted"
+msgstr "Тарифный план успешно удалён"
+
+#: tariff_app/views.py:72
+msgid "Not have a confirmations of delete"
+msgstr "Нет подтверждения удаления"
+
+#: tariff_app/views.py:100
+msgid "New periodic pay successfully created"
+msgstr "Новый периодический платёж создан"
+
+#: tariff_app/views.py:102
+msgid "Periodic pay has been changed"
+msgstr "Периодический платёж изменён"

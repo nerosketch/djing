@@ -6,6 +6,8 @@ try:
 except ImportError:
     raise ImportError("You must create config file local_settings.py from template")
 
+from django.utils.translation import gettext_lazy as _
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from django.urls import reverse_lazy
@@ -124,6 +126,17 @@ SESSION_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'ru-RU'
+
+LANGUAGES = [
+    ('ru', _('Russian')),
+    ('en', _('English')),
+]
+
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+LOCALE_PATHS = (
+    os.path.join(PROJECT_PATH, '../locale'),
+)
 
 TIME_ZONE = 'Europe/Simferopol'
 

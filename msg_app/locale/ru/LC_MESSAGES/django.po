@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-04 17:52+0300\n"
+"POT-Creation-Date: 2018-04-24 23:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -19,146 +19,148 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: forms.py:25
+#: msg_app/forms.py:26
 msgid "you must choose at least 1 participants"
 msgstr "вы должны выбрать как минимум одного участника"
 
-#: models.py:14 templates/msg_app/conversations.html.py:54
+#: msg_app/models.py:16 msg_app/templates/msg_app/conversations.html:55
 msgid "New"
 msgstr "Новая"
 
-#: models.py:15
+#: msg_app/models.py:17
 msgid "Seen"
 msgstr "Просмотренное"
 
-#: models.py:16
+#: msg_app/models.py:18
 msgid "Deleted"
 msgstr "Удалённое"
 
-#: models.py:28
+#: msg_app/models.py:30
 msgid "Message status"
 msgstr "Статус сообщения"
 
-#: models.py:29
+#: msg_app/models.py:31
 msgid "Messages statuses"
 msgstr "Статусы сообщений"
 
-#: models.py:33
+#: msg_app/models.py:35
 msgid "Body"
 msgstr "Тело"
 
-#: models.py:34
+#: msg_app/models.py:36
 msgid "sent at"
 msgstr "отправлено"
 
-#: models.py:36 models.py:234
+#: msg_app/models.py:38 msg_app/models.py:241
 msgid "Conversation"
 msgstr "Беседа"
 
-#: models.py:66
+#: msg_app/models.py:68 msg_app/views.py:90
 msgid "Message"
 msgstr "Сообщение"
 
-#: models.py:67
+#: msg_app/models.py:69
 msgid "Messages"
 msgstr "Сообщения"
 
-#: models.py:69
+#: msg_app/models.py:71
 msgid "Can view messages"
 msgstr "может просматривать сообщения"
 
-#: models.py:77
+#: msg_app/models.py:79
 msgid "Admin"
 msgstr "Админ"
 
-#: models.py:78
+#: msg_app/models.py:80
 msgid "Guest"
 msgstr "Гость"
 
-#: models.py:79
+#: msg_app/models.py:81
 msgid "Banned user"
 msgstr "Запрещённый пользователь"
 
-#: models.py:80
+#: msg_app/models.py:82
 msgid "Inviter"
 msgstr "Создатель"
 
-#: models.py:90
+#: msg_app/models.py:93
 msgid "Conversation membership"
 msgstr "Членство в беседе"
 
-#: models.py:91
+#: msg_app/models.py:94
 msgid "Conversation memberships"
 msgstr "Членства в беседах"
 
-#: models.py:100
+#: msg_app/models.py:103
 msgid "Participant profile does not found"
 msgstr "Учётная запись участника не найдена"
 
-#: models.py:110
+#: msg_app/models.py:112
 msgid "No name"
 msgstr "Без имени"
 
-#: models.py:235 templates/msg_app/conversations.html.py:14
+#: msg_app/models.py:242 msg_app/templates/msg_app/conversations.html:14
 msgid "Conversations"
 msgstr "Беседы"
 
-#: models.py:237
+#: msg_app/models.py:244
 msgid "Can view conversation"
 msgstr "Может просматривать беседы"
 
-#: templates/msg_app/chat.html:7 templates/msg_app/conversations.html.py:7
+#: msg_app/templates/msg_app/chat.html:7
+#: msg_app/templates/msg_app/conversations.html:7
 msgid "Private messages"
 msgstr "Личные сообщения"
 
-#: templates/msg_app/chat.html:16
+#: msg_app/templates/msg_app/chat.html:16
 msgid "peoples"
 msgstr "участников"
 
-#: templates/msg_app/chat.html:26
+#: msg_app/templates/msg_app/chat.html:26
 msgid "Delete"
 msgstr "Удалить"
 
-#: templates/msg_app/chat.html:58
+#: msg_app/templates/msg_app/chat.html:58
 msgid "Message history is empty"
 msgstr "История сообщений пуста"
 
-#: templates/msg_app/chat.html:75
+#: msg_app/templates/msg_app/chat.html:75
 msgid "Send"
 msgstr "Отправить"
 
-#: templates/msg_app/conversations.html:32
+#: msg_app/templates/msg_app/conversations.html:15
+msgid "Enter to conversation by clicking to it"
+msgstr "Войдите в беседу кликнув по ней"
+
+#: msg_app/templates/msg_app/conversations.html:33
 #, python-format
 msgid "%(participants_count)s participants, %(msg_count)s messages"
 msgstr "%(participants_count)s участников, %(msg_count)s сообщений"
 
-#: templates/msg_app/conversations.html:38
+#: msg_app/templates/msg_app/conversations.html:39
 msgid "No messages found"
 msgstr "Сообщения не найдены"
 
-#: templates/msg_app/conversations.html:47
+#: msg_app/templates/msg_app/conversations.html:48
 msgid "Any conversations not found"
 msgstr "Не найдено ни одной беседы"
 
-#: templates/msg_app/modal_new_conversation.html:5
+#: msg_app/templates/msg_app/modal_new_conversation.html:5
 msgid "Create conversation"
 msgstr "Создать беседу"
 
-#: templates/msg_app/modal_new_conversation.html:19
+#: msg_app/templates/msg_app/modal_new_conversation.html:19
 msgid "for select multiple press ctrl and click on field"
 msgstr "Для выбора нескольких вариантов зажмите ctrl и кликните нужный вариант"
 
-#: templates/msg_app/modal_new_conversation.html:28
+#: msg_app/templates/msg_app/modal_new_conversation.html:28
 msgid "Add"
 msgstr "Добавить"
 
-#: views.py:26
+#: msg_app/views.py:35
 msgid "Conversation has been created"
 msgstr "Беседа создана"
 
-#: views.py:29 views.py:48
+#: msg_app/views.py:38 msg_app/views.py:57
 msgid "fix form errors"
 msgstr "заполните все поля в соответствии с их форматом"
-
-msgid "Enter to conversation by clicking to it"
-msgstr "Войдите в беседу кликнув по ней"

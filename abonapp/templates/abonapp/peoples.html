@@ -57,7 +57,7 @@
                         <th class="col-xs-2">{% trans 'Service' %}</th>
                         <th class="hidden-xs col-sm-1">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_replace request order_by='ballance' dir=dir|default:'down' %}">
-                                {% trans 'Ballance' %}
+                                {% trans 'Balance' %}
                             </a>
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>

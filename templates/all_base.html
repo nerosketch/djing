@@ -1,7 +1,7 @@
-<!DOCTYPE html>{% load globaltags %}
+<!DOCTYPE html>{% load globaltags %}{% load i18n %}
 <html lang="ru_RU">
 <head>
-    <title>{% global_var 'COMPANY_NAME' %} - Админка</title>
+    <title>{% global_var 'COMPANY_NAME' %} - {% trans 'Admin side' %}</title>
     <meta charset="UTF-8">
     <!--[if lt IE 9]><meta http-equiv="refresh" content="0;URL=/static/bad_ie.html" /><![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,8 @@
     <script src="/static/js/all.min.js"></script>
     <script src="/static/js/my.js"></script>
     <link rel="shortcut icon" href="/static/img/favicon_m.ico">
-    <meta name="author" content="Дмитрий Новиков">
+    <meta name="author" content="Dmitry Novikov">
+    <meta name="contact" content="nerosketch@gmail.com">
 </head>
 <body>
 
@@ -43,20 +44,18 @@
             <ul class="nav navbar-nav">
 
                 {% url 'acc_app:other_profile' request.user.id as home_url %}
-                <li{% if home_url == request.path %} class="active"{% endif %}><a href="{{ home_url }}">Главная</a></li>
+                <li{% if home_url == request.path %} class="active"{% endif %}><a href="{{ home_url }}">{% trans 'Main page' %}</a></li>
 
                 {% if request.user.is_superuser %}
                     {% url 'mapapp:home' as map_url %}
-                    <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">Карта</a></li>
+                    <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">{% trans 'Map page' %}</a></li>
                 {% endif %}
 
-                <!--<li><a href="{ % url 'statistics:home' %}" target="_blank">График траффика</a></li>--->
-
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Другое <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'acc_app:profile' %}"><span class="glyphicon glyphicon-wrench"></span> Настройки</a></li>
-                        <li><a href="{% url 'acc_app:logout' %}"><span class="glyphicon glyphicon-log-out"></span> Выйти</a></li>
+                        <li><a href="{% url 'acc_app:profile' %}"><span class="glyphicon glyphicon-wrench"></span> {% trans 'Settings' %}</a></li>
+                        <li><a href="{% url 'acc_app:logout' %}"><span class="glyphicon glyphicon-log-out"></span> {% trans 'Exit' %}</a></li>
                     </ul>
                 </li>
             </ul>

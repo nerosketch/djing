@@ -168,7 +168,7 @@ class ExportUsersForm(forms.Form):
         ('is_active', _('Is active')),
         ('telephone', _('Telephone')),
         ('current_tariff__tariff__title', _('Service title')),
-        ('ballance', _('Ballance')),
+        ('ballance', _('Balance')),
         ('device__comment', _('Device')),
         ('dev_port__descr', _('Device port')),
         ('is_dynamic_ip', _('Is dynamic ip'))

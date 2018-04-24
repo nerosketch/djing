@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-09 11:15+0300\n"
+"POT-Creation-Date: 2018-04-24 23:27+0300\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -17,28 +17,30 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: templates/searchapp/index.html:8
+#: searchapp/templates/searchapp/index.html:8
 #, python-format
 msgid "Search by %(searchstring)s"
 msgstr "Поиск по %(searchstring)s"
 
-#: templates/searchapp/index.html:16
+#: searchapp/templates/searchapp/index.html:16
 msgid "Change search string there"
 msgstr "Измените строку поиска"
 
-#: templates/searchapp/index.html:21
+#: searchapp/templates/searchapp/index.html:21
 msgid "Find"
 msgstr "Найти"
 
-#: templates/searchapp/index.html:46 templates/searchapp/index.html:75
+#: searchapp/templates/searchapp/index.html:48
+#: searchapp/templates/searchapp/index.html:85
 msgid "Nothing to found"
 msgstr "Ничего не найдено"
 
-#: templates/searchapp/index.html:49 templates/searchapp/index.html:78
+#: searchapp/templates/searchapp/index.html:52
+#: searchapp/templates/searchapp/index.html:89
 msgid "You can change search string and try again"
 msgstr "Вы можете изменить строку поиска и попробовать ещё раз"
 
-#: templates/searchapp/index.html:68
+#: searchapp/templates/searchapp/index.html:76
 #, python-format
 msgid "Network state is %(netw_status)s"
 msgstr "Сетевой статус: %(netw_status)s"
