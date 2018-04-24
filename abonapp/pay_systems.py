@@ -4,23 +4,23 @@ from mydefs import safe_int, safe_float
 from .models import Abon, AllTimePayLog
 from django.db import DatabaseError
 from django.conf import settings
+from xmlview.decorators import xml_view
 
 SECRET = getattr(settings, 'PAY_SECRET')
 SERV_ID = getattr(settings, 'PAY_SERV_ID')
 
 
+@xml_view(root_node='pay-response')
 def allpay(request):
     def bad_ret(err_id, err_description=None):
-        current_date = timezone.now()
-        res = [
-            "<?xml version='1.0' encoding='UTF-8'?>",
-            "<pay-response>",
-            "  <status_code>%d</status_code>" % safe_int(err_id),
-            "  <time_stamp>%s</time_stamp>" % current_date.strftime("%d.%m.%Y %H:%M:%S"),
-            "  <description>%s</description>" % err_description if err_description is not None else '',
-            "</pay-response>"
-        ]
-        return '\n'.join(res)
+        now = timezone.now()
+        r = {
+            'status_code': safe_int(err_id),
+            'time_stamp': now.strftime("%d.%m.%Y %H:%M")
+        }
+        if err_description:
+            r.update({'description': err_description})
+        return r
 
     try:
         serv_id = request.GET.get('SERVICE_ID')
@@ -29,8 +29,10 @@ def allpay(request):
         pay_id = request.GET.get('PAY_ID')
         pay_amount = safe_float(request.GET.get('PAY_AMOUNT'))
         sign = request.GET.get('SIGN').lower()
+        current_date = timezone.now().strftime("%d.%m.%Y %H:%M")
 
-        if act <= 0: return bad_ret(-101, 'ACT less than zero')
+        if act <= 0:
+            return bad_ret(-101, 'ACT less than zero')
 
         # check sign
         md = md5()
@@ -44,18 +46,16 @@ def allpay(request):
             abon = Abon.objects.get(username=pay_account)
             fio = abon.fio
             ballance = float(abon.ballance)
-            current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
-            return "<?xml version='1.0' encoding='UTF-8'?>\n" \
-                   "<pay-response>\n" \
-                   "  <balance>%.2f</balance>\n" % ballance + \
-                   "  <name>%s</name>\n" % fio + \
-                   "  <account>%s</account>\n" % pay_account + \
-                   "  <service_id>%s</service_id>\n" % SERV_ID + \
-                   "  <min_amount>10.0</min_amount>\n" \
-                   "  <max_amount>50000</max_amount>\n" \
-                   "  <status_code>21</status_code>\n" \
-                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
-                   "</pay-response>"
+            return {
+                'balance': ballance,
+                'name': fio,
+                'account': pay_account,
+                'service_id': SERV_ID,
+                'min_amount': 10.0,
+                'max_amount': 5000,
+                'status_code': 21,
+                'time_stamp': current_date
+            }
         elif act == 4:
             trade_point = safe_int(request.GET.get('TRADE_POINT'))
             receipt_num = safe_int(request.GET.get('RECEIPT_NUM'))
@@ -74,30 +74,26 @@ def allpay(request):
                 trade_point=trade_point,
                 receipt_num=receipt_num
             )
-            current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
-            return "<?xml version='1.0' encoding='UTF-8'?>" \
-                   "<pay-response>\n" + \
-                   "  <pay_id>%s</pay_id>\n" % pay_id + \
-                   "  <service_id>%s</service_id>\n" % serv_id + \
-                   "  <amount>%.2f</amount>\n" % pay_amount + \
-                   "  <status_code>22</status_code>\n" + \
-                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
-                   "</pay-response>"
+            return {
+                'pay_id': pay_id,
+                'service_id': serv_id,
+                'amount': pay_amount,
+                'status_code': 22,
+                'time_stamp': current_date
+            }
         elif act == 7:
             pay = AllTimePayLog.objects.get(pay_id=pay_id)
-            current_date = timezone.now().strftime("%d.%m.%Y %H:%M:%S")
-            return "<?xml version='1.0' encoding='UTF-8'?>\n" \
-                   "<pay-response>\n" \
-                   "  <status_code>11</status_code>\n" \
-                   "  <time_stamp>%s</time_stamp>\n" % current_date + \
-                   "  <transaction>\n" \
-                   "    <pay_id>%s</pay_id>\n" % pay_id + \
-                   "    <service_id>%s</service_id>\n" % serv_id + \
-                   "    <amount>%.2f</amount>\n" % float(pay.summ) + \
-                   "    <status>111</status>\n" + \
-                   "    <time_stamp>%s</time_stamp>\n" % current_date + \
-                   "  </transaction>\n" \
-                   "</pay-response>"
+            return {
+                'status_code': 11,
+                'time_stamp': current_date,
+                'transaction': {
+                    'pay_id': pay_id,
+                    'service_id': serv_id,
+                    'amount': pay.summ,
+                    'status': 111,
+                    'time_stamp': pay.date_add.strftime("%d.%m.%Y %H:%M")
+                }
+            }
         else:
             return bad_ret(-101, 'ACT is not passed')
 

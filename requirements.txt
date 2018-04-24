@@ -23,3 +23,6 @@ pyst2
 django-jsonview
 django-bitfield
 transliterate
+
+# django-xmlview for pay system allpay
+-e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview

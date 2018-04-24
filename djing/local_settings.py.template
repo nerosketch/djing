@@ -25,7 +25,11 @@ DATABASES = {
         'NAME': 'djing_db',
         'USER': 'DJING_MYSQL_USERNAME',  # You can change the user name
         'PASSWORD': 'DJING_MYSQL_PASSWORD',  # You can change the password
-        'HOST': 'localhost'
+        'HOST': 'localhost',
+        'TEST': {
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci'
+        }
     }
 }
 
