@@ -39,19 +39,20 @@
                 {% bootstrap_icon 'home' as ic %}
                 {% bootstrap_field form.house addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="id_password">{% trans 'Password' %}</label>
+                {# password field #}
+                {% bootstrap_icon 'lock' as ic %}
+                {% bootstrap_button '' button_type='button' icon='eye-open' button_class='btn-default' id='passwdtoggler' size='sm' as bt %}
+                {% bootstrap_field form.password form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt addon_before=ic %}
 
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                        {{ form.password }}{{ form.password.errors }}
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" onmousedown="document.getElementById('id_password').type='text'" onmouseup="document.getElementById('id_password').type='password'">
-                                <span class="glyphicon glyphicon-eye-open"></span>
-                            </button>
-                        </span>
-                    </div>
-                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('#passwdtoggler').on('mousedown', function(){
+                            document.getElementById("{{ form.password.id_for_label }}").type='text';
+                        }).on('mouseup', function(){
+                            document.getElementById("{{ form.password.id_for_label }}").type='password';
+                        });
+                    });
+                </script>
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">

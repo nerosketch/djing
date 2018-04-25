@@ -9,7 +9,7 @@ from django.conf import settings
 from group_app.models import Group
 
 DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
-TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
+TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
 
 
 class MyUserManager(BaseUserManager):
@@ -59,7 +59,7 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
     telephone = models.CharField(
         max_length=16,
         verbose_name=_('Telephone'),
-        # unique=True,
+        blank=True,
         validators=[RegexValidator(TELEPHONE_REGEXP)]
     )
 

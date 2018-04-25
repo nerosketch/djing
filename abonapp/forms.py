@@ -8,7 +8,7 @@ from . import models
 from django.conf import settings
 from djing import IP_ADDR_REGEX
 
-TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^\+[7,8,9,3]\d{10,11}$')
+TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
 
 
 def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
@@ -73,9 +73,7 @@ class AbonForm(forms.ModelForm):
             }),
             'telephone': forms.TextInput(attrs={
                 'placeholder': _('telephone placeholder'),
-                'pattern': TELEPHONE_REGEXP,
-                'required': '',
-                'class': 'form-control'
+                'pattern': TELEPHONE_REGEXP
             }),
             'description': forms.Textarea(attrs={'rows': '4'}),
             'is_active': forms.NullBooleanSelect(attrs={'class': 'form-control'})
