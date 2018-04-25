@@ -138,3 +138,4 @@ class Port(models.Model):
         )
         verbose_name = _('Port')
         verbose_name_plural = _('Ports')
+        ordering = ['num']

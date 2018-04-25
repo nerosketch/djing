@@ -14,6 +14,7 @@ class Dot(models.Model):
         db_table = 'dots'
         verbose_name = _('Map point')
         verbose_name_plural = _('Map points')
+        ordering = ['title']
         permissions = (
             ('can_view', _('Can view')),
         )

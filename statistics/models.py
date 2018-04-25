@@ -127,3 +127,4 @@ class StatCache(models.Model):
 
     class Meta:
         db_table = 'flowcache'
+        ordering = ['-last_time']

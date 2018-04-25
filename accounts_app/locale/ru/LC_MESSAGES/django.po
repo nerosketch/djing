@@ -299,3 +299,9 @@ msgstr "Редактировать"
 
 msgid "Access to groups"
 msgstr "Доступ к группам"
+
+msgid "Administrator"
+msgstr "Сотрудник"
+
+msgid "Manage responsibility groups"
+msgstr "Ответственность за группы"

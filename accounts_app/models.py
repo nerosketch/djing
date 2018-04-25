@@ -86,6 +86,7 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'base_accounts'
+        ordering = ['username']
 
 
 class UserProfileManager(MyUserManager):

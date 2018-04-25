@@ -132,3 +132,4 @@ class ExtraComment(models.Model):
         )
         verbose_name = _('Extra comment')
         verbose_name_plural = _('Extra comments')
+        ordering = ['-date_create']

@@ -243,3 +243,4 @@ class Conversation(models.Model):
         permissions = (
             ('can_view_conversation', _('Can view conversation')),
         )
+        ordering = ['title']

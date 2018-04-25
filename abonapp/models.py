@@ -302,6 +302,7 @@ class PassportInfo(models.Model):
         db_table = 'passport_info'
         verbose_name = _('Passport Info')
         verbose_name_plural = _('Passport Info')
+        ordering = ['series']
 
     def __str__(self):
         return "%s %s" % (self.series, self.number)
@@ -409,7 +410,7 @@ class AdditionalTelephone(models.Model):
 
     class Meta:
         db_table = 'additional_telephones'
-        ordering = ('owner_name',)
+        ordering = ['owner_name']
         permissions = (
             ('can_view_additionaltelephones', _('Can view additional telephones')),
         )
@@ -448,6 +449,7 @@ class PeriodicPayForId(models.Model):
 
     class Meta:
         db_table = 'periodic_pay_for_id'
+        ordering = ['last_pay']
 
 
 @receiver(post_delete, sender=Abon)

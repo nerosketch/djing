@@ -110,6 +110,7 @@ class SMSOut(models.Model):
         )
         verbose_name = _('Out SMS')
         verbose_name_plural = _('Out SMS')
+        ordering = ['-when']
 
     def __str__(self):
         return self.text

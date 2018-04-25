@@ -20,6 +20,7 @@ class TelegramBot(models.Model):
         db_table = 'chat_telegram_bot'
         verbose_name = _('Telegram bot')
         verbose_name_plural = _('Telegram bots')
+        ordering = ['chat_id']
 
 
 class MessageHistory(models.Model):
@@ -34,6 +35,7 @@ class MessageHistory(models.Model):
         db_table = 'chat_message_history'
         verbose_name = _('Message history')
         verbose_name_plural = _('Message histories')
+        ordering = ['-date_sent']
 
 
 class MessageQueueManager(models.Manager):
@@ -68,3 +70,4 @@ class MessageQueue(models.Model):
         db_table = 'chat_message_queue'
         verbose_name = _('Message queue')
         verbose_name_plural = _('Message queue')
+        ordering = ['target_employee__username']
