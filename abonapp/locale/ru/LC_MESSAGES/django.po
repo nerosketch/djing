@@ -1145,3 +1145,15 @@ msgstr "Периодический платёж успешно удалён"
 #: abonapp/views.py:1112
 msgid "User flags has changed successfully"
 msgstr "Флаги абонента изменены успешно"
+
+msgid "Sub information"
+msgstr "Инфо"
+
+msgid "Payments"
+msgstr "Финансы"
+
+msgid "History of tasks"
+msgstr "История платежей"
+
+msgid "Charts"
+msgstr "Графики"

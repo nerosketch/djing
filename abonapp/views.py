@@ -264,7 +264,7 @@ def abon_services(request, gid, uname):
         return redirect('abonapp:abon_services', abon.group.id, abon.username)
 
     try:
-        periodic_pay = models.PeriodicPayForId.objects.get(account=abon)
+        periodic_pay = models.PeriodicPayForId.objects.filter(account=abon).first()
     except models.PeriodicPayForId.DoesNotExist:
         periodic_pay = None
 
