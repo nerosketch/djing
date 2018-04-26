@@ -363,7 +363,10 @@ class AbonHomeUpdateView(UpdateView):
 def terminal_pay(request):
     from .pay_systems import allpay
     ret_text = allpay(request)
-    return HttpResponse(ret_text)
+    if isinstance(ret_text, HttpResponse):
+        return ret_text
+    else:
+        return HttpResponse(ret_text)
 
 
 @login_required
