@@ -29,8 +29,12 @@
             {% for gr in groups %}
                 <tr>
                     <td>{{ gr.pk }}</td>
-                    <td><a href="{% url 'group_app:edit' gr.pk %}" class="btn-modal">{{ gr.title }}</a></td>
-                    <td class="btn-group">
+                    <td>
+                        <a href="{% url 'group_app:edit' gr.pk %}" class="btn-modal"{% if gr.code %} title="{{ gr.code }}"{% endif %}>
+                            {{ gr.title }}
+                        </a>
+                    </td>
+                    <td>
                         <a href="{% url 'group_app:edit' gr.pk %}" class="btn btn-sm btn-default btn-modal">
                             <span class="glyphicon glyphicon-cog"></span>
                         </a>

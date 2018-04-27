@@ -73,3 +73,6 @@ msgstr "Исправьте ошибки формы"
 #: group_app/views.py:47
 msgid "New group are created"
 msgstr "Новая группа успешно создана"
+
+msgid "Tech code"
+msgstr "Технический код"

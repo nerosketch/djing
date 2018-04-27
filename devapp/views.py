@@ -74,6 +74,7 @@ def devdel(request, device_id):
     try:
         dev = Device.objects.get(pk=device_id)
         back_url = resolve_url('devapp:devs', group_id=dev.group.pk if dev.group else 0)
+        dev.update_dhcp(remove=True)
         dev.delete()
         return res_success(request, back_url)
     except Device.DoesNotExist:

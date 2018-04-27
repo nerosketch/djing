@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from djing.fields import MACAddressField
 from .base_intr import DevBase
@@ -81,45 +82,19 @@ class Device(models.Model):
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
-    def update_dhcp(self):
+    def update_dhcp(self, remove=False):
         if self.devtype not in ('On', 'Dl'):
             return
-        # raise ProgrammingError('переделать это безобразие')
-        # FIXME: переделать это безобразие
-        grp = self.group.id
-        code = ''
-        if grp == 87:
-            code = 'chk'
-        elif grp == 85:
-            code = 'drf'
-        elif grp == 86:
-            code = 'eme'
-        elif grp == 84:
-            code = 'kunc'
-        elif grp == 47:
-            code = 'mtr'
-        elif grp == 60:
-            code = 'nvg'
-        elif grp == 65:
-            code = 'ohot'
-        elif grp == 89:
-            code = 'psh'
-        elif grp == 92:
-            code = 'str'
-        elif grp == 80 or grp == 94:
-            code = 'uy'
-        elif grp == 79 or grp == 91:
-            code = 'zrk'
-        elif grp == 95:
-            code = 'yst'
-        elif grp == 96:
-            code = 'lzk'
-        elif grp == 51:
-            code = 'sad'
-        elif grp == 46:
-            code = 'zhem'
+        if self.group is None:
+            raise DeviceDBException(_('Device does not have a group, please fix that'))
+        code = self.group.code
         newmac = str(self.mac_addr)
-        run(["%s/devapp/onu_register.sh" % settings.BASE_DIR, newmac, code])
+        filepath = os.path.join(settings.BASE_DIR, 'devapp', 'onu_register.sh')
+        if remove:
+            param = 'del'
+        else:
+            param = 'update'
+        run([filepath, param, newmac, code])
 
 
 class Port(models.Model):
@@ -128,11 +103,11 @@ class Port(models.Model):
     descr = models.CharField(_('Description'), max_length=60, null=True, blank=True)
 
     def __str__(self):
-        return "%d: %s" % (int(self.num), self.descr)
+        return "%d: %s" % (self.num, self.descr)
 
     class Meta:
         db_table = 'dev_port'
-        unique_together = (('device', 'num'))
+        unique_together = (('device', 'num'),)
         permissions = (
             ('can_toggle_ports', _('Can toggle ports')),
         )

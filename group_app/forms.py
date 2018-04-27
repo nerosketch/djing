@@ -5,4 +5,4 @@ from . import models
 class GroupForm(forms.ModelForm):
     class Meta:
         model = models.Group
-        fields = ['title']
+        fields = '__all__'

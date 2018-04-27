@@ -5,6 +5,7 @@ from django.db import models
 
 class Group(models.Model):
     title = models.CharField(_('Title'), max_length=127, unique=True)
+    code = models.CharField(_('Tech code'), blank=True, max_length=12)
 
     def get_absolute_url(self):
         url = resolve_url('group_app:edit', self.pk)
