@@ -12,10 +12,10 @@ TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11
 
 
 def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
-    username = ''.join([choice(chars) for i in range(length)])
+    username = ''.join(choice(chars) for i in range(length))
 
     if split:
-        username = delimiter.join([username[start:start + split] for start in range(0, len(username), split)])
+        username = delimiter.join(username[start:start + split] for start in range(0, len(username), split))
 
     try:
         models.Abon.objects.get(username=username)
@@ -65,7 +65,7 @@ class AbonForm(forms.ModelForm):
 
     class Meta:
         model = models.Abon
-        fields = ['username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'ip_address']
+        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'ip_address')
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),
@@ -88,7 +88,7 @@ class AbonForm(forms.ModelForm):
         try:
             abon_raw_passw = models.AbonRawPassword.objects.get(account=acc)
             abon_raw_passw.passw_text = raw_password
-            abon_raw_passw.save(update_fields=['passw_text'])
+            abon_raw_passw.save(update_fields=('passw_text',))
         except models.AbonRawPassword.DoesNotExist:
             models.AbonRawPassword.objects.create(
                 account=acc,
@@ -100,7 +100,7 @@ class AbonForm(forms.ModelForm):
 class PassportForm(forms.ModelForm):
     class Meta:
         model = models.PassportInfo
-        exclude = ['abon']
+        exclude = ('abon',)
         widgets = {
             'series': forms.TextInput(attrs={'required': '', 'pattern': '^\d{4}$'}),
             'number': forms.TextInput(attrs={'required': '', 'pattern': '^\d{6}$'}),
@@ -136,7 +136,7 @@ class AbonStreetForm(forms.ModelForm):
 class AdditionalTelephoneForm(forms.ModelForm):
     class Meta:
         model = models.AdditionalTelephone
-        exclude = ['abon']
+        exclude = ('abon',)
         widgets = {
             'telephone': forms.TextInput(attrs={
                 'placeholder': _('telephone placeholder'),
@@ -151,7 +151,7 @@ class AdditionalTelephoneForm(forms.ModelForm):
 class PeriodicPayForIdForm(forms.ModelForm):
     class Meta:
         model = models.PeriodicPayForId
-        exclude = ['account']
+        exclude = ('account',)
 
 
 class ExportUsersForm(forms.Form):
@@ -179,8 +179,8 @@ class ExportUsersForm(forms.Form):
 class MarkersForm(forms.ModelForm):
     class Meta:
         model = models.Abon
-        fields = ['markers']
+        fields = ('markers',)
 
     def save(self, commit=True):
         instance = super(MarkersForm, self).save(commit=False)
-        return instance.save(update_fields=['markers'])
+        return instance.save(update_fields=('markers',))

@@ -1,3 +1,4 @@
+urllib3
 Django==1.11
 Pillow
 telepot

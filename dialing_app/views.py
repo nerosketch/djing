@@ -22,11 +22,11 @@ from .forms import SMSOutForm
 
 
 class BaseListView(ListView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator([login_required, permission_required('dialing_app.change_asteriskcdr')], name='dispatch')
+@method_decorator((login_required, permission_required('dialing_app.change_asteriskcdr')), name='dispatch')
 class LastCallsListView(BaseListView):
     template_name = 'index.html'
     context_object_name = 'logs'
@@ -62,7 +62,7 @@ def to_abon(request, tel):
         return redirect('abonapp:group_list')
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class VoiceMailRequestsListView(BaseListView):
     template_name = 'vmail.html'
     context_object_name = 'vmessages'
@@ -83,7 +83,7 @@ class VoiceMailReportsListView(VoiceMailRequestsListView):
         return context
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class DialsFilterListView(BaseListView):
     context_object_name = 'logs'
     template_name = 'index.html'
@@ -118,7 +118,7 @@ class DialsFilterListView(BaseListView):
         return cdr
 
 
-@method_decorator([login_required, permission_required('dialing_app.can_view_sms')], name='dispatch')
+@method_decorator((login_required, permission_required('dialing_app.can_view_sms')), name='dispatch')
 class InboxSMSListView(BaseListView):
     template_name = 'inbox_sms.html'
     context_object_name = 'sms_messages'
@@ -160,7 +160,7 @@ class SmsManager(SecureApiView):
     #
     # Api view for management sms from dongle
     #
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     @staticmethod
     def bad_cmd(**kwargs) -> JSONType:

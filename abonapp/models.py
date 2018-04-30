@@ -34,7 +34,7 @@ class AbonLog(models.Model):
         permissions = (
             ('can_view_abonlog', _('Can view subscriber logs')),
         )
-        ordering = ['-date']
+        ordering = ('-date',)
 
     def __str__(self):
         return self.comment
@@ -68,7 +68,7 @@ class AbonTariff(models.Model):
         )
         verbose_name = _('Abon service')
         verbose_name_plural = _('Abon services')
-        ordering = ['time_start']
+        ordering = ('time_start',)
 
 
 class AbonStreet(models.Model):
@@ -82,7 +82,7 @@ class AbonStreet(models.Model):
         db_table = 'abon_street'
         verbose_name = _('Street')
         verbose_name_plural = _('Streets')
-        ordering = ['name']
+        ordering = ('name',)
 
 
 class ExtraFieldsModel(models.Model):
@@ -185,7 +185,7 @@ class Abon(BaseAccount):
         # unique_together = ('device', 'dev_port')
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
-        ordering = ['fio']
+        ordering = ('fio',)
 
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
@@ -273,7 +273,7 @@ class Abon(BaseAccount):
         # check if ip address already busy
         if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
                 pk=self.pk).count() > 0:
-            raise ValidationError({'ip_address': [gettext('Ip address already exist')]})
+            raise ValidationError({'ip_address': (gettext('Ip address already exist'),)})
         return super(Abon, self).clean()
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
@@ -292,8 +292,8 @@ class Abon(BaseAccount):
 
 
 class PassportInfo(models.Model):
-    series = models.CharField(_('Pasport serial'), max_length=4, validators=[validators.integer_validator])
-    number = models.CharField(_('Pasport number'), max_length=6, validators=[validators.integer_validator])
+    series = models.CharField(_('Pasport serial'), max_length=4, validators=(validators.integer_validator,))
+    number = models.CharField(_('Pasport number'), max_length=6, validators=(validators.integer_validator,))
     distributor = models.CharField(_('Distributor'), max_length=64)
     date_of_acceptance = models.DateField()
     abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
@@ -302,7 +302,7 @@ class PassportInfo(models.Model):
         db_table = 'passport_info'
         verbose_name = _('Passport Info')
         verbose_name_plural = _('Passport Info')
-        ordering = ['series']
+        ordering = ('series',)
 
     def __str__(self):
         return "%s %s" % (self.series, self.number)
@@ -366,7 +366,7 @@ class AllTimePayLog(models.Model):
 
     class Meta:
         db_table = 'all_time_pay_log'
-        ordering = ['-date_add']
+        ordering = ('-date_add',)
 
 
 # log for all terminals
@@ -381,7 +381,7 @@ class AllPayLog(models.Model):
 
     class Meta:
         db_table = 'all_pay_log'
-        ordering = ['-date_action']
+        ordering = ('-date_action',)
 
 
 class AbonRawPassword(models.Model):
@@ -401,7 +401,7 @@ class AdditionalTelephone(models.Model):
         max_length=16,
         verbose_name=_('Telephone'),
         # unique=True,
-        validators=[RegexValidator(TELEPHONE_REGEXP)]
+        validators=(RegexValidator(TELEPHONE_REGEXP),)
     )
     owner_name = models.CharField(max_length=127)
 
@@ -410,7 +410,7 @@ class AdditionalTelephone(models.Model):
 
     class Meta:
         db_table = 'additional_telephones'
-        ordering = ['owner_name']
+        ordering = ('owner_name',)
         permissions = (
             ('can_view_additionaltelephones', _('Can view additional telephones')),
         )
@@ -439,17 +439,17 @@ class PeriodicPayForId(models.Model):
                 abon.add_ballance(author, -amount, comment=gettext('Charge for "%(service)s"') % {
                     'service': self.periodic_pay
                 })
-                abon.save(update_fields=['ballance'])
+                abon.save(update_fields=('ballance',))
                 self.last_pay = now
                 self.next_pay = next_pay_date
-                self.save(update_fields=['last_pay', 'next_pay'])
+                self.save(update_fields=('last_pay', 'next_pay'))
 
     def __str__(self):
         return "%s %s" % (self.periodic_pay, self.next_pay)
 
     class Meta:
         db_table = 'periodic_pay_for_id'
-        ordering = ['last_pay']
+        ordering = ('last_pay',)
 
 
 @receiver(post_delete, sender=Abon)

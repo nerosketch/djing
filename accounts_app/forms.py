@@ -14,7 +14,7 @@ class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
         Should be called *after* form is validated.
         """
         perms = set(self.cleaned_data[self.get_obj_perms_field_name()])
-        model_perms = set([c[0] for c in self.get_obj_perms_field_choices()])
+        model_perms = set((c[0] for c in self.get_obj_perms_field_choices()))
         init_perms = set(self.get_obj_perms_field_initial())
 
         to_remove = (model_perms - perms) & init_perms
@@ -28,4 +28,4 @@ class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
 class AvatarChangeForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['avatar']
+        fields = ('avatar',)

@@ -24,7 +24,7 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             return
         if abon.ip_address != client_ip:
             abon.ip_address = client_ip
-            abon.save(update_fields=['ip_address'])
+            abon.save(update_fields=('ip_address',))
             abon.sync_with_nas(created=False)
     except Abon.DoesNotExist:
         return "User with device with mac '%s' does not exist" % switch_mac
@@ -36,14 +36,14 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             'switch_mac': switch_mac
         }
     except MultipleObjectsReturned as e:
-        return 'MultipleObjectsReturned:' + ' '.join([type(e), e, str(switch_port)])
+        return 'MultipleObjectsReturned:' + ' '.join(type(e), e, str(switch_port))
 
 
 def dhcp_expiry(client_ip) -> Optional[str]:
     try:
         abon = Abon.objects.get(ip_address=client_ip)
         abon.ip_address = None
-        abon.save(update_fields=['ip_address'])
+        abon.save(update_fields=('ip_address',))
         abon.sync_with_nas(created=False)
     except Abon.DoesNotExist:
         return "Subscriber with ip %s does not exist" % client_ip

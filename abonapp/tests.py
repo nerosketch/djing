@@ -32,7 +32,7 @@ class AllPayTestCase(TestCase):
         )
         a1.ballance = -13.12
         a1.fio = 'Test Name'
-        a1.save(update_fields=['ballance', 'fio'])
+        a1.save(update_fields=('ballance', 'fio'))
         # Abon.objects.create_user(
         #    telephone='+79788163841',
         #    username='pay_account2',
@@ -52,7 +52,7 @@ class AllPayTestCase(TestCase):
             }
         ))
         r = r.content.decode('utf-8')
-        self.assertXMLEqual(r, ''.join([
+        self.assertXMLEqual(r, ''.join((
             "<pay-response>",
                 "<balance>-13.12</balance>",
                 "<name>Test Name</name>",
@@ -63,7 +63,7 @@ class AllPayTestCase(TestCase):
                 "<status_code>21</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
             "</pay-response>"
-        ]))
+        )))
 
     def user_pay_pay(self):
         print('test_user_pay_pay')
@@ -79,7 +79,7 @@ class AllPayTestCase(TestCase):
             'SIGN': _make_sign(4, 'pay_account1', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
         }))
         r = r.content.decode('utf-8')
-        xml = ''.join([
+        xml = ''.join((
             "<pay-response>",
                 "<pay_id>840ab457-e7d1-4494-8197-9570da035170</pay_id>",
                 "<service_id>%s</service_id>" % SERVICE_ID,
@@ -87,7 +87,7 @@ class AllPayTestCase(TestCase):
                 "<status_code>22</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
             "</pay-response>"
-        ])
+        ))
         self.test_pay_time = current_date
         self.assertXMLEqual(r, xml)
 
@@ -103,7 +103,7 @@ class AllPayTestCase(TestCase):
             }
         ))
         r = r.content.decode('utf-8')
-        xml = ''.join([
+        xml = ''.join((
             "<pay-response>",
                 "<status_code>11</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
@@ -115,7 +115,7 @@ class AllPayTestCase(TestCase):
                     "<time_stamp>%s</time_stamp>" % self.test_pay_time,
                 "</transaction>"
             "</pay-response>"
-        ])
+        ))
         self.assertXMLEqual(r, xml)
 
     def check_ballance(self):
@@ -148,12 +148,12 @@ class AllPayTestCase(TestCase):
         }
                           ))
         r = r.content.decode('utf-8')
-        self.assertXMLEqual(r, ''.join([
+        self.assertXMLEqual(r, ''.join((
             "<pay-response>",
                 "<status_code>-40</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
             "</pay-response>"
-        ]))
+        )))
 
     def try_pay_double(self):
         print('try_pay_double')
@@ -181,12 +181,12 @@ class AllPayTestCase(TestCase):
             'SIGN': _make_sign(7, '', SERVICE_ID, uuid)
         }))
         r = r.content.decode('utf-8')
-        xml = ''.join([
+        xml = ''.join((
             "<pay-response>",
                 "<status_code>-10</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
             "</pay-response>"
-        ])
+        ))
         self.assertXMLEqual(r, xml)
 
     def test_pays(self):

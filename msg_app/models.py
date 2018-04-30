@@ -48,7 +48,7 @@ class Message(models.Model):
             if ms.status == code:
                 return False
             ms.status = code
-            ms.save(update_fields=['status'])
+            ms.save(update_fields=('status',))
             return True
         except MessageStatus.DoesNotExist:
             return False
@@ -64,7 +64,7 @@ class Message(models.Model):
 
     class Meta:
         db_table = 'messages'
-        ordering = ['-sent_at']
+        ordering = ('-sent_at',)
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
         permissions = (
@@ -105,9 +105,9 @@ def id_to_userprofile(acc):
 
 class ConversationManager(models.Manager):
     def create_conversation(self, author, other_participants, title=None):
-        other_participants = [id_to_userprofile(acc) for acc in other_participants]
+        other_participants = tuple(id_to_userprofile(acc) for acc in other_participants)
         if not title:
-            usernames = [acc.username for acc in other_participants]
+            usernames = tuple(acc.username for acc in other_participants)
             if not usernames:
                 title = _('No name')
             else:
@@ -130,7 +130,7 @@ class ConversationManager(models.Manager):
             return 0
 
     def fetch(self, account):
-        conversations = self.filter(models.Q(author=account) | models.Q(participants__in=[account])).annotate(
+        conversations = self.filter(models.Q(author=account) | models.Q(participants__in=(account,))).annotate(
             msg_count=models.Count('message', distinct=True)
         )
         return conversations
@@ -194,7 +194,7 @@ class Conversation(models.Model):
             if not isinstance(cm, ConversationMembership):
                 raise TypeError('cm must be instance of msg_app.ConversationMembership')
         cm.status = status
-        cm.save(update_fields=['status'])
+        cm.save(update_fields=('status',))
         return cm
 
     def make_participant_status_admin(self, user):
@@ -243,4 +243,4 @@ class Conversation(models.Model):
         permissions = (
             ('can_view_conversation', _('Can view conversation')),
         )
-        ordering = ['title']
+        ordering = ('title',)

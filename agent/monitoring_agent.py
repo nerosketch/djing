@@ -2,6 +2,8 @@
 import sys
 import re
 from hashlib import sha256
+from typing import Iterable, Union, AnyStr
+
 import requests
 
 API_AUTH_SECRET = 'your api key'
@@ -19,31 +21,31 @@ def calc_hash(data):
     return sha256(result_data).hexdigest()
 
 
-def check_sign(get_list, sign):
+def check_sign(get_list: Iterable, sign: str):
     hashed = '_'.join(get_list)
     my_sign = calc_hash(hashed)
     return sign == my_sign
 
 
-def validate(regexp, string):
+def validate(regexp: Union[bytes, str, re.__Regex], string: AnyStr):
     if not re.match(regexp, string):
         raise ValueError
     return string
 
 
-def validate_status(text):
+def validate_status(text: str):
     if text not in ('UP', 'DOWN', 'UNREACHABLE'):
         raise ValueError
     return text
 
 
-def send_request(mac, status, sign):
+def send_request(mac, stat, sign_hash):
     r = requests.get(
         "%(domain)s/dev/on_device_event/" % {'domain': SERVER_DOMAIN},
         params={
             'mac': mac,
-            'status': status,
-            'sign': sign
+            'status': stat,
+            'sign': sign_hash
         })
     if r.status_code == 200:
         print(r.json())

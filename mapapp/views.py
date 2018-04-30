@@ -20,7 +20,7 @@ from guardian.decorators import permission_required
 
 
 class BaseListView(ListView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 

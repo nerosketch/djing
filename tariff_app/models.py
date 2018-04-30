@@ -11,7 +11,7 @@ from jsonfield import JSONField
 
 class TariffManager(models.Manager):
     def get_tariffs_by_group(self, group_id):
-        return self.filter(groups__id__in=[group_id])
+        return self.filter(groups__id__in=(group_id,))
 
 
 class Tariff(models.Model):
@@ -51,7 +51,7 @@ class Tariff(models.Model):
 
     class Meta:
         db_table = 'tariffs'
-        ordering = ['title']
+        ordering = ('title',)
         verbose_name = _('Service')
         verbose_name_plural = _('Services')
 
@@ -104,7 +104,7 @@ class PeriodicPay(models.Model):
         )
         verbose_name = _('Periodic pay')
         verbose_name_plural = _('Periodic pays')
-        ordering = ['-id']
+        ordering = ('-id',)
 
 
 @receiver(models.signals.pre_delete, sender=PeriodicPay)

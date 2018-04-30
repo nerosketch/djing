@@ -9,8 +9,8 @@ from .fields import UnixDateTimeField
 
 def get_dates():
     tables = connection.introspection.table_names()
-    tables = [t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_')]
-    return [datetime.strptime(t, '%d%m%Y').date() for t in tables]
+    tables = (t.replace('flowstat_', '') for t in tables if t.startswith('flowstat_'))
+    return tuple(datetime.strptime(t, '%d%m%Y').date() for t in tables)
 
 
 class StatManager(models.Manager):
@@ -22,21 +22,21 @@ class StatManager(models.Manager):
             chunk_size = len(lst) // chunk_count
             if chunk_size == 0:
                 chunk_size = 1
-            return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+            return tuple(lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size))
 
         def avarage(elements):
             return sum(elements) / len(elements)
 
         try:
             charts_data = self.filter(uname=username)
-            charts_times = [cd.cur_time.timestamp() * 1000 for cd in charts_data]
-            charts_octets = [cd.octets for cd in charts_data]
+            charts_times = tuple(cd.cur_time.timestamp() * 1000 for cd in charts_data)
+            charts_octets = tuple(cd.octets for cd in charts_data)
             if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
                 charts_octets = split_list(charts_octets, count_of_parts)
-                charts_octets = [byte_to_mbit(avarage(c)) for c in charts_octets]
+                charts_octets = (byte_to_mbit(avarage(c)) for c in charts_octets)
 
                 charts_times = split_list(charts_times, count_of_parts)
-                charts_times = [avarage(t) for t in charts_times]
+                charts_times = (avarage(t) for t in charts_times)
 
                 charts_data = zip(charts_times, charts_octets)
                 charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
@@ -127,4 +127,4 @@ class StatCache(models.Model):
 
     class Meta:
         db_table = 'flowcache'
-        ordering = ['-last_time']
+        ordering = ('-last_time',)

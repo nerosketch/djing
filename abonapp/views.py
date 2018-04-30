@@ -37,10 +37,10 @@ PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class PeoplesListView(BaseAbonListView):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
@@ -85,7 +85,7 @@ class PeoplesListView(BaseAbonListView):
         return context
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class GroupListView(BaseAbonListView):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
@@ -98,7 +98,7 @@ class GroupListView(BaseAbonListView):
         return queryset
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.add_abon'), name='dispatch')
 class AbonCreateView(CreateView):
     group = None
@@ -154,7 +154,7 @@ class AbonCreateView(CreateView):
         return super(AbonCreateView, self).form_invalid(form)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.delete_abon'), name='dispatch')
 class DelAbonDeleteView(DeleteView):
     model = models.Abon
@@ -198,7 +198,7 @@ def abonamount(request, gid, uname):
             if abonuname == uname:
                 amnt = mydefs.safe_float(request.POST.get('amount'))
                 abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
-                abon.save(update_fields=['ballance'])
+                abon.save(update_fields=('ballance',))
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
                 return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
             else:
@@ -214,7 +214,7 @@ def abonamount(request, gid, uname):
     }, request=request)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(BaseAbonListView):
     context_object_name = 'invoices'
@@ -232,7 +232,7 @@ class DebtsListView(BaseAbonListView):
         return context
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(BaseAbonListView):
     context_object_name = 'pay_history'
@@ -277,7 +277,7 @@ def abon_services(request, gid, uname):
     })
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.change_abon'), name='post')
 class AbonHomeUpdateView(UpdateView):
     model = models.Abon
@@ -473,7 +473,7 @@ def unsubscribe_service(request, gid, uname, abon_tariff_id):
 @method_decorator(permission_required('abonapp.can_view_abonlog'), name='dispatch')
 class LogListView(ListView):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
-    http_method_names = ['get']
+    http_method_names = ('get',)
     context_object_name = 'logs'
     template_name = 'abonapp/log.html'
     model = models.AbonLog
@@ -483,7 +483,7 @@ class LogListView(ListView):
 @method_decorator(permission_required('abonapp.can_view_invoiceforpayment'), name='dispatch')
 class DebtorsListView(ListView):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
-    http_method_names = ['get']
+    http_method_names = ('get',)
     context_object_name = 'invoices'
     template_name = 'abonapp/debtors.html'
     queryset = models.InvoiceForPayment.objects.filter(status=True)
@@ -493,7 +493,7 @@ class DebtorsListView(ListView):
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class TaskLogListView(ListView):
     paginate_by = PAGINATION_ITEMS_PER_PAGE
-    http_method_names = ['get']
+    http_method_names = ('get',)
     context_object_name = 'tasks'
     template_name = 'abonapp/task_log.html'
 
@@ -553,12 +553,12 @@ def chgroup_tariff(request, gid):
     if request.method == 'POST':
         tr = request.POST.getlist('tr')
         grp.tariff_set.clear()
-        grp.tariff_set.add(*[int(d) for d in tr])
+        grp.tariff_set.add(*(int(d) for d in tr))
         grp.save()
         messages.success(request, _('Successfully saved'))
         return redirect('abonapp:ch_group_tariff', gid)
     tariffs = Tariff.objects.all()
-    seleted_tariffs_id = [pk[0] for pk in grp.tariff_set.only('pk').values_list('pk')]
+    seleted_tariffs_id = (pk[0] for pk in grp.tariff_set.only('pk').values_list('pk'))
     return render(request, 'abonapp/group_tariffs.html', {
         'group': grp,
         'seleted_tariffs': seleted_tariffs_id,
@@ -575,7 +575,7 @@ def dev(request, gid, uname):
         if request.method == 'POST':
             dev = Device.objects.get(pk=request.POST.get('dev'))
             abon.device = dev
-            abon.save(update_fields=['device'])
+            abon.save(update_fields=('device',))
             messages.success(request, _('Device has successfully attached'))
             return redirect('abonapp:abon_home', gid=gid, uname=uname)
         else:
@@ -600,7 +600,7 @@ def clear_dev(request, gid, uname):
         abon = models.Abon.objects.get(username=uname)
         abon.device = None
         abon.dev_port = None
-        abon.save(update_fields=['device', 'dev_port'])
+        abon.save(update_fields=('device', 'dev_port'))
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -624,7 +624,7 @@ def charts(request, gid, uname):
         abon = models.Abon.objects.get(username=uname)
         if abon.group is None:
             abon.group = Group.objects.get(pk=gid)
-            abon.save(update_fields=['group'])
+            abon.save(update_fields=('group',))
 
         charts_data = StatElem.objects.chart(
             abon.username,
@@ -692,12 +692,11 @@ def make_extra_field(request, gid, uname):
 @login_required
 @permission_required('abonapp.change_extra_fields_model')
 def extra_field_change(request, gid, uname):
-    extras = [(int(x), y) for x, y in zip(request.POST.getlist('ed'), request.POST.getlist('ex'))]
     try:
-        for ex in extras:
-            extra_field = models.ExtraFieldsModel.objects.get(pk=ex[0])
-            extra_field.data = ex[1]
-            extra_field.save(update_fields=['data'])
+        for ed, ex in zip(request.POST.getlist('ed'), request.POST.getlist('ex')):
+            extra_field = models.ExtraFieldsModel.objects.get(pk=ed)
+            extra_field.data = ex
+            extra_field.save(update_fields=('data',))
         messages.success(request, _("Extra fields has been saved"))
     except models.ExtraFieldsModel.DoesNotExist:
         messages.error(request, _('One or more extra fields has not been saved'))
@@ -763,7 +762,7 @@ def abon_ping(request):
     }
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins,), name='dispatch')
 class DialsListView(BaseAbonListView):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
@@ -838,9 +837,9 @@ def save_user_dev_port(request, gid, uname):
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:
             abon.is_dynamic_ip = is_dynamic_ip
-            abon.save(update_fields=['dev_port', 'is_dynamic_ip'])
+            abon.save(update_fields=('dev_port', 'is_dynamic_ip'))
         else:
-            abon.save(update_fields=['dev_port'])
+            abon.save(update_fields=('dev_port',))
         messages.success(request, _('User port has been saved'))
     except DevPort.DoesNotExist:
         messages.error(request, _('Selected port does not exist'))
@@ -875,9 +874,7 @@ def street_add(request, gid):
 def street_edit(request, gid):
     try:
         if request.method == 'POST':
-            streets_pairs = [(int(sid), sname) for sid, sname in
-                             zip(request.POST.getlist('sid'), request.POST.getlist('sname'))]
-            for sid, sname in streets_pairs:
+            for sid, sname in zip(request.POST.getlist('sid'), request.POST.getlist('sname')):
                 street = models.AbonStreet.objects.get(pk=sid)
                 street.name = sname
                 street.save()
@@ -993,7 +990,7 @@ def abon_export(request, gid):
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="users.csv"'
                 writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
-                display_values = [f[1] for f in frm.fields['fields'].choices if f[0] in fields]
+                display_values = (f[1] for f in frm.fields['fields'].choices if f[0] in fields)
                 writer.writerow(display_values)
                 for row in subscribers:
                     writer.writerow(row)
@@ -1019,7 +1016,7 @@ def abon_export(request, gid):
 def reset_ip(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     abon.ip_address = None
-    abon.save(update_fields=['ip_address'])
+    abon.save(update_fields=('ip_address',))
     return {
         'status': 0,
         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
@@ -1087,9 +1084,9 @@ def del_periodic_pay(request, gid, uname, periodic_pay_id):
     return redirect('abonapp:abon_services', gid, uname)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins,), name='dispatch')
 class EditSibscriberMarkers(UpdateView):
-    http_method_names = ['get', 'post']
+    http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
     form_class = forms.MarkersForm
 
@@ -1121,18 +1118,18 @@ class EditSibscriberMarkers(UpdateView):
 @mydefs.only_admins
 @json_view
 def abons(request):
-    ablist = [{
+    ablist = ({
         'id': abn.pk,
         'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
         'ip': abn.ip_address.int_ip(),
         'is_active': abn.is_active
-    } for abn in models.Abon.objects.all()]
+    } for abn in models.Abon.objects.all())
 
-    tarlist = [{
+    tarlist = ({
         'id': trf.pk,
         'speedIn': trf.speedIn,
         'speedOut': trf.speedOut
-    } for trf in Tariff.objects.all()]
+    } for trf in Tariff.objects.all())
 
     data = {
         'subscribers': ablist,
@@ -1150,7 +1147,7 @@ def search_abon(request):
     if not word:
         return None
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = [{'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results]
+    results = ({'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results)
     return results
 
 
@@ -1158,7 +1155,7 @@ class DhcpLever(SecureApiView):
     #
     # Api view for dhcp event
     #
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     @method_decorator(json_view)
     def get(self, request, *args, **kwargs):

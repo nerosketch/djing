@@ -88,7 +88,7 @@ class Task(models.Model):
             act_type='f',
             who=current_user
         )
-        self.save(update_fields=['state', 'out_date'])
+        self.save(update_fields=('state', 'out_date'))
 
     def do_fail(self, current_user):
         self.state = 'C'  # Crashed
@@ -97,7 +97,7 @@ class Task(models.Model):
             act_type='b',
             who=current_user
         )
-        self.save(update_fields=['state'])
+        self.save(update_fields=('state',))
 
     def send_notification(self):
         if self.abon:
@@ -132,4 +132,4 @@ class ExtraComment(models.Model):
         )
         verbose_name = _('Extra comment')
         verbose_name_plural = _('Extra comments')
-        ordering = ['-date_create']
+        ordering = ('-date_create',)

@@ -11,7 +11,7 @@ from . import forms
 
 @method_decorator(login_required, name='dispatch')
 class GroupListView(ListView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'group_app/group_list.html'
     model = models.Group
@@ -20,7 +20,7 @@ class GroupListView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class EditGroupView(UpdateView):
-    http_method_names = ['get', 'post']
+    http_method_names = ('get', 'post')
     template_name = 'group_app/edit_group.html'
     form_class = forms.GroupForm
     model = models.Group
@@ -38,7 +38,7 @@ class EditGroupView(UpdateView):
 
 @method_decorator(login_required, name='dispatch')
 class AddGroupView(CreateView):
-    http_method_names = ['get', 'post']
+    http_method_names = ('get', 'post')
     template_name = 'group_app/add_group.html'
     form_class = forms.GroupForm
     success_url = reverse_lazy('group_app:group_list')

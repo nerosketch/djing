@@ -50,7 +50,7 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
         _('profile username'),
         max_length=127,
         unique=True,
-        validators=[RegexValidator(r'^\w{1,127}$')]
+        validators=(RegexValidator(r'^\w{1,127}$'),)
     )
     fio = models.CharField(_('fio'), max_length=256)
     birth_day = models.DateField(_('birth day'), auto_now_add=True)
@@ -60,11 +60,11 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
         max_length=16,
         verbose_name=_('Telephone'),
         blank=True,
-        validators=[RegexValidator(TELEPHONE_REGEXP)]
+        validators=(RegexValidator(TELEPHONE_REGEXP),)
     )
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['telephone']
+    REQUIRED_FIELDS = ('telephone',)
 
     def get_full_name(self):
         return self.fio if self.fio else self.username
@@ -86,12 +86,12 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'base_accounts'
-        ordering = ['username']
+        ordering = ('username',)
 
 
 class UserProfileManager(MyUserManager):
     def get_profiles_by_group(self, group_id):
-        return self.filter(responsibility_groups__id__in=[group_id], is_admin=True, is_active=True)
+        return self.filter(responsibility_groups__id__in=(group_id,), is_admin=True, is_active=True)
 
 
 class UserProfile(BaseAccount):
@@ -116,7 +116,7 @@ class UserProfile(BaseAccount):
         )
         verbose_name = _('Staff account profile')
         verbose_name_plural = _('Staff account profiles')
-        ordering = ['fio']
+        ordering = ('fio',)
 
     def _thumbnail_avatar(self):
         if self.avatar and os.path.isfile(self.avatar.path):
