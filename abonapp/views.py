@@ -700,7 +700,7 @@ def extra_field_change(request, gid, uname):
         messages.success(request, _("Extra fields has been saved"))
     except models.ExtraFieldsModel.DoesNotExist:
         messages.error(request, _('One or more extra fields has not been saved'))
-    return redirect('abonapp:abon_home', gid=gid, username=uname)
+    return redirect('abonapp:abon_home', gid=gid, uname=uname)
 
 
 @login_required
