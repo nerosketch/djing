@@ -26,7 +26,7 @@ else
 fi
 
 
-DHCP_MACS='./macs.conf'
+DHCP_MACS='/etc/dhcp/macs.conf'
 PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin
 
 
