@@ -54,7 +54,7 @@ class Device(models.Model):
         )
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
-        ordering = ['id']
+        ordering = ('id',)
 
     def get_abons(self):
         pass
@@ -63,7 +63,7 @@ class Device(models.Model):
         return self.status
 
     def get_manager_klass(self):
-        klasses = [kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype]
+        klasses = tuple(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
         if len(klasses) > 0:
             res = klasses[0][1]
             if issubclass(res, DevBase):
@@ -94,7 +94,7 @@ class Device(models.Model):
             param = 'del'
         else:
             param = 'update'
-        run([filepath, param, newmac, code])
+        run((filepath, param, newmac, code))
 
 
 class Port(models.Model):
@@ -113,4 +113,4 @@ class Port(models.Model):
         )
         verbose_name = _('Port')
         verbose_name_plural = _('Ports')
-        ordering = ['num']
+        ordering = ('num',)

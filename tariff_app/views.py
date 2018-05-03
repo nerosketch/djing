@@ -17,11 +17,11 @@ from . import forms
 
 
 class BaseServiceListView(ListView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class TariffsListView(BaseServiceListView, OrderingMixin):
     """
     Show Services(Tariffs) list

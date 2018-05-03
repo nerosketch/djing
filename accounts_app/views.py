@@ -21,7 +21,7 @@ from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 
 
 class BaseAccListView(ListView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
@@ -87,7 +87,7 @@ def profile_show(request, uid=0):
     })
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class AvatarUpdateView(UpdateView):
     form_class = AvatarChangeForm
     template_name = 'accounts/settings/ch_info.html'
@@ -180,7 +180,7 @@ def delete_profile(request, uid):
     return redirect('acc_app:accounts_list')
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class AccountsListView(BaseAccListView):
     template_name = 'accounts/acc_list.html'
     context_object_name = 'users'
@@ -270,7 +270,7 @@ def set_abon_groups_permission(request, uid):
     picked_groups = picked_groups.values_list('pk', flat=True)
 
     if request.method == 'POST':
-        checked_groups = [int(ag) for ag in request.POST.getlist('grp', default=0)]
+        checked_groups = tuple(int(ag) for ag in request.POST.getlist('grp', default=0))
         for grp in Group.objects.all():
             if grp.pk in checked_groups and grp.pk not in picked_groups:
                 assign_perm('groupapp.can_view_group', userprofile, obj=grp)
@@ -287,9 +287,9 @@ def set_abon_groups_permission(request, uid):
     })
 
 
-@method_decorator([login_required, mydefs.only_admins], name='dispatch')
+@method_decorator((login_required, mydefs.only_admins), name='dispatch')
 class ManageResponsibilityGroups(ListView):
-    http_method_names = ['get', 'post']
+    http_method_names = ('get', 'post')
     template_name = 'accounts/manage_responsibility_groups.html'
     context_object_name = 'groups'
     queryset = Group.objects.only('pk', 'title')
@@ -306,14 +306,14 @@ class ManageResponsibilityGroups(ListView):
         context = super(ManageResponsibilityGroups, self).get_context_data(**kwargs)
         context['uid'] = self.kwargs.get('uid')
         context['userprofile'] = self.object
-        context['existing_groups'] = [g.get('pk') for g in self.object.responsibility_groups.only('pk').values('pk')]
+        context['existing_groups'] = (g.get('pk') for g in self.object.responsibility_groups.only('pk').values('pk'))
         return context
 
     def post(self, request, *args, **kwargs):
-        checked_groups = [int(ag) for ag in request.POST.getlist('grp', default=0)]
+        checked_groups = (int(ag) for ag in request.POST.getlist('grp', default=0))
         profile = self.object
         profile.responsibility_groups.clear()
-        profile.responsibility_groups.add(*[int(g) for g in checked_groups])
+        profile.responsibility_groups.add(*(int(g) for g in checked_groups))
         profile.save()
         messages.success(request, _('Responsibilities has been updated'))
         return HttpResponseRedirect(self.get_success_url())

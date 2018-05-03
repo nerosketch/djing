@@ -167,7 +167,7 @@ def require_ssl(view):
 
 class MultipleException(Exception):
     def __init__(self, err_list):
-        if not isinstance(err_list, list):
+        if not isinstance(err_list, (list, tuple)):
             raise TypeError
         self.err_list = err_list
 

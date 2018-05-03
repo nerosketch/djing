@@ -74,7 +74,7 @@ class DjingTelebot(helper.ChatHandler):
         text = msg['text'].lower()
 
         # выполняем комманды если они есть
-        if text in list(self.cmds.keys()):
+        if text in self.cmds.keys():
             self.cmds[text]()
         elif self._dialog_fn is not None:
             if not callable(self._dialog_fn):
@@ -123,7 +123,7 @@ class DjingTelebot(helper.ChatHandler):
             return
         try:
             socket.inet_aton(ip)
-            ret = os.popen('`which ping` -c 10 ' + ip).read()
+            ret = os.popen('`which ping` -c 10 %s' % ip).read()
             self._sent_reply(ret)
         except socket.error:
             self._question(_("It's not like ip address, try again"), self.ping)

@@ -65,7 +65,7 @@ def allpay(request):
                 return bad_ret(-100)
 
             abon.add_ballance(None, pay_amount, comment='AllPay %.2f' % pay_amount)
-            abon.save(update_fields=['ballance'])
+            abon.save(update_fields=('ballance',))
 
             AllTimePayLog.objects.create(
                 pay_id=pay_id,

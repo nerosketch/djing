@@ -30,11 +30,11 @@ from .forms import DeviceForm, PortForm
 
 
 class BaseDeviceListView(global_base_views.BaseListWithFiltering):
-    http_method_names = ['get']
+    http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class DevicesListView(global_base_views.OrderingMixin, BaseDeviceListView):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
@@ -61,7 +61,7 @@ class DevicesListView(global_base_views.OrderingMixin, BaseDeviceListView):
         return response
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceListView):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
@@ -181,10 +181,10 @@ def manage_ports(request, device_id):
     })
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView):
     template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     def get_object(self, queryset=None):
         dev_id = self.kwargs.get('device_id')
@@ -241,7 +241,7 @@ def add_ports(request, device_id):
                 try:
                     port = Port.objects.get(num=port_num, device=dev)
                     port.descr = port_text
-                    port.save(update_fields=['descr'])
+                    port.save(update_fields=('descr',))
                 except Port.DoesNotExist:
                     Port.objects.create(
                         num=port_num,
@@ -250,12 +250,12 @@ def add_ports(request, device_id):
                     )
 
         db_ports = Port.objects.filter(device=dev)
-        db_ports = [TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports]
+        db_ports = (TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
 
         manager = dev.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
-            ports = [TempPort(p.num, p.nm, p.st, False) for p in ports]
+            ports = (TempPort(p.num, p.nm, p.st, False) for p in ports)
             res_ports = set(db_ports + ports)
         else:
             res_ports = db_ports
@@ -417,7 +417,7 @@ def toggle_port(request, device_id, portid, status=0):
     return redirect('devapp:view', dev.group.pk if dev.group is not None else 0, device_id)
 
 
-@method_decorator([login_required, only_admins], name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class GroupsListView(BaseDeviceListView):
     context_object_name = 'groups'
     template_name = 'devapp/group_list.html'
@@ -431,16 +431,18 @@ class GroupsListView(BaseDeviceListView):
 
 
 @login_required
+@json_view
 def search_dev(request):
     word = request.GET.get('s')
     if word is None or word == '':
-        results = [{'id': 0, 'text': ''}]
+        results = ({'id': 0, 'text': ''},)
     else:
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
-        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results]
-    return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
+        results = ({'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results)
+    #return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
+    return results
 
 
 @login_required
@@ -470,6 +472,7 @@ def fix_device_group(request, device_id):
 
 
 @login_required
+@json_view
 def fix_onu(request):
     mac = request.GET.get('cmd_param')
     status = 1
@@ -484,10 +487,10 @@ def fix_onu(request):
                    (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
             for srcmac, snmpnum in ports:
                 # convert bytes mac address to str presentation mac address
-                real_mac = ':'.join(['%x' % ord(i) for i in srcmac])
+                real_mac = ':'.join('%x' % ord(i) for i in srcmac)
                 if mac == real_mac:
                     onu.snmp_item_num = snmpnum
-                    onu.save(update_fields=['snmp_item_num'])
+                    onu.save(update_fields=('snmp_item_num',))
                     status = 0
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
@@ -495,10 +498,10 @@ def fix_onu(request):
             text = text + '\n%s' % _('Parent device not found')
     except Device.DoesNotExist:
         pass
-    return JsonResponse({
+    return {
         'status': status,
         'dat': text
-    })
+    }
 
 
 @login_required
@@ -519,7 +522,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
     #
     # Api view for monitoring devices
     #
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     @method_decorator(json_view)
     def get(self, request):
@@ -550,7 +553,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
                 device_down.status = 'und'
                 notify_text = 'Device %(device_name)s getting undefined status code'
 
-            device_down.save(update_fields=['status'])
+            device_down.save(update_fields=('status',))
 
             if not device_down.is_noticeable:
                 return {'text': 'Notification for %s is unnecessary' % device_down.ip_address or device_down.comment}
@@ -582,7 +585,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
 
 
 class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     def get(self, request, *args, **kwargs):
         from transliterate import translit
@@ -620,7 +623,7 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
     def templ(host_name: str, host_addr: str, mac: Optional[str], parent_host_name: Optional[str]):
         if not host_addr:
             return
-        r = [
+        r = (
             "define host{",
             "\tuse				generic-switch",
             "\thost_name		%s" % host_name,
@@ -628,14 +631,14 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             "\tparents			%s" % parent_host_name if parent_host_name is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
-        ]
+        )
         return '\n'.join(i for i in r if i)
 
     @staticmethod
     def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: int):
         if not host_addr:
             return
-        r = [
+        r = (
             "define host{",
             "\tuse				device-onu",
             "\thost_name		%s" % host_name,
@@ -643,18 +646,18 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             "\t_snmp_item		%d" % snmp_item if snmp_item is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
-        ]
+        )
         return '\n'.join(i for i in r if i)
 
 
 class DevicesGetListView(global_base_views.SecureApiView):
-    http_method_names = ['get']
+    http_method_names = ('get',)
 
     @method_decorator(json_view)
     def get(self, request, *args, **kwargs):
         from netaddr import EUI
         device_type = request.GET.get('type')
-        dev_types = [dt[0] for dt in Device.DEVICE_TYPES]
+        dev_types = tuple(dt[0] for dt in Device.DEVICE_TYPES)
         if device_type not in dev_types:
             devs = Device.objects.all()
         else:
@@ -663,4 +666,4 @@ class DevicesGetListView(global_base_views.SecureApiView):
         for r in res:
             if isinstance(r['mac_addr'], EUI):
                 r['mac_addr'] = int(r['mac_addr'])
-        return list(res)
+        return tuple(res)

@@ -88,11 +88,11 @@ def clean_number(n):
 
 def encode_str(s):
     """Returns the hexadecimal representation of ``s``"""
-    return ''.join(["%02x" % ord(n) for n in s])
+    return ''.join("%02x" % ord(n) for n in s)
 
 
 def encode_bytes(b):
-    return ''.join(["%02x" % n for n in b])
+    return ''.join("%02x" % n for n in b)
 
 
 def pack_8bits_to_7bits(message, udh=None):

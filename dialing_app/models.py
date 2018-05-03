@@ -69,7 +69,7 @@ class AsteriskCDR(models.Model):
     class Meta:
         db_table = 'cdr'
         managed = False
-        ordering = ['-calldate']
+        ordering = ('-calldate',)
 
 
 class SMSModel(models.Model):
@@ -85,7 +85,7 @@ class SMSModel(models.Model):
         )
         verbose_name = _('SMS')
         verbose_name_plural = _('SMS')
-        ordering = ['-when']
+        ordering = ('-when',)
 
     def __str__(self):
         return self.text
@@ -110,7 +110,7 @@ class SMSOut(models.Model):
         )
         verbose_name = _('Out SMS')
         verbose_name_plural = _('Out SMS')
-        ordering = ['-when']
+        ordering = ('-when',)
 
     def __str__(self):
         return self.text

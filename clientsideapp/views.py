@@ -90,9 +90,9 @@ def debt_buy(request, d_id):
                 'username': abon.get_full_name(),
                 'amount': amount
             })
-            abon.save(update_fields=['ballance'])
+            abon.save(update_fields=('ballance',))
             debt.set_ok()
-            debt.save(update_fields=['status', 'date_pay'])
+            debt.save(update_fields=('status', 'date_pay'))
             return redirect('client_side:debts')
         except LogicError as e:
             messages.error(request, e)
