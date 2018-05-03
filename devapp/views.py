@@ -250,12 +250,12 @@ def add_ports(request, device_id):
                     )
 
         db_ports = Port.objects.filter(device=dev)
-        db_ports = (TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
+        db_ports = tuple(TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
 
         manager = dev.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
-            ports = (TempPort(p.num, p.nm, p.st, False) for p in ports)
+            ports = tuple(TempPort(p.num, p.nm, p.st, False) for p in ports)
             res_ports = set(db_ports + ports)
         else:
             res_ports = db_ports
