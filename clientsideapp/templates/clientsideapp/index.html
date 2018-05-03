@@ -1,4 +1,39 @@
 {% extends 'clientsideapp/ext.html' %}
+{% load i18n %}
+
 {% block client_main %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">{% trans 'Account info' %}</div>
+    <div class="panel-body">
+        {% with user=request.user %}
+        <dl class="dl-horizontal">
+            <dt>{% trans 'Username' %}</dt>
+            <dd>{{ user.username }}</dd>
+
+            <dt>{% trans 'fio' %}</dt>
+            <dd>{{ user.fio }}</dd>
+
+            <dt>{% trans 'Primary telephone' %}</dt>
+            <dd>{{ user.telephone }}</dd>
+
+            <dt>{% trans 'Ip Address' %}</dt>
+            <dd>{{ user.ip_address }}</dd>
+
+            {% if user.street %}
+                <dt>{% trans 'Address' %}</dt>
+                <dd>{{ user.street.name }}, {{ user.house|default:'' }}</dd>
+            {% endif %}
+
+            {% if num_active_tasks > 0 %}
+                <dt>{% trans 'Num of active tasks' %}</dt>
+                <dd>{{ num_active_tasks }}</dd>
+            {% endif %}
+
+        </dl>
+        {% endwith %}
+    </div>
+</div>
+
     {% include 'custom_pages/main_page.htm' %}
 {% endblock %}

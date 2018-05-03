@@ -1,16 +1,16 @@
 img.navbar-brand {
-    width: 59px;
-    height: 50px;
-    padding: 0;
-    margin: 0 15px 0 0;
+  width: 59px;
+  height: 50px;
+  padding: 0;
+  margin: 0 15px 0 0;
 }
 
 .table thead {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 /* White background in tables */
 .table tr:nth-of-type(2n) {
-    background-color: white;
+  background-color: white;
 }
 
 
@@ -21,6 +21,15 @@ img.navbar-brand {
 .modal-header.primary {background-color: #789cbb;}
 
 body{
-    padding: 88px 15px 0;
+  padding: 88px 15px 0;
 }
 
+
+@media (min-width: 768px){
+  .dl-horizontal dt {
+      width: 240px;
+  }
+  .dl-horizontal dd{
+      margin-left: 260px;
+  }
+}

@@ -1,4 +1,3 @@
-# coding=utf-8
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,13 +7,17 @@ from django.utils.translation import gettext_lazy as _, gettext
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
+from taskapp.models import Task
 from mydefs import LogicError
 from agent import NasFailedResult, NasNetworkError
 
 
 @login_required
 def home(request):
-    return render(request, 'clientsideapp/index.html')
+    num_active_tasks = Task.objects.filter(abon=request.user, state='S').count()
+    return render(request, 'clientsideapp/index.html', {
+        'num_active_tasks': num_active_tasks
+    })
 
 
 @login_required
@@ -104,4 +107,12 @@ def debt_buy(request, d_id):
         'debt': debt,
         'amount': debt.amount,
         'ballance_after': abon.ballance - debt.amount
+    })
+
+
+@login_required
+def task_history(request):
+    tasks = Task.objects.filter(abon=request.user)
+    return render(request, 'clientsideapp/tasklist.html', {
+        'tasks': tasks
     })

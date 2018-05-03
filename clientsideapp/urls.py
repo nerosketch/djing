@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from django.conf.urls import url
 from . import views
 
@@ -10,5 +9,6 @@ urlpatterns = [
     url(r'^services$', views.services, name='services'),
     url(r'^services/(?P<srv_id>\d+)/buy$', views.buy_service, name='buy_service'),
     url(r'^debts$', views.debts_list, name='debts'),
-    url(r'^debts/(?P<d_id>\d+)$', views.debt_buy, name='debt_buy')
+    url(r'^debts/(?P<d_id>\d+)$', views.debt_buy, name='debt_buy'),
+    url(r'^tasks$', views.task_history, name='task_history')
 ]
