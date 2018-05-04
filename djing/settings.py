@@ -130,7 +130,7 @@ LANGUAGE_CODE = 'ru'
 
 LANGUAGES = (
     ('ru', _('Russian')),
-    #('en', _('English')),
+    ('en', _('English'))
 )
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))

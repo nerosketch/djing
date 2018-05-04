@@ -36,7 +36,7 @@ class StatManager(models.Manager):
                 charts_octets = (byte_to_mbit(avarage(c)) for c in charts_octets)
 
                 charts_times = split_list(charts_times, count_of_parts)
-                charts_times = (avarage(t) for t in charts_times)
+                charts_times = tuple(avarage(t) for t in charts_times)
 
                 charts_data = zip(charts_times, charts_octets)
                 charts_data = ["{x: new Date(%d), y: %.2f}" % (cd[0], cd[1]) for cd in charts_data]
