@@ -53,7 +53,7 @@
                             </a>
                             {% if order_by == 'house' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-                        <th class="col-xs-2">{% trans 'Telephone' %}</th>
+                        <th class="col-xs-1">{% trans 'Telephone' %}</th>
                         <th class="col-xs-2">{% trans 'Service' %}</th>
                         <th class="hidden-xs col-sm-1">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_replace request order_by='ballance' dir=dir|default:'down' %}">
@@ -62,7 +62,7 @@
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="hidden-xs">{% trans 'Markers' %}</th>
-                        <th class="hidden-xs">#</th>
+                        <th class="col-xs-1">#</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -95,7 +95,7 @@
                         <td class="col-xs-2">{{ human.fio }}</td>
                         <td class="col-xs-2">{{ human.street|default:_('Not assigned') }}</td>
                         <td class="col-xs-1">{{ human.house|default:'-' }}</td>
-                        <td class="col-xs-2"><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
+                        <td class="col-xs-1"><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                         <td class="col-xs-2">
                             {% if human.current_tariff %}
                                 {% if can_ch_trf %}
@@ -111,7 +111,7 @@
                             {% for user_icon in human.get_flag_icons %}<span class="m-icon {{ user_icon }}"></span>
                             {% endfor %}
                         </td>
-                        <td class="hidden-xs">
+                        <td class="col-xs-1">
                             {% if can_del_abon %}
                                 <a href="{% url 'abonapp:del_abon' group.pk human.username %}" class="btn btn-danger btn-sm btn-modal">
                                     <span class="glyphicon glyphicon-remove"></span>
