@@ -251,10 +251,8 @@ $(document).ready(function () {
 		pr.find('.form-control-feedback').remove();
 		if ($(this)[0].checkValidity()) {
 			pr.addClass('has-success');
-			$(this).after('<span class="glyphicon glyphicon-ok form-control-feedback"></span>');
 		} else {
 			pr.addClass('has-error');
-			$(this).after('<span class="glyphicon glyphicon-remove form-control-feedback"></span>');
 		}
 	});
 
