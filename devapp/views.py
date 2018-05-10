@@ -435,12 +435,12 @@ class GroupsListView(BaseDeviceListView):
 def search_dev(request):
     word = request.GET.get('s')
     if word is None or word == '':
-        results = ({'id': 0, 'text': ''},)
+        results = [{'id': 0, 'text': ''}]
     else:
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
-        results = ({'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results)
+        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results]
     #return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
     return results
 
