@@ -1,12 +1,15 @@
 from hashlib import md5
 
+from accounts_app.models import UserProfile
+from django.shortcuts import resolve_url
 from django.test import TestCase, RequestFactory
 from django.conf import settings
 from django.utils import timezone
 from xmltodict import parse
 
-from abonapp.models import Abon
+from abonapp.models import Abon, AbonStreet
 from abonapp.pay_systems import allpay
+from group_app.models import Group
 
 rf = RequestFactory()
 SERVICE_ID = getattr(settings, 'PAY_SERV_ID')
@@ -196,3 +199,58 @@ class AllPayTestCase(TestCase):
         self.check_ballance()
         self.try_pay_double()
         self.non_existing_pay()
+
+
+class StreetTestCase(TestCase):
+    group = None
+    street = None
+
+    def setUp(self):
+        grp = Group.objects.create(title='Grp1')
+        self.street = AbonStreet.objects.create(name='test_street', group=grp)
+        AbonStreet.objects.create(name='test_street1', group=grp)
+        AbonStreet.objects.create(name='test_street2', group=grp)
+        AbonStreet.objects.create(name='test_street3', group=grp)
+        AbonStreet.objects.create(name='test_street4', group=grp)
+        AbonStreet.objects.create(name='test_street5', group=grp)
+        self.group = grp
+        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
+        # self.client.login(username=my_admin.username, password=my_admin.password)
+        self.adminuser = my_admin
+
+    def test_street_make_cyrillic(self):
+        print('test_make_cyrillic_street')
+        # title = ''.join(chr(n) for n in range(1072, 1104))
+        cyrrilic = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
+        self.client.force_login(self.adminuser)
+        url = resolve_url('abonapp:street_add', self.group.pk)
+        r = self.client.post(url, {
+            'name': cyrrilic,
+            'group': self.group.pk
+        })
+        # print(r, r.content.decode('utf-8'))
+        self.assertEqual(r.status_code, 302)
+
+    def test_street_edit(self):
+        print('test_edit_steet')
+        url = resolve_url('abonapp:street_edit', self.group.pk)
+        streets = AbonStreet.objects.exclude(pk=self.street.pk)
+        self.client.force_login(self.adminuser)
+        r = self.client.post(url, {
+            'sid': tuple(s.id for s in streets),
+            'sname': tuple('%s_' % s.name for s in streets)
+        })
+        streets = AbonStreet.objects.exclude(pk=self.street.pk)
+        for street in streets:
+            self.assertTrue(street.name.endswith('_'))
+        self.assertEqual(r.status_code, 302)
+
+    def test_street_del(self):
+        print('test_street_del')
+        self.client.force_login(self.adminuser)
+        for street in AbonStreet.objects.exclude(pk=self.street.pk):
+            url = resolve_url('abonapp:street_del', self.group.pk, street.pk)
+            r = self.client.get(url)
+            self.assertEqual(r.status_code, 302)
+        after_count = AbonStreet.objects.exclude(pk=self.street.pk).count()
+        self.assertEqual(after_count, 0)
