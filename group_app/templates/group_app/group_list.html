@@ -16,6 +16,7 @@
             <thead>
             <tr>
                 <th width="50">#</th>
+                <th width="50">{% trans 'TeCo' %}</th>
                 <th>
                     <a href="{% url 'group_app:group_list' %}?order_by=title&dir={{ dir|default:'down' }}">
                         {% trans 'Title' %}
@@ -29,8 +30,9 @@
             {% for gr in groups %}
                 <tr>
                     <td>{{ gr.pk }}</td>
+                    <td>{{ gr.code }}</td>
                     <td>
-                        <a href="{% url 'group_app:edit' gr.pk %}" class="btn-modal"{% if gr.code %} title="{{ gr.code }}"{% endif %}>
+                        <a href="{% url 'group_app:edit' gr.pk %}" class="btn-modal"{% if gr.code %} title="{{ gr.code }}" data-toggle="tooltip"{% endif %}>
                             {{ gr.title }}
                         </a>
                     </td>
@@ -42,13 +44,13 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="3"><a href="#">{% trans 'Groups was not found' %}</a></td>
+                    <td colspan="4"><a href="#">{% trans 'Groups was not found' %}</a></td>
                 </tr>
             {% endfor %}
             </tbody>
             <tfoot>
             <tr>
-                <td colspan="3" class="btn-group btn-group-sm">
+                <td colspan="4" class="btn-group btn-group-sm">
                     <a href="{% url 'group_app:add' %}" class="btn btn-success btn-modal">
                         <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'Add group' %}</span>
                     </a>

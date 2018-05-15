@@ -76,3 +76,6 @@ msgstr "Новая группа успешно создана"
 
 msgid "Tech code"
 msgstr "Технический код"
+
+msgid "TeCo"
+msgstr "Тех. код"
