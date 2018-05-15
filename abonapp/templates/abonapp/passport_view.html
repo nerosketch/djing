@@ -4,7 +4,7 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Passport information' %}</h3>
@@ -12,14 +12,14 @@
                 <div class="panel-body">
                     <form role="form" class="form-horizontal" action="{% url 'abonapp:passport_view' group.pk abon.username %}" method="post">{% csrf_token %}
 
-                        {% bootstrap_field frm.series label_class='col-sm-3' field_class='col-sm-9' form_group_class='form-group-sm' %}
-                        {% bootstrap_field frm.number label_class='col-sm-3' field_class='col-sm-9' form_group_class='form-group-sm' %}
-                        {% bootstrap_field frm.distributor label_class='col-sm-3' field_class='col-sm-9' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.series label_class='col-sm-5 col-md-3' field_class='col-sm-7 col-md-9' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.number label_class='col-sm-5 col-md-3' field_class='col-sm-7 col-md-9' form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.distributor label_class='col-sm-5 col-md-3' field_class='col-sm-7 col-md-9' form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
-                            <label for="id_date_of_acceptance" class="col-sm-3 control-label">{% trans 'Date of acceptance' %}</label>
-                            <div class="col-sm-9">
-                                {{ frm.date_of_acceptance }}{{ frm.date_of_acceptance.errors }}
+                            <label for="id_date_of_acceptance" class="col-sm-5 col-md-3 control-label">{% trans 'Date of acceptance' %}</label>
+                            <div class="col-sm-7 col-md-9">
+                                {{ form.date_of_acceptance }}{{ form.date_of_acceptance.errors }}
                             </div>
                             <script type="text/javascript">
                                 $(function () {
@@ -31,7 +31,7 @@
                         </div>
 
                         <div class="form-group-sm">
-                            <div class="col-sm-offset-3 col-sm-9">
+                            <div class="col-sm-offset-5 col-md-offset-3 col-sm-7 col-md-9">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                                 </button>

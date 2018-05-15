@@ -296,7 +296,7 @@ class PassportInfo(models.Model):
     number = models.CharField(_('Pasport number'), max_length=6, validators=(validators.integer_validator,))
     distributor = models.CharField(_('Distributor'), max_length=64)
     date_of_acceptance = models.DateField()
-    abon = models.OneToOneField(Abon, on_delete=models.SET_NULL, blank=True, null=True)
+    abon = models.OneToOneField(Abon, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         db_table = 'passport_info'

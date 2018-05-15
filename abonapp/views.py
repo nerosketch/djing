@@ -509,39 +509,44 @@ class TaskLogListView(ListView):
         return context
 
 
-@login_required
-@permission_required('abonapp.can_view_passport')
-def passport_view(request, gid, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    try:
-        if request.method == 'POST':
-            try:
-                passport_instance = models.PassportInfo.objects.get(abon=abon)
-            except models.PassportInfo.DoesNotExist:
-                passport_instance = None
-            frm = forms.PassportForm(request.POST, instance=passport_instance)
-            if frm.is_valid():
-                pi = frm.save(commit=False)
-                pi.abon = abon
-                pi.save()
-                messages.success(request, _('Passport information has been saved'))
-                return redirect('abonapp:passport_view', gid=gid, uname=uname)
-            else:
-                messages.error(request, _('fix form errors'))
-        else:
-            passp_instance = models.PassportInfo.objects.get(abon=abon)
-            frm = forms.PassportForm(instance=passp_instance)
-    except models.Abon.DoesNotExist:
-        messages.error(request, _('Abon does not exist'))
-        return redirect('abonapp:people_list', gid=gid)
-    except models.PassportInfo.DoesNotExist:
-        messages.warning(request, _('Passport info for the user does not exist'))
-        frm = forms.PassportForm()
-    return render(request, 'abonapp/passport_view.html', {
-        'group': get_object_or_404(Group, pk=gid),
-        'abon': abon,
-        'frm': frm
-    })
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('abonapp.can_view_passport'), name='dispatch')
+class PassportUpdateView(UpdateView):
+    form_class = forms.PassportForm
+    model = models.PassportInfo
+    template_name = 'abonapp/passport_view.html'
+
+    def get_object(self, queryset=None):
+        self.abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
+        try:
+            passport_instance = models.PassportInfo.objects.get(abon=self.abon)
+        except models.PassportInfo.DoesNotExist:
+            passport_instance = None
+        return passport_instance
+
+    def form_valid(self, form):
+        pi = form.save(commit=False)
+        pi.abon = self.abon
+        pi.save()
+        messages.success(self.request, _('Passport information has been saved'))
+        return super(PassportUpdateView, self).form_valid(form)
+
+    def get_success_url(self):
+        return resolve_url('abonapp:passport_view',
+                           gid=self.kwargs.get('gid'),
+                           uname=self.kwargs.get('uname'))
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('fix form errors'))
+        return super(PassportUpdateView, self).form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'group': get_object_or_404(Group, pk=self.kwargs.get('gid')),
+            'abon': self.abon
+        }
+        context.update(kwargs)
+        return super(PassportUpdateView, self).get_context_data(**context)
 
 
 @login_required
