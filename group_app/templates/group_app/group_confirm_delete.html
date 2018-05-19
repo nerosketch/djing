@@ -1,0 +1,13 @@
+{% load i18n %}
+<form role="form" action="{% url 'group_app:del' object.pk %}" method="post">{% csrf_token %}
+    <div class="modal-header warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-list-alt"></span>{% trans 'Remove group' %}</h4>
+    </div>
+    <div class="modal-body">
+        <h4>{% blocktrans %}Are you sure you want to delete group {{ object }}?{% endblocktrans %}</h4>
+        <button type="submit" class="btn btn-danger" value="DELETE">
+            <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+        </button>
+    </div>
+</form>

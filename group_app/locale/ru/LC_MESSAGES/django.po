@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-24 23:27+0300\n"
+"POT-Creation-Date: 2018-05-19 12:21+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov <nerosketch@gmail.com>\n"
 "Language: ru\n"
@@ -19,63 +19,78 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: group_app/models.py:7 group_app/templates/group_app/group_list.html:21
+#: models.py:7 templates/group_app/group_list.html:22
 msgid "Title"
 msgstr "Название"
 
-#: group_app/models.py:16
-msgid "Can view group"
-msgstr "Может видеть группы"
-
-#: group_app/models.py:18
-msgid "Group"
-msgstr "Группа"
-
-#: group_app/models.py:19 group_app/templates/group_app/ext.html:7
-#: group_app/templates/group_app/ext.html:8
-#: group_app/templates/group_app/ext.html:14
-#: group_app/templates/group_app/group_list.html:7
-#: group_app/templates/group_app/group_list.html:10
-msgid "Groups"
-msgstr "Группы"
-
-#: group_app/templates/group_app/add_group.html:4
-#: group_app/templates/group_app/add_group.html:9
-#: group_app/templates/group_app/group_list.html:49
-msgid "Add group"
-msgstr "Добавить группу"
-
-#: group_app/templates/group_app/add_group.html:16
-msgid "Add"
-msgstr "Добавить"
-
-#: group_app/templates/group_app/edit_group.html:4
-#: group_app/templates/group_app/edit_group.html:9
-msgid "Edit group"
-msgstr "Изменить группу"
-
-#: group_app/templates/group_app/edit_group.html:16
-msgid "Save"
-msgstr "Сохранить"
-
-#: group_app/templates/group_app/group_list.html:41
-msgid "Groups was not found"
-msgstr "Не найдено ни одной группы"
-
-#: group_app/views.py:31
-msgid "Group changes has been saved"
-msgstr "Изменения сохранены"
-
-#: group_app/views.py:35 group_app/views.py:51
-msgid "Please fix form errors"
-msgstr "Исправьте ошибки формы"
-
-#: group_app/views.py:47
-msgid "New group are created"
-msgstr "Новая группа успешно создана"
-
+#: models.py:8
 msgid "Tech code"
 msgstr "Технический код"
 
+#: models.py:17
+msgid "Can view group"
+msgstr "Может видеть группы"
+
+#: models.py:19
+msgid "Group"
+msgstr "Группа"
+
+#: models.py:20 templates/group_app/ext.html:7 templates/group_app/ext.html:8
+#: templates/group_app/ext.html:14 templates/group_app/group_list.html:7
+#: templates/group_app/group_list.html:10
+msgid "Groups"
+msgstr "Группы"
+
+#: templates/group_app/add_group.html:4 templates/group_app/add_group.html:9
+#: templates/group_app/group_list.html:58
+msgid "Add group"
+msgstr "Добавить группу"
+
+#: templates/group_app/add_group.html:16
+msgid "Add"
+msgstr "Добавить"
+
+#: templates/group_app/edit_group.html:4 templates/group_app/edit_group.html:9
+msgid "Edit group"
+msgstr "Изменить группу"
+
+#: templates/group_app/edit_group.html:16
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/group_app/group_confirm_delete.html:5
+msgid "Remove group"
+msgstr "Удалить группу"
+
+#: templates/group_app/group_confirm_delete.html:8
+#, python-format
+msgid "Are you sure you want to delete group %(object)s?"
+msgstr "Вы уверены что хотите удалить группу %(object)s?"
+
+#: templates/group_app/group_confirm_delete.html:10
+msgid "Delete"
+msgstr "Удалить"
+
+#: templates/group_app/group_list.html:19
 msgid "TeCo"
 msgstr "Тех. код"
+
+#: templates/group_app/group_list.html:50
+msgid "Groups was not found"
+msgstr "Не найдено ни одной группы"
+
+#: views.py:34
+msgid "Group changes has been saved"
+msgstr "Изменения сохранены"
+
+#: views.py:38 views.py:54
+msgid "Please fix form errors"
+msgstr "Исправьте ошибки формы"
+
+#: views.py:50
+msgid "New group are created"
+msgstr "Новая группа успешно создана"
+
+#: views.py:72
+msgid "Group is contain subscribers. Remove them before delete group"
+msgstr "Группа содержит абонентов. Удалите их перед удалением группы"
