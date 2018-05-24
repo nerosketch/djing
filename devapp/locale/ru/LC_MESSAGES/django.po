@@ -532,3 +532,6 @@ msgstr "%(device_name)s недостижим"
 
 msgid "Device %(device_name)s getting undefined status code"
 msgstr "Устройство %(device_name)s получило не определённый код состояния"
+
+msgid "Ip address or parent device with ip address required for ONU device"
+msgstr "Необходим ip адрес. Или родительское устройство с назначенным ip адресом необходимо."

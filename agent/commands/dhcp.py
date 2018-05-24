@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from typing import Optional
 from django.core.exceptions import MultipleObjectsReturned
 from abonapp.models import Abon
@@ -19,13 +18,13 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
         if not abon.is_dynamic_ip:
             print('D:', 'User settings is not dynamic')
             return
-        if not abon.is_access():
-            print('D:', 'User %s is not access to service' % abon.username)
-            return
         if abon.ip_address != client_ip:
             abon.ip_address = client_ip
             abon.save(update_fields=('ip_address',))
-            abon.sync_with_nas(created=False)
+            if abon.is_access():
+                abon.sync_with_nas(created=False)
+            else:
+                print('D:', 'User %s is not access to service' % abon.username)
     except Abon.DoesNotExist:
         return "User with device with mac '%s' does not exist" % switch_mac
     except Device.DoesNotExist:
@@ -36,7 +35,7 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             'switch_mac': switch_mac
         }
     except MultipleObjectsReturned as e:
-        return 'MultipleObjectsReturned:' + ' '.join(type(e), e, str(switch_port))
+        return 'MultipleObjectsReturned:' + ' '.join((type(e), e, str(switch_port)))
 
 
 def dhcp_expiry(client_ip) -> Optional[str]:

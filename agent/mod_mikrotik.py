@@ -405,7 +405,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             self.add_user(usr)
 
     def remove_user_range(self, users: VectorAbon):
-        if not isinstance(users, (tuple, list)):
+        if not isinstance(users, (tuple, list, set)):
             raise ValueError('*users* is used twice, generator does not fit')
         queue_ids = (usr.queue_id for usr in users if usr is not None)
         QueueManager.remove_range(self, queue_ids)

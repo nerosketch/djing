@@ -163,7 +163,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             if parent_device is not None and parent_device.ip_address:
                 dev_ip_addr = parent_device.ip_address
         if dev_ip_addr is None:
-            raise DeviceImplementationError('Ip address or parent device with ip address required for ONU device')
+            raise DeviceImplementationError(gettext('Ip address or parent device with ip address required for ONU device'))
         SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
 
     @staticmethod

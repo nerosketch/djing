@@ -71,7 +71,7 @@ class PeoplesListView(BaseAbonListView):
 
     def get_context_data(self, **kwargs):
         gid = mydefs.safe_int(self.kwargs.get('gid'))
-        if gid == 0:
+        if gid < 1:
             return HttpResponseBadRequest('group id is broken')
         group = get_object_or_404(Group, pk=gid)
         if not self.request.user.has_perm('group_app.can_view_group', group):
