@@ -2,9 +2,13 @@ import os
 import re
 import importlib
 import typing as t
+from urllib.parse import unquote
+
+from django.http import HttpResponseRedirect, HttpResponse
+from netaddr import mac_unix, mac_eui48
 
 from django.shortcuts import _get_queryset
-from netaddr import mac_unix, mac_eui48
+from django.utils.http import is_safe_url
 
 MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
@@ -76,3 +80,12 @@ _JSONType_1 = t.Union[str, int, float, bool, None, t.Dict[str, _JSONType_0], t.L
 _JSONType_2 = t.Union[str, int, float, bool, None, t.Dict[str, _JSONType_1], t.List[_JSONType_1]]
 _JSONType_3 = t.Union[str, int, float, bool, None, t.Dict[str, _JSONType_2], t.List[_JSONType_2]]
 JSONType = t.Union[str, int, float, bool, None, t.Dict[str, _JSONType_3], t.List[_JSONType_3]]
+
+
+def httpresponse_to_referrer(request):
+    next = request.META.get('HTTP_REFERER')
+    if next:
+        next = unquote(next)
+    if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        next = '/'
+    return HttpResponseRedirect(next) if next else HttpResponse(status=204)

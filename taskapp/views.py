@@ -17,6 +17,7 @@ from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 from guardian.decorators import permission_required_or_403 as permission_required
 from chatbot.models import MessageQueue
 from abonapp.models import Abon
+from djing import httpresponse_to_referrer
 from .handle import TaskException
 from .models import Task, ExtraComment
 from mydefs import only_admins, safe_int, MultipleException, RuTimedelta
@@ -137,7 +138,11 @@ class TaskUpdateView(UpdateView):
         else:
             if not request.user.has_perm('taskapp.change_task'):
                 raise PermissionDenied
-        return super(TaskUpdateView, self).dispatch(request, *args, **kwargs)
+        try:
+            return super(TaskUpdateView, self).dispatch(request, *args, **kwargs)
+        except TaskException as e:
+            messages.error(request, e)
+        return httpresponse_to_referrer(request)
 
     def get_form_kwargs(self):
         kwargs = super(TaskUpdateView, self).get_form_kwargs()
