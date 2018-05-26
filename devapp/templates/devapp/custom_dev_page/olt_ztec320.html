@@ -1,0 +1,44 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
+{% load i18n %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% with uptime=dev_manager.uptime %}
+                        {% if uptime %}
+                            <h3 class="panel-title">{% trans 'Uptime' %} {{ uptime }}</h3>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="panel-body">
+                {% with grp=dev.group.pk mng=dev_manager %}
+                    {% for fiber in dev_manager.get_fibers %}
+                        <div class="port{% if fiber.fb_onu_num > 0 %} mega{% endif %} text-center">
+                            <b>{{ fiber.fb_name }}</b>
+                            {% if fiber.fb_onu_num > 0 %}
+                                <a href="{% url 'devapp:zte_port_view' grp dev.id fiber.fb_id %}" class="port-img">
+                                    <b>{{ fiber.fb_onu_num }}</b>
+                                </a>
+                            {% else %}
+                                <a href="#" class="port-img">
+                                    <b>0</b>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <h3>{% trans 'We have not received info, please check options :(' %}</h3>
+                    {% endfor %}
+
+                </div>
+                <div class="panel-footer">
+                    <b>{% trans 'Long description' %}</b>: {{ mng.get_long_description }}<br>
+                    <b>{% trans 'Hostname' %}</b>: {{ mng.get_hostname }}.
+                </div>
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

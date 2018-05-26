@@ -26,7 +26,8 @@ class Device(models.Model):
         ('Dl', dev_types.DLinkDevice),
         ('Pn', dev_types.OLTDevice),
         ('On', dev_types.OnuDevice),
-        ('Ex', dev_types.EltexSwitch)
+        ('Ex', dev_types.EltexSwitch),
+        ('Zt', dev_types.Olt_ZTE_C320)
     )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
                                choices=MyChoicesAdapter(DEVICE_TYPES))

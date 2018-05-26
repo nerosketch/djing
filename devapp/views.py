@@ -5,7 +5,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -72,10 +72,10 @@ class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceLi
 @permission_required('devapp.delete_device')
 def devdel(request, device_id):
     try:
-        dev = Device.objects.get(pk=device_id)
-        back_url = resolve_url('devapp:devs', group_id=dev.group.pk if dev.group else 0)
-        dev.update_dhcp(remove=True)
-        dev.delete()
+        device_instance = Device.objects.get(pk=device_id)
+        back_url = resolve_url('devapp:devs', group_id=device_instance.group.pk if device_instance.group else 0)
+        device_instance.update_dhcp(remove=True)
+        device_instance.delete()
         return res_success(request, back_url)
     except Device.DoesNotExist:
         return res_error(request, _('Delete failed'))
@@ -163,12 +163,13 @@ def dev(request, group_id, device_id=0):
 @login_required
 @permission_required('devapp.change_device')
 def manage_ports(request, device_id):
+    device = ports = None
     try:
-        dev = Device.objects.get(pk=device_id)
-        if dev.group is None:
+        device = Device.objects.get(pk=device_id)
+        if device.group is None:
             messages.error(request, _('Device does not have a group, please fix that'))
-            return redirect('devapp:fix_device_group', dev.pk)
-        ports = Port.objects.filter(device=dev).annotate(num_abons=Count('abon'))
+            return redirect('devapp:fix_device_group', device.pk)
+        ports = Port.objects.filter(device=device).annotate(num_abons=Count('abon'))
 
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
@@ -177,7 +178,7 @@ def manage_ports(request, device_id):
         messages.error(request, e)
     return render(request, 'devapp/manage_ports/list.html', {
         'ports': ports,
-        'dev': dev
+        'dev': device
     })
 
 
@@ -224,12 +225,12 @@ def add_ports(request, device_id):
         def __str__(self):
             return "p:%d\tT:%s" % (self.pid, self.text)
 
+    device = get_object_or_404(Device, pk=device_id)
+    res_ports = list()
     try:
-        res_ports = list()
-        dev = Device.objects.get(pk=device_id)
-        if dev.group is None:
+        if device.group is None:
             messages.error(request, _('Device does not have a group, please fix that'))
-            return redirect('devapp:fix_device_group', dev.pk)
+            return redirect('devapp:fix_device_group', device.pk)
         if request.method == 'POST':
             ports = zip(
                 request.POST.getlist('p_text'),
@@ -239,20 +240,20 @@ def add_ports(request, device_id):
                 if port_text == '' or port_text is None:
                     continue
                 try:
-                    port = Port.objects.get(num=port_num, device=dev)
+                    port = Port.objects.get(num=port_num, device=device)
                     port.descr = port_text
                     port.save(update_fields=('descr',))
                 except Port.DoesNotExist:
                     Port.objects.create(
                         num=port_num,
-                        device=dev,
+                        device=device,
                         descr=port_text
                     )
 
-        db_ports = Port.objects.filter(device=dev)
+        db_ports = Port.objects.filter(device=device)
         db_ports = tuple(TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
 
-        manager = dev.get_manager_object()
+        manager = device.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
             ports = tuple(TempPort(p.num, p.nm, p.st, False) for p in ports)
@@ -269,7 +270,7 @@ def add_ports(request, device_id):
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     return render(request, 'devapp/manage_ports/add_ports.html', {
         'ports': res_ports,
-        'dev': dev
+        'dev': device
     })
 
 
@@ -356,30 +357,30 @@ def add_single_port(request, group_id, device_id):
 @permission_required('devapp.can_view_device')
 def devview(request, device_id):
     ports, manager = None, None
-    dev = get_object_or_404(Device, id=device_id)
+    device = get_object_or_404(Device, id=device_id)
 
-    if not dev.group:
+    if not device.group:
         messages.warning(request, _('Please attach group for device'))
-        return redirect('devapp:fix_device_group', dev.pk)
+        return redirect('devapp:fix_device_group', device.pk)
 
     template_name = 'ports.html'
     try:
-        if dev.ip_address:
-            if not ping(dev.ip_address):
+        if device.ip_address:
+            if not ping(device.ip_address):
                 messages.error(request, _('Dot was not pinged'))
-        if dev.man_passw:
-            manager = dev.get_manager_object()
-            ports = manager.get_ports()
-            if len(ports) > 0 and isinstance(ports[0], Exception):
+        if device.man_passw:
+            manager = device.get_manager_object()
+            ports = tuple(manager.get_ports())
+            if ports is not None and len(ports) > 0 and isinstance(ports[0], Exception):
                 messages.error(request, ports[0])
                 ports = ports[1]
             template_name = manager.get_template_name()
         else:
             messages.warning(request, _('Not Set snmp device password'))
         return render(request, 'devapp/custom_dev_page/' + template_name, {
-            'dev': dev,
+            'dev': device,
             'ports': ports,
-            'dev_accs': Abon.objects.filter(device=dev),
+            'dev_accs': Abon.objects.filter(device=device),
             'dev_manager': manager
         })
     except EasySNMPError as e:
@@ -387,21 +388,34 @@ def devview(request, device_id):
     except (DeviceDBException, DeviceImplementationError) as e:
         messages.error(request, e)
     return render(request, 'devapp/custom_dev_page/' + template_name, {
-        'dev': dev
+        'dev': device
+    })
+
+
+@login_required
+def zte_port_view(request, group_id: str, device_id: str, fiber_id: str):
+    fiber_id = safe_int(fiber_id)
+    zte_olt_device = get_object_or_404(Device, id=device_id)
+    manager = zte_olt_device.get_manager_object()
+    onu_list = manager.get_ports_on_fiber(fiber_id)
+    return render(request, 'devapp/custom_dev_page/olt_ztec320_ports.html', {
+        'onu_list': onu_list,
+        'dev': zte_olt_device,
+        'grp': group_id
     })
 
 
 @login_required
 @permission_required('devapp.can_toggle_ports')
-def toggle_port(request, device_id, portid, status=0):
+def toggle_port(request, device_id: int, portid: int, status=0):
     portid = int(portid)
     status = int(status)
-    dev = get_object_or_404(Device, id=int(device_id))
+    device = get_object_or_404(Device, id=int(device_id))
     try:
-        if ping(dev.ip_address):
-            if dev.man_passw:
-                manager = dev.get_manager_object()
-                ports = manager.get_ports()
+        if ping(device.ip_address):
+            if device.man_passw:
+                manager = device.get_manager_object()
+                ports = tuple(manager.get_ports())
                 if status:
                     ports[portid - 1].enable()
                 else:
@@ -414,7 +428,7 @@ def toggle_port(request, device_id, portid, status=0):
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     except EasySNMPError as e:
         messages.error(request, 'EasySNMPError: %s' % e)
-    return redirect('devapp:view', dev.group.pk if dev.group is not None else 0, device_id)
+    return redirect('devapp:view', device.group.pk if device.group is not None else 0, device_id)
 
 
 @method_decorator((login_required, only_admins), name='dispatch')
@@ -440,14 +454,16 @@ def search_dev(request):
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
-        results = [{'id': dev.pk, 'text': "%s: %s" % (dev.ip_address or '', dev.comment)} for dev in results]
-    #return JsonResponse(results, json_dumps_params={'ensure_ascii': False}, safe=False)
+        results = ({
+            'id': device.pk,
+            'text': "%s: %s" % (device.ip_address or '', device.comment)
+        } for device in results)
     return results
 
 
 @login_required
 def fix_device_group(request, device_id):
-    dev = get_object_or_404(Device, pk=device_id)
+    device = get_object_or_404(Device, pk=device_id)
     try:
         if request.method == 'POST':
             frm = DeviceForm(request.POST, instance=dev)
@@ -466,8 +482,8 @@ def fix_device_group(request, device_id):
         return HttpResponse('ValueError')
     return render(request, 'devapp/fix_dev_group.html', {
         'form': frm,
-        'dev': dev,
-        'selected_parent_dev': dev.parent_dev
+        'dev': device,
+        'selected_parent_dev': device.parent_dev
     })
 
 
@@ -594,25 +610,25 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
         def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
             return replreg.sub('', name)
 
-        for dev in Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
+        for device in Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
                 .select_related('parent_dev') \
                 .only('ip_address', 'comment', 'parent_dev'):
-            host_name = norm_name("%d%s" % (dev.pk, translit(dev.comment, language_code='ru', reversed=True)))
+            host_name = norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
             conf = None
-            mac_addr = dev.mac_addr
-            if dev.devtype == 'On':
-                if dev.parent_dev:
-                    host_addr = dev.parent_dev.ip_address
-                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=dev.snmp_item_num or None)
+            mac_addr = device.mac_addr
+            if device.devtype == 'On':
+                if device.parent_dev:
+                    host_addr = device.parent_dev.ip_address
+                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
                 else:
-                    if dev.ip_address:
-                        host_addr = dev.ip_address
-                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=dev.snmp_item_num or None)
+                    if device.ip_address:
+                        host_addr = device.ip_address
+                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
             else:
                 parent_host_name = norm_name("%d%s" % (
-                    dev.parent_dev.pk, translit(dev.parent_dev.comment, language_code='ru', reversed=True)
-                )) if dev.parent_dev else None
-                conf = self.templ(host_name, host_addr=dev.ip_address, mac=mac_addr, parent_host_name=parent_host_name)
+                    device.parent_dev.pk, translit(device.parent_dev.comment, language_code='ru', reversed=True)
+                )) if device.parent_dev else None
+                conf = self.templ(host_name, host_addr=device.ip_address, mac=mac_addr, parent_host_name=parent_host_name)
             if conf is not None:
                 confs.append(conf)
         response = HttpResponse(''.join(confs), content_type='text/plain')

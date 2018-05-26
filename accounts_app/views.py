@@ -199,7 +199,8 @@ def perms(request, uid):
     klasses = (
         'abonapp.Abon', 'accounts_app.UserProfile',
         'abonapp.AbonTariff', 'abonapp.AbonStreet', 'devapp.Device',
-        'abonapp.PassportInfo', 'abonapp.AdditionalTelephone', 'tariff_app.PeriodicPay'
+        'abonapp.PassportInfo', 'abonapp.AdditionalTelephone', 'tariff_app.PeriodicPay',
+        'group_app.Group'
     )
     return render(request, 'accounts/perms/objects_types.html', {
         'userprofile': userprofile,

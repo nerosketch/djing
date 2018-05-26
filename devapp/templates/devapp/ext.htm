@@ -2,16 +2,18 @@
 {% load i18n %}
 {% block main %}
 
-    <ol class="breadcrumb">
-        <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
-        {% if dev.group %}
-            <li><a href="{% url 'devapp:devs' dev.group.pk %}">{{ dev.group.title }}</a></li>
-        {% else %}
-            <li>{% trans 'Not assigned' %}</li>
-        {% endif %}
-        <li class="active">{{ dev.comment }}</li>
-    </ol>
+    {% block breadcrumb %}
+        <ol class="breadcrumb">
+            <li><span class="glyphicon glyphicon-home"></span></li>
+            <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
+            {% if dev.group %}
+                <li><a href="{% url 'devapp:devs' dev.group.pk %}">{{ dev.group.title }}</a></li>
+            {% else %}
+                <li>{% trans 'Not assigned' %}</li>
+            {% endif %}
+            <li class="active">{{ dev.comment }}</li>
+        </ol>
+    {% endblock %}
 
     {% include 'message_block.html' %}
 

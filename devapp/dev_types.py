@@ -1,4 +1,4 @@
-from typing import AnyStr
+from typing import AnyStr, Iterable
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
 from django.utils.translation import gettext_lazy as _, gettext
@@ -8,11 +8,11 @@ from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationEr
 
 
 class DLinkPort(BasePort):
-    def __init__(self, num, name, status, mac, speed, snmpWorker):
+    def __init__(self, num, name, status, mac, speed, snmp_worker):
         BasePort.__init__(self, num, name, status, mac, speed)
-        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+        if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
-        self.snmp_worker = snmpWorker
+        self.snmp_worker = snmp_worker
 
     def disable(self):
         self.snmp_worker.set_int_value(
@@ -79,11 +79,11 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
 
 class ONUdev(BasePort):
-    def __init__(self, num, name, status, mac, speed, signal, snmpWorker):
+    def __init__(self, num, name, status, mac, speed, signal, snmp_worker):
         super(ONUdev, self).__init__(num, name, status, mac, speed)
-        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+        if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
-        self.snmp_worker = snmpWorker
+        self.snmp_worker = snmp_worker
         self.signal = signal
 
     def disable(self):
@@ -103,14 +103,13 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
     @staticmethod
     def description():
-        return _('PON OLT')
+        return gettext('PON OLT')
 
     def reboot(self):
         pass
 
     def get_ports(self) -> ListOrError:
         nms = self.get_list('.1.3.6.1.4.1.3320.101.10.1.1.79')
-
         res = []
         try:
             for nm in nms:
@@ -124,7 +123,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
                     signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-                    snmpWorker=self)
+                    snmp_worker=self)
                 res.append(onu)
         except EasySNMPTimeoutError as e:
             return EasySNMPTimeoutError(
@@ -136,8 +135,8 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         return self.get_item('.1.3.6.1.2.1.1.5.0')
 
     def uptime(self):
-        uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.9.1.4.1'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
+        up_timestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.9.1.4.1'))
+        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
     def get_template_name(self):
@@ -163,7 +162,9 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             if parent_device is not None and parent_device.ip_address:
                 dev_ip_addr = parent_device.ip_address
         if dev_ip_addr is None:
-            raise DeviceImplementationError(gettext('Ip address or parent device with ip address required for ONU device'))
+            raise DeviceImplementationError(gettext(
+                'Ip address or parent device with ip address required for ONU device'
+            ))
         SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
 
     @staticmethod
@@ -217,11 +218,11 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
 
 class EltexPort(BasePort):
-    def __init__(self, snmpWorker, *args, **kwargs):
+    def __init__(self, snmp_worker, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
-        if not issubclass(snmpWorker.__class__, SNMPBaseWorker):
+        if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
-        self.snmp_worker = snmpWorker
+        self.snmp_worker = snmp_worker
 
     def disable(self):
         self.snmp_worker.set_int_value(
@@ -269,3 +270,59 @@ class EltexSwitch(DLinkDevice):
     @staticmethod
     def is_use_device_port():
         return False
+
+
+class Olt_ZTE_C320(OLTDevice):
+
+    @staticmethod
+    def description():
+        return gettext('OLT ZTE C320')
+
+    def get_fibers(self):
+        fibers = ({
+            'fb_id': fiber_id,
+            'fb_name': fiber_name,
+            'fb_onu_num': safe_int(self.get_item('.1.3.6.1.4.1.3902.1012.3.13.1.1.13.%d' % int(fiber_id)))
+        } for fiber_name, fiber_id in self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.1.1.1'))
+        return fibers
+
+    def get_ports_on_fiber(self, fiber_num: int) -> Iterable:
+        def conv_signal(lvl: int) -> float:
+            if lvl == 65535: return 0.0
+            r = 0
+            if 0 < lvl < 30000:
+                r = lvl * 0.002 - 30
+            elif 60000 < lvl < 65534:
+                r = (lvl - 65534) * 0.002 - 30
+            return round(r, 2)
+
+        onu_types = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
+        onu_ports = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.2.%d' % fiber_num)
+        onu_signals = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num)
+
+        # Real sn in last 3 octets
+        onu_sns = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%d' % fiber_num)
+        onu_prefixs = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d' % fiber_num)
+        onu_list = ({
+            'onu_type': onu_type,
+            'onu_port': onu_port,
+            'onu_signal': conv_signal(safe_int(onu_signal)),
+            'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets
+        } for onu_type, onu_port, onu_signal, onu_sn, onu_prefix in zip(
+            onu_types, onu_ports, onu_signals, onu_sns, onu_prefixs
+        ))
+        return onu_list
+
+    def uptime(self):
+        up_timestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
+        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100)) or RuTimedelta(timedelta())
+        return tm
+
+    def get_long_description(self):
+        return self.get_item('.1.3.6.1.2.1.1.1.0')
+
+    def get_hostname(self):
+        return self.get_item('.1.3.6.1.2.1.1.5.0')
+
+    def get_template_name(self):
+        return 'olt_ztec320.html'

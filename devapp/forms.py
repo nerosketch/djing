@@ -25,8 +25,7 @@ class DeviceForm(forms.ModelForm):
             }),
             'comment': forms.TextInput(attrs={
                 'required': True
-            }),
-            'man_passw': forms.PasswordInput(render_value=True)
+            })
         }
 
 
