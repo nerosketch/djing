@@ -454,10 +454,10 @@ def search_dev(request):
         results = Device.objects.filter(
             Q(comment__icontains=word) | Q(ip_address=word)
         ).only('pk', 'ip_address', 'comment')[:16]
-        results = ({
+        results = [{
             'id': device.pk,
             'text': "%s: %s" % (device.ip_address or '', device.comment)
-        } for device in results)
+        } for device in results]
     return results
 
 
