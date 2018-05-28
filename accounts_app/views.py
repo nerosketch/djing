@@ -307,11 +307,11 @@ class ManageResponsibilityGroups(ListView):
         context = super(ManageResponsibilityGroups, self).get_context_data(**kwargs)
         context['uid'] = self.kwargs.get('uid')
         context['userprofile'] = self.object
-        context['existing_groups'] = (g.get('pk') for g in self.object.responsibility_groups.only('pk').values('pk'))
+        context['existing_groups'] = tuple(g.get('pk') for g in self.object.responsibility_groups.only('pk').values('pk'))
         return context
 
     def post(self, request, *args, **kwargs):
-        checked_groups = (int(ag) for ag in request.POST.getlist('grp', default=0))
+        checked_groups = tuple(int(ag) for ag in request.POST.getlist('grp', default=0))
         profile = self.object
         profile.responsibility_groups.clear()
         profile.responsibility_groups.add(*(int(g) for g in checked_groups))
