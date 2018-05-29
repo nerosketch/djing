@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
-from .handle import handle as task_handle
+# from .handle import handle as task_handle
 
 TASK_PRIORITIES = (
     ('A', _('Higher')),
@@ -54,7 +54,7 @@ class ChangeLog(models.Model):
         return self.get_act_type_display()
 
 
-def _delta_add_days():
+def delta_add_days():
     return timezone.now() + timedelta(days=3)
 
 
@@ -65,7 +65,7 @@ class Task(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+', on_delete=models.SET_NULL, null=True,
                                blank=True, verbose_name=_('Task author'))
     priority = models.CharField(_('A priority'), max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
-    out_date = models.DateField(_('Reality'), null=True, blank=True, default=_delta_add_days)
+    out_date = models.DateField(_('Reality'), null=True, blank=True, default=delta_add_days)
     time_of_create = models.DateTimeField(_('Date of create'), auto_now_add=True)
     state = models.CharField(_('Condition'), max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
     attachment = models.ImageField(_('Attached image'), upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)

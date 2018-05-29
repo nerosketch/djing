@@ -1,12 +1,15 @@
 from django.utils.translation import ugettext as _
 from django import forms
-from .models import Task, ExtraComment, _delta_add_days
+from .models import Task, ExtraComment, delta_add_days
 from accounts_app.models import UserProfile
 from taskapp.handle import TaskException
 
 
 class TaskFrm(forms.ModelForm):
     def __init__(self, initial_abon=None, *args, **kwargs):
+        kwargs.update({'initial': {
+            'out_date': delta_add_days().strftime("%Y-%m-%d")
+        }})
         super(TaskFrm, self).__init__(*args, **kwargs)
         self.fields['recipients'].queryset = UserProfile.objects.filter(is_admin=True)
 
@@ -26,7 +29,7 @@ class TaskFrm(forms.ModelForm):
 
     class Meta:
         model = Task
-        exclude = ['time_of_create', 'author', 'device']
+        exclude = ('time_of_create', 'author', 'device')
         widgets = {
             'descr': forms.TextInput(attrs={
                 'placeholder': _('Short description'),
@@ -37,9 +40,6 @@ class TaskFrm(forms.ModelForm):
             }),
             'out_date': forms.DateInput(attrs={'class': 'form-control'}),
             'abon': forms.Select(attrs={'class': 'form-control'})
-        }
-        initials = {
-            'out_date': _delta_add_days()
         }
 
 
@@ -55,4 +55,4 @@ class ExtraCommentForm(forms.ModelForm):
 
     class Meta:
         model = ExtraComment
-        fields = ['text']
+        fields = ('text',)
