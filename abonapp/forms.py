@@ -98,6 +98,12 @@ class AbonForm(forms.ModelForm):
 
 
 class PassportForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.update({'initial': {
+            'date_of_acceptance': datetime(year=2014, month=6, day=1).strftime("%Y-%m-%d")
+        }})
+        super(PassportForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = models.PassportInfo
         exclude = ('abon',)
@@ -106,9 +112,6 @@ class PassportForm(forms.ModelForm):
             'number': forms.TextInput(attrs={'required': '', 'pattern': '^\d{6}$'}),
             'distributor': forms.TextInput(attrs={'required': ''}),
             'date_of_acceptance': forms.DateInput(attrs={'class': 'form-control', 'required': ''})
-        }
-        initials = {
-            'date_of_acceptance': datetime(year=2014, month=6, day=1)
         }
 
 
