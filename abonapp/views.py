@@ -563,7 +563,7 @@ def chgroup_tariff(request, gid):
         messages.success(request, _('Successfully saved'))
         return redirect('abonapp:ch_group_tariff', gid)
     tariffs = Tariff.objects.all()
-    seleted_tariffs_id = (pk[0] for pk in grp.tariff_set.only('pk').values_list('pk'))
+    seleted_tariffs_id = tuple(pk[0] for pk in grp.tariff_set.only('pk').values_list('pk'))
     return render(request, 'abonapp/group_tariffs.html', {
         'group': grp,
         'seleted_tariffs': seleted_tariffs_id,
