@@ -14,7 +14,7 @@ from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from django.views.generic import DetailView
 
 from devapp.base_intr import DeviceImplementationError
-from mydefs import res_success, res_error, only_admins, safe_int
+from djing.lib import res_success, res_error, only_admins, safe_int
 from abonapp.models import Abon
 from group_app.models import Group
 from accounts_app.models import UserProfile
@@ -137,7 +137,7 @@ def dev(request, group_id, device_id=0):
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
                 'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
-                'snmp_item_num': request.GET.get('n') or 0
+                'snmp_extra': request.GET.get('n') or ''
             })
         else:
             frm = DeviceForm(instance=devinst)
@@ -505,8 +505,8 @@ def fix_onu(request):
                 # convert bytes mac address to str presentation mac address
                 real_mac = ':'.join('%x' % ord(i) for i in srcmac)
                 if mac == real_mac:
-                    onu.snmp_item_num = snmpnum
-                    onu.save(update_fields=('snmp_item_num',))
+                    onu.snmp_extra = str(snmpnum)
+                    onu.save(update_fields=('snmp_extra',))
                     status = 0
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
@@ -619,11 +619,11 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             if device.devtype == 'On':
                 if device.parent_dev:
                     host_addr = device.parent_dev.ip_address
-                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
+                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
                 else:
                     if device.ip_address:
                         host_addr = device.ip_address
-                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
+                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
             else:
                 parent_host_name = norm_name("%d%s" % (
                     device.parent_dev.pk, translit(device.parent_dev.comment, language_code='ru', reversed=True)
@@ -651,7 +651,7 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
         return '\n'.join(i for i in r if i)
 
     @staticmethod
-    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: int):
+    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: str):
         if not host_addr:
             return
         r = (
@@ -659,7 +659,7 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             "\tuse				device-onu",
             "\thost_name		%s" % host_name,
             "\taddress			%s" % host_addr,
-            "\t_snmp_item		%d" % snmp_item if snmp_item is not None else '',
+            "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
         )

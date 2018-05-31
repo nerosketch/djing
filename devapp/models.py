@@ -1,8 +1,9 @@
 import os
 from django.db import models
+
 from djing.fields import MACAddressField
 from .base_intr import DevBase
-from mydefs import MyGenericIPAddressField, MyChoicesAdapter
+from djing.lib import MyGenericIPAddressField, MyChoicesAdapter
 from . import dev_types
 from subprocess import run
 from django.conf import settings
@@ -27,7 +28,8 @@ class Device(models.Model):
         ('Pn', dev_types.OLTDevice),
         ('On', dev_types.OnuDevice),
         ('Ex', dev_types.EltexSwitch),
-        ('Zt', dev_types.Olt_ZTE_C320)
+        ('Zt', dev_types.Olt_ZTE_C320),
+        ('Zo', dev_types.ZteOnuDevice)
     )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
                                choices=MyChoicesAdapter(DEVICE_TYPES))
@@ -36,7 +38,7 @@ class Device(models.Model):
     parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True,
                                    on_delete=models.SET_NULL)
 
-    snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0, blank=True)
+    snmp_extra = models.CharField(_('SNMP extra info'), max_length=256, null=True, blank=True)
 
     NETWORK_STATES = (
         ('und', _('Undefined')),
