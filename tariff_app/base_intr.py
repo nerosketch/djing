@@ -17,7 +17,7 @@ class TariffBase(metaclass=ABCMeta):
     @staticmethod
     def description() -> AnyStr:
         """
-        Usage in mydefs.MyChoicesAdapter for choices fields.
+        Usage in djing.lib.MyChoicesAdapter for choices fields.
         :return: human readable description
         """
         raise NotImplementedError
@@ -54,5 +54,5 @@ class PeriodicPayCalcBase(metaclass=ABCMeta):
     @staticmethod
     def description() -> AnyStr:
         """Return text description.
-        Uses in mydefs.MyChoicesAdapter for CHOICES fields"""
+        Uses in djing.lib.MyChoicesAdapter for CHOICES fields"""
         raise NotImplementedError

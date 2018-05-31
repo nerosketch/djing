@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import mydefs
+from djing.lib import MyGenericIPAddressField
 import statistics.fields
 
 
@@ -18,8 +18,7 @@ class Migration(migrations.Migration):
             name='StatCache',
             fields=[
                 ('last_time', statistics.fields.UnixDateTimeField()),
-                (
-                'ip', mydefs.MyGenericIPAddressField(max_length=8, primary_key=True, protocol='ipv4', serialize=False)),
+                ('ip', MyGenericIPAddressField(max_length=8, primary_key=True, protocol='ipv4', serialize=False)),
                 ('octets', models.PositiveIntegerField(default=0)),
                 ('packets', models.PositiveIntegerField(default=0)),
             ],

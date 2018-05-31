@@ -25,7 +25,7 @@ ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 
 # required for django-guardian
 AUTHENTICATION_BACKENDS = (
-    'djing.auth_backends.CustomAuthBackend',
+    'djing.lib.auth_backends.CustomAuthBackend',
     # 'django.contrib.auth.backends.ModelBackend', # default
     'guardian.backends.ObjectPermissionBackend'
 )

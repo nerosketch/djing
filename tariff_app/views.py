@@ -12,7 +12,7 @@ from guardian.decorators import permission_required_or_403 as permission_require
 
 from djing.global_base_views import OrderingMixin
 from .models import Tariff, PeriodicPay
-import mydefs
+from djing import lib
 from . import forms
 
 
@@ -21,7 +21,7 @@ class BaseServiceListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.only_admins), name='dispatch')
 class TariffsListView(BaseServiceListView, OrderingMixin):
     """
     Show Services(Tariffs) list
@@ -33,7 +33,7 @@ class TariffsListView(BaseServiceListView, OrderingMixin):
 
 @login_required
 def edit_tarif(request, tarif_id=0):
-    tarif_id = mydefs.safe_int(tarif_id)
+    tarif_id = lib.safe_int(tarif_id)
 
     if tarif_id == 0:
         if not request.user.has_perm('tariff_app.add_tariff'):
@@ -70,7 +70,7 @@ def del_tarif(request, tid):
             messages.success(request, _('Service has been deleted'))
         else:
             messages.error(request, _('Not have a confirmations of delete'))
-        return mydefs.res_success(request, 'tarifs:home')
+        return lib.res_success(request, 'tarifs:home')
     return render_to_text('tariff_app/modal_del_warning.html', {'tid': tid}, request=request)
 
 

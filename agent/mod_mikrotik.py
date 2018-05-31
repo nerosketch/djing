@@ -6,7 +6,7 @@ from abc import ABCMeta
 from hashlib import md5
 from typing import Iterable, Optional, Tuple
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
-from mydefs import singleton
+from djing.lib import singleton
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings

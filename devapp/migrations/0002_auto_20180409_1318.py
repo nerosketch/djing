@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import mydefs
+from djing.lib import MyGenericIPAddressField
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='device',
             name='ip_address',
-            field=mydefs.MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4',
+            field=MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4',
                                                  verbose_name='Ip address'),
         ),
     ]

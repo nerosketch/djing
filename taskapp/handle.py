@@ -2,7 +2,7 @@
 from django.utils.translation import gettext as _
 from chatbot.telebot import send_notify
 from chatbot.models import ChatException
-from mydefs import MultipleException
+from djing.lib import MultipleException
 
 
 class TaskException(Exception):

@@ -1,5 +1,3 @@
-# coding=utf-8
-from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -15,12 +13,14 @@ from datetime import datetime
 
 from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 from guardian.decorators import permission_required_or_403 as permission_required
+from jsonview.decorators import json_view
+
 from chatbot.models import MessageQueue
 from abonapp.models import Abon
 from djing import httpresponse_to_referrer
+from djing.lib import only_admins, safe_int, MultipleException, RuTimedelta
 from .handle import TaskException
 from .models import Task, ExtraComment
-from mydefs import only_admins, safe_int, MultipleException, RuTimedelta
 from .forms import TaskFrm, ExtraCommentForm
 
 
@@ -249,6 +249,7 @@ def remind(request, task_id):
     return redirect('taskapp:home')
 
 
+@json_view
 def check_news(request):
     if request.user.is_authenticated and request.user.is_admin:
         msg = MessageQueue.objects.pop(user=request.user, tag='taskap')

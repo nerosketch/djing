@@ -16,7 +16,7 @@ from jsonview.decorators import json_view
 from abonapp.models import Abon
 from djing.global_base_views import SecureApiView
 from djing import JSONType
-from mydefs import only_admins, safe_int
+from djing.lib import only_admins, safe_int
 from .models import AsteriskCDR, SMSModel, SMSOut
 from .forms import SMSOutForm
 

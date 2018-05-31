@@ -1,6 +1,6 @@
 from hashlib import md5
 from django.utils import timezone
-from mydefs import safe_int, safe_float
+from djing.lib import safe_int, safe_float
 from .models import Abon, AllTimePayLog
 from django.db import DatabaseError
 from django.conf import settings
