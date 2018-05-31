@@ -15,6 +15,7 @@ from group_app.models import Group
 from .models import UserProfile
 from .forms import AvatarChangeForm
 from djing import lib
+from djing.lib.decorators import only_admins
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 
@@ -61,7 +62,7 @@ class SignOut(RedirectView):
 
 
 @login_required
-@lib.only_admins
+@only_admins
 def profile_show(request, uid=0):
     uid = lib.safe_int(uid)
 
@@ -86,7 +87,7 @@ def profile_show(request, uid=0):
     })
 
 
-@method_decorator((login_required, lib.only_admins), name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class AvatarUpdateView(UpdateView):
     form_class = AvatarChangeForm
     template_name = 'accounts/settings/ch_info.html'
@@ -99,7 +100,7 @@ class AvatarUpdateView(UpdateView):
 
 
 @login_required
-@lib.only_admins
+@only_admins
 def ch_info(request):
     if request.method == 'POST':
         user = request.user
@@ -168,7 +169,7 @@ def create_profile(request):
 
 
 @login_required
-@lib.only_admins
+@only_admins
 def delete_profile(request, uid):
     prf = get_object_or_404(UserProfile, id=uid)
     if uid != request.user.id:
@@ -179,7 +180,7 @@ def delete_profile(request, uid):
     return redirect('acc_app:accounts_list')
 
 
-@method_decorator((login_required, lib.only_admins), name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class AccountsListView(BaseAccListView):
     template_name = 'accounts/acc_list.html'
     context_object_name = 'users'
@@ -287,7 +288,7 @@ def set_abon_groups_permission(request, uid):
     })
 
 
-@method_decorator((login_required, lib.only_admins), name='dispatch')
+@method_decorator((login_required, only_admins), name='dispatch')
 class ManageResponsibilityGroups(ListView):
     http_method_names = ('get', 'post')
     template_name = 'accounts/manage_responsibility_groups.html'

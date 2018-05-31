@@ -2,7 +2,7 @@
 
 from array import array
 
-from messaging.mms.mms_pdu import MMSDecoder
+from djing.lib.messaging import MMSDecoder
 
 
 def is_a_wap_push_notification(s):

@@ -535,3 +535,12 @@ msgstr "Устройство %(device_name)s получило не опреде�
 
 msgid "Ip address or parent device with ip address required for ONU device"
 msgstr "Необходим ip адрес. Или родительское устройство с назначенным ip адресом необходимо."
+
+msgid "Are you sure you want to delete device?"
+msgstr "Вы уверены что хотите удалить устройство?"
+
+msgid "Remove device"
+msgstr "Удалить устройство"
+
+msgid "Device successfully deleted"
+msgstr "Устройство успешно удалено"

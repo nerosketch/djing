@@ -18,7 +18,8 @@ from jsonview.decorators import json_view
 from chatbot.models import MessageQueue
 from abonapp.models import Abon
 from djing import httpresponse_to_referrer
-from djing.lib import only_admins, safe_int, MultipleException, RuTimedelta
+from djing.lib import safe_int, MultipleException, RuTimedelta
+from djing.lib.decorators import only_admins
 from .handle import TaskException
 from .models import Task, ExtraComment
 from .forms import TaskFrm, ExtraCommentForm

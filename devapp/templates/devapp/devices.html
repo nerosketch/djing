@@ -65,7 +65,7 @@
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}
-                            <a href="{% url 'devapp:del' grpid dev.pk %}" class="btn btn-danger">
+                            <a href="{% url 'devapp:del' grpid dev.pk %}" class="btn btn-danger btn-modal">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         {% endif %}

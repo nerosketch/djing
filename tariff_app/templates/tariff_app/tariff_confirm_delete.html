@@ -1,0 +1,15 @@
+{% extends 'base_delete_modal.html' %}
+{% load i18n %}
+
+{% block modal_form_url %}
+    {% url 'tarifs:del' tid %}
+{% endblock %}
+
+{% block modal_form_title %}
+    {% trans 'Delete service' %}
+{% endblock %}
+
+{% block modal_form_text %}
+    <label>{% trans 'Are you sure you want to delete tariff?' %}</label>
+    <p>{% blocktrans %}after delete the tariff, subscribers who use that tariff will be disconnected from it.{% endblocktrans %}</p>
+{% endblock %}

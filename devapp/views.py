@@ -11,10 +11,11 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import DetailView
+from django.views.generic import DetailView, DeleteView
 
 from devapp.base_intr import DeviceImplementationError
-from djing.lib import res_success, res_error, only_admins, safe_int
+from djing.lib.decorators import only_admins
+from djing.lib import safe_int
 from abonapp.models import Abon
 from group_app.models import Group
 from accounts_app.models import UserProfile
@@ -68,19 +69,23 @@ class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceLi
     queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
 
 
-@login_required
-@permission_required('devapp.delete_device')
-def devdel(request, device_id):
-    try:
-        device_instance = Device.objects.get(pk=device_id)
-        back_url = resolve_url('devapp:devs', group_id=device_instance.group.pk if device_instance.group else 0)
-        device_instance.update_dhcp(remove=True)
-        device_instance.delete()
-        return res_success(request, back_url)
-    except Device.DoesNotExist:
-        return res_error(request, _('Delete failed'))
-    except DeviceDBException as e:
-        return res_error(request, e)
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('devapp.delete_device'), name='dispatch')
+class DeviceVeleteView(DeleteView):
+    model = Device
+    pk_url_kwarg = 'device_id'
+
+    def get_success_url(self):
+        return resolve_url('devapp:devs', group_id=self.object.group.pk if self.object.group else 0)
+
+    def delete(self, request, *args, **kwargs):
+        res = super().delete(request, *args, **kwargs)
+        try:
+            self.object.update_dhcp(remove=True)
+        except DeviceDBException as e:
+            messages.error(request, e)
+        messages.success(request, _('Device successfully deleted'))
+        return res
 
 
 @login_required
