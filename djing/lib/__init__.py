@@ -1,5 +1,6 @@
 import socket
 import struct
+from abc import ABCMeta
 from datetime import timedelta
 from collections import Iterator
 from django.db import models
@@ -125,12 +126,10 @@ class LogicError(Exception):
     pass
 
 
-def singleton(class_):
-    instances = {}
+class Singleton(type):
+    _instances = {}
 
-    def getinstance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-
-    return getinstance
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]

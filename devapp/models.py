@@ -20,6 +20,8 @@ class DeviceMonitoringException(Exception):
 
 
 class Device(models.Model):
+    _cached_manager = None
+
     ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     comment = models.CharField(_('Comment'), max_length=256)
@@ -71,11 +73,14 @@ class Device(models.Model):
             res = klasses[0][1]
             if issubclass(res, DevBase):
                 return res
-        return
+        raise TypeError('one of types is not subclass of DevBase. '
+                        'Or implementation of that device type is not found')
 
     def get_manager_object(self) -> DevBase:
         man_klass = self.get_manager_klass()
-        return man_klass(self)
+        if self._cached_manager is None:
+            self._cached_manager = man_klass(self)
+        return self._cached_manager
 
     # Can attach device to subscriber in subscriber page
     def has_attachable_to_subscriber(self):
