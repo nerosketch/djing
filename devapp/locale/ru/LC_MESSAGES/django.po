@@ -603,3 +603,6 @@ msgstr "%(device_name)s недостижим"
 
 msgid "Device %(device_name)s getting undefined status code"
 msgstr "Устройство %(device_name)s получило не определённый код состояния"
+
+msgid "View"
+msgstr "Посмотреть"

@@ -43,21 +43,23 @@
             <tbody>
             {% with can_del_dev=perms.devapp.delete_device can_ch_dev=perms.devapp.change_device grpid=group.id %}
             {% for dev in devices %}
-
+                {% url 'devapp:view' grpid dev.pk as viewurl %}
                 <tr>
                     <td>
-                        {% if dev.status == 'und' %}&ndash;
-                        {% else %}
-                            {% if dev.status == 'unr' or dev.status == 'dwn' %}
-                                <span class="glyphicon glyphicon-exclamation-sign text-danger"></span>
-                            {% elif dev.status == 'up' %}
-                                <span class="glyphicon glyphicon-ok-circle text-success"></span>
+                        <a href="{{ viewurl }}" class="btn btn-sm btn-default">
+                            {% if dev.status == 'und' %}&ndash;
                             {% else %}
-                                <span class="glyphicon glyphicon-question-sign text-warning"></span>
+                                {% if dev.status == 'unr' or dev.status == 'dwn' %}
+                                    <span class="glyphicon glyphicon-eye-open text-danger"></span>
+                                {% elif dev.status == 'up' %}
+                                    <span class="glyphicon glyphicon-eye-open text-success"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-eye-open text-warning"></span>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
+                        </a>
                     </td>
-                    <td><a href="{% url 'devapp:view' grpid dev.pk %}">{{ dev.ip_address }}</a></td>
+                    <td><a href="{{ viewurl }}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
                     <td>{{ dev.get_devtype_display }}</td>

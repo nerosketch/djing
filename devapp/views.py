@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
@@ -11,10 +10,10 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import DetailView, DeleteView
+from django.views.generic import DetailView, DeleteView, UpdateView, CreateView
 
 from devapp.base_intr import DeviceImplementationError
-from djing.lib.decorators import only_admins
+from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib import safe_int
 from abonapp.models import Abon
 from group_app.models import Group
@@ -88,81 +87,138 @@ class DeviceVeleteView(DeleteView):
         return res
 
 
-@login_required
-@permission_required('devapp.can_view_device')
-def dev(request, group_id, device_id=0):
-    device_group = get_object_or_404(Group, pk=group_id)
-    if not request.user.has_perm('group_app.can_view_group', device_group):
-        raise PermissionDenied
-    devinst = get_object_or_404(Device, id=device_id) if device_id != 0 else None
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
+class DeviceUpdate(UpdateView):
+    template_name = 'devapp/dev.html'
+    context_object_name = 'dev'
+    model = Device
+    form_class = DeviceForm
+    pk_url_kwarg = 'device_id'
+    device_group = None
     already_dev = None
 
-    if request.method == 'POST':
-        if device_id == 0:
-            if not request.user.has_perm('devapp.add_device'):
-                raise PermissionDenied
-        else:
-            if not request.user.has_perm('devapp.change_device'):
-                raise PermissionDenied
+    def post(self, request, *args, **kwargs):
+        if not request.user.has_perm('devapp.change_device'):
+            raise PermissionDenied
         try:
-            frm = DeviceForm(request.POST, instance=devinst)
-            if frm.is_valid():
-
-                # check if that device is exist
-                try:
-                    already_dev = Device.objects.exclude(pk=device_id).get(mac_addr=request.POST.get('mac_addr'))
-                    if already_dev.group:
-                        messages.warning(request, _('You have redirected to existing device'))
-                        return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
-                    else:
-                        messages.warning(request, _('Please attach group for device'))
-                        return redirect('devapp:fix_device_group', already_dev.pk)
-                except Device.DoesNotExist:
-                    pass
-
-                # else update device info
-                ndev = frm.save()
-                # change device info in dhcpd.conf
-                ndev.update_dhcp()
-                messages.success(request, _('Device info has been saved'))
-                return redirect('devapp:edit', ndev.group.pk, ndev.pk)
-            else:
-                messages.error(request, _('Form is invalid, check fields and try again'))
+            return super().post(request, *args, **kwargs)
         except IntegrityError as e:
             if 'unique constraint' in str(e):
                 messages.error(request, _('Duplicate user and port: %s') % e)
             else:
                 messages.error(request, e)
-    else:
-        if devinst is None:
-            frm = DeviceForm(initial={
-                'group': device_group,
-                'devtype': request.GET.get('t'),
-                'mac_addr': request.GET.get('mac'),
-                'comment': request.GET.get('c'),
-                'ip_address': request.GET.get('ip'),
-                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
-                'snmp_extra': request.GET.get('n') or ''
-            })
-        else:
-            frm = DeviceForm(instance=devinst)
+        return self.form_invalid(self.get_form())
 
-    if devinst is None:
-        parent_device_id = request.GET.get('pdev')
-        return render(request, 'devapp/add_dev.html', {
-            'form': frm,
-            'group': device_group,
-            'already_dev': already_dev,
-            'selected_parent_dev': get_object_or_None(Device, pk=parent_device_id)
-        })
-    else:
-        return render(request, 'devapp/dev.html', {
-            'form': frm,
-            'dev': devinst,
-            'selected_parent_dev': devinst.parent_dev,
-            'group': device_group,
-            'already_dev': already_dev
-        })
+    def form_valid(self, form):
+        # check if that device is exist
+        device_id = self.kwargs.get(self.pk_url_kwarg)
+        try:
+            already_dev = self.model.objects.exclude(pk=device_id).get(mac_addr=self.request.POST.get('mac_addr'))
+            self.already_dev = already_dev
+            if already_dev.group:
+                messages.warning(self.request, _('You have redirected to existing device'))
+                return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
+            else:
+                messages.warning(self.request, _('Please attach group for device'))
+                return redirect('devapp:fix_device_group', already_dev.pk)
+        except Device.DoesNotExist:
+            pass
+        r = super().form_valid(form)
+        # change device info in dhcpd.conf
+        print(self.object)
+        self.object.update_dhcp()
+        messages.success(self.request, _('Device info has been saved'))
+        return r
+
+    def get_success_url(self):
+        return resolve_url('devapp:edit', self.device_group.pk, self.object.pk)
+
+    def dispatch(self, request, *args, **kwargs):
+        group_id = self.kwargs.get('group_id')
+        device_group = get_object_or_404(Group, pk=group_id)
+        if not request.user.has_perm('group_app.can_view_group', device_group):
+            raise PermissionDenied
+        self.device_group = device_group
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('Form is invalid, check fields and try again'))
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['selected_parent_dev'] = self.object.parent_dev
+        context['group'] = self.device_group
+        context['already_dev'] = self.already_dev
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
+class DeviceCreateView(CreateView):
+    template_name = 'devapp/add_dev.html'
+    context_object_name = 'dev'
+    model = Device
+    form_class = DeviceForm
+    device_group = None
+    already_dev = None
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.has_perm('devapp.add_device'):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # check if that device is exist
+        device_id = self.kwargs.get(self.pk_url_kwarg)
+        try:
+            already_dev = self.model.objects.exclude(pk=device_id).get(mac_addr=self.request.POST.get('mac_addr'))
+            self.already_dev = already_dev
+            if already_dev.group:
+                messages.warning(self.request, _('You have redirected to existing device'))
+                return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
+            else:
+                messages.warning(self.request, _('Please attach group for device'))
+                return redirect('devapp:fix_device_group', already_dev.pk)
+        except Device.DoesNotExist:
+            pass
+        r = super().form_valid(form)
+        # change device info in dhcpd.conf
+        print(self.object)
+        self.object.update_dhcp()
+        messages.success(self.request, _('Device info has been saved'))
+        return r
+
+    def get_success_url(self):
+        return resolve_url('devapp:edit', self.device_group.pk, self.object.pk)
+
+    def dispatch(self, request, *args, **kwargs):
+        group_id = self.kwargs.get('group_id')
+        device_group = get_object_or_404(Group, pk=group_id)
+        if not request.user.has_perm('group_app.can_view_group', device_group):
+            raise PermissionDenied
+        self.device_group = device_group
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {
+            'group': self.device_group,
+            'devtype': self.request.GET.get('t'),
+            'mac_addr': self.request.GET.get('mac'),
+            'comment': self.request.GET.get('c'),
+            'ip_address': self.request.GET.get('ip'),
+            'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
+            'snmp_extra': self.request.GET.get('n') or ''
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group'] = self.device_group
+        context['already_dev'] = self.already_dev
+        parent_device_id = self.request.GET.get('pdev')
+        context['selected_parent_dev'] = get_object_or_None(Device, pk=parent_device_id)
+        return context
 
 
 @login_required
@@ -471,7 +527,7 @@ def fix_device_group(request, device_id):
     device = get_object_or_404(Device, pk=device_id)
     try:
         if request.method == 'POST':
-            frm = DeviceForm(request.POST, instance=dev)
+            frm = DeviceForm(request.POST, instance=device)
             if frm.is_valid():
                 ch_dev = frm.save()
                 if ch_dev.group:
@@ -482,7 +538,7 @@ def fix_device_group(request, device_id):
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         else:
-            frm = DeviceForm(instance=dev)
+            frm = DeviceForm(instance=device)
     except ValueError:
         return HttpResponse('ValueError')
     return render(request, 'devapp/fix_dev_group.html', {
@@ -605,70 +661,21 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             }
 
 
-class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
-    http_method_names = ('get',)
+@hash_auth_view
+def nagios_objects_conf(request):
+    def getconf(device_instance: Device):
+        config = device_instance.generate_config_template()
+        if config is not None:
+            return config
 
-    def get(self, request, *args, **kwargs):
-        from transliterate import translit
-        confs = list()
-
-        def norm_name(name: str, replreg=re.compile(r'\W{1,255}', re.IGNORECASE)):
-            return replreg.sub('', name)
-
-        for device in Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
-                .select_related('parent_dev') \
-                .only('ip_address', 'comment', 'parent_dev'):
-            host_name = norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
-            conf = None
-            mac_addr = device.mac_addr
-            if device.devtype == 'On':
-                if device.parent_dev:
-                    host_addr = device.parent_dev.ip_address
-                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
-                else:
-                    if device.ip_address:
-                        host_addr = device.ip_address
-                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
-            else:
-                parent_host_name = norm_name("%d%s" % (
-                    device.parent_dev.pk, translit(device.parent_dev.comment, language_code='ru', reversed=True)
-                )) if device.parent_dev else None
-                conf = self.templ(host_name, host_addr=device.ip_address, mac=mac_addr, parent_host_name=parent_host_name)
-            if conf is not None:
-                confs.append(conf)
-        response = HttpResponse(''.join(confs), content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="objects.cfg"'
-        return response
-
-    @staticmethod
-    def templ(host_name: str, host_addr: str, mac: Optional[str], parent_host_name: Optional[str]):
-        if not host_addr:
-            return
-        r = (
-            "define host{",
-            "\tuse				generic-switch",
-            "\thost_name		%s" % host_name,
-            "\taddress			%s" % host_addr,
-            "\tparents			%s" % parent_host_name if parent_host_name is not None else '',
-            "\t_mac_addr		%s" % mac if mac is not None else '',
-            "}\n"
-        )
-        return '\n'.join(i for i in r if i)
-
-    @staticmethod
-    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: str):
-        if not host_addr:
-            return
-        r = (
-            "define host{",
-            "\tuse				device-onu",
-            "\thost_name		%s" % host_name,
-            "\taddress			%s" % host_addr,
-            "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
-            "\t_mac_addr		%s" % mac if mac is not None else '',
-            "}\n"
-        )
-        return '\n'.join(i for i in r if i)
+    devices_queryset = Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
+        .select_related('parent_dev') \
+        .only('ip_address', 'comment', 'parent_dev')
+    confs = map(getconf, devices_queryset)
+    confs = (c for c in confs if c is not None)
+    response = HttpResponse(''.join(confs), content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename="objects.cfg"'
+    return response
 
 
 class DevicesGetListView(global_base_views.SecureApiView):

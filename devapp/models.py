@@ -1,14 +1,15 @@
 import os
-from django.db import models
-
-from djing.fields import MACAddressField
-from .base_intr import DevBase
-from djing.lib import MyGenericIPAddressField, MyChoicesAdapter
-from . import dev_types
+from typing import Optional, AnyStr
 from subprocess import run
+from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+from djing.fields import MACAddressField
+from djing.lib import MyGenericIPAddressField, MyChoicesAdapter
 from group_app.models import Group
+from . import dev_types
+from .base_intr import DevBase
 
 
 class DeviceDBException(Exception):
@@ -103,6 +104,10 @@ class Device(models.Model):
         else:
             param = 'update'
         run((filepath, param, newmac, code))
+
+    def generate_config_template(self) -> Optional[AnyStr]:
+        mng_class = self.get_manager_klass()
+        return mng_class.monitoring_template(self)
 
 
 class Port(models.Model):

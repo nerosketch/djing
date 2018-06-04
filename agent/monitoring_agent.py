@@ -21,13 +21,13 @@ def calc_hash(data):
     return sha256(result_data).hexdigest()
 
 
-def check_sign(get_list: Iterable, sign: str):
+def check_sign(get_list: Iterable, sign_str: str):
     hashed = '_'.join(get_list)
     my_sign = calc_hash(hashed)
-    return sign == my_sign
+    return sign_str == my_sign
 
 
-def validate(regexp: Union[bytes, str, re.__Regex], string: AnyStr):
+def validate(regexp: Union[bytes, str], string: AnyStr):
     if not re.match(regexp, string):
         raise ValueError
     return string

@@ -18,10 +18,6 @@ class ZTEFiberIsFull(ZteOltConsoleError):
     pass
 
 
-class ZTEFiberNumberNotFound(ZteOltConsoleError):
-    pass
-
-
 class ValidationError(ValueError):
     pass
 
@@ -222,9 +218,7 @@ def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes,
         stack_num, rack_num, fiber_num
     )
 
-    if last_onu_number < 1:
-        raise ZTEFiberNumberNotFound
-    elif last_onu_number > 126:
+    if last_onu_number > 126:
         raise ZTEFiberIsFull('olt fiber %d is full' % fiber_num)
 
     # enter to config
@@ -257,8 +251,8 @@ if __name__ == '__main__':
     ip = '10.40.1.10'
     try:
         register_onu_ZTE_F660(
-            olt_ip=ip, onu_sn=b'ZTEGC0458DCE', login_passwd=(b'admin', b'2ekc3'),
-            onu_mac=b'cc:7b:35:8b:7:0'
+            olt_ip=ip, onu_sn=b'ZTEG^#*$&@&', login_passwd=(b'admin', b'password'),
+            onu_mac=b'MAC'
         )
     except ZteOltConsoleError as e:
         print(e)

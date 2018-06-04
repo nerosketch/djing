@@ -1,11 +1,41 @@
+import re
 from typing import AnyStr, Iterable, Optional, Dict
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
+from transliterate import translit
 from django.utils.translation import gettext_lazy as _, gettext
 
 from djing.lib import RuTimedelta, safe_int
 from djing.lib.tln.tln import ValidationError as TlnValidationError
 from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
+
+
+def _norm_name(name: str, replreg=None):
+    if replreg is None:
+        return re.sub(pattern='\W{1,255}', repl='', string=name, flags=re.IGNORECASE)
+    return replreg.sub('', name)
+
+
+def plain_ip_device_mon_template(device) -> Optional[AnyStr]:
+    if not device:
+        raise ValueError
+
+    parent_host_name = _norm_name("%d%s" % (
+        device.parent_dev.pk, translit(device.parent_dev.comment, language_code='ru', reversed=True)
+    )) if device.parent_dev else None
+
+    host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
+    mac_addr = device.mac_addr
+    r = (
+        "define host{",
+        "\tuse				generic-switch",
+        "\thost_name		%s" % host_name,
+        "\taddress			%s" % device.ip_address,
+        "\tparents			%s" % parent_host_name if parent_host_name is not None else '',
+        "\t_mac_addr		%s" % mac_addr if mac_addr is not None else '',
+        "}\n"
+    )
+    return '\n'.join(i for i in r if i)
 
 
 class DLinkPort(BasePort):
@@ -81,6 +111,10 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def validate_extra_snmp_info(self, v: str) -> None:
         # Dlink has no require snmp info
         pass
+
+    @staticmethod
+    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+        return plain_ip_device_mon_template(device, *args, **kwargs)
 
 
 class ONUdev(BasePort):
@@ -159,6 +193,10 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         # Olt has no require snmp info
         pass
 
+    @staticmethod
+    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+        return plain_ip_device_mon_template(device)
+
 
 class OnuDevice(DevBase, SNMPBaseWorker):
     def __init__(self, dev_instance):
@@ -232,6 +270,24 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         except ValueError:
             raise TlnValidationError(_('Onu snmp field must be en integer'))
 
+    @staticmethod
+    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+        if not device:
+            return
+        host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
+        snmp_item = device.snmp_extra
+        mac = device.mac_addr
+        r = (
+            "define host{",
+            "\tuse				device-onu",
+            "\thost_name		%s" % host_name,
+            # "\taddress			%s" % device.ip_address,
+            "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
+            "\t_mac_addr		%s" % mac if mac is not None else '',
+            "}\n"
+        )
+        return '\n'.join(i for i in r if i)
+
 
 class EltexPort(BasePort):
     def __init__(self, snmp_worker, *args, **kwargs):
@@ -286,6 +342,10 @@ class EltexSwitch(DLinkDevice):
     @staticmethod
     def is_use_device_port():
         return False
+
+    @staticmethod
+    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+        return plain_ip_device_mon_template(device)
 
 
 def conv_signal(lvl: int) -> float:
@@ -384,3 +444,21 @@ class ZteOnuDevice(OnuDevice):
             int(fiber_num), int(onu_port)
         except ValueError:
             raise TlnValidationError(_('Zte onu snmp field must be two dot separated integers'))
+
+    @staticmethod
+    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+        if not device:
+            return
+        host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
+        snmp_item = device.snmp_extra
+        mac = device.mac_addr
+        r = (
+            "define host{",
+            "\tuse				dev-onu-zte-f660",
+            "\thost_name		%s" % host_name,
+            # "\taddress			%s" % device.ip_address,
+            "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
+            "\t_mac_addr		%s" % mac if mac is not None else '',
+            "}\n"
+        )
+        return '\n'.join(i for i in r if i)
