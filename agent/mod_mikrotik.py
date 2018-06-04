@@ -11,11 +11,12 @@ from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTarif
 from . import settings as local_settings
 from django.conf import settings
 from djing import ping
+from agent.core import NasNetworkError, NasFailedResult
 
 DEBUG = getattr(settings, 'DEBUG', False)
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
-LIST_USERS_BLOCKED = 'DjingUsersBlocked'
+#LIST_USERS_BLOCKED = 'DjingUsersBlocked'
 
 
 @singleton
@@ -421,12 +422,14 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             return
         if not isinstance(user.tariff, TariffStruct):
             raise TypeError
-        QueueManager.add(self, user)
-        IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
-        # remove user from denied user list
-        firewall_ip_list_obj = IpAddressListManager.find(self, user.ip, LIST_USERS_BLOCKED)
-        if len(firewall_ip_list_obj) > 1:
-            IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
+        try:
+            QueueManager.add(self, user)
+        except (NasNetworkError, NasFailedResult) as e:
+            print('Error:', e)
+        try:
+            IpAddressListManager.add(self, LIST_USERS_ALLOWED, user.ip)
+        except (NasNetworkError, NasFailedResult) as e:
+            print('Error:', e)
 
     def remove_user(self, user: AbonStruct):
         QueueManager.remove(self, user)
