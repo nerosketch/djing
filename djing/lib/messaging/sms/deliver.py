@@ -3,11 +3,11 @@
 
 from datetime import datetime, timedelta
 
-from messaging.utils import (swap, swap_number, encode_bytes, debug,
-                             unpack_msg, unpack_msg2, to_array)
-from messaging.sms import consts
-from messaging.sms.base import SmsBase
-from messaging.sms.udh import UserDataHeader
+from djing.lib.messaging.utils import (swap, swap_number, encode_bytes, debug,
+                                 unpack_msg, unpack_msg2, to_array)
+from djing.lib.messaging.sms import consts
+from djing.lib.messaging.sms.submit import SmsBase
+from djing.lib.messaging.sms.udh import UserDataHeader
 
 
 class SmsDeliver(SmsBase):

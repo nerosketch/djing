@@ -6,7 +6,7 @@ from abc import ABCMeta
 from hashlib import md5
 from typing import Iterable, Optional, Tuple
 from .core import BaseTransmitter, NasFailedResult, NasNetworkError
-from mydefs import singleton
+from djing.lib import Singleton
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings
@@ -19,8 +19,7 @@ LIST_USERS_ALLOWED = 'DjingUsersAllowed'
 #LIST_USERS_BLOCKED = 'DjingUsersBlocked'
 
 
-@singleton
-class ApiRos:
+class ApiRos(metaclass=Singleton):
     """Routeros api"""
     sk = None
     is_login = False
@@ -224,8 +223,8 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
 
         speeds = info['=max-limit'].split('/')
         t = TariffStruct(
-            speedIn=parse_speed(speeds[1]),
-            speedOut=parse_speed(speeds[0])
+            speed_in=parse_speed(speeds[1]),
+            speed_out=parse_speed(speeds[0])
         )
         try:
             a = AbonStruct(
@@ -483,7 +482,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         interface = r[0]['=interface']
         r = self._exec_cmd((
             '/ping', '=address=%s' % host, '=arp-ping=yes', '=interval=100ms', '=count=%d' % count,
-                     '=interface=%s' % interface
+            '=interface=%s' % interface
         ))
         received, sent = int(r[-2:][0]['=received']), int(r[-2:][0]['=sent'])
         return received, sent

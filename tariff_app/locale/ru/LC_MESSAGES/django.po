@@ -209,3 +209,6 @@ msgstr "Новый периодический платёж создан"
 #: tariff_app/views.py:102
 msgid "Periodic pay has been changed"
 msgstr "Периодический платёж изменён"
+
+msgid "Are you sure you want to delete tariff?"
+msgstr "Вы уверены что хотите удалить тариф?"

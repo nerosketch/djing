@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 import djing.fields
-import mydefs
+from djing.lib import MyGenericIPAddressField
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 (
-                'ip_address', mydefs.MyGenericIPAddressField(max_length=8, protocol='ipv4', verbose_name='Ip address')),
+                'ip_address', MyGenericIPAddressField(max_length=8, protocol='ipv4', verbose_name='Ip address')),
                 ('mac_addr', djing.fields.MACAddressField(blank=True, integer=True, null=True, unique=True,
                                                           verbose_name='Mac address')),
                 ('comment', models.CharField(max_length=256, verbose_name='Comment')),

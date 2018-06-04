@@ -2,13 +2,13 @@
 {% load i18n %}
 
 {% block modal_form_url %}
-    {% url 'group_app:del' object.pk %}
+    {% url 'devapp:del' object.group.pk object.pk %}
 {% endblock %}
 
 {% block modal_form_title %}
-    {% trans 'Remove group' %}
+    {% trans 'Remove device' %}
 {% endblock %}
 
 {% block modal_form_text %}
-    <h4>{% blocktrans %}Are you sure you want to delete group {{ object }}?{% endblocktrans %}</h4>
+    <h4>{% trans 'Are you sure you want to delete device?' %}</h4>
 {% endblock %}

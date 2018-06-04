@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-24 23:27+0300\n"
+"POT-Creation-Date: 2018-06-02 16:39+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,377 +18,456 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: devapp/base_intr.py:82
+#: base_intr.py:92
 msgid "Ip address is required"
 msgstr "Ip адрес необходим"
 
-#: devapp/dev_types.py:35
+#: dev_types.py:37
 msgid "DLink switch"
 msgstr "Свич D'Link"
 
-#: devapp/dev_types.py:54
+#: dev_types.py:56
 msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
-#: devapp/dev_types.py:106
+#: dev_types.py:112
 msgid "PON OLT"
 msgstr ""
 
-#: devapp/dev_types.py:131 devapp/views.py:268 devapp/views.py:413
+#: dev_types.py:136 views.py:275 views.py:433
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
 
-#: devapp/dev_types.py:171
+#: dev_types.py:176
+msgid "Ip address or parent device with ip address required for ONU device"
+msgstr ""
+"Необходим ip адрес. Или родительское устройство с назначенным ip адресом "
+"необходимо."
+
+#: dev_types.py:182
 msgid "PON ONU"
 msgstr ""
 
-#: devapp/dev_types.py:216
+#: dev_types.py:227
 msgid "ONU not connected"
 msgstr "ONU не в сети"
 
-#: devapp/dev_types.py:242
+#: dev_types.py:234
+msgid "Onu snmp field must be en integer"
+msgstr "Поле для snmp информации об ONU должно быть числом"
+
+#: dev_types.py:260
 msgid "Eltex switch"
 msgstr "Элтекс свич"
 
-#: devapp/forms.py:14
+#: dev_types.py:305
+msgid "OLT ZTE C320"
+msgstr ""
+
+#: dev_types.py:354
+msgid "ZTE PON ONU"
+msgstr ""
+
+#: dev_types.py:387
+msgid "Zte onu snmp field must be two dot separated integers"
+msgstr ""
+"Поле snmp информации для ZTE ONU должно быть двумя целыми числами, "
+"разделенными точкой"
+
+#: forms.py:16
 msgid "Mac address is required for fill"
 msgstr "MAC-адрес необходим для заполнения"
 
-#: devapp/forms.py:15
+#: forms.py:17
 msgid "Device with that mac is already exist"
 msgstr "Устройство с этим мак-адресом уже есть"
 
-#: devapp/forms.py:48
+#: forms.py:63
 msgid "Port number on device must be unique"
 msgstr "Номер порта на устройстве должен быть уникальным"
 
-#: devapp/models.py:21 devapp/templates/devapp/custom_dev_page/onu.html:18
-#: devapp/templates/devapp/devices.html:22
-#: devapp/templates/devapp/devices_null_group.html:20
+#: models.py:25 templates/devapp/custom_dev_page/onu.html:18
+#: templates/devapp/custom_dev_page/onu_for_zte.html:18
+#: templates/devapp/devices.html:22 templates/devapp/devices_null_group.html:20
 msgid "Ip address"
 msgstr "Ip адрес"
 
-#: devapp/models.py:22 devapp/templates/devapp/devices.html:32
+#: models.py:26 templates/devapp/devices.html:32
 msgid "Mac address"
 msgstr "Мак адрес"
 
-#: devapp/models.py:23 devapp/templates/devapp/devices.html:28
-#: devapp/templates/devapp/devices_null_group.html:26
+#: models.py:27 templates/devapp/devices.html:28
+#: templates/devapp/devices_null_group.html:26
 msgid "Comment"
 msgstr "Комментарий"
 
-#: devapp/models.py:30 devapp/templates/devapp/devices.html:36
-#: devapp/templates/devapp/devices_null_group.html:32
+#: models.py:36 templates/devapp/devices.html:36
+#: templates/devapp/devices_null_group.html:32
 msgid "Device type"
 msgstr "Тип устройства"
 
-#: devapp/models.py:32
+#: models.py:38
 msgid "SNMP password"
 msgstr "Пароль SNMP"
 
-#: devapp/models.py:33
+#: models.py:39
 msgid "Device group"
 msgstr "Группа устройства"
 
-#: devapp/models.py:34 devapp/templates/devapp/add_dev.html:46
-#: devapp/templates/devapp/custom_dev_page/onu.html:34
-#: devapp/templates/devapp/custom_dev_page/ports.html:59
-#: devapp/templates/devapp/dev.html:33
-#: devapp/templates/devapp/fix_dev_group.html:42
+#: models.py:40 templates/devapp/add_dev.html:46
+#: templates/devapp/custom_dev_page/onu.html:34
+#: templates/devapp/custom_dev_page/onu_for_zte.html:34
+#: templates/devapp/custom_dev_page/ports.html:59 templates/devapp/dev.html:33
+#: templates/devapp/fix_dev_group.html:42
 msgid "Parent device"
 msgstr "Родительское устройство"
 
-#: devapp/models.py:37
-msgid "SNMP Number"
-msgstr "SNMP Ном."
+#: models.py:43
+msgid "SNMP extra info"
+msgstr "Доп. инфо для snmp"
 
-#: devapp/models.py:40
+#: models.py:46
 msgid "Undefined"
 msgstr "Не определено"
 
-#: devapp/models.py:41
+#: models.py:47
 msgid "Up"
 msgstr "В сети"
 
-#: devapp/models.py:42
+#: models.py:48
 msgid "Unreachable"
 msgstr "Не доступно"
 
-#: devapp/models.py:43
+#: models.py:49
 msgid "Down"
 msgstr "Не в сети"
 
-#: devapp/models.py:45
+#: models.py:51
 msgid "Status"
 msgstr "Состояние"
 
-#: devapp/models.py:47
+#: models.py:53
 msgid "Send notify when monitoring state changed"
 msgstr "Отправлять уведомления при событиях мониторинга"
 
-#: devapp/models.py:52
+#: models.py:58
 msgid "Can view device"
 msgstr "Может видеть устройство"
 
-#: devapp/models.py:54 devapp/models.py:126
+#: models.py:60 models.py:108
 msgid "Device"
 msgstr "Устройство"
 
-#: devapp/models.py:55 devapp/templates/devapp/devices.html:14
-#: devapp/templates/devapp/devices_null_group.html:8
+#: models.py:61 templates/devapp/devices.html:14
+#: templates/devapp/devices_null_group.html:8
 msgid "Devices"
 msgstr "Устройства"
 
-#: devapp/models.py:127 devapp/templates/devapp/manage_ports/list.html:11
+#: models.py:96 views.py:175 views.py:237
+msgid "Device does not have a group, please fix that"
+msgstr "У устройства нет группы, пожалуйста, исправьте это"
+
+#: models.py:109 templates/devapp/manage_ports/list.html:11
 msgid "Number"
 msgstr "Номер"
 
-#: devapp/models.py:128 devapp/templates/devapp/custom_dev_page/onu.html:20
-#: devapp/templates/devapp/custom_dev_page/ports.html:88
-#: devapp/templates/devapp/manage_ports/add_ports.html:33
-#: devapp/templates/devapp/manage_ports/list.html:12
+#: models.py:110 templates/devapp/custom_dev_page/onu.html:20
+#: templates/devapp/custom_dev_page/onu_for_zte.html:20
+#: templates/devapp/custom_dev_page/ports.html:88
+#: templates/devapp/manage_ports/add_ports.html:33
+#: templates/devapp/manage_ports/list.html:12
 msgid "Description"
 msgstr "Описание"
 
-#: devapp/models.py:137
+#: models.py:119
 msgid "Can toggle ports"
 msgstr "Может переключать порты"
 
-#: devapp/models.py:139 devapp/templates/devapp/custom_dev_page/ports.html:110
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:24
+#: models.py:121 templates/devapp/custom_dev_page/ports.html:110
+#: templates/devapp/manage_ports/fix_abon_device.html:24
 msgid "Port"
 msgstr "Порт"
 
-#: devapp/models.py:140
+#: models.py:122
 msgid "Ports"
 msgstr "Порты"
 
-#: devapp/templates/devapp/add_dev.html:8
-#: devapp/templates/devapp/devices.html:8
-#: devapp/templates/devapp/devices_null_group.html:7
-#: devapp/templates/devapp/fix_dev_group.html:9
-#: devapp/templates/devapp/group_list.html:7
-#: devapp/templates/devapp/manage_ports/add_ports.html:7
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:7
+#: templates/devapp/add_dev.html:8
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:7
+#: templates/devapp/devices.html:8 templates/devapp/devices_null_group.html:7
+#: templates/devapp/fix_dev_group.html:9 templates/devapp/group_list.html:7
+#: templates/devapp/manage_ports/add_ports.html:7
+#: templates/devapp/manage_ports/fix_abon_device.html:7
 msgid "Groups"
 msgstr "Группы"
 
-#: devapp/templates/devapp/add_dev.html:10
+#: templates/devapp/add_dev.html:10
 msgid "Add new device"
 msgstr "Добавить устройство"
 
-#: devapp/templates/devapp/add_dev.html:16
-#: devapp/templates/devapp/custom_dev_page/ports.html:68
-#: devapp/templates/devapp/devices.html:63
-#: devapp/templates/devapp/manage_ports/add_ports.html:16
+#: templates/devapp/add_dev.html:16
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:12
+#: templates/devapp/custom_dev_page/ports.html:68
+#: templates/devapp/devices.html:63
+#: templates/devapp/manage_ports/add_ports.html:16
 msgid "Not assigned"
 msgstr "&lt;Не назначено&gt;"
 
-#: devapp/templates/devapp/add_dev.html:21 devapp/templates/devapp/dev.html:8
+#: templates/devapp/add_dev.html:21 templates/devapp/dev.html:8
 msgid "Device info"
 msgstr "Инфа о железке"
 
-#: devapp/templates/devapp/add_dev.html:60 devapp/templates/devapp/dev.html:43
-#: devapp/templates/devapp/dev.html:47
-#: devapp/templates/devapp/fix_dev_group.html:51
-#: devapp/templates/devapp/fix_dev_group.html:55
+#: templates/devapp/add_dev.html:60 templates/devapp/dev.html:43
+#: templates/devapp/dev.html:47 templates/devapp/fix_dev_group.html:51
+#: templates/devapp/fix_dev_group.html:55
 msgid "Find the device"
 msgstr "Найти устройство"
 
-#: devapp/templates/devapp/add_dev.html:72 devapp/templates/devapp/dev.html:61
-#: devapp/templates/devapp/fix_dev_group.html:64
-#: devapp/templates/devapp/manage_ports/add_ports.html:75
-#: devapp/templates/devapp/manage_ports/add_ports.html:79
-#: devapp/templates/devapp/manage_ports/modal_add_edit_port.html:21
+#: templates/devapp/add_dev.html:72 templates/devapp/dev.html:61
+#: templates/devapp/fix_dev_group.html:64
+#: templates/devapp/manage_ports/add_ports.html:75
+#: templates/devapp/manage_ports/add_ports.html:79
+#: templates/devapp/manage_ports/modal_add_edit_port.html:21
 msgid "Save"
 msgstr "Сохранить"
 
-#: devapp/templates/devapp/add_dev.html:75 devapp/templates/devapp/dev.html:73
-#: devapp/templates/devapp/fix_dev_group.html:67
+#: templates/devapp/add_dev.html:75 templates/devapp/dev.html:73
+#: templates/devapp/fix_dev_group.html:67
 msgid "Reset"
 msgstr "Сбросить"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:10
-#: devapp/templates/devapp/custom_dev_page/onu.html:12
-#: devapp/templates/devapp/custom_dev_page/ports.html:12
+#: templates/devapp/custom_dev_page/olt.html:10
+#: templates/devapp/custom_dev_page/olt_ztec320.html:11
+#: templates/devapp/custom_dev_page/onu.html:12
+#: templates/devapp/custom_dev_page/onu_for_zte.html:12
+#: templates/devapp/custom_dev_page/ports.html:12
 msgid "Uptime"
 msgstr "Без перезагрузки"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:17
+#: templates/devapp/custom_dev_page/olt.html:17
 msgid "SNMP Num"
 msgstr "SNMP Ном."
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:18
+#: templates/devapp/custom_dev_page/olt.html:18
 msgid "Name"
 msgstr "Имя"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:19
-#: devapp/templates/devapp/custom_dev_page/onu.html:19
+#: templates/devapp/custom_dev_page/olt.html:19
+#: templates/devapp/custom_dev_page/onu.html:19
+#: templates/devapp/custom_dev_page/onu_for_zte.html:19
 msgid "Mac"
 msgstr "Мак"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:20
-#: devapp/templates/devapp/custom_dev_page/onu.html:73
+#: templates/devapp/custom_dev_page/olt.html:20
+#: templates/devapp/custom_dev_page/onu.html:74
+#: templates/devapp/custom_dev_page/onu_for_zte.html:77
 msgid "Signal"
 msgstr "Ур. сигнала"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:38
+#: templates/devapp/custom_dev_page/olt.html:38
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:45
 msgid "Create device"
 msgstr "Создать устройство"
 
-#: devapp/templates/devapp/custom_dev_page/olt.html:45
-#: devapp/templates/devapp/manage_ports/list.html:48
+#: templates/devapp/custom_dev_page/olt.html:45
+#: templates/devapp/manage_ports/list.html:48
 msgid "Ports not found"
 msgstr "Порты не найдены"
 
-#: devapp/templates/devapp/custom_dev_page/onu.html:10
-#: devapp/templates/devapp/custom_dev_page/ports.html:10
-msgid "Title of the type of switch"
-msgstr "Название типа свича"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:22
-msgid "Attached user"
-msgstr "Прикрепленный абонент"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:47
-msgid "ONU Status"
-msgstr "Состояние ONU"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:57
-msgid "ONU error"
-msgstr "ONU ошибка"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:71
-msgid "Name on OLT"
-msgstr "Имя на OLT"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:72
-msgid "Distance(m)"
-msgstr "Расстояние (м)"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:77
-#: devapp/templates/devapp/custom_dev_page/onu.html:85
-msgid "Mac on OLT"
-msgstr "MAC адрес на OLT"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:78
-msgid "Mac-addresses does not match"
-msgstr "MAC адреса не совпадают"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:79
-#: devapp/templates/devapp/custom_dev_page/onu.html:81
-msgid "Fix it"
-msgstr "Исправить"
-
-#: devapp/templates/devapp/custom_dev_page/onu.html:92
-msgid "Info does not fetch"
-msgstr "Информация не получена"
-
-#: devapp/templates/devapp/custom_dev_page/ports.html:44
-msgid "Disable port"
-msgstr "Выключить порт"
-
-#: devapp/templates/devapp/custom_dev_page/ports.html:48
-msgid "Enable port"
-msgstr "Включить порт"
-
-#: devapp/templates/devapp/custom_dev_page/ports.html:54
+#: templates/devapp/custom_dev_page/olt_ztec320.html:31
+#: templates/devapp/custom_dev_page/ports.html:54
 msgid "We have not received info, please check options :("
 msgstr "Инфа не получена, проверьте настройки :("
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:80
+#: templates/devapp/custom_dev_page/olt_ztec320.html:36
+msgid "Long description"
+msgstr "Длинное описание"
+
+#: templates/devapp/custom_dev_page/olt_ztec320.html:37
+msgid "Hostname"
+msgstr "Имя хоста"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:15
+msgid "OLT Scan"
+msgstr "Скан OLT"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:27
+msgid "Onu type"
+msgstr "Тип ONU"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:28
+msgid "Onu port"
+msgstr "Порт ONU"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:29
+msgid "Onu signal"
+msgstr "Сигнала ONU"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:30
+msgid "Serial"
+msgstr "Серийный номер"
+
+#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:52
+msgid "ONU not found"
+msgstr "ONU не найдена"
+
+#: templates/devapp/custom_dev_page/onu.html:10
+#: templates/devapp/custom_dev_page/onu_for_zte.html:10
+#: templates/devapp/custom_dev_page/ports.html:10
+msgid "Title of the type of switch"
+msgstr "Название типа свича"
+
+#: templates/devapp/custom_dev_page/onu.html:22
+#: templates/devapp/custom_dev_page/onu_for_zte.html:22
+msgid "Attached user"
+msgstr "Прикрепленный абонент"
+
+#: templates/devapp/custom_dev_page/onu.html:48
+#: templates/devapp/custom_dev_page/onu_for_zte.html:50
+msgid "ONU Status"
+msgstr "Состояние ONU"
+
+#: templates/devapp/custom_dev_page/onu.html:58
+#: templates/devapp/custom_dev_page/onu_for_zte.html:60
+msgid "ONU error"
+msgstr "ONU ошибка"
+
+#: templates/devapp/custom_dev_page/onu.html:72
+#: templates/devapp/custom_dev_page/onu_for_zte.html:75
+msgid "Name on OLT"
+msgstr "Имя на OLT"
+
+#: templates/devapp/custom_dev_page/onu.html:73
+#: templates/devapp/custom_dev_page/onu_for_zte.html:76
+msgid "Distance(m)"
+msgstr "Расстояние (м)"
+
+#: templates/devapp/custom_dev_page/onu.html:78
+#: templates/devapp/custom_dev_page/onu.html:86
+msgid "Mac on OLT"
+msgstr "MAC адрес на OLT"
+
+#: templates/devapp/custom_dev_page/onu.html:79
+msgid "Mac-addresses does not match"
+msgstr "MAC адреса не совпадают"
+
+#: templates/devapp/custom_dev_page/onu.html:80
+#: templates/devapp/custom_dev_page/onu.html:82
+msgid "Fix it"
+msgstr "Исправить"
+
+#: templates/devapp/custom_dev_page/onu.html:93
+#: templates/devapp/custom_dev_page/onu_for_zte.html:83
+msgid "Info does not fetch"
+msgstr "Информация не получена"
+
+#: templates/devapp/custom_dev_page/ports.html:44
+msgid "Disable port"
+msgstr "Выключить порт"
+
+#: templates/devapp/custom_dev_page/ports.html:48
+msgid "Enable port"
+msgstr "Включить порт"
+
+#: templates/devapp/custom_dev_page/ports.html:80
 msgid "Device log"
 msgstr "Лог устройства"
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:87
+#: templates/devapp/custom_dev_page/ports.html:87
 msgid "Level"
 msgstr "Уровень"
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:89
+#: templates/devapp/custom_dev_page/ports.html:89
 msgid "Date"
 msgstr "Дата"
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:104
+#: templates/devapp/custom_dev_page/ports.html:104
 msgid "Ports comment"
 msgstr "Комментарии портов"
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:111
+#: templates/devapp/custom_dev_page/ports.html:111
 msgid "Title"
 msgstr "Название"
 
-#: devapp/templates/devapp/custom_dev_page/ports.html:122
+#: templates/devapp/custom_dev_page/ports.html:122
 msgid "We have not received info for ports"
 msgstr "Инфа о портах не получена"
 
-#: devapp/templates/devapp/dev.html:65 devapp/templates/devapp/dev.html:69
-#: devapp/templates/devapp/manage_ports/add_ports.html:53
-#: devapp/templates/devapp/manage_ports/add_ports.html:55
-#: devapp/templates/devapp/manage_ports/list.html:35
-#: devapp/templates/devapp/manage_ports/modal_del_port.html:14
+#: templates/devapp/dev.html:65 templates/devapp/dev.html:69
+#: templates/devapp/manage_ports/add_ports.html:53
+#: templates/devapp/manage_ports/add_ports.html:55
+#: templates/devapp/manage_ports/list.html:35
+#: templates/devapp/manage_ports/modal_del_port.html:14
 msgid "Delete"
 msgstr "Удалить"
 
-#: devapp/templates/devapp/dev.html:68
+#: templates/devapp/dev.html:68
 msgid "Permission denied"
 msgstr "Доступ запрещён"
 
-#: devapp/templates/devapp/devices.html:81
-#: devapp/templates/devapp/devices_null_group.html:62
+#: templates/devapp/device_confirm_delete.html:9
+msgid "Remove device"
+msgstr "Удалить устройство"
+
+#: templates/devapp/device_confirm_delete.html:13
+msgid "Are you sure you want to delete device?"
+msgstr "Вы уверены что хотите удалить устройство?"
+
+#: templates/devapp/devices.html:81 templates/devapp/devices_null_group.html:62
 msgid "Devices does not found"
 msgstr "Нет созданных устройств"
 
-#: devapp/templates/devapp/devices.html:81
-#: devapp/templates/devapp/devices.html:91
-#: devapp/templates/devapp/devices_null_group.html:62
-#: devapp/templates/devapp/devices_null_group.html:72
+#: templates/devapp/devices.html:81 templates/devapp/devices.html:91
+#: templates/devapp/devices_null_group.html:62
+#: templates/devapp/devices_null_group.html:72
 msgid "Create"
 msgstr "Cоздать"
 
-#: devapp/templates/devapp/devices_null_group.html:13
-#: devapp/templates/devapp/group_list.html:32
+#: templates/devapp/devices_null_group.html:13
+#: templates/devapp/group_list.html:32
 msgid "Devices without group"
 msgstr "Устройства без группы"
 
-#: devapp/templates/devapp/fix_dev_group.html:17
+#: templates/devapp/fix_dev_group.html:17
 msgid "Fix device group"
 msgstr "Поправить группу устройства"
 
-#: devapp/templates/devapp/group_list.html:14
+#: templates/devapp/group_list.html:14
 msgid "Group title"
 msgstr "Название"
 
-#: devapp/templates/devapp/group_list.html:24
+#: templates/devapp/group_list.html:24
 msgid "Groups was not found"
 msgstr "Эта группа не найдена"
 
-#: devapp/templates/devapp/group_list.html:35
+#: templates/devapp/group_list.html:35
 msgid "Export to nagios objects"
 msgstr "Экспортировать конфиг для nagios"
 
-#: devapp/templates/devapp/manage_ports/add_ports.html:10
-#: devapp/templates/devapp/manage_ports/list.html:58
+#: templates/devapp/manage_ports/add_ports.html:10
+#: templates/devapp/manage_ports/list.html:58
 msgid "Add ports"
 msgstr "Добавить порты"
 
-#: devapp/templates/devapp/manage_ports/add_ports.html:32
+#: templates/devapp/manage_ports/add_ports.html:32
 msgid "Mode"
 msgstr "Режим"
 
-#: devapp/templates/devapp/manage_ports/add_ports.html:60
-#: devapp/templates/devapp/manage_ports/list.html:57
+#: templates/devapp/manage_ports/add_ports.html:60
+#: templates/devapp/manage_ports/list.html:57
 msgid "Add"
 msgstr "Добавить"
 
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:10
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:16
+#: templates/devapp/manage_ports/fix_abon_device.html:10
+#: templates/devapp/manage_ports/fix_abon_device.html:16
 msgid "Fix subscriber ports conflict"
 msgstr "Исправить конфликт абонентов на порту"
 
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:21
+#: templates/devapp/manage_ports/fix_abon_device.html:21
 msgid "Subscribers list on port"
 msgstr "Список абонентов на порту"
 
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:25
+#: templates/devapp/manage_ports/fix_abon_device.html:25
 msgid ""
 "You may choose the subscriber who correctly attached to device port. When "
 "you have found right subscriber, remove the port from the other person"
@@ -397,15 +476,15 @@ msgstr ""
 "найдёте нужного абонента удалите этот порт у другого абонента чтоб исправить "
 "конфликт"
 
-#: devapp/templates/devapp/manage_ports/fix_abon_device.html:31
+#: templates/devapp/manage_ports/fix_abon_device.html:31
 msgid "Abons not found"
 msgstr "Абоненты не найдены"
 
-#: devapp/templates/devapp/manage_ports/list.html:13
+#: templates/devapp/manage_ports/list.html:13
 msgid "Count of subscribers"
 msgstr "Сколько абонов"
 
-#: devapp/templates/devapp/manage_ports/list.html:26
+#: templates/devapp/manage_ports/list.html:26
 #, python-format
 msgid ""
 "Port should not have more than one subscriber, <a href='%(furl)s'>fix that</"
@@ -414,112 +493,104 @@ msgstr ""
 "Порт не должен иметь больше одного назначенного абонента, <a "
 "href='%(furl)s'>исправить</a>"
 
-#: devapp/templates/devapp/manage_ports/list.html:31
+#: templates/devapp/manage_ports/list.html:31
 msgid "Show subscriber on port"
 msgstr "Показать абонента на порту"
 
-#: devapp/templates/devapp/manage_ports/list.html:40
-#: devapp/templates/devapp/manage_ports/modal_add_edit_port.html:14
+#: templates/devapp/manage_ports/list.html:40
+#: templates/devapp/manage_ports/modal_add_edit_port.html:14
 msgid "Edit"
 msgstr "Редактировать"
 
-#: devapp/templates/devapp/manage_ports/modal_del_port.html:7
+#: templates/devapp/manage_ports/modal_del_port.html:7
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: devapp/templates/devapp/manage_ports/modal_del_port.html:11
+#: templates/devapp/manage_ports/modal_del_port.html:11
 msgid "Are you sure that you want to delete switch port from db?"
 msgstr "Вы уверены что хотите удалить порт свича из бд?"
 
-#: devapp/templates/devapp/manage_ports/modal_show_subscriber_on_port.html:5
+#: templates/devapp/manage_ports/modal_show_subscriber_on_port.html:5
 msgid "Subscriber on port"
 msgstr "Абонент на порту"
 
-#: devapp/views.py:80
-msgid "Delete failed"
-msgstr "Неизвестная ошибка при удалении :("
+#: views.py:87
+msgid "Device successfully deleted"
+msgstr "Устройство успешно удалено"
 
-#: devapp/views.py:109
+#: views.py:115
 msgid "You have redirected to existing device"
 msgstr "Вы были переадресованы на существующее устройство"
 
-#: devapp/views.py:112 devapp/views.py:361 devapp/views.py:457
+#: views.py:118 views.py:368 views.py:481
 msgid "Please attach group for device"
 msgstr "Пожалуйста назначте устройству группу в настройках"
 
-#: devapp/views.py:121
+#: views.py:127
 msgid "Device info has been saved"
 msgstr "Инфа о точке сохранена"
 
-#: devapp/views.py:124 devapp/views.py:307 devapp/views.py:336
-#: devapp/views.py:459
+#: views.py:130 views.py:314 views.py:343 views.py:483
 msgid "Form is invalid, check fields and try again"
 msgstr "Ошибка в данных, проверте их ещё раз"
 
-#: devapp/views.py:127
+#: views.py:133
 #, python-format
 msgid "Duplicate user and port: %s"
 msgstr "Пользователь с таким портом и устройством уже есть: %s"
 
-#: devapp/views.py:168 devapp/views.py:230
-msgid "Device does not have a group, please fix that"
-msgstr "У устройства нет группы, пожалуйста, исправьте это"
-
-#: devapp/views.py:173 devapp/views.py:263 devapp/views.py:348
+#: views.py:180 views.py:270 views.py:355
 msgid "Device does not exist"
 msgstr "Устойство не найдено"
 
-#: devapp/views.py:194
+#: views.py:201
 msgid "Subscribers on port does not exist"
 msgstr "Абоненты на порту не найдены"
 
-#: devapp/views.py:196
+#: views.py:203
 msgid "More than one subscriber on device port"
 msgstr "Больше одного абонента на порту устройства"
 
-#: devapp/views.py:282
+#: views.py:289
 msgid "Port successfully removed"
 msgstr "Порт успешно удалён"
 
-#: devapp/views.py:290 devapp/views.py:318
+#: views.py:297 views.py:325
 msgid "Port does not exist"
 msgstr "Порт не найден"
 
-#: devapp/views.py:305 devapp/views.py:333
+#: views.py:312 views.py:340
 msgid "Port successfully saved"
 msgstr "Порт успешно сохранён"
 
-#: devapp/views.py:368 devapp/views.py:411
+#: views.py:375 views.py:431
 msgid "Dot was not pinged"
 msgstr "Эта точка не пингуется"
 
-#: devapp/views.py:377 devapp/views.py:409
+#: views.py:384 views.py:429
 msgid "Not Set snmp device password"
 msgstr "Не указан snmp пароль для устройства"
 
-#: devapp/views.py:385
+#: views.py:392
 msgid "SNMP error on device"
 msgstr "Ошибка SNMP на устройстве"
 
-#: devapp/views.py:454
+#: views.py:478
 msgid "Device fixed"
 msgstr "Устройство исправлено"
 
-#: devapp/views.py:483
+#: views.py:508
 #, python-format
 msgid "Device with mac address %(mac)s does not exist"
 msgstr "Устройство мак адресом %(mac)s не найдено"
 
-#: devapp/views.py:491
+#: views.py:516
 msgid "Fixed"
 msgstr "Исправлено, обновите страницу"
 
-#: devapp/views.py:494
+#: views.py:519
 msgid "Parent device not found"
 msgstr "Вышестоящее устройство не найдено"
-
-#~ msgid "Plugin output"
-#~ msgstr "Вывод мониторинга"
 
 msgid "Device %(device_name)s is up"
 msgstr "%(device_name)s в сети"
@@ -532,6 +603,3 @@ msgstr "%(device_name)s недостижим"
 
 msgid "Device %(device_name)s getting undefined status code"
 msgstr "Устройство %(device_name)s получило не определённый код состояния"
-
-msgid "Ip address or parent device with ip address required for ONU device"
-msgstr "Необходим ip адрес. Или родительское устройство с назначенным ip адресом необходимо."

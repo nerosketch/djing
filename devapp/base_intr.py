@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
-from django.utils.translation import gettext
 from typing import Union, Iterable, AnyStr, Generator, Optional
-
 from easysnmp import Session
+
+from django.utils.translation import gettext
 
 ListOrError = Union[
     Iterable,
@@ -15,7 +15,7 @@ class DeviceImplementationError(Exception):
     pass
 
 
-class DevBase(object, metaclass=ABCMeta):
+class DevBase(object):
     def __init__(self, dev_instance=None):
         self.db_instance = dev_instance
 
@@ -52,6 +52,15 @@ class DevBase(object, metaclass=ABCMeta):
     @abstractmethod
     def is_use_device_port() -> bool:
         """True if used device port while opt82 authorization"""
+
+    @abstractmethod
+    def validate_extra_snmp_info(self, v: str) -> None:
+        """
+        Validate extra snmp field for each device.
+        If validation failed then raise en exception from djing.lib.tln.ValidationError
+        with description of error.
+        :param v: String value for validate
+        """
 
 
 class BasePort(object, metaclass=ABCMeta):

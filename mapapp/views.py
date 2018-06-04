@@ -14,7 +14,7 @@ from jsonview.decorators import json_view
 from group_app.models import Group
 from .models import Dot
 from .forms import DotForm
-from mydefs import safe_int
+from djing.lib import safe_int
 from devapp.models import Device
 from guardian.decorators import permission_required
 

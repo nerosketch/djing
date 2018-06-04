@@ -42,7 +42,7 @@
                             <td>{{ onu.onu_signal }}</td>
                             <td>{{ onu.onu_sn }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?t=On&pdev={{ dev.pk }}&c={{ onu.onu_sn }}" title="{% trans 'Create device' %}">
+                                <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.onu_sn }}&n={{ onu.snmp_extra }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>

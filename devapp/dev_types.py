@@ -1,9 +1,10 @@
-from typing import AnyStr, Iterable
+from typing import AnyStr, Iterable, Optional, Dict
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
 from django.utils.translation import gettext_lazy as _, gettext
 
-from mydefs import RuTimedelta, safe_int
+from djing.lib import RuTimedelta, safe_int
+from djing.lib.tln.tln import ValidationError as TlnValidationError
 from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
 
 
@@ -76,6 +77,10 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     @staticmethod
     def is_use_device_port():
         return True
+
+    def validate_extra_snmp_info(self, v: str) -> None:
+        # Dlink has no require snmp info
+        pass
 
 
 class ONUdev(BasePort):
@@ -150,6 +155,10 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def is_use_device_port():
         return False
 
+    def validate_extra_snmp_info(self, v: str) -> None:
+        # Olt has no require snmp info
+        pass
+
 
 class OnuDevice(DevBase, SNMPBaseWorker):
     def __init__(self, dev_instance):
@@ -197,7 +206,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
     def get_details(self):
         if self.db_instance is None:
             return
-        num = self.db_instance.snmp_item_num
+        num = safe_int(self.db_instance.snmp_extra)
         if num == 0:
             return
         try:
@@ -215,6 +224,13 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             }
         except EasySNMPTimeoutError as e:
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
+
+    def validate_extra_snmp_info(self, v: str) -> None:
+        # DBCOM Onu have en integer snmp port
+        try:
+            int(v)
+        except ValueError:
+            raise TlnValidationError(_('Onu snmp field must be en integer'))
 
 
 class EltexPort(BasePort):
@@ -272,8 +288,17 @@ class EltexSwitch(DLinkDevice):
         return False
 
 
-class Olt_ZTE_C320(OLTDevice):
+def conv_signal(lvl: int) -> float:
+    if lvl == 65535: return 0.0
+    r = 0
+    if 0 < lvl < 30000:
+        r = lvl * 0.002 - 30
+    elif 60000 < lvl < 65534:
+        r = (lvl - 65534) * 0.002 - 30
+    return round(r, 2)
 
+
+class Olt_ZTE_C320(OLTDevice):
     @staticmethod
     def description():
         return gettext('OLT ZTE C320')
@@ -287,16 +312,8 @@ class Olt_ZTE_C320(OLTDevice):
         return fibers
 
     def get_ports_on_fiber(self, fiber_num: int) -> Iterable:
-        def conv_signal(lvl: int) -> float:
-            if lvl == 65535: return 0.0
-            r = 0
-            if 0 < lvl < 30000:
-                r = lvl * 0.002 - 30
-            elif 60000 < lvl < 65534:
-                r = (lvl - 65534) * 0.002 - 30
-            return round(r, 2)
 
-        onu_types = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
+        onu_types = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
         onu_ports = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.2.%d' % fiber_num)
         onu_signals = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num)
 
@@ -304,13 +321,15 @@ class Olt_ZTE_C320(OLTDevice):
         onu_sns = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%d' % fiber_num)
         onu_prefixs = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d' % fiber_num)
         onu_list = ({
-            'onu_type': onu_type,
+            'onu_type': onu_type_num[0],
             'onu_port': onu_port,
             'onu_signal': conv_signal(safe_int(onu_signal)),
-            'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets
-        } for onu_type, onu_port, onu_signal, onu_sn, onu_prefix in zip(
+            'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets,
+            'snmp_extra': "%d.%d" % (fiber_num, safe_int(onu_type_num[1])),
+        } for onu_type_num, onu_port, onu_signal, onu_sn, onu_prefix in zip(
             onu_types, onu_ports, onu_signals, onu_sns, onu_prefixs
         ))
+
         return onu_list
 
     def uptime(self):
@@ -326,3 +345,42 @@ class Olt_ZTE_C320(OLTDevice):
 
     def get_template_name(self):
         return 'olt_ztec320.html'
+
+
+class ZteOnuDevice(OnuDevice):
+    @staticmethod
+    def description():
+        return _('ZTE PON ONU')
+
+    def get_details(self) -> Optional[Dict]:
+        if self.db_instance is None:
+            return
+        snmp_extra = self.db_instance.snmp_extra
+        if not snmp_extra:
+            return
+        try:
+            fiber_num, onu_num = snmp_extra.split('.')
+            fiber_num, onu_num = int(fiber_num), int(onu_num)
+            status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%d.%d.1' % (fiber_num, onu_num))
+            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d.%d.1' % (fiber_num, onu_num))
+            distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%d.%d.1' % (fiber_num, onu_num))
+            name = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d.%d' % (fiber_num, onu_num))
+            return {
+                'status': status,
+                'signal': conv_signal(safe_int(signal)),
+                'name': name,
+                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
+            }
+        except ValueError:
+            pass
+
+    def get_template_name(self):
+        return 'onu_for_zte.html'
+
+    def validate_extra_snmp_info(self, v: str) -> None:
+        # for example 268501760.5
+        try:
+            fiber_num, onu_port = v.split('.')
+            int(fiber_num), int(onu_port)
+        except ValueError:
+            raise TlnValidationError(_('Zte onu snmp field must be two dot separated integers'))

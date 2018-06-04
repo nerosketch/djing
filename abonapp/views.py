@@ -20,7 +20,6 @@ from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
-import mydefs
 from devapp.models import Device, Port as DevPort
 from datetime import datetime, date, timedelta
 from taskapp.models import Task
@@ -30,6 +29,7 @@ from group_app.models import Group
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
+from djing import lib
 from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
 
 PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -40,14 +40,14 @@ class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
     http_method_names = ('get',)
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 class PeoplesListView(BaseAbonListView):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
 
     def get_queryset(self):
-        street_id = mydefs.safe_int(self.request.GET.get('street'))
-        gid = mydefs.safe_int(self.kwargs.get('gid'))
+        street_id = lib.safe_int(self.request.GET.get('street'))
+        gid = lib.safe_int(self.kwargs.get('gid'))
         peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
         if street_id > 0:
             peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
@@ -61,7 +61,7 @@ class PeoplesListView(BaseAbonListView):
                         abon.stat_cache = StatCache.objects.get(ip=abon.ip_address)
                     except StatCache.DoesNotExist:
                         pass
-        except mydefs.LogicError as e:
+        except lib.LogicError as e:
             messages.warning(self.request, e)
         ordering = self.get_ordering()
         if ordering and isinstance(ordering, str):
@@ -70,7 +70,7 @@ class PeoplesListView(BaseAbonListView):
         return peoples_list
 
     def get_context_data(self, **kwargs):
-        gid = mydefs.safe_int(self.kwargs.get('gid'))
+        gid = lib.safe_int(self.kwargs.get('gid'))
         if gid < 1:
             return HttpResponseBadRequest('group id is broken')
         group = get_object_or_404(Group, pk=gid)
@@ -80,12 +80,12 @@ class PeoplesListView(BaseAbonListView):
         context = super(PeoplesListView, self).get_context_data(**kwargs)
 
         context['streets'] = models.AbonStreet.objects.filter(group=gid)
-        context['street_id'] = mydefs.safe_int(self.request.GET.get('street'))
+        context['street_id'] = lib.safe_int(self.request.GET.get('street'))
         context['group'] = group
         return context
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 class GroupListView(BaseAbonListView):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
@@ -98,7 +98,7 @@ class GroupListView(BaseAbonListView):
         return queryset
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.add_abon'), name='dispatch')
 class AbonCreateView(CreateView):
     group = None
@@ -142,9 +142,9 @@ class AbonCreateView(CreateView):
             messages.success(self.request, _('create abon success msg'))
             self.abon = abon
             return super(AbonCreateView, self).form_valid(form)
-        except (IntegrityError, NasFailedResult, NasNetworkError, mydefs.LogicError) as e:
+        except (IntegrityError, NasFailedResult, NasNetworkError, lib.LogicError) as e:
             messages.error(self.request, e)
-        except mydefs.MultipleException as errs:
+        except lib.MultipleException as errs:
             for err in errs.err_list:
                 messages.error(self.request, err)
         return self.render_to_response(self.get_context_data(form=form))
@@ -154,7 +154,7 @@ class AbonCreateView(CreateView):
         return super(AbonCreateView, self).form_invalid(form)
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.delete_abon'), name='dispatch')
 class DelAbonDeleteView(DeleteView):
     model = models.Abon
@@ -181,7 +181,7 @@ class DelAbonDeleteView(DeleteView):
             messages.error(self.request, e)
         except NasFailedResult as e:
             messages.error(self.request, _("NAS says: '%s'") % e)
-        except mydefs.MultipleException as errs:
+        except lib.MultipleException as errs:
             for err in errs.err_list:
                 messages.error(self.request, err)
         return HttpResponseRedirect(self.success_url)
@@ -196,7 +196,7 @@ def abonamount(request, gid, uname):
         if request.method == 'POST':
             abonuname = request.POST.get('abonuname')
             if abonuname == uname:
-                amnt = mydefs.safe_float(request.POST.get('amount'))
+                amnt = lib.safe_float(request.POST.get('amount'))
                 abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
                 abon.save(update_fields=('ballance',))
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
@@ -205,7 +205,7 @@ def abonamount(request, gid, uname):
                 messages.error(request, _('I not know the account id'))
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
-    except mydefs.MultipleException as errs:
+    except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
     return render_to_text('abonapp/modal_abonamount.html', {
@@ -214,7 +214,7 @@ def abonamount(request, gid, uname):
     }, request=request)
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(BaseAbonListView):
     context_object_name = 'invoices'
@@ -232,7 +232,7 @@ class DebtsListView(BaseAbonListView):
         return context
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(BaseAbonListView):
     context_object_name = 'pay_history'
@@ -252,7 +252,7 @@ class PayHistoryListView(BaseAbonListView):
 
 
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 def abon_services(request, gid, uname):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.can_view_group', grp):
@@ -277,7 +277,7 @@ def abon_services(request, gid, uname):
     })
 
 
-@method_decorator((login_required, mydefs.only_admins), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('abonapp.change_abon'), name='post')
 class AbonHomeUpdateView(UpdateView):
     model = models.Abon
@@ -291,11 +291,11 @@ class AbonHomeUpdateView(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         try:
             return super(AbonHomeUpdateView, self).dispatch(request, *args, **kwargs)
-        except mydefs.LogicError as e:
+        except lib.LogicError as e:
             messages.error(request, e)
         except (NasFailedResult, NasNetworkError) as e:
             messages.error(request, e)
-        except mydefs.MultipleException as errs:
+        except lib.MultipleException as errs:
             for err in errs.err_list:
                 messages.error(request, err)
         return self.render_to_response(self.get_context_data())
@@ -342,11 +342,11 @@ class AbonHomeUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         abon = self.object
-        dev = getattr(abon, 'device')
+        device = getattr(abon, 'device')
         context = {
             'group': self.group,
-            'device': dev,
-            'dev_ports': DevPort.objects.filter(device=dev) if dev else None
+            'device': device,
+            'dev_ports': DevPort.objects.filter(device=device) if device else None
         }
         context.update(kwargs)
         return super(AbonHomeUpdateView, self).get_context_data(**context)
@@ -354,9 +354,9 @@ class AbonHomeUpdateView(UpdateView):
     def get_success_url(self):
         abon = self.object
         return resolve_url('abonapp:abon_home',
-            gid=getattr(abon.group, 'pk', 0),
-            uname=abon.username
-        )
+                           gid=getattr(abon.group, 'pk', 0),
+                           uname=abon.username
+                           )
 
 
 @transaction.atomic
@@ -377,7 +377,7 @@ def add_invoice(request, gid, uname):
 
     try:
         if request.method == 'POST':
-            curr_amount = mydefs.safe_int(request.POST.get('curr_amount'))
+            curr_amount = lib.safe_int(request.POST.get('curr_amount'))
             comment = request.POST.get('comment')
 
             newinv = models.InvoiceForPayment()
@@ -395,7 +395,7 @@ def add_invoice(request, gid, uname):
 
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
-    except mydefs.MultipleException as errs:
+    except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
     return render(request, 'abonapp/addInvoice.html', {
@@ -406,7 +406,7 @@ def add_invoice(request, gid, uname):
 
 
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 @permission_required('abonapp.can_buy_tariff')
 @transaction.atomic
 def pick_tariff(request, gid, uname):
@@ -429,14 +429,14 @@ def pick_tariff(request, gid, uname):
             abon.sync_with_nas(created=False)
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
-    except (mydefs.LogicError, NasFailedResult) as e:
+    except (lib.LogicError, NasFailedResult) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.error(request, e)
         return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
     except Tariff.DoesNotExist:
         messages.error(request, _('Tariff your picked does not exist'))
-    except mydefs.MultipleException as errs:
+    except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
     except ValueError as e:
@@ -446,7 +446,7 @@ def pick_tariff(request, gid, uname):
         'tariffs': tariffs,
         'abon': abon,
         'group': grp,
-        'selected_tariff': mydefs.safe_int(request.GET.get('selected_tariff'))
+        'selected_tariff': lib.safe_int(request.GET.get('selected_tariff'))
     })
 
 
@@ -463,7 +463,7 @@ def unsubscribe_service(request, gid, uname, abon_tariff_id):
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
-    except mydefs.MultipleException as errs:
+    except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
     return redirect('abonapp:abon_services', gid=gid, uname=uname)
@@ -550,7 +550,7 @@ class PassportUpdateView(UpdateView):
 
 
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 def chgroup_tariff(request, gid):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.change_group', grp):
@@ -578,8 +578,7 @@ def dev(request, gid, uname):
     try:
         abon = models.Abon.objects.get(username=uname)
         if request.method == 'POST':
-            dev = Device.objects.get(pk=request.POST.get('dev'))
-            abon.device = dev
+            abon.device = Device.objects.get(pk=request.POST.get('dev'))
             abon.save(update_fields=('device',))
             messages.success(request, _('Device has successfully attached'))
             return redirect('abonapp:abon_home', gid=gid, uname=uname)
@@ -683,7 +682,7 @@ def make_extra_field(request, gid, uname):
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
         frm = forms.ExtraFieldForm()
-    except mydefs.MultipleException as errs:
+    except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
         frm = forms.ExtraFieldForm()
@@ -731,7 +730,7 @@ def abon_ping(request):
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
     try:
         if ip is None:
-            raise mydefs.LogicError(_('Ip not passed'))
+            raise lib.LogicError(_('Ip not passed'))
         tm = Transmitter()
         ping_result = tm.ping(ip)
         if ping_result is None:
@@ -756,7 +755,7 @@ def abon_ping(request):
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _('ping ok') + ' ' + str(ping_result)
                 status = True
 
-    except (NasFailedResult, mydefs.LogicError) as e:
+    except (NasFailedResult, lib.LogicError) as e:
         messages.error(request, e)
     except NasNetworkError as e:
         messages.warning(request, e)
@@ -767,7 +766,7 @@ def abon_ping(request):
     }
 
 
-@method_decorator((login_required, mydefs.only_admins,), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
 class DialsListView(BaseAbonListView):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
@@ -813,7 +812,7 @@ def save_user_dev_port(request, gid, uname):
     if request.method != 'POST':
         messages.error(request, _('Method is not POST'))
         return redirect('abonapp:abon_home', gid, uname)
-    user_port = mydefs.safe_int(request.POST.get('user_port'))
+    user_port = lib.safe_int(request.POST.get('user_port'))
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
     is_dynamic_ip = True if is_dynamic_ip == 'on' else False
     try:
@@ -948,7 +947,7 @@ def tel_add(request, gid, uname):
 @permission_required('abnapp.delete_additionaltelephone')
 def tel_del(request, gid, uname):
     try:
-        tid = mydefs.safe_int(request.GET.get('tid'))
+        tid = lib.safe_int(request.GET.get('tid'))
         tel = models.AdditionalTelephone.objects.get(pk=tid)
         tel.delete()
         messages.success(request, _('Additional telephone successfully deleted'))
@@ -964,17 +963,17 @@ def phonebook(request, gid):
     t1 = models.Abon.objects.filter(group__id=int(gid)).only('telephone', 'fio').values_list('telephone', 'fio')
     t2 = models.AdditionalTelephone.objects.filter(abon__group__id=gid).only('telephone', 'owner_name').values_list(
         'telephone', 'owner_name')
-    tels = list(t1) + list(t2)
+    telephones = tuple(t1) + tuple(t2)
     if res_format == 'csv':
         import csv
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="phones.csv"'
         writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
-        for row in tels:
+        for row in telephones:
             writer.writerow(row)
         return response
     return render_to_text('abonapp/modal_phonebook.html', {
-        'tels': tels,
+        'tels': telephones,
         'gid': gid
     }, request=request)
 
@@ -1029,7 +1028,7 @@ def reset_ip(request, gid, uname):
 
 
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 def fin_report(request):
     q = models.AllTimePayLog.objects.by_days()
     res_format = request.GET.get('f')
@@ -1089,7 +1088,7 @@ def del_periodic_pay(request, gid, uname, periodic_pay_id):
     return redirect('abonapp:abon_services', gid, uname)
 
 
-@method_decorator((login_required, mydefs.only_admins,), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
 class EditSibscriberMarkers(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
@@ -1120,7 +1119,7 @@ class EditSibscriberMarkers(UpdateView):
 
 # API's
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 @json_view
 def abons(request):
     ablist = ({
@@ -1145,7 +1144,7 @@ def abons(request):
 
 
 @login_required
-@mydefs.only_admins
+@lib.decorators.only_admins
 @json_view
 def search_abon(request):
     word = request.GET.get('s')
@@ -1172,15 +1171,14 @@ class DhcpLever(SecureApiView):
 
     @staticmethod
     def on_dhcp_event(data: Dict) -> Optional[str]:
-        '''
+        """
         data = {
             'client_ip': ip2int('127.0.0.1'),
             'client_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_port': 3,
             'cmd': 'commit'
-        }
-        '''
+        }"""
         r = None
         try:
             action = data['cmd']
@@ -1193,7 +1191,7 @@ class DhcpLever(SecureApiView):
                 r = dhcp_expiry(data['client_ip'])
             elif action == 'release':
                 r = dhcp_release(data['client_ip'])
-        except mydefs.LogicError as e:
+        except lib.LogicError as e:
             print('LogicError', e)
             r = str(e)
         return r

@@ -1,0 +1,19 @@
+{% load i18n %}
+<form role="form" action="{% block modal_form_url %}#modal_url{% endblock %}" method="post">{% csrf_token %}
+    <div class="modal-header warning">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">
+            <span class="glyphicon glyphicon-earphone"></span>
+            {% block modal_form_title %}Form title{% endblock %}
+        </h4>
+    </div>
+    <div class="modal-body">
+        {% block modal_form_text %}
+            <h4>{% trans 'Are you sure about them?' %}</h4>
+        {% endblock %}
+        <button type="submit" class="btn btn-danger" value="DELETE">
+            <span class="glyphicon glyphicon-remove"></span>
+            {% block modal_btn_delete_text %}{% trans 'Delete' %}{% endblock %}
+        </button>
+    </div>
+</form>

@@ -11,10 +11,11 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
-from django.views.generic import DetailView
+from django.views.generic import DetailView, DeleteView
 
 from devapp.base_intr import DeviceImplementationError
-from mydefs import res_success, res_error, only_admins, safe_int
+from djing.lib.decorators import only_admins
+from djing.lib import safe_int
 from abonapp.models import Abon
 from group_app.models import Group
 from accounts_app.models import UserProfile
@@ -68,19 +69,23 @@ class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceLi
     queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
 
 
-@login_required
-@permission_required('devapp.delete_device')
-def devdel(request, device_id):
-    try:
-        device_instance = Device.objects.get(pk=device_id)
-        back_url = resolve_url('devapp:devs', group_id=device_instance.group.pk if device_instance.group else 0)
-        device_instance.update_dhcp(remove=True)
-        device_instance.delete()
-        return res_success(request, back_url)
-    except Device.DoesNotExist:
-        return res_error(request, _('Delete failed'))
-    except DeviceDBException as e:
-        return res_error(request, e)
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('devapp.delete_device'), name='dispatch')
+class DeviceVeleteView(DeleteView):
+    model = Device
+    pk_url_kwarg = 'device_id'
+
+    def get_success_url(self):
+        return resolve_url('devapp:devs', group_id=self.object.group.pk if self.object.group else 0)
+
+    def delete(self, request, *args, **kwargs):
+        res = super().delete(request, *args, **kwargs)
+        try:
+            self.object.update_dhcp(remove=True)
+        except DeviceDBException as e:
+            messages.error(request, e)
+        messages.success(request, _('Device successfully deleted'))
+        return res
 
 
 @login_required
@@ -137,7 +142,7 @@ def dev(request, group_id, device_id=0):
                 'comment': request.GET.get('c'),
                 'ip_address': request.GET.get('ip'),
                 'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
-                'snmp_item_num': request.GET.get('n') or 0
+                'snmp_extra': request.GET.get('n') or ''
             })
         else:
             frm = DeviceForm(instance=devinst)
@@ -505,8 +510,8 @@ def fix_onu(request):
                 # convert bytes mac address to str presentation mac address
                 real_mac = ':'.join('%x' % ord(i) for i in srcmac)
                 if mac == real_mac:
-                    onu.snmp_item_num = snmpnum
-                    onu.save(update_fields=('snmp_item_num',))
+                    onu.snmp_extra = str(snmpnum)
+                    onu.save(update_fields=('snmp_extra',))
                     status = 0
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
@@ -619,11 +624,11 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             if device.devtype == 'On':
                 if device.parent_dev:
                     host_addr = device.parent_dev.ip_address
-                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
+                    conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
                 else:
                     if device.ip_address:
                         host_addr = device.ip_address
-                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_item_num or None)
+                        conf = self.templ_onu(host_name, host_addr, mac=mac_addr, snmp_item=device.snmp_extra or None)
             else:
                 parent_host_name = norm_name("%d%s" % (
                     device.parent_dev.pk, translit(device.parent_dev.comment, language_code='ru', reversed=True)
@@ -651,7 +656,7 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
         return '\n'.join(i for i in r if i)
 
     @staticmethod
-    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: int):
+    def templ_onu(host_name: str, host_addr: str, mac: Optional[str], snmp_item: str):
         if not host_addr:
             return
         r = (
@@ -659,7 +664,7 @@ class NagiosObjectsConfView(global_base_views.AuthenticatedOrHashAuthView):
             "\tuse				device-onu",
             "\thost_name		%s" % host_name,
             "\taddress			%s" % host_addr,
-            "\t_snmp_item		%d" % snmp_item if snmp_item is not None else '',
+            "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
         )

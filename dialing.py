@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 from hashlib import sha256
 
 from pid.decorator import pidfile
-from messaging.sms import SmsSubmit, SmsDeliver
+from djing.lib.messaging.sms import SmsSubmit, SmsDeliver
 from asterisk import manager as ast_mngr
 
 

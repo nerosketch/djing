@@ -30,7 +30,6 @@
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-md-3">{% trans 'Mac address' %}</th>
-		        {# <th class="col-md-3 hidden-xs hidden-sm">{% trans 'Plugin output' %}</th> #}
                 <th class="col-md-1">
                     <a href="{% url 'devapp:devs' group.pk %}?{% url_replace request order_by='devtype' dir=dir|default:'down' %}">
                         {% trans 'Device type' %}
@@ -61,11 +60,10 @@
                     <td><a href="{% url 'devapp:view' grpid dev.pk %}">{{ dev.ip_address }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
-                    {# <td class="hidden-xs hidden-sm">{{ dev.mon.plugin_output|default:'&ndash;' }}</td> #}
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-xs btn-group-justified">
                         {% if can_del_dev %}
-                            <a href="{% url 'devapp:del' grpid dev.pk %}" class="btn btn-danger">
+                            <a href="{% url 'devapp:del' grpid dev.pk %}" class="btn btn-danger btn-modal">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         {% endif %}

@@ -110,7 +110,7 @@ td.btn-group {
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    border-radius: 0px 0px 5px 5px;
+    border-radius: 0 0 5px 5px;
     padding: 10px;
 }
 
@@ -209,8 +209,7 @@ a.port-img{
     left: 0;
   }
 
-  .row-offcanvas-left
-  .sidebar-offcanvas {
+  .row-offcanvas-left .sidebar-offcanvas {
     left: -50%; /* 6 columns */
   }
 
@@ -299,3 +298,16 @@ pre {
 .m-icon_dollar{background-position: 0 -52px;}
 .m-icon_service{background-position: -26px -52px;}
 .m-icon_mrk{background-position: -52px -52px;}
+
+
+@media (max-width: 991px) and (min-width: 768px){
+    .container {
+        width: 874px;
+    }
+}
+
+
+/* Icon near to device info */
+.font-extra-large{
+    font-size: 75px;
+}

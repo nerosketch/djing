@@ -52,7 +52,7 @@
             </div>
 
             {% bootstrap_icon 'list-alt' as ic %}
-            {% bootstrap_field form.snmp_item_num addon_before=ic %}
+            {% bootstrap_field form.snmp_extra addon_before=ic %}
 
             {% bootstrap_field form.is_noticeable %}
 
@@ -61,7 +61,7 @@
                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
                 {% if perms.devapp.delete_device %}
-                    <a href="{% url 'devapp:del' group.pk|default:0 dev.pk %}" class="btn btn-danger">
+                    <a href="{% url 'devapp:del' group.pk|default:0 dev.pk %}" class="btn btn-danger btn-modal">
                         <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
                     </a>
                 {% else %}

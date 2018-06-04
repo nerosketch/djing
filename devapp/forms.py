@@ -1,7 +1,9 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 
+from djing.lib.tln.tln import ValidationError as TlnValidationError
 from . import models
 from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 
@@ -15,9 +17,23 @@ class DeviceForm(forms.ModelForm):
         'unique': _('Device with that mac is already exist')
     })
 
+    def clean_snmp_extra(self):
+        snmp_extra = self.cleaned_data.get('snmp_extra')
+        if snmp_extra is None:
+            return
+        device = self.instance
+        manager = device.get_manager_object()
+        try:
+            manager.validate_extra_snmp_info(snmp_extra)
+        except TlnValidationError as e:
+            raise ValidationError(
+                e, code='invalid'
+            )
+        return snmp_extra
+
     class Meta:
         model = models.Device
-        exclude = ['map_dot', 'status']
+        exclude = ('map_dot', 'status')
         widgets = {
             'ip_address': forms.TextInput(attrs={
                 'pattern': IP_ADDR_REGEX,

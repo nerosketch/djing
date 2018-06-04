@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 ('priority',
                  models.CharField(choices=[('A', 'Higher'), ('C', 'Average'), ('E', 'Low')], default='E', max_length=1,
                                   verbose_name='A priority')),
-                ('out_date', models.DateField(blank=True, default=taskapp.models._delta_add_days, null=True,
+                ('out_date', models.DateField(blank=True, default=taskapp.models.delta_add_days, null=True,
                                               verbose_name='Reality')),
                 ('time_of_create', models.DateTimeField(auto_now_add=True, verbose_name='Date of create')),
                 ('state', models.CharField(choices=[('S', 'New'), ('C', 'Confused'), ('F', 'Completed')], default='S',

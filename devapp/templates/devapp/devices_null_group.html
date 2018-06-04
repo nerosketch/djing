@@ -46,12 +46,12 @@
                     <td>{{ dev.get_devtype_display }}</td>
                     <td class="btn-group btn-group-sm">
                         {% if can_del_dev %}
-                            <a href="{% url 'devapp:del' 0 dev.pk %}" class="btn btn-danger btn-sm">
+                            <a href="{% url 'devapp:del' 0 dev.pk %}" class="btn btn-danger btn-modal">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                         {% endif %}
                         {% if can_change_dev %}
-                            <a href="{% url 'devapp:edit' 0 dev.pk %}" class="btn btn-default btn-sm">
+                            <a href="{% url 'devapp:edit' 0 dev.pk %}" class="btn btn-default">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
                         {% endif %}

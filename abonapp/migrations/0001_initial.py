@@ -7,7 +7,7 @@ from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
-import mydefs
+from djing import lib
 import re
 
 
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                  models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True,
                                       primary_key=True, serialize=False, to='accounts_app.BaseAccount')),
                 ('ballance', models.FloatField(default=0.0)),
-                ('ip_address', mydefs.MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4')),
+                ('ip_address', lib.MyGenericIPAddressField(blank=True, max_length=8, null=True, protocol='ipv4')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='Comment')),
                 ('house', models.CharField(blank=True, max_length=12, null=True, verbose_name='House')),
                 ('is_dynamic_ip', models.BooleanField(default=False)),

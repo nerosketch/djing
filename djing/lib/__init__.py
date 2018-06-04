@@ -1,16 +1,9 @@
-# -*- coding: utf-8 -*-
-from datetime import timedelta
-from json import dumps
 import socket
 import struct
+from abc import ABCMeta
+from datetime import timedelta
 from collections import Iterator
-from functools import wraps
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import redirect
 from django.db import models
-from django.conf import settings
-
-DEBUG = getattr(settings, 'DEBUG', False)
 
 
 def ip2int(addr):
@@ -39,20 +32,6 @@ def safe_int(i):
         return 0 if i is None or i == '' else int(i)
     except ValueError:
         return 0
-
-
-def res_success(request, redirect_to='/'):
-    if request.is_ajax():
-        return HttpResponse(dumps({'errnum': 0}))
-    else:
-        return redirect(redirect_to)
-
-
-def res_error(request, text):
-    if request.is_ajax():
-        return HttpResponse(dumps({'errnum': 1, 'errtext': text}))
-    else:
-        raise Http404(text)
 
 
 class MyGenericIPAddressField(models.GenericIPAddressField):
@@ -105,19 +84,7 @@ class MyChoicesAdapter(Iterator):
             return res
 
 
-# Декоратор проверяет аккаунт, чтоб не пускать клиентов в страницы администрации
-def only_admins(fn):
-    @wraps(fn)
-    def wrapped(request, *args, **kwargs):
-        if request.user.is_admin:
-            return fn(request, *args, **kwargs)
-        else:
-            return redirect('client_side:home')
-
-    return wrapped
-
-
-# Русифицированный вывод timedelta
+# Russian localized timedelta
 class RuTimedelta(timedelta):
     def __new__(cls, tm):
         if isinstance(tm, timedelta):
@@ -148,23 +115,6 @@ class RuTimedelta(timedelta):
         return text_date
 
 
-def require_ssl(view):
-    """
-    Decorator that requires an SSL connection. If the current connection is not SSL, we redirect to the SSL version of
-    the page.
-    from: https://gist.github.com/ckinsey/9709984
-    """
-
-    @wraps(view)
-    def wrapper(request, *args, **kwargs):
-        if not DEBUG and not request.is_secure():
-            target_url = "https://" + request.META['HTTP_HOST'] + request.path_info
-            return HttpResponseRedirect(target_url)
-        return view(request, *args, **kwargs)
-
-    return wrapper
-
-
 class MultipleException(Exception):
     def __init__(self, err_list):
         if not isinstance(err_list, (list, tuple)):
@@ -176,12 +126,10 @@ class LogicError(Exception):
     pass
 
 
-def singleton(class_):
-    instances = {}
+class Singleton(type):
+    _instances = {}
 
-    def getinstance(*args, **kwargs):
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-
-    return getinstance
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]

@@ -1,8 +1,9 @@
 import os
 from django.db import models
+
 from djing.fields import MACAddressField
 from .base_intr import DevBase
-from mydefs import MyGenericIPAddressField, MyChoicesAdapter
+from djing.lib import MyGenericIPAddressField, MyChoicesAdapter
 from . import dev_types
 from subprocess import run
 from django.conf import settings
@@ -19,6 +20,8 @@ class DeviceMonitoringException(Exception):
 
 
 class Device(models.Model):
+    _cached_manager = None
+
     ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     comment = models.CharField(_('Comment'), max_length=256)
@@ -27,7 +30,8 @@ class Device(models.Model):
         ('Pn', dev_types.OLTDevice),
         ('On', dev_types.OnuDevice),
         ('Ex', dev_types.EltexSwitch),
-        ('Zt', dev_types.Olt_ZTE_C320)
+        ('Zt', dev_types.Olt_ZTE_C320),
+        ('Zo', dev_types.ZteOnuDevice)
     )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
                                choices=MyChoicesAdapter(DEVICE_TYPES))
@@ -36,7 +40,7 @@ class Device(models.Model):
     parent_dev = models.ForeignKey('self', verbose_name=_('Parent device'), blank=True, null=True,
                                    on_delete=models.SET_NULL)
 
-    snmp_item_num = models.PositiveSmallIntegerField(_('SNMP Number'), default=0, blank=True)
+    snmp_extra = models.CharField(_('SNMP extra info'), max_length=256, null=True, blank=True)
 
     NETWORK_STATES = (
         ('und', _('Undefined')),
@@ -69,11 +73,14 @@ class Device(models.Model):
             res = klasses[0][1]
             if issubclass(res, DevBase):
                 return res
-        return
+        raise TypeError('one of types is not subclass of DevBase. '
+                        'Or implementation of that device type is not found')
 
     def get_manager_object(self) -> DevBase:
         man_klass = self.get_manager_klass()
-        return man_klass(self)
+        if self._cached_manager is None:
+            self._cached_manager = man_klass(self)
+        return self._cached_manager
 
     # Can attach device to subscriber in subscriber page
     def has_attachable_to_subscriber(self):

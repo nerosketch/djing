@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 from struct import pack, unpack, calcsize
-from typing import Iterable
-from .utils import int2ip, ip2int
+from typing import Iterable, Optional
+from djing.lib import int2ip, ip2int
 
 
 class BaseStruct(object, metaclass=ABCMeta):
     @abstractmethod
-    def serialize(self):
-        """привращаем инфу в бинарную строку"""
+    def serialize(self) -> Optional[bytes]:
+        """make binary"""
 
     @abstractmethod
-    def deserialize(self, data, *args):
-        """создаём объект из бинарной строки"""
+    def deserialize(self, data: bytes, *args):
+        """restore from binary"""
 
     def __ne__(self, other):
         return not self == other
@@ -25,11 +25,11 @@ class IpStruct(BaseStruct):
         else:
             self.__ip = ip2int(str(ip))
 
-    def serialize(self):
+    def serialize(self) -> Optional[bytes]:
         dt = pack("!I", int(self.__ip))
         return dt
 
-    def deserialize(self, data, *args):
+    def deserialize(self, data: bytes, *args):
         dt = unpack("!I", data)
         self.__ip = int(dt[0])
         return self
@@ -54,12 +54,12 @@ class IpStruct(BaseStruct):
 
 # Как обслуживается абонент
 class TariffStruct(BaseStruct):
-    def __init__(self, tariff_id=0, speedIn=None, speedOut=None):
+    def __init__(self, tariff_id=0, speed_in=None, speed_out=None):
         self.tid = int(tariff_id)
-        self.speedIn = float(speedIn if speedIn is not None else 0.001)
-        self.speedOut = float(speedOut if speedOut is not None else 0.001)
+        self.speedIn = speed_in or 0
+        self.speedOut = speed_out or 0
 
-    def serialize(self):
+    def serialize(self) -> Optional[bytes]:
         dt = pack("!Iff", int(self.tid), float(self.speedIn), float(self.speedOut))
         return dt
 
@@ -67,7 +67,7 @@ class TariffStruct(BaseStruct):
     def is_empty(self):
         return self.tid == 0 and self.speedIn == 0.001 and self.speedOut == 0.001
 
-    def deserialize(self, data, *args):
+    def deserialize(self, data: bytes, *args):
         dt = unpack("!Iff", data)
         self.tid = int(dt[0])
         self.speedIn = float(dt[1])
@@ -96,7 +96,7 @@ class AbonStruct(BaseStruct):
         self.tariff = tariff
         self.is_active = is_active
 
-    def serialize(self):
+    def serialize(self) -> Optional[bytes]:
         if self.tariff is None:
             return
         if not isinstance(self.tariff, TariffStruct):
@@ -106,7 +106,7 @@ class AbonStruct(BaseStruct):
         dt = pack("!LII?", self.uid, int(self.ip), self.tariff.tid, self.is_active)
         return dt
 
-    def deserialize(self, data, tariff=None):
+    def deserialize(self, data: bytes, tariff=None):
         dt = unpack("!LII?", data)
         self.uid = dt[0]
         self.ip = IpStruct(dt[1])
@@ -137,12 +137,12 @@ class ShapeItem(BaseStruct):
         self.abon = abon
         self.sid = sid
 
-    def serialize(self):
+    def serialize(self) -> Optional[bytes]:
         abon_pack = self.abon.serialize()
         dt = pack('!L', self.sid)
         return dt + abon_pack
 
-    def deserialize(self, data, *args):
+    def deserialize(self, data: bytes, *args):
         sz = calcsize('!L')
         dt = unpack('!L', data[:sz])
         self.sid = dt
