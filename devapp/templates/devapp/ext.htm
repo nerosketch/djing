@@ -26,7 +26,7 @@
         {% url 'devapp:view' dev.group.pk|default:0 dev.pk as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>
             <a href="{{ devapp_view }}">
-                {% trans 'Ports' %} {{ dev.ip_address }}
+                {% trans 'View' %} {{ dev.ip_address }}
             </a>
         </li>
 

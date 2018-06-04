@@ -1,6 +1,6 @@
 import socket
 import struct
-from abc import ABCMeta
+from hashlib import sha256
 from datetime import timedelta
 from collections import Iterator
 from django.db import models
@@ -133,3 +133,21 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
+
+#
+# Function for hash auth
+#
+
+def calc_hash(data):
+    if type(data) is str:
+        result_data = data.encode('utf-8')
+    else:
+        result_data = bytes(data)
+    return sha256(result_data).hexdigest()
+
+
+def check_sign(get_list, sign):
+    hashed = '_'.join(get_list)
+    my_sign = calc_hash(hashed)
+    return sign == my_sign
