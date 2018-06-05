@@ -392,6 +392,23 @@ class Olt_ZTE_C320(OLTDevice):
 
         return onu_list
 
+    def get_units_unregistered(self, fiber_num: int) -> Iterable:
+        sn_num_list = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.3.1.2.%d' % fiber_num)
+        firmware_ver = self.get_list('.1.3.6.1.4.1.3902.1012.3.13.3.1.11.%d' % fiber_num)
+        loid_passws = self.get_list('.1.3.6.1.4.1.3902.1012.3.13.3.1.9.%d' % fiber_num)
+        loids = self.get_list('.1.3.6.1.4.1.3902.1012.3.13.3.1.8.%d' % fiber_num)
+
+        return ({
+            'mac': ':'.join('%x' % ord(i) for i in sn[-6:]),
+            'firmware_ver': frm_ver,
+            'loid_passw': loid_passw,
+            'loid': loid,
+            'sn': sn,
+            'extra_snmp': '%d.%d' % (fiber_num, int(num))
+        } for frm_ver, loid_passw, loid, (sn, num) in zip(
+            firmware_ver, loid_passws, loids, sn_num_list
+        ))
+
     def uptime(self):
         up_timestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
         tm = RuTimedelta(timedelta(seconds=up_timestamp / 100)) or RuTimedelta(timedelta())
