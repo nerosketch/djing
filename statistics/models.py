@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, date, time
 from django.db import models, connection, ProgrammingError
 from django.utils.timezone import now
 
-from djing.lib import MyGenericIPAddressField
+from djing.fields import MyGenericIPAddressField
 from .fields import UnixDateTimeField
 
 

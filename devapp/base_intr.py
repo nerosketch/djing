@@ -45,14 +45,15 @@ class DevBase(object, metaclass=ABCMeta):
     def get_template_name(self) -> AnyStr:
         """Return path to html template for device"""
 
-    @abstract_static_method
-    def has_attachable_to_subscriber() -> bool:
+    @abstractmethod
+    def has_attachable_to_subscriber(self) -> bool:
         """Can connect device to subscriber"""
 
     @abstract_static_method
     def is_use_device_port() -> bool:
         """True if used device port while opt82 authorization"""
 
+    # fixme: only that is abstract static
     @abstract_static_method
     def validate_extra_snmp_info(v: str) -> None:
         """
@@ -62,8 +63,12 @@ class DevBase(object, metaclass=ABCMeta):
         :param v: String value for validate
         """
 
-    @abstract_static_method
-    def monitoring_template(device_instance, *args, **kwargs) -> Optional[str]:
+    @abstractmethod
+    def register_device(self):
+        pass
+
+    @abstractmethod
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         """
         Template for monitoring system config
         :return: string for config file

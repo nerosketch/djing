@@ -5,6 +5,8 @@ from telnetlib import Telnet
 from time import sleep
 from typing import Generator, Dict, Optional, Tuple
 
+from djing.lib import process_lock
+
 
 class ZteOltConsoleError(Exception):
     pass
@@ -192,6 +194,7 @@ class OltZTERegister(TelnetApi):
         ))) + r
 
 
+@process_lock
 def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes):
     onu_type = b'ZTE-F660'
     line_profile = b'ZTE-F660-LINE'

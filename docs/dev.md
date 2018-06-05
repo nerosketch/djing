@@ -77,8 +77,7 @@ class EltexSwitch(DLinkDevice):
         tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
         return tm
 
-    @staticmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber(self) -> bool:
         return False
 
     @staticmethod
@@ -99,7 +98,7 @@ class EltexSwitch(DLinkDevice):
 Метод **@uptime**, понятно что возвращает, укажите нужный OID. Вернётся тип *RuTimedelta*, это переопределённый тип **timedelta**, я его реализовал
 для локализации временного промежутка на русский.
 
-Статический метод **@has_attachable_to_subscriber** возвращает правду если это устройство можно привязать к абоненту.
+Метод **@has_attachable_to_subscriber** возвращает правду если это устройство можно привязать к абоненту.
 Например у Dlink стоит True потому что Dlink стоит во многих местах на доступе, и его порты принадлежат
 абонентам при авторизации.
 

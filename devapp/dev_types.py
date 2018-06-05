@@ -6,7 +6,7 @@ from transliterate import translit
 from django.utils.translation import gettext_lazy as _, gettext
 
 from djing.lib import RuTimedelta, safe_int
-from djing.lib.tln.tln import ValidationError as TlnValidationError
+from djing.lib.tln.tln import ValidationError as TlnValidationError, register_onu_ZTE_F660
 from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
 
 
@@ -100,8 +100,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'ports.html'
 
-    @staticmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber(self) -> bool:
         return True
 
     @staticmethod
@@ -113,8 +112,8 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         # Dlink has no require snmp info
         pass
 
-    @staticmethod
-    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        device = self.db_instance
         return plain_ip_device_mon_template(device, *args, **kwargs)
 
 
@@ -182,8 +181,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'olt.html'
 
-    @staticmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber(self) -> bool:
         return False
 
     @staticmethod
@@ -195,8 +193,8 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         # Olt has no require snmp info
         pass
 
-    @staticmethod
-    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        device = self.db_instance
         return plain_ip_device_mon_template(device)
 
 
@@ -235,8 +233,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return "onu.html"
 
-    @staticmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber(self) -> bool:
         return True
 
     @staticmethod
@@ -273,8 +270,8 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         except ValueError:
             raise TlnValidationError(_('Onu snmp field must be en integer'))
 
-    @staticmethod
-    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        device = self.db_instance
         if not device:
             return
         host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
@@ -344,16 +341,15 @@ class EltexSwitch(DLinkDevice):
         tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
-    @staticmethod
-    def has_attachable_to_subscriber():
+    def has_attachable_to_subscriber(self) -> bool:
         return True
 
     @staticmethod
     def is_use_device_port():
         return False
 
-    @staticmethod
-    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        device = self.db_instance
         return plain_ip_device_mon_template(device)
 
 
@@ -432,6 +428,9 @@ class Olt_ZTE_C320(OLTDevice):
     def get_template_name(self):
         return 'olt_ztec320.html'
 
+    def register_device(self):
+        pass
+
 
 class ZteOnuDevice(OnuDevice):
     @staticmethod
@@ -472,8 +471,8 @@ class ZteOnuDevice(OnuDevice):
         except ValueError:
             raise TlnValidationError(_('Zte onu snmp field must be two dot separated integers'))
 
-    @staticmethod
-    def monitoring_template(device, *args, **kwargs) -> Optional[str]:
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        device = self.db_instance
         if not device:
             return
         host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
@@ -495,3 +494,18 @@ class ZteOnuDevice(OnuDevice):
             "}\n"
         )
         return '\n'.join(i for i in r if i)
+
+    def register_device(self):
+        device = self.db_instance
+        ip = None
+        if device.ip_address:
+            ip = device.ip_address
+        elif device.parent_dev:
+            ip = device.parent_dev.ip_address
+        if ip:
+            mac = str(device.mac_addr).encode()
+            sn = b"ZTEG%s" % b''.join(mac.split(b':')[-4:]).upper()
+            register_onu_ZTE_F660(
+                olt_ip=ip, onu_sn=sn, login_passwd=(b'admin', b'2ekc3'),
+                onu_mac=mac
+            )

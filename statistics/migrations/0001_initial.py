@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from djing.lib import MyGenericIPAddressField
+from djing.fields import MyGenericIPAddressField
 import statistics.fields
 
 

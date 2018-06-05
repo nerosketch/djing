@@ -22,13 +22,15 @@ class DeviceForm(forms.ModelForm):
         if snmp_extra is None:
             return
         device = self.instance
-        manager_class = device.get_manager_klass()
-        try:
-            manager_class.validate_extra_snmp_info(snmp_extra)
-        except TlnValidationError as e:
-            raise ValidationError(
-                e, code='invalid'
-            )
+        # fixme: if creating device than check disabled
+        if device.pk is not None:
+            manager_class = device.get_manager_klass()
+            try:
+                manager_class.validate_extra_snmp_info(snmp_extra)
+            except TlnValidationError as e:
+                raise ValidationError(
+                    e, code='invalid'
+                )
         return snmp_extra
 
     class Meta:

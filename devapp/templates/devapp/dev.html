@@ -69,6 +69,9 @@
                         <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
                     </a>
                 {% endif %}
+                <a href="{% url 'devapp:dev_register' group.pk|default:0 dev.pk %}" class="btn btn-default btn-cmd">
+                    <span class="glyphicon glyphicon-fire"></span> <span class="hidden-xs">{% trans 'Register device' %}</span>
+                </a>
                 <button type="reset" class="btn btn-default">
                     <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
                 </button>

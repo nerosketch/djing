@@ -14,8 +14,9 @@ from django.views.generic import DetailView, DeleteView, UpdateView, CreateView
 
 from devapp.base_intr import DeviceImplementationError
 from djing.lib.decorators import only_admins, hash_auth_view
-from djing.lib import safe_int
+from djing.lib import safe_int, ProcessLocked
 from abonapp.models import Abon
+from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError
 from group_app.models import Group
 from accounts_app.models import UserProfile
 from django.conf import settings
@@ -693,3 +694,30 @@ class DevicesGetListView(global_base_views.SecureApiView):
             if isinstance(r['mac_addr'], EUI):
                 r['mac_addr'] = int(r['mac_addr'])
         return tuple(res)
+
+
+@login_required
+@json_view
+def regster_device(request, device_id: str):
+    def format_msg(msg: str, icon: str):
+        return ' '.join((
+            '<span class="glyphicon glyphicon-%s"></span>' % icon,
+            '<span class="hidden-xs">%s</span>' % msg
+        ))
+    device = get_object_or_404(Device, pk=device_id)
+    status = 1
+    try:
+        device.register_device()
+        status = 0
+    except OnuZteRegisterError:
+        text = format_msg(gettext('Unregistered onu not found'), 'eye-close')
+    except (ConnectionRefusedError, ZteOltConsoleError) as e:
+        text = format_msg(e, 'exclamation-sign')
+    except ProcessLocked:
+        text = format_msg(gettext('Process locked by another process'), 'time')
+    else:
+        text = format_msg(msg='ok', icon='ok')
+    return {
+        'status': status,
+        'dat': text
+    }

@@ -234,7 +234,7 @@ msgstr "Сохранить"
 #: templates/devapp/add_dev.html:75 templates/devapp/dev.html:73
 #: templates/devapp/fix_dev_group.html:67
 msgid "Reset"
-msgstr "Сбросить"
+msgstr "Сбросить форму"
 
 #: templates/devapp/custom_dev_page/olt.html:10
 #: templates/devapp/custom_dev_page/olt_ztec320.html:11
@@ -609,3 +609,12 @@ msgstr "Посмотреть"
 
 msgid "Unregistered units"
 msgstr "Незарегистрированные юниты"
+
+msgid "Register device"
+msgstr "Зарегистрировать устройство"
+
+msgid "Unregistered onu not found"
+msgstr "Незарегистрированные ONU не найдены"
+
+msgid "Process locked by another process"
+msgstr "Процесс занят другой задачей, подождите чуть и попробуйте ещё"

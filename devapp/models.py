@@ -5,8 +5,8 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from djing.fields import MACAddressField
-from djing.lib import MyGenericIPAddressField, MyChoicesAdapter
+from djing.fields import MACAddressField, MyGenericIPAddressField
+from djing.lib import MyChoicesAdapter
 from group_app.models import Group
 from . import dev_types
 from .base_intr import DevBase
@@ -84,9 +84,9 @@ class Device(models.Model):
         return self._cached_manager
 
     # Can attach device to subscriber in subscriber page
-    def has_attachable_to_subscriber(self):
-        mngr_class = self.get_manager_klass()
-        return mngr_class.has_attachable_to_subscriber()
+    def has_attachable_to_subscriber(self) -> bool:
+        mngr = self.get_manager_object()
+        return mngr.has_attachable_to_subscriber()
 
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
@@ -106,8 +106,13 @@ class Device(models.Model):
         run((filepath, param, newmac, code))
 
     def generate_config_template(self) -> Optional[AnyStr]:
-        mng_class = self.get_manager_klass()
-        return mng_class.monitoring_template(self)
+        mng = self.get_manager_object()
+        return mng.monitoring_template()
+
+    def register_device(self):
+        mng = self.get_manager_object()
+        # if hasattr(mng, 'register_device') and callable(mng.register_device):
+        mng.register_device()
 
 
 class Port(models.Model):

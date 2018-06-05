@@ -14,7 +14,8 @@ from django.utils.translation import ugettext_lazy as _, gettext
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
-from djing.lib import ip2int, MyGenericIPAddressField, LogicError
+from djing.lib import ip2int, LogicError
+from djing.fields import MyGenericIPAddressField
 from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField

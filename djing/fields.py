@@ -4,6 +4,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from netaddr import EUI, AddrFormatError
+
+from djing.lib import ip2int, int2ip
 from .formfields import MACAddressField as MACAddressFormField
 from . import default_dialect
 import warnings
@@ -107,3 +109,29 @@ try:
     add_introspection_rules([], ["^macaddress\.fields\.MACAddressField"])
 except ImportError:
     pass
+
+
+class MyGenericIPAddressField(models.GenericIPAddressField):
+    description = "Int32 notation ip address"
+
+    def __init__(self, protocol='ipv4', *args, **kwargs):
+        super(MyGenericIPAddressField, self).__init__(protocol=protocol, *args, **kwargs)
+        self.max_length = 8
+
+    def get_prep_value(self, value):
+        # strIp to Int
+        value = super(MyGenericIPAddressField, self).get_prep_value(value)
+        return ip2int(value)
+
+    def to_python(self, value):
+        return value
+
+    def get_internal_type(self):
+        return 'PositiveIntegerField'
+
+    @staticmethod
+    def from_db_value(value, expression, connection, context):
+        return int2ip(value) if value != 0 else None
+
+    def int_ip(self):
+        return ip2int(self)

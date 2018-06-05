@@ -1,9 +1,9 @@
 import socket
 import struct
+from functools import wraps
 from hashlib import sha256
 from datetime import timedelta
 from collections import Iterator
-from django.db import models
 
 
 def ip2int(addr):
@@ -32,32 +32,6 @@ def safe_int(i):
         return 0 if i is None or i == '' else int(i)
     except ValueError:
         return 0
-
-
-class MyGenericIPAddressField(models.GenericIPAddressField):
-    description = "Int32 notation ip address"
-
-    def __init__(self, protocol='ipv4', *args, **kwargs):
-        super(MyGenericIPAddressField, self).__init__(protocol=protocol, *args, **kwargs)
-        self.max_length = 8
-
-    def get_prep_value(self, value):
-        # strIp to Int
-        value = super(MyGenericIPAddressField, self).get_prep_value(value)
-        return ip2int(value)
-
-    def to_python(self, value):
-        return value
-
-    def get_internal_type(self):
-        return 'PositiveIntegerField'
-
-    @staticmethod
-    def from_db_value(value, expression, connection, context):
-        return int2ip(value) if value != 0 else None
-
-    def int_ip(self):
-        return ip2int(self)
 
 
 # Предназначен для Django CHOICES чтоб можно было передавать классы вместо просто описания поля,
@@ -151,3 +125,28 @@ def check_sign(get_list, sign):
     hashed = '_'.join(get_list)
     my_sign = calc_hash(hashed)
     return sign == my_sign
+
+#
+# only one process for function
+#
+
+
+class ProcessLocked(OSError):
+    pass
+
+
+def process_lock(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        s = None
+        try:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            # Create an abstract socket, by prefixing it with null.
+            s.bind('\0postconnect_djing_lock_func_%s' % fn.__name__)
+            return fn(*args, **kwargs)
+        except socket.error:
+            raise ProcessLocked
+        finally:
+            if s is not None:
+                s.close()
+    return wrapped

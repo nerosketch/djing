@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 import djing.fields
-from djing.lib import MyGenericIPAddressField
+from djing.fields import MyGenericIPAddressField
 
 
 class Migration(migrations.Migration):
