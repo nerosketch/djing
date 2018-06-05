@@ -12,4 +12,4 @@ class TariffForm(forms.ModelForm):
 class PeriodicPayForm(forms.ModelForm):
     class Meta:
         model = models.PeriodicPay
-        exclude = ['when_add', 'extra_info']
+        exclude = ('when_add', 'extra_info')

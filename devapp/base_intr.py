@@ -53,8 +53,8 @@ class DevBase(object, metaclass=ABCMeta):
     def is_use_device_port() -> bool:
         """True if used device port while opt82 authorization"""
 
-    @abstractmethod
-    def validate_extra_snmp_info(self, v: str) -> None:
+    @abstract_static_method
+    def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
         If validation failed then raise en exception from djing.lib.tln.ValidationError

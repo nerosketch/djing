@@ -5,4 +5,4 @@ from .models import SMSOut
 class SMSOutForm(forms.ModelForm):
     class Meta:
         model = SMSOut
-        fields = ['dst', 'text']
+        fields = ('dst', 'text')

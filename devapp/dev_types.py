@@ -108,7 +108,8 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def is_use_device_port():
         return True
 
-    def validate_extra_snmp_info(self, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # Dlink has no require snmp info
         pass
 
@@ -189,7 +190,8 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def is_use_device_port():
         return False
 
-    def validate_extra_snmp_info(self, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # Olt has no require snmp info
         pass
 
@@ -263,7 +265,8 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         except EasySNMPTimeoutError as e:
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
-    def validate_extra_snmp_info(self, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # DBCOM Onu have en integer snmp port
         try:
             int(v)
@@ -454,7 +457,8 @@ class ZteOnuDevice(OnuDevice):
     def get_template_name(self):
         return 'onu_for_zte.html'
 
-    def validate_extra_snmp_info(self, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # for example 268501760.5
         try:
             fiber_num, onu_port = v.split('.')

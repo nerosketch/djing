@@ -18,7 +18,7 @@ class ConversationForm(forms.ModelForm):
 
     class Meta:
         model = Conversation
-        exclude = ['date_create', 'author']
+        exclude = ('date_create', 'author')
 
     def create(self, author):
         participants = self.cleaned_data['participants']
@@ -39,7 +39,7 @@ class ConversationForm(forms.ModelForm):
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
-        exclude = ['sent_at', 'author', 'conversation', 'account_status']
+        exclude = ('sent_at', 'author', 'conversation', 'account_status')
         widgets = {
             'text': forms.Textarea(attrs={'class': 'form-control'}),
             'attachment': forms.FileInput(attrs={'class': 'form-control'})

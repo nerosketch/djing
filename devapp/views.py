@@ -126,7 +126,6 @@ class DeviceUpdate(UpdateView):
             pass
         r = super().form_valid(form)
         # change device info in dhcpd.conf
-        print(self.object)
         self.object.update_dhcp()
         messages.success(self.request, _('Device info has been saved'))
         return r
@@ -171,9 +170,8 @@ class DeviceCreateView(CreateView):
 
     def form_valid(self, form):
         # check if that device is exist
-        device_id = self.kwargs.get(self.pk_url_kwarg)
         try:
-            already_dev = self.model.objects.exclude(pk=device_id).get(mac_addr=self.request.POST.get('mac_addr'))
+            already_dev = self.model.objects.get(mac_addr=self.request.POST.get('mac_addr'))
             self.already_dev = already_dev
             if already_dev.group:
                 messages.warning(self.request, _('You have redirected to existing device'))
@@ -185,7 +183,6 @@ class DeviceCreateView(CreateView):
             pass
         r = super().form_valid(form)
         # change device info in dhcpd.conf
-        print(self.object)
         self.object.update_dhcp()
         messages.success(self.request, _('Device info has been saved'))
         return r
@@ -202,15 +199,16 @@ class DeviceCreateView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        return {
-            'group': self.device_group,
-            'devtype': self.request.GET.get('t'),
-            'mac_addr': self.request.GET.get('mac'),
-            'comment': self.request.GET.get('c'),
-            'ip_address': self.request.GET.get('ip'),
-            'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
-            'snmp_extra': self.request.GET.get('n') or ''
-        }
+        if self.request.method == 'GET':
+            return {
+                'group': self.device_group,
+                'devtype': self.request.GET.get('t'),
+                'mac_addr': self.request.GET.get('mac'),
+                'comment': self.request.GET.get('c'),
+                'ip_address': self.request.GET.get('ip'),
+                'man_passw': getattr(settings, 'DEFAULT_SNMP_PASSWORD', ''),
+                'snmp_extra': self.request.GET.get('n') or ''
+            }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

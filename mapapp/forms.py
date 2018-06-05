@@ -6,7 +6,7 @@ from .models import Dot
 class DotForm(forms.ModelForm):
     class Meta:
         model = Dot
-        exclude = ['devices']
+        exclude = ('devices',)
 
         widgets = {
             'title': forms.TextInput(attrs={'required': '', 'autofocus': ''}),

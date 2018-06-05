@@ -22,9 +22,9 @@ class DeviceForm(forms.ModelForm):
         if snmp_extra is None:
             return
         device = self.instance
-        manager = device.get_manager_object()
+        manager_class = device.get_manager_klass()
         try:
-            manager.validate_extra_snmp_info(snmp_extra)
+            manager_class.validate_extra_snmp_info(snmp_extra)
         except TlnValidationError as e:
             raise ValidationError(
                 e, code='invalid'
@@ -48,7 +48,7 @@ class DeviceForm(forms.ModelForm):
 class PortForm(forms.ModelForm):
     class Meta:
         model = models.Port
-        exclude = ['device']
+        exclude = ('device',)
         widgets = {
             'num': forms.NumberInput(attrs={
                 'min': '0'
