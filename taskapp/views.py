@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
 from django.db.models import Count
 from django.shortcuts import redirect, get_object_or_404, resolve_url
 from django.contrib import messages
@@ -265,7 +264,7 @@ def check_news(request):
             r = {'auth': True, 'exist': False}
     else:
         r = {'auth': False}
-    return HttpResponse(dumps(r))
+    return r
 
 
 @method_decorator((login_required, only_admins), name='dispatch')
