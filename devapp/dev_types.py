@@ -280,11 +280,17 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
         snmp_item = device.snmp_extra
         mac = device.mac_addr
+        if device.ip_address:
+            address = device.ip_address
+        elif device.parent_dev:
+            address = device.parent_dev.ip_address
+        else:
+            address = None
         r = (
             "define host{",
             "\tuse				device-onu",
             "\thost_name		%s" % host_name,
-            # "\taddress			%s" % device.ip_address,
+            "\taddress			%s" % address if address else None,
             "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
@@ -473,11 +479,17 @@ class ZteOnuDevice(OnuDevice):
         host_name = _norm_name("%d%s" % (device.pk, translit(device.comment, language_code='ru', reversed=True)))
         snmp_item = device.snmp_extra
         mac = device.mac_addr
+        if device.ip_address:
+            address = device.ip_address
+        elif device.parent_dev:
+            address = device.parent_dev.ip_address
+        else:
+            address = None
         r = (
             "define host{",
             "\tuse				dev-onu-zte-f660",
             "\thost_name		%s" % host_name,
-            # "\taddress			%s" % device.ip_address,
+            "\taddress			%s" % address if address else None,
             "\t_snmp_item		%s" % snmp_item if snmp_item is not None else '',
             "\t_mac_addr		%s" % mac if mac is not None else '',
             "}\n"
