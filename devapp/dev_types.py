@@ -116,6 +116,9 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         device = self.db_instance
         return plain_ip_device_mon_template(device, *args, **kwargs)
 
+    def register_device(self):
+        pass
+
 
 class ONUdev(BasePort):
     def __init__(self, num, name, status, mac, speed, signal, snmp_worker):
@@ -197,6 +200,9 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         device = self.db_instance
         return plain_ip_device_mon_template(device)
 
+    def register_device(self):
+        pass
+
 
 class OnuDevice(DevBase, SNMPBaseWorker):
     def __init__(self, dev_instance):
@@ -252,13 +258,14 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = ':'.join('%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num))
             # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
-            return {
-                'status': status,
-                'signal': int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
-                'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
-                'mac': mac,
-                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
-            }
+            if status.isdigit():
+                return {
+                    'status': status,
+                    'signal': int(signal) / 10 if signal.isdigit() else 0,
+                    'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
+                    'mac': mac,
+                    'distance': int(distance) / 10 if distance.isdigit() else 0
+                }
         except EasySNMPTimeoutError as e:
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
@@ -293,6 +300,9 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             "}\n"
         )
         return '\n'.join(i for i in r if i)
+
+    def register_device(self):
+        pass
 
 
 class EltexPort(BasePort):
@@ -505,7 +515,8 @@ class ZteOnuDevice(OnuDevice):
         if ip:
             mac = str(device.mac_addr).encode()
             sn = b"ZTEG%s" % b''.join(mac.split(b':')[-4:]).upper()
+            # FIXME: Store login & password for device somewhere
             register_onu_ZTE_F660(
-                olt_ip=ip, onu_sn=sn, login_passwd=(b'admin', b'2ekc3'),
+                olt_ip=ip, onu_sn=sn, login_passwd=(b'admin', device.man_passw.encode()),
                 onu_mac=mac
             )
