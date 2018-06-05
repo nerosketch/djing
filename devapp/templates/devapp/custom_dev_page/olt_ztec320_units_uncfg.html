@@ -16,6 +16,10 @@
     </ol>
 {% endblock %}
 
+{% block page-header %}
+    <h3>{{ dev.comment|default:_('Not assigned') }}. {% trans 'Unregistered units' %}</h3>
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-sm-12">
@@ -24,10 +28,10 @@
                     <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
-                        <th class="col-xs-2">{% trans 'Onu type' %}</th>
-                        <th class="col-xs-3">{% trans 'Onu port' %}</th>
-                        <th class="col-xs-3">{% trans 'Onu signal' %}</th>
-                        <th class="col-xs-2">{% trans 'Serial' %}</th>
+                        <th class="col-xs-2">{% trans 'Mac' %}</th>
+                        <th class="col-xs-3">{% trans 'Firmware version' %}</th>
+                        <th class="col-xs-3">{% trans 'LOID password' %}</th>
+                        <th class="col-xs-2">{% trans 'LOID' %}</th>
                         <th class="col-xs-1">#</th>
                     </tr>
                     </thead>
@@ -35,14 +39,13 @@
                     <tbody>
                     {% for onu in onu_list %}
                         <tr>
-                            <td>-
-                            </td>
-                            <td>{{ onu.onu_type }}</td>
-                            <td>{{ onu.onu_port }}</td>
-                            <td>{{ onu.onu_signal }}</td>
-                            <td>{{ onu.onu_sn }}</td>
+                            <td>-</td>
+                            <td>{{ onu.mac }}</td>
+                            <td>{{ onu.firmware_ver }}</td>
+                            <td>{{ onu.loid_passw }}</td>
+                            <td>{{ onu.loid }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.onu_sn }}&n={{ onu.snmp_extra }}" title="{% trans 'Create device' %}">
+                                <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.loid }}&n={{ onu.extra_snmp }}&mac={{ onu.mac }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>

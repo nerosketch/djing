@@ -454,12 +454,12 @@ def devview(request, device_id):
 
 
 @login_required
-def zte_port_view(request, group_id: str, device_id: str, fiber_id: str):
+def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
     fiber_id = safe_int(fiber_id)
     zte_olt_device = get_object_or_404(Device, id=device_id)
     manager = zte_olt_device.get_manager_object()
-    onu_list = manager.get_ports_on_fiber(fiber_id)
-    return render(request, 'devapp/custom_dev_page/olt_ztec320_ports.html', {
+    onu_list = manager.get_units_unregistered(fiber_id)
+    return render(request, 'devapp/custom_dev_page/olt_ztec320_units_uncfg.html', {
         'onu_list': onu_list,
         'dev': zte_olt_device,
         'grp': group_id

@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^search_dev$', views.search_dev),
 
     # ZTE ports under fibers
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<fiber_id>\d+)$', views.zte_port_view, name='zte_port_view'),
+    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<fiber_id>\d+)$', views.zte_port_view_uncfg, name='zte_port_view_uncfg'),
 
     # Monitoring api
     url(r'^on_device_event/$', views.OnDeviceMonitoringEvent.as_view()),

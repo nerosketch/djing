@@ -18,7 +18,9 @@
     {% include 'message_block.html' %}
 
     <div class="page-header">
-        <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
+        {% block page-header %}
+            <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
+        {% endblock %}
     </div>
 
     <ul class="nav nav-tabs">
