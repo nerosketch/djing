@@ -258,10 +258,11 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = ':'.join('%x' % ord(i) for i in self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num))
             # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
+            signal = safe_int(signal)
             if status.isdigit():
                 return {
                     'status': status,
-                    'signal': int(signal) / 10 if signal.isdigit() else 0,
+                    'signal': signal / 10 if signal != 0 else 0,
                     'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                     'mac': mac,
                     'distance': int(distance) / 10 if distance.isdigit() else 0
