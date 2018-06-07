@@ -20,8 +20,6 @@ from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
-TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
-
 
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon', models.CASCADE)
@@ -402,7 +400,9 @@ class AdditionalTelephone(models.Model):
         max_length=16,
         verbose_name=_('Telephone'),
         # unique=True,
-        validators=(RegexValidator(TELEPHONE_REGEXP),)
+        validators=(RegexValidator(
+            getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
+        ),)
     )
     owner_name = models.CharField(max_length=127)
 

@@ -32,11 +32,9 @@ from djing import ping
 from djing import lib
 from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
 
-PAGINATION_ITEMS_PER_PAGE = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-
 
 class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
-    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
 
 
@@ -472,7 +470,7 @@ def unsubscribe_service(request, gid, uname, abon_tariff_id):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(permission_required('abonapp.can_view_abonlog'), name='dispatch')
 class LogListView(ListView):
-    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'logs'
     template_name = 'abonapp/log.html'
@@ -482,7 +480,7 @@ class LogListView(ListView):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(permission_required('abonapp.can_view_invoiceforpayment'), name='dispatch')
 class DebtorsListView(ListView):
-    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'invoices'
     template_name = 'abonapp/debtors.html'
@@ -492,7 +490,7 @@ class DebtorsListView(ListView):
 @method_decorator(login_required, name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class TaskLogListView(ListView):
-    paginate_by = PAGINATION_ITEMS_PER_PAGE
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'tasks'
     template_name = 'abonapp/task_log.html'

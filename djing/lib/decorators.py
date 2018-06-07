@@ -5,9 +5,6 @@ from django.shortcuts import redirect
 
 from djing.lib import check_sign
 
-DEBUG = getattr(settings, 'DEBUG', False)
-API_AUTH_SECRET = getattr(settings, 'API_AUTH_SECRET')
-
 
 def require_ssl(view):
     """
@@ -18,7 +15,8 @@ def require_ssl(view):
 
     @wraps(view)
     def wrapper(request, *args, **kwargs):
-        if not DEBUG and not request.is_secure():
+        debug = getattr(settings, 'DEBUG', False)
+        if not debug and not request.is_secure():
             target_url = "https://" + request.META['HTTP_HOST'] + request.path_info
             return HttpResponseRedirect(target_url)
         return view(request, *args, **kwargs)
@@ -41,6 +39,7 @@ def only_admins(fn):
 def hash_auth_view(fn):
     @wraps(fn)
     def wrapped(request, *args, **kwargs):
+        api_auth_secret = getattr(settings, 'API_AUTH_SECRET')
         sign = request.GET.get('sign')
         if sign is None or sign == '':
             return HttpResponseForbidden('Access Denied')
@@ -50,7 +49,7 @@ def hash_auth_view(fn):
         del get_values['sign']
         values_list = [l for l in get_values.values() if l]
         values_list.sort()
-        values_list.append(API_AUTH_SECRET)
+        values_list.append(api_auth_secret)
         if check_sign(values_list, sign):
             return fn(request, *args, **kwargs)
         else:

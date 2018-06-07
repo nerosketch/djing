@@ -687,9 +687,12 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
 @hash_auth_view
 def nagios_objects_conf(request):
     def getconf(device_instance: Device):
-        config = device_instance.generate_config_template()
-        if config is not None:
-            return config
+        try:
+            config = device_instance.generate_config_template()
+            if config is not None:
+                return config
+        except DeviceImplementationError:
+            pass
 
     devices_queryset = Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
         .select_related('parent_dev') \
@@ -717,7 +720,7 @@ class DevicesGetListView(global_base_views.SecureApiView):
         for r in res:
             if isinstance(r['mac_addr'], EUI):
                 r['mac_addr'] = int(r['mac_addr'])
-        return tuple(res)
+        return list(res)
 
 
 @login_required

@@ -35,5 +35,5 @@ urlpatterns = [
 
     # Nagios mon generate
     url(r'^nagios/hosts/$', views.nagios_objects_conf, name='nagios_objects_conf'),
-    url(r'^api/getall/$', views.DevicesGetListView.as_view())
+    url(r'^api/getall/$', views.DevicesGetListView.as_view(), name='nagios_get_all_hosts')
 ]

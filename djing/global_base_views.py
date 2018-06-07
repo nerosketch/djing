@@ -10,9 +10,6 @@ from netaddr import IPNetwork, IPAddress
 from django.core.paginator import InvalidPage, EmptyPage
 from djing.lib.decorators import hash_auth_view
 
-API_AUTH_SECRET = getattr(settings, 'API_AUTH_SECRET')
-API_AUTH_SUBNET = getattr(settings, 'API_AUTH_SUBNET')
-
 
 class RedirectWhenError(Exception):
     def __init__(self, url, failed_message=None):
@@ -28,7 +25,8 @@ class RedirectWhenError(Exception):
 class HashAuthView(View):
 
     def __init__(self, *args, **kwargs):
-        if API_AUTH_SECRET is None or API_AUTH_SECRET == 'your api secret':
+        api_auth_secret = getattr(settings, 'API_AUTH_SECRET')
+        if api_auth_secret is None or api_auth_secret == 'your api secret':
             raise NotImplementedError('You must specified API_AUTH_SECRET in settings')
         else:
             super(HashAuthView, self).__init__(*args, **kwargs)
@@ -53,15 +51,16 @@ class AllowedSubnetMixin(object):
         Return 403 denied otherwise.
         """
         ip = IPAddress(request.META.get('REMOTE_ADDR'))
-        if type(API_AUTH_SUBNET) is str:
-            if ip in IPNetwork(API_AUTH_SUBNET):
+        api_auth_subnet = getattr(settings, 'API_AUTH_SUBNET')
+        if type(api_auth_subnet) is str:
+            if ip in IPNetwork(api_auth_subnet):
                 return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         try:
-            for subnet in API_AUTH_SUBNET:
+            for subnet in api_auth_subnet:
                 if ip in IPNetwork(subnet):
                     return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         except TypeError:
-            if ip in IPNetwork(str(API_AUTH_SUBNET)):
+            if ip in IPNetwork(str(api_auth_subnet)):
                 return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden('Access Denied')
 

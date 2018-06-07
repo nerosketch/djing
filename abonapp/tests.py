@@ -13,13 +13,12 @@ from abonapp.pay_systems import allpay
 from group_app.models import Group
 
 rf = RequestFactory()
-SERVICE_ID = getattr(settings, 'PAY_SERV_ID')
-SECRET = getattr(settings, 'PAY_SECRET')
 
 
 def _make_sign(act: int, pay_account: str, serv_id: str, pay_id):
     md = md5()
-    s = "%d_%s_%s_%s_%s" % (act, pay_account, serv_id, pay_id, SECRET)
+    secret = getattr(settings, 'PAY_SECRET')
+    s = "%d_%s_%s_%s_%s" % (act, pay_account, serv_id, pay_id, secret)
     md.update(bytes(s, 'utf-8'))
     return md.hexdigest()
 
@@ -46,13 +45,14 @@ class AllPayTestCase(TestCase):
     def user_pay_view(self):
         print('test_user_pay_view')
         current_date = timezone.now().strftime(self.time_format)
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url, {
                 'ACT': 1,
                 'PAY_ACCOUNT': 'pay_account1',
-                'SERVICE_ID': SERVICE_ID,
+                'SERVICE_ID': service_id,
                 'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
                 'TRADE_POINT': 'term1',
-                'SIGN': _make_sign(1, 'pay_account1', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+                'SIGN': _make_sign(1, 'pay_account1', service_id, '840ab457-e7d1-4494-8197-9570da035170')
             }
         ))
         r = r.content.decode('utf-8')
@@ -61,7 +61,7 @@ class AllPayTestCase(TestCase):
                 "<balance>-13.12</balance>",
                 "<name>Test Name</name>",
                 "<account>pay_account1</account>",
-                "<service_id>%s</service_id>" % SERVICE_ID,
+                "<service_id>%s</service_id>" % service_id,
                 "<min_amount>10.0</min_amount>",
                 "<max_amount>5000</max_amount>",
                 "<status_code>21</status_code>",
@@ -72,21 +72,22 @@ class AllPayTestCase(TestCase):
     def user_pay_pay(self):
         print('test_user_pay_pay')
         current_date = timezone.now().strftime(self.time_format)
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url, {
             'ACT': 4,
             'PAY_ACCOUNT': 'pay_account1',
             'PAY_AMOUNT': 18.21,
             'RECEIPT_NUM': 2126235,
-            'SERVICE_ID': SERVICE_ID,
+            'SERVICE_ID': service_id,
             'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
             'TRADE_POINT': 'term1',
-            'SIGN': _make_sign(4, 'pay_account1', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+            'SIGN': _make_sign(4, 'pay_account1', service_id, '840ab457-e7d1-4494-8197-9570da035170')
         }))
         r = r.content.decode('utf-8')
         xml = ''.join((
             "<pay-response>",
                 "<pay_id>840ab457-e7d1-4494-8197-9570da035170</pay_id>",
-                "<service_id>%s</service_id>" % SERVICE_ID,
+                "<service_id>%s</service_id>" % service_id,
                 "<amount>18.21</amount>",
                 "<status_code>22</status_code>",
                 "<time_stamp>%s</time_stamp>" % current_date,
@@ -98,12 +99,13 @@ class AllPayTestCase(TestCase):
     def user_pay_check(self):
         print('test_user_pay_check')
         current_date = timezone.now().strftime(self.time_format)
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url,
             {
                 'ACT': 7,
-                'SERVICE_ID': SERVICE_ID,
+                'SERVICE_ID': service_id,
                 'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
-                'SIGN': _make_sign(7, '', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+                'SIGN': _make_sign(7, '', service_id, '840ab457-e7d1-4494-8197-9570da035170')
             }
         ))
         r = r.content.decode('utf-8')
@@ -113,7 +115,7 @@ class AllPayTestCase(TestCase):
                 "<time_stamp>%s</time_stamp>" % current_date,
                 "<transaction>",
                     "<pay_id>840ab457-e7d1-4494-8197-9570da035170</pay_id>",
-                    "<service_id>%s</service_id>" % SERVICE_ID,
+                    "<service_id>%s</service_id>" % service_id,
                     "<amount>18.21</amount>",
                     "<status>111</status>",
                     "<time_stamp>%s</time_stamp>" % self.test_pay_time,
@@ -124,14 +126,15 @@ class AllPayTestCase(TestCase):
 
     def check_ballance(self):
         print('check_ballance')
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url,
             {
                 'ACT': 1,
                 'PAY_ACCOUNT': 'pay_account1',
-                'SERVICE_ID': SERVICE_ID,
+                'SERVICE_ID': service_id,
                 'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
                 'TRADE_POINT': 'term1',
-                'SIGN': _make_sign(1, 'pay_account1', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+                'SIGN': _make_sign(1, 'pay_account1', service_id, '840ab457-e7d1-4494-8197-9570da035170')
             }
         ))
         r = r.content.decode('utf-8')
@@ -142,13 +145,14 @@ class AllPayTestCase(TestCase):
     def test_client_does_not_exist(self):
         print('test_client_does_not_exist')
         current_date = timezone.now().strftime(self.time_format)
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url, {
             'ACT': 1,
             'PAY_ACCOUNT': 'not_existing_acc',
-            'SERVICE_ID': SERVICE_ID,
+            'SERVICE_ID': service_id,
             'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
             'TRADE_POINT': 'term1',
-            'SIGN': _make_sign(1, 'not_existing_acc', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+            'SIGN': _make_sign(1, 'not_existing_acc', service_id, '840ab457-e7d1-4494-8197-9570da035170')
         }
                           ))
         r = r.content.decode('utf-8')
@@ -161,13 +165,14 @@ class AllPayTestCase(TestCase):
 
     def try_pay_double(self):
         print('try_pay_double')
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url, {
             'ACT': 4,
             'PAY_ACCOUNT': 'pay_account1',
-            'SERVICE_ID': SERVICE_ID,
+            'SERVICE_ID': service_id,
             'PAY_ID': '840ab457-e7d1-4494-8197-9570da035170',
             'TRADE_POINT': 'term1',
-            'SIGN': _make_sign(4, 'pay_account1', SERVICE_ID, '840ab457-e7d1-4494-8197-9570da035170')
+            'SIGN': _make_sign(4, 'pay_account1', service_id, '840ab457-e7d1-4494-8197-9570da035170')
         }))
         r = r.content.decode('utf-8')
         r = parse(r)
@@ -178,11 +183,12 @@ class AllPayTestCase(TestCase):
         print('non_existing_pay')
         current_date = timezone.now().strftime(self.time_format)
         uuid = '9f154e93-d800-419a-92f7-da33529138be'
+        service_id = getattr(settings, 'PAY_SERV_ID')
         r = allpay(rf.get(self.pay_url, {
             'ACT': 7,
-            'SERVICE_ID': SERVICE_ID,
+            'SERVICE_ID': service_id,
             'PAY_ID': uuid,
-            'SIGN': _make_sign(7, '', SERVICE_ID, uuid)
+            'SIGN': _make_sign(7, '', service_id, uuid)
         }))
         r = r.content.decode('utf-8')
         xml = ''.join((

@@ -8,9 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from group_app.models import Group
 
-DEFAULT_PICTURE = getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
-TELEPHONE_REGEXP = getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
-
 
 class MyUserManager(BaseUserManager):
     def create_user(self, telephone, username, password=None):
@@ -60,7 +57,9 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
         max_length=16,
         verbose_name=_('Telephone'),
         blank=True,
-        validators=(RegexValidator(TELEPHONE_REGEXP),)
+        validators=(RegexValidator(
+            getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
+        ),)
     )
 
     USERNAME_FIELD = 'username'
@@ -105,7 +104,7 @@ class UserProfile(BaseAccount):
         if self.avatar and os.path.isfile(self.avatar.path):
             return self.avatar.url
         else:
-            return DEFAULT_PICTURE
+            return getattr(settings, 'DEFAULT_PICTURE', '/static/img/user_ava.gif')
 
     def get_min_ava(self):
         return self.get_big_ava()
