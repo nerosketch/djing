@@ -51,7 +51,7 @@
                     <li{% if map_url == request.path %} class="active"{% endif %}><a href="{{ map_url }}" target="_blank">{% trans 'Map page' %}</a></li>
                 {% endif %}
 
-                <li class="dropdown">
+                {% comment %} <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Language' %} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
 
@@ -64,7 +64,7 @@
                         {% endfor %}
 
                     </ul>
-                </li>
+                </li> {% endcomment %}
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
