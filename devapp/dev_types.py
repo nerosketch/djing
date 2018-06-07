@@ -7,7 +7,10 @@ from django.utils.translation import gettext_lazy as _, gettext
 
 from djing.lib import RuTimedelta, safe_int
 from djing.lib.tln.tln import ValidationError as TlnValidationError, register_onu_ZTE_F660
-from .base_intr import DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError, ListOrError
+from .base_intr import (
+    DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError,
+    ListOrError, DeviceConfigurationError
+)
 
 
 def _norm_name(name: str, replreg=None):
@@ -116,7 +119,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         device = self.db_instance
         return plain_ip_device_mon_template(device, *args, **kwargs)
 
-    def register_device(self):
+    def register_device(self, extra_data: Dict):
         pass
 
 
@@ -200,7 +203,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         device = self.db_instance
         return plain_ip_device_mon_template(device)
 
-    def register_device(self):
+    def register_device(self, extra_data: Dict):
         pass
 
 
@@ -302,7 +305,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         )
         return '\n'.join(i for i in r if i)
 
-    def register_device(self):
+    def register_device(self, extra_data: Dict):
         pass
 
 
@@ -439,9 +442,6 @@ class Olt_ZTE_C320(OLTDevice):
     def get_template_name(self):
         return 'olt_ztec320.html'
 
-    def register_device(self):
-        pass
-
 
 class ZteOnuDevice(OnuDevice):
     @staticmethod
@@ -506,7 +506,9 @@ class ZteOnuDevice(OnuDevice):
         )
         return '\n'.join(i for i in r if i)
 
-    def register_device(self):
+    def register_device(self, extra_data: Dict):
+        if extra_data is None:
+            raise DeviceConfigurationError('You have not info in extra_data field, please fill it in JSON')
         device = self.db_instance
         ip = None
         if device.ip_address:
@@ -516,8 +518,15 @@ class ZteOnuDevice(OnuDevice):
         if ip:
             mac = str(device.mac_addr).encode()
             sn = b"ZTEG%s" % b''.join(mac.split(b':')[-4:]).upper()
-            # FIXME: Store login & password for device somewhere
+            telnet = extra_data.get('telnet')
+            if telnet is None:
+                raise DeviceConfigurationError('For ZTE configuration needed "telnet" section in extra_data')
+            login = telnet.get('login')
+            password = telnet.get('password')
+            if login is None or password is None:
+                raise DeviceConfigurationError('For ZTE configuration needed login and'
+                                               ' password for telnet access in extra_data')
             register_onu_ZTE_F660(
-                olt_ip=ip, onu_sn=sn, login_passwd=(b'admin', device.man_passw.encode()),
+                olt_ip=ip, onu_sn=sn, login_passwd=(login.encode(), password.encode()),
                 onu_mac=mac
             )

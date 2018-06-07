@@ -35,7 +35,7 @@ class DeviceForm(forms.ModelForm):
 
     class Meta:
         model = models.Device
-        exclude = ('map_dot', 'status')
+        exclude = ('map_dot', 'status', 'extra_data')
         widgets = {
             'ip_address': forms.TextInput(attrs={
                 'pattern': IP_ADDR_REGEX,
@@ -45,6 +45,12 @@ class DeviceForm(forms.ModelForm):
                 'required': True
             })
         }
+
+
+class DeviceExtraDataForm(forms.ModelForm):
+    class Meta:
+        model = models.Device
+        fields = ('extra_data',)
 
 
 class PortForm(forms.ModelForm):

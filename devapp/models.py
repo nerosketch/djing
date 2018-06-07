@@ -4,6 +4,7 @@ from subprocess import run
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from jsonfield import JSONField
 
 from djing.fields import MACAddressField, MyGenericIPAddressField
 from djing.lib import MyChoicesAdapter
@@ -42,6 +43,9 @@ class Device(models.Model):
                                    on_delete=models.SET_NULL)
 
     snmp_extra = models.CharField(_('SNMP extra info'), max_length=256, null=True, blank=True)
+    extra_data = JSONField(verbose_name=_('Extra data'),
+                           help_text=_('Extra data in JSON format. You may use it for your custom data'),
+                           blank=True, null=True)
 
     NETWORK_STATES = (
         ('und', _('Undefined')),
@@ -112,7 +116,7 @@ class Device(models.Model):
     def register_device(self):
         mng = self.get_manager_object()
         # if hasattr(mng, 'register_device') and callable(mng.register_device):
-        mng.register_device()
+        mng.register_device(self.extra_data)
 
 
 class Port(models.Model):

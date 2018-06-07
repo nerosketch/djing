@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
-from typing import Union, Iterable, AnyStr, Generator, Optional
+from typing import Union, Iterable, AnyStr, Generator, Optional, Dict
 from easysnmp import Session
 
 from django.utils.translation import gettext
@@ -14,6 +14,10 @@ ListOrError = Union[
 
 
 class DeviceImplementationError(Exception):
+    pass
+
+
+class DeviceConfigurationError(DeviceImplementationError):
     pass
 
 
@@ -64,7 +68,7 @@ class DevBase(object, metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def register_device(self):
+    def register_device(self, extra_data: Dict):
         pass
 
     @abstractmethod

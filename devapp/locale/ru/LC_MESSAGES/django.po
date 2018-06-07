@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-02 16:39+0300\n"
+"POT-Creation-Date: 2018-06-07 13:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,57 +18,57 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: base_intr.py:92
+#: base_intr.py:103
 msgid "Ip address is required"
 msgstr "Ip адрес необходим"
 
-#: dev_types.py:37
+#: dev_types.py:66
 msgid "DLink switch"
 msgstr "Свич D'Link"
 
-#: dev_types.py:56
+#: dev_types.py:85
 msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
-#: dev_types.py:112
+#: dev_types.py:148
 msgid "PON OLT"
 msgstr ""
 
-#: dev_types.py:136 views.py:275 views.py:433
+#: dev_types.py:172 views.py:354 views.py:512
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
 
-#: dev_types.py:176
+#: dev_types.py:219
 msgid "Ip address or parent device with ip address required for ONU device"
 msgstr ""
 "Необходим ip адрес. Или родительское устройство с назначенным ip адресом "
 "необходимо."
 
-#: dev_types.py:182
+#: dev_types.py:225
 msgid "PON ONU"
 msgstr ""
 
-#: dev_types.py:227
+#: dev_types.py:271
 msgid "ONU not connected"
 msgstr "ONU не в сети"
 
-#: dev_types.py:234
+#: dev_types.py:279
 msgid "Onu snmp field must be en integer"
 msgstr "Поле для snmp информации об ONU должно быть числом"
 
-#: dev_types.py:260
+#: dev_types.py:332
 msgid "Eltex switch"
 msgstr "Элтекс свич"
 
-#: dev_types.py:305
+#: dev_types.py:380
 msgid "OLT ZTE C320"
 msgstr ""
 
-#: dev_types.py:354
+#: dev_types.py:449
 msgid "ZTE PON ONU"
 msgstr ""
 
-#: dev_types.py:387
+#: dev_types.py:483
 msgid "Zte onu snmp field must be two dot separated integers"
 msgstr ""
 "Поле snmp информации для ZTE ONU должно быть двумя целыми числами, "
@@ -82,39 +82,39 @@ msgstr "MAC-адрес необходим для заполнения"
 msgid "Device with that mac is already exist"
 msgstr "Устройство с этим мак-адресом уже есть"
 
-#: forms.py:63
+#: forms.py:71
 msgid "Port number on device must be unique"
 msgstr "Номер порта на устройстве должен быть уникальным"
 
-#: models.py:25 templates/devapp/custom_dev_page/onu.html:18
+#: models.py:27 templates/devapp/custom_dev_page/onu.html:18
 #: templates/devapp/custom_dev_page/onu_for_zte.html:18
 #: templates/devapp/devices.html:22 templates/devapp/devices_null_group.html:20
 msgid "Ip address"
 msgstr "Ip адрес"
 
-#: models.py:26 templates/devapp/devices.html:32
+#: models.py:28 templates/devapp/devices.html:32
 msgid "Mac address"
 msgstr "Мак адрес"
 
-#: models.py:27 templates/devapp/devices.html:28
+#: models.py:29 templates/devapp/devices.html:28
 #: templates/devapp/devices_null_group.html:26
 msgid "Comment"
 msgstr "Комментарий"
 
-#: models.py:36 templates/devapp/devices.html:36
+#: models.py:38 templates/devapp/devices.html:35
 #: templates/devapp/devices_null_group.html:32
 msgid "Device type"
 msgstr "Тип устройства"
 
-#: models.py:38
+#: models.py:40
 msgid "SNMP password"
 msgstr "Пароль SNMP"
 
-#: models.py:39
+#: models.py:41
 msgid "Device group"
 msgstr "Группа устройства"
 
-#: models.py:40 templates/devapp/add_dev.html:46
+#: models.py:42 templates/devapp/add_dev.html:46
 #: templates/devapp/custom_dev_page/onu.html:34
 #: templates/devapp/custom_dev_page/onu_for_zte.html:34
 #: templates/devapp/custom_dev_page/ports.html:59 templates/devapp/dev.html:33
@@ -122,56 +122,66 @@ msgstr "Группа устройства"
 msgid "Parent device"
 msgstr "Родительское устройство"
 
-#: models.py:43
+#: models.py:45
 msgid "SNMP extra info"
 msgstr "Доп. инфо для snmp"
 
 #: models.py:46
+msgid "Extra data"
+msgstr "Дополнительные данные"
+
+#: models.py:47
+msgid "Extra data in JSON format. You may use it for your custom data"
+msgstr ""
+"Дополнительные данные в формате JSON. Вы можете хранить там собственные "
+"данные"
+
+#: models.py:51
 msgid "Undefined"
 msgstr "Не определено"
 
-#: models.py:47
+#: models.py:52
 msgid "Up"
 msgstr "В сети"
 
-#: models.py:48
+#: models.py:53
 msgid "Unreachable"
 msgstr "Не доступно"
 
-#: models.py:49
+#: models.py:54
 msgid "Down"
 msgstr "Не в сети"
 
-#: models.py:51
+#: models.py:56
 msgid "Status"
 msgstr "Состояние"
 
-#: models.py:53
+#: models.py:58
 msgid "Send notify when monitoring state changed"
 msgstr "Отправлять уведомления при событиях мониторинга"
 
-#: models.py:58
+#: models.py:63
 msgid "Can view device"
 msgstr "Может видеть устройство"
 
-#: models.py:60 models.py:108
+#: models.py:65 models.py:123
 msgid "Device"
 msgstr "Устройство"
 
-#: models.py:61 templates/devapp/devices.html:14
+#: models.py:66 templates/devapp/devices.html:14
 #: templates/devapp/devices_null_group.html:8
 msgid "Devices"
 msgstr "Устройства"
 
-#: models.py:96 views.py:175 views.py:237
+#: models.py:102 views.py:254 views.py:316
 msgid "Device does not have a group, please fix that"
 msgstr "У устройства нет группы, пожалуйста, исправьте это"
 
-#: models.py:109 templates/devapp/manage_ports/list.html:11
+#: models.py:124 templates/devapp/manage_ports/list.html:11
 msgid "Number"
 msgstr "Номер"
 
-#: models.py:110 templates/devapp/custom_dev_page/onu.html:20
+#: models.py:125 templates/devapp/custom_dev_page/onu.html:20
 #: templates/devapp/custom_dev_page/onu_for_zte.html:20
 #: templates/devapp/custom_dev_page/ports.html:88
 #: templates/devapp/manage_ports/add_ports.html:33
@@ -179,21 +189,21 @@ msgstr "Номер"
 msgid "Description"
 msgstr "Описание"
 
-#: models.py:119
+#: models.py:134
 msgid "Can toggle ports"
 msgstr "Может переключать порты"
 
-#: models.py:121 templates/devapp/custom_dev_page/ports.html:110
+#: models.py:136 templates/devapp/custom_dev_page/ports.html:110
 #: templates/devapp/manage_ports/fix_abon_device.html:24
 msgid "Port"
 msgstr "Порт"
 
-#: models.py:122
+#: models.py:137
 msgid "Ports"
 msgstr "Порты"
 
 #: templates/devapp/add_dev.html:8
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:7
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:7
 #: templates/devapp/devices.html:8 templates/devapp/devices_null_group.html:7
 #: templates/devapp/fix_dev_group.html:9 templates/devapp/group_list.html:7
 #: templates/devapp/manage_ports/add_ports.html:7
@@ -206,9 +216,10 @@ msgid "Add new device"
 msgstr "Добавить устройство"
 
 #: templates/devapp/add_dev.html:16
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:12
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:12
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:20
 #: templates/devapp/custom_dev_page/ports.html:68
-#: templates/devapp/devices.html:63
+#: templates/devapp/devices.html:64
 #: templates/devapp/manage_ports/add_ports.html:16
 msgid "Not assigned"
 msgstr "&lt;Не назначено&gt;"
@@ -223,16 +234,16 @@ msgstr "Инфа о железке"
 msgid "Find the device"
 msgstr "Найти устройство"
 
-#: templates/devapp/add_dev.html:72 templates/devapp/dev.html:61
+#: templates/devapp/add_dev.html:72 templates/devapp/dev.html:62
 #: templates/devapp/fix_dev_group.html:64
 #: templates/devapp/manage_ports/add_ports.html:75
 #: templates/devapp/manage_ports/add_ports.html:79
 #: templates/devapp/manage_ports/modal_add_edit_port.html:21
+#: templates/devapp/modal_device_extra_edit.html:14
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/devapp/add_dev.html:75 templates/devapp/dev.html:73
-#: templates/devapp/fix_dev_group.html:67
+#: templates/devapp/add_dev.html:75 templates/devapp/fix_dev_group.html:67
 msgid "Reset"
 msgstr "Сбросить форму"
 
@@ -253,6 +264,7 @@ msgid "Name"
 msgstr "Имя"
 
 #: templates/devapp/custom_dev_page/olt.html:19
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:31
 #: templates/devapp/custom_dev_page/onu.html:19
 #: templates/devapp/custom_dev_page/onu_for_zte.html:19
 msgid "Mac"
@@ -265,7 +277,7 @@ msgid "Signal"
 msgstr "Ур. сигнала"
 
 #: templates/devapp/custom_dev_page/olt.html:38
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:45
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:48
 msgid "Create device"
 msgstr "Создать устройство"
 
@@ -287,27 +299,27 @@ msgstr "Длинное описание"
 msgid "Hostname"
 msgstr "Имя хоста"
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:15
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:15
 msgid "OLT Scan"
 msgstr "Скан OLT"
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:27
-msgid "Onu type"
-msgstr "Тип ONU"
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:20
+msgid "Unregistered units"
+msgstr "Незарегистрированные юниты"
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:28
-msgid "Onu port"
-msgstr "Порт ONU"
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:32
+msgid "Firmware version"
+msgstr "Версия прошивки"
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:29
-msgid "Onu signal"
-msgstr "Сигнала ONU"
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:33
+msgid "LOID password"
+msgstr "LOID пароль"
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:30
-msgid "Serial"
-msgstr "Серийный номер"
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:34
+msgid "LOID"
+msgstr ""
 
-#: templates/devapp/custom_dev_page/olt_ztec320_ports.html:52
+#: templates/devapp/custom_dev_page/olt_ztec320_units_uncfg.html:55
 msgid "ONU not found"
 msgstr "ONU не найдена"
 
@@ -393,7 +405,7 @@ msgstr "Название"
 msgid "We have not received info for ports"
 msgstr "Инфа о портах не получена"
 
-#: templates/devapp/dev.html:65 templates/devapp/dev.html:69
+#: templates/devapp/dev.html:66 templates/devapp/dev.html:70
 #: templates/devapp/manage_ports/add_ports.html:53
 #: templates/devapp/manage_ports/add_ports.html:55
 #: templates/devapp/manage_ports/list.html:35
@@ -401,9 +413,17 @@ msgstr "Инфа о портах не получена"
 msgid "Delete"
 msgstr "Удалить"
 
-#: templates/devapp/dev.html:68
+#: templates/devapp/dev.html:69
 msgid "Permission denied"
 msgstr "Доступ запрещён"
+
+#: templates/devapp/dev.html:74
+msgid "Register device"
+msgstr "Зарегистрировать устройство"
+
+#: templates/devapp/dev.html:81
+msgid "Tech date"
+msgstr "Техническая информация"
 
 #: templates/devapp/device_confirm_delete.html:9
 msgid "Remove device"
@@ -514,83 +534,107 @@ msgstr "Вы уверены что хотите удалить порт свич
 msgid "Subscriber on port"
 msgstr "Абонент на порту"
 
+#: templates/devapp/modal_device_extra_edit.html:8
+msgid "Change extra data for device"
+msgstr "Изменить дополнительные данные для устройства"
+
+#: templates/devapp/modal_device_extra_edit.html:18
+msgid "Back"
+msgstr "Назад"
+
 #: views.py:87
 msgid "Device successfully deleted"
 msgstr "Устройство успешно удалено"
 
-#: views.py:115
-msgid "You have redirected to existing device"
-msgstr "Вы были переадресованы на существующее устройство"
-
-#: views.py:118 views.py:368 views.py:481
-msgid "Please attach group for device"
-msgstr "Пожалуйста назначте устройству группу в настройках"
-
-#: views.py:127
-msgid "Device info has been saved"
-msgstr "Инфа о точке сохранена"
-
-#: views.py:130 views.py:314 views.py:343 views.py:483
-msgid "Form is invalid, check fields and try again"
-msgstr "Ошибка в данных, проверте их ещё раз"
-
-#: views.py:133
+#: views.py:109
 #, python-format
 msgid "Duplicate user and port: %s"
 msgstr "Пользователь с таким портом и устройством уже есть: %s"
 
-#: views.py:180 views.py:270 views.py:355
+#: views.py:121 views.py:178
+msgid "You have redirected to existing device"
+msgstr "Вы были переадресованы на существующее устройство"
+
+#: views.py:124 views.py:181 views.py:447 views.py:560
+msgid "Please attach group for device"
+msgstr "Пожалуйста назначте устройству группу в настройках"
+
+#: views.py:131 views.py:188
+msgid "Device info has been saved"
+msgstr "Инфа о точке сохранена"
+
+#: views.py:146 views.py:393 views.py:422 views.py:562
+msgid "Form is invalid, check fields and try again"
+msgstr "Ошибка в данных, проверте их ещё раз"
+
+#: views.py:238
+msgid "Device extra data has successfully updated"
+msgstr "Дополнительная информация об устройстве успешно обновлена"
+
+#: views.py:259 views.py:349 views.py:434
 msgid "Device does not exist"
 msgstr "Устойство не найдено"
 
-#: views.py:201
+#: views.py:280
 msgid "Subscribers on port does not exist"
 msgstr "Абоненты на порту не найдены"
 
-#: views.py:203
+#: views.py:282
 msgid "More than one subscriber on device port"
 msgstr "Больше одного абонента на порту устройства"
 
-#: views.py:289
+#: views.py:368
 msgid "Port successfully removed"
 msgstr "Порт успешно удалён"
 
-#: views.py:297 views.py:325
+#: views.py:376 views.py:404
 msgid "Port does not exist"
 msgstr "Порт не найден"
 
-#: views.py:312 views.py:340
+#: views.py:391 views.py:419
 msgid "Port successfully saved"
 msgstr "Порт успешно сохранён"
 
-#: views.py:375 views.py:431
+#: views.py:454 views.py:510
 msgid "Dot was not pinged"
 msgstr "Эта точка не пингуется"
 
-#: views.py:384 views.py:429
+#: views.py:463 views.py:508
 msgid "Not Set snmp device password"
 msgstr "Не указан snmp пароль для устройства"
 
-#: views.py:392
+#: views.py:471
 msgid "SNMP error on device"
 msgstr "Ошибка SNMP на устройстве"
 
-#: views.py:478
+#: views.py:557
 msgid "Device fixed"
 msgstr "Устройство исправлено"
 
-#: views.py:508
+#: views.py:587
 #, python-format
 msgid "Device with mac address %(mac)s does not exist"
 msgstr "Устройство мак адресом %(mac)s не найдено"
 
-#: views.py:516
+#: views.py:595
 msgid "Fixed"
 msgstr "Исправлено, обновите страницу"
 
-#: views.py:519
+#: views.py:598
 msgid "Parent device not found"
 msgstr "Вышестоящее устройство не найдено"
+
+#: views.py:737
+msgid "Unregistered onu not found"
+msgstr "Незарегистрированные ONU не найдены"
+
+#: views.py:739
+msgid "Wrong login or password for telnet access"
+msgstr "Не правильный логин или пароль для доступа по telnet"
+
+#: views.py:743
+msgid "Process locked by another process"
+msgstr "Процесс занят другой задачей, подождите чуть и попробуйте ещё"
 
 msgid "Device %(device_name)s is up"
 msgstr "%(device_name)s в сети"
@@ -607,14 +651,5 @@ msgstr "Устройство %(device_name)s получило не опреде�
 msgid "View"
 msgstr "Посмотреть"
 
-msgid "Unregistered units"
-msgstr "Незарегистрированные юниты"
-
-msgid "Register device"
-msgstr "Зарегистрировать устройство"
-
-msgid "Unregistered onu not found"
-msgstr "Незарегистрированные ONU не найдены"
-
-msgid "Process locked by another process"
-msgstr "Процесс занят другой задачей, подождите чуть и попробуйте ещё"
+msgid "Enter valid JSON"
+msgstr "Введите данные в формате JSON"

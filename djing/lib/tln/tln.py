@@ -20,6 +20,10 @@ class ZTEFiberIsFull(ZteOltConsoleError):
     pass
 
 
+class ZteOltLoginFailed(ZteOltConsoleError):
+    pass
+
+
 class ValidationError(ValueError):
     pass
 
@@ -55,12 +59,6 @@ class TelnetApi(Telnet):
                                )
         sock = self.get_socket()
         sock.send(naws_cmd)
-
-    def enter(self, username: bytes, passw: bytes) -> None:
-        self.read_until(b'Username:')
-        self.write(username)
-        self.read_until(b'Password:')
-        self.write(passw)
 
     def read_lines(self) -> Generator:
         while True:
@@ -109,6 +107,15 @@ class OltZTERegister(TelnetApi):
     def __init__(self, screen_size: Tuple[int, int], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.resize_screen(*screen_size)
+
+    def enter(self, username: bytes, passw: bytes) -> None:
+        self.read_until(b'Username:')
+        self.write(username)
+        self.read_until(b'Password:')
+        self.write(passw)
+        for l in self.read_lines():
+            if b'bad password' in l:
+                raise ZteOltLoginFailed
 
     def get_unregistered_onu(self, sn: bytes) -> Optional[Dict]:
         lines = tuple(self.command_to(b'show gpon onu uncfg'))
@@ -251,10 +258,10 @@ def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes,
 
 
 if __name__ == '__main__':
-    ip = '10.40.1.10'
+    ip = '192.168.0.100'
     try:
         register_onu_ZTE_F660(
-            olt_ip=ip, onu_sn=b'ZTEG^#*$&@&', login_passwd=(b'admin', b'password'),
+            olt_ip=ip, onu_sn=b'ZTEG^#*$&@&', login_passwd=(b'login', b'password'),
             onu_mac=b'MAC'
         )
     except ZteOltConsoleError as e:

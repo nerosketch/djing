@@ -16,7 +16,7 @@ from devapp.base_intr import DeviceImplementationError
 from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib import safe_int, ProcessLocked
 from abonapp.models import Abon
-from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError
+from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, ZteOltLoginFailed
 from group_app.models import Group
 from accounts_app.models import UserProfile
 from django.conf import settings
@@ -27,7 +27,7 @@ from chatbot.models import ChatException
 from jsonview.decorators import json_view
 from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
-from .forms import DeviceForm, PortForm
+from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 
 
 class BaseDeviceListView(global_base_views.BaseListWithFiltering):
@@ -71,7 +71,7 @@ class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceLi
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(permission_required('devapp.delete_device'), name='dispatch')
-class DeviceVeleteView(DeleteView):
+class DeviceDeleteView(DeleteView):
     model = Device
     pk_url_kwarg = 'device_id'
 
@@ -218,6 +218,30 @@ class DeviceCreateView(CreateView):
         parent_device_id = self.request.GET.get('pdev')
         context['selected_parent_dev'] = get_object_or_None(Device, pk=parent_device_id)
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('devapp.change_device'), name='dispatch')
+class DeviceUpdateExtra(UpdateView):
+    template_name = 'devapp/modal_device_extra_edit.html'
+    model = Device
+    form_class = DeviceExtraDataForm
+    pk_url_kwarg = 'device_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group_id'] = self.kwargs.get('group_id')
+        return context
+
+    def form_valid(self, form):
+        r = super().form_valid(form)
+        messages.success(self.request, _('Device extra data has successfully updated'))
+        return r
+
+    def get_success_url(self):
+        return resolve_url('devapp:edit',
+                           self.kwargs.get('group_id'),
+                           self.kwargs.get('device_id'))
 
 
 @login_required
@@ -612,7 +636,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             if not re.match(MAC_ADDR_REGEX, dev_mac):
                 return {'text': 'mac address %s is not valid' % dev_mac}
 
-            device_down = Device.objects.filter(mac_addr=dev_mac).first()
+            device_down = Device.objects.filter(mac_addr=dev_mac).defer('extra_data').first()
             if device_down is None:
                 return {'text': 'Devices with mac %s does not exist' % dev_mac}
 
@@ -689,7 +713,7 @@ class DevicesGetListView(global_base_views.SecureApiView):
             devs = Device.objects.all()
         else:
             devs = Device.objects.filter(devtype=device_type)
-        res = devs.defer('man_passw', 'group', 'parent_dev').values()
+        res = devs.defer('man_passw', 'group', 'parent_dev', 'extra_data').values()
         for r in res:
             if isinstance(r['mac_addr'], EUI):
                 r['mac_addr'] = int(r['mac_addr'])
@@ -711,8 +735,12 @@ def regster_device(request, device_id: str):
         status = 0
     except OnuZteRegisterError:
         text = format_msg(gettext('Unregistered onu not found'), 'eye-close')
+    except ZteOltLoginFailed:
+        text = format_msg(gettext('Wrong login or password for telnet access'), 'lock')
     except (ConnectionRefusedError, ZteOltConsoleError) as e:
         text = format_msg(e, 'exclamation-sign')
+    except DeviceImplementationError as e:
+        text = format_msg(e, 'wrench')
     except ProcessLocked:
         text = format_msg(gettext('Process locked by another process'), 'time')
     else:
