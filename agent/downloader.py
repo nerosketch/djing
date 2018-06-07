@@ -2,7 +2,7 @@
 from urllib import request
 from hashlib import sha256
 
-API_AUTH_SECRET = 'piodpaosdpa_sd&3jf[owfafogjaspioha*a'
+API_AUTH_SECRET = 'your api key'
 FILE_LINK = 'http://localhost:8000/dev/nagios/hosts/'
 
 """
