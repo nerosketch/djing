@@ -115,8 +115,10 @@ class Device(models.Model):
 
     def register_device(self):
         mng = self.get_manager_object()
-        # if hasattr(mng, 'register_device') and callable(mng.register_device):
-        mng.register_device(self.extra_data)
+        if self.extra_data is None:
+            if self.parent_dev and self.parent_dev.extra_data is not None:
+                return mng.register_device(self.parent_dev.extra_data)
+        return mng.register_device(self.extra_data)
 
 
 class Port(models.Model):
