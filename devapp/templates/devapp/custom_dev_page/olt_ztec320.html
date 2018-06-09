@@ -17,15 +17,9 @@
                     {% for fiber in dev_manager.get_fibers %}
                         <div class="port{% if fiber.fb_onu_num > 0 %} mega{% endif %} text-center">
                             <b>{{ fiber.fb_name }}</b>
-                            {% if fiber.fb_onu_num > 0 %}
-                                <a href="{% url 'devapp:zte_port_view_uncfg' grp dev.id fiber.fb_id %}" class="port-img">
-                                    <b>{{ fiber.fb_onu_num }}</b>
-                                </a>
-                            {% else %}
-                                <a href="#" class="port-img">
-                                    <b>0</b>
-                                </a>
-                            {% endif %}
+                            <a href="{% url 'devapp:zte_port_view_uncfg' grp dev.id fiber.fb_id %}" class="port-img">
+                                <b>{{ fiber.fb_onu_num }}</b>
+                            </a>
                         </div>
                     {% empty %}
                         <h3>{% trans 'We have not received info, please check options :(' %}</h3>

@@ -517,7 +517,12 @@ class ZteOnuDevice(OnuDevice):
             ip = device.parent_dev.ip_address
         if ip:
             mac = str(device.mac_addr).encode()
-            sn = b"ZTEG%s" % b''.join(mac.split(b':')[-4:]).upper()
+
+            # Format serial number from mac address
+            # because saved mac address was make from serial number
+            sn = (b'%.2X' % int(x, base=16) for x in mac.split(b':')[-4:])
+            sn = b"ZTEG%s" % b''.join(sn)
+
             telnet = extra_data.get('telnet')
             if telnet is None:
                 raise DeviceConfigurationError('For ZTE configuration needed "telnet" section in extra_data')
