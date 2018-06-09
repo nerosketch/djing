@@ -422,8 +422,7 @@ class Olt_ZTE_C320(OLTDevice):
             'firmware_ver': frm_ver,
             'loid_passw': loid_passw,
             'loid': loid,
-            'sn': sn,
-            'extra_snmp': '%d.%d' % (fiber_num, int(num))
+            'sn': sn
         } for frm_ver, loid_passw, loid, (sn, num) in zip(
             firmware_ver, loid_passws, loids, sn_num_list
         ))
@@ -526,7 +525,11 @@ class ZteOnuDevice(OnuDevice):
             if login is None or password is None:
                 raise DeviceConfigurationError('For ZTE configuration needed login and'
                                                ' password for telnet access in extra_data')
-            register_onu_ZTE_F660(
+            stack_num, rack_num, fiber_num, new_onu_port_num = register_onu_ZTE_F660(
                 olt_ip=ip, onu_sn=sn, login_passwd=(login.encode(), password.encode()),
                 onu_mac=mac
             )
+            bin_snmp_fiber_number = "10000{0:08b}{1:08b}00000000".format(rack_num, fiber_num)
+            snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
+            device.snmp_extra = "%d.%d" % (snmp_fiber_num, new_onu_port_num)
+            device.save(update_fields=('snmp_extra',))

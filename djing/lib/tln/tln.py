@@ -202,7 +202,7 @@ class OltZTERegister(TelnetApi):
 
 
 @process_lock
-def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes):
+def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes) -> Tuple:
     onu_type = b'ZTE-F660'
     line_profile = b'ZTE-F660-LINE'
     remote_profile = b'ZTE-F660-ROUTER'
@@ -254,7 +254,7 @@ def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes,
 
     tn.apply_conf_to_onu(onu_mac, 145)
     sleep(1)
-    return
+    return stack_num, rack_num, fiber_num, new_onu_port_num
 
 
 if __name__ == '__main__':

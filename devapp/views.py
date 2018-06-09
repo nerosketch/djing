@@ -725,7 +725,7 @@ class DevicesGetListView(global_base_views.SecureApiView):
 
 @login_required
 @json_view
-def regster_device(request, device_id: str):
+def register_device(request, device_id: str):
     def format_msg(msg: str, icon: str):
         return ' '.join((
             '<span class="glyphicon glyphicon-%s"></span>' % icon,

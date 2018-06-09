@@ -96,7 +96,8 @@ class Device(models.Model):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
     def update_dhcp(self, remove=False):
-        if self.devtype not in ('On', 'Dl'):
+        # FIXME: Remove static list of registrable device types
+        if self.devtype not in ('On', 'Dl', 'Zo'):
             return
         if self.group is None:
             raise DeviceDBException(_('Device does not have a group, please fix that'))

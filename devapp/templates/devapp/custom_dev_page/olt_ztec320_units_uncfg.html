@@ -45,7 +45,7 @@
                             <td>{{ onu.loid_passw }}</td>
                             <td>{{ onu.loid }}</td>
                             <td>
-                                <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.loid }}&n={{ onu.extra_snmp }}&mac={{ onu.mac }}" title="{% trans 'Create device' %}">
+                                <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.loid }}&mac={{ onu.mac }}" title="{% trans 'Create device' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                             </td>
