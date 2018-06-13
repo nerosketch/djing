@@ -271,11 +271,8 @@ def check_news(request):
 @method_decorator(permission_required('taskapp.add_extracomment'), name='dispatch')
 class NewCommentView(CreateView):
     form_class = ExtraCommentForm
-    http_method_names = ['get', 'post']
-
-    def get_success_url(self):
-        task_id = self.kwargs.get('task_id')
-        return resolve_url('taskapp:edit', task_id)
+    model = ExtraComment
+    http_method_names = ('get', 'post')
 
     def form_valid(self, form):
         self.task = get_object_or_404(Task, pk=self.kwargs.get('task_id'))

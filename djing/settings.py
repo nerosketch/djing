@@ -33,12 +33,12 @@ AUTHENTICATION_BACKENDS = (
 # Application definition
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ip_pool',
     'accounts_app',
     'abonapp',
     'tariff_app',
@@ -57,6 +57,10 @@ INSTALLED_APPS = [
     'bootstrapform',
     'bootstrap3'
 ]
+
+if DEBUG:
+    INSTALLED_APPS.insert(0, 'django.contrib.admin')
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

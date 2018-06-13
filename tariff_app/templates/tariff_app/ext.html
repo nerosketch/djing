@@ -1,14 +1,18 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Services' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <h3>{% trans 'Services' %}</h3>
+{% endblock %}
 
+{% block main %}
     <ul class="nav nav-tabs">
 
         {% url 'tarifs:home' as tarhome %}
@@ -32,5 +36,4 @@
             {% block content %}{% endblock %}
         </div>
     </div>
-
 {% endblock %}

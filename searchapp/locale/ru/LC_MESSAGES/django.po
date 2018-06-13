@@ -44,3 +44,6 @@ msgstr "Вы можете изменить строку поиска и попр
 #, python-format
 msgid "Network state is %(netw_status)s"
 msgstr "Сетевой статус: %(netw_status)s"
+
+msgid "Search"
+msgstr "Поиск"

@@ -305,3 +305,6 @@ msgstr "Сотрудник"
 
 msgid "Manage responsibility groups"
 msgstr "Ответственность за группы"
+
+msgid "Profile"
+msgstr "Учётная запись"

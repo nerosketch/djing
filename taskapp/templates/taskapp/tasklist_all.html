@@ -1,19 +1,23 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 {% load tasktags %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
         <li class="active">{% trans 'All tasks' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
-    <div class="page-header">
-        <h2>{% trans 'Records of all the tasks in the system' %}</h2>
-    </div>
+{% block page-header %}
+    <h3>{% trans 'Records of all the tasks in the system' %}</h3>
+{% endblock %}
+
+
+{% block main %}
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
@@ -118,7 +122,5 @@
             </tfoot>
         </table>
     </div>
-
-    {% include 'pagination.html' %}
 
 {% endblock %}

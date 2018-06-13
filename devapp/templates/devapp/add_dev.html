@@ -1,21 +1,21 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
         <li><a href="{% url 'devapp:devs' group.pk %}">{{ group.title }}</a></li>
         <li class="active">{% trans 'Add new device' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <legend>{{ group.title|default:_('Not assigned') }}</legend>
+{% endblock %}
 
-    <div class="page-header">
-        <h2>{{ group.title|default:_('Not assigned') }}</h2>
-    </div>
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Device info' %}</h3>
@@ -51,7 +51,7 @@
 
                         {% if selected_parent_dev %}
                             <button class="selectajax-btn form-control btn btn-default">
-                                {{ selected_parent_dev.ip_address }}: {{ selected_parent_dev.comment }}
+                                {{ selected_parent_dev.ip_address|default:'-' }}: {{ selected_parent_dev.comment }}
                             </button>
                         {% else %}
                             <button class="selectajax-btn form-control btn btn-default hidden"></button>
@@ -79,5 +79,4 @@
             </form>
         </div>
     </div>
-
 {% endblock %}

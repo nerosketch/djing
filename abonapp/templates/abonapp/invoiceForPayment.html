@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
@@ -9,10 +9,13 @@
         <li><a href="{% url 'abonapp:abon_phistory' group.pk abon.username %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Debts' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block page-header %}
     <h3>{% trans 'Debtor' %} {{ abon.fio }}</h3>
+{% endblock %}
+
+{% block main %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
@@ -66,7 +69,4 @@
             {% endif %}
         </table>
     </div>
-
-    {% include 'pagination.html' %}
-
 {% endblock %}

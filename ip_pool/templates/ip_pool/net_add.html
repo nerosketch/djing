@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load globaltags %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'ip_pool:networks' %}">{% trans 'Ip pool' %}</a></li>
+        <li class="active">{% trans 'Add network' %}</li>
+    </ol>
+{% endblock %}
+
+{% block main %}
+    <form action="{% url 'ip_pool:net_add' %}" method="post">{% csrf_token %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Add network' %}</h3>
+        </div>
+        <div class="panel-body">
+            {% bootstrap_form form %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                <button class="btn btn-success">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Add' %}
+                </button>
+                <a href="{% back_url request %}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-backward"></span> {% trans 'Back' %}
+                </a>
+            </div>
+        </div>
+    </div>
+    </form>
+{% endblock %}

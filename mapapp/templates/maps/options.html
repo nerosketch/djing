@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Map settings' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
-    {% with can_change_dot=perms.mapapp.change_dot can_delete_dot=perms.mapapp.delete_dot %}
+{% block page-header %}
     <h3>{% trans 'Map point' %}</h3>
+{% endblock %}
+
+{% block main %}
+    {% with can_change_dot=perms.mapapp.change_dot can_delete_dot=perms.mapapp.delete_dot %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
@@ -68,6 +71,4 @@
         </table>
     </div>
     {% endwith %}
-
-    {% include 'pagination.html' %}
 {% endblock %}

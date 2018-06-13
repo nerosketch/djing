@@ -131,9 +131,6 @@ class DeviceUpdate(UpdateView):
         messages.success(self.request, _('Device info has been saved'))
         return r
 
-    def get_success_url(self):
-        return resolve_url('devapp:edit', self.device_group.pk, self.object.pk)
-
     def dispatch(self, request, *args, **kwargs):
         group_id = self.kwargs.get('group_id')
         device_group = get_object_or_404(Group, pk=group_id)
@@ -188,9 +185,6 @@ class DeviceCreateView(CreateView):
         messages.success(self.request, _('Device info has been saved'))
         return r
 
-    def get_success_url(self):
-        return resolve_url('devapp:edit', self.device_group.pk, self.object.pk)
-
     def dispatch(self, request, *args, **kwargs):
         group_id = self.kwargs.get('group_id')
         device_group = get_object_or_404(Group, pk=group_id)
@@ -237,11 +231,6 @@ class DeviceUpdateExtra(UpdateView):
         r = super().form_valid(form)
         messages.success(self.request, _('Device extra data has successfully updated'))
         return r
-
-    def get_success_url(self):
-        return resolve_url('devapp:edit',
-                           self.kwargs.get('group_id'),
-                           self.kwargs.get('device_id'))
 
 
 @login_required

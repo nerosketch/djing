@@ -2,16 +2,18 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load globaltags %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
 	    <li><a href="{% url 'taskapp:home' %}">{% trans 'Tasks' %}</a></li>
 	    <li class="active">{% if task.id %}{% trans 'Edit' %}{% else %}{% trans 'Create' %}{% endif %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
+{% block main %}
     <div class="row">
         <div class="{% if task %}col-sm-6{% else %}col-sm-12{% endif %}">
             <div class="panel panel-default">

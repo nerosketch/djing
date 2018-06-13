@@ -147,3 +147,7 @@ class BaseListWithFiltering(RedirectWhenErrorMixin, ListView):
                 'page_number': page_number,
                 'message': str(e)
             })
+
+
+class BaseOrderedFilteringList(OrderingMixin, BaseListWithFiltering):
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)

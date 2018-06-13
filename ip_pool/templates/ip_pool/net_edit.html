@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load globaltags %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'ip_pool:networks' %}">{% trans 'Ip pool' %}</a></li>
+        <li class="active">{{ object }}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}{{ object }}{% endblock %}
+
+{% block main %}
+    <form action="{% url 'ip_pool:net_edit' object.pk %}" method="post">{% csrf_token %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Edit network' %}</h3>
+        </div>
+        <div class="panel-body">
+            {% bootstrap_form form %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                <button class="btn btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                </button>
+                <a href="{% back_url request %}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-backward"></span> {% trans 'Back' %}
+                </a>
+                <a href="{% url 'ip_pool:ip_list' object.pk %}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+                    <span class="hidden-xs hidden-sm">{% trans 'View employed' %}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    </form>
+{% endblock %}

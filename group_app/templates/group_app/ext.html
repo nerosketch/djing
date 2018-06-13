@@ -1,23 +1,25 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'group_app:group_list' %}">{% trans 'Groups' %}</a></li>
         <li class="active">{% block active_text %}{% trans 'Groups' %}{% endblock %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
-    <div class="page-header">
-        <h2>{% trans 'Groups' %}</h2>
-    </div>
+{% block page-header %}
+    <h3>{% trans 'Groups' %}</h3>
+{% endblock %}
 
+
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-body">
             {% block content %}{% endblock %}
         </div>
     </div>
-
 {% endblock %}

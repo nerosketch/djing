@@ -1,6 +1,5 @@
 from django.conf.urls import url, include
 from django.conf import settings
-# from django.contrib import admin
 
 from .views import home
 
@@ -18,17 +17,18 @@ urlpatterns = [
     url(r'^msg/', include('msg_app.urls', namespace='msg_app')),
     url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
     url(r'^groups/', include('group_app.urls', namespace='group_app')),
+    url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool'))
 
     # Switch language
     #url(r'^i18n/', include('django.conf.urls.i18n')),
-
-    # url(r'^admin/', admin.site.urls)
 
 ]
 
 if settings.DEBUG:
     from django.conf.urls.static import static
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from django.contrib import admin
 
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += staticfiles_urlpatterns()
+    urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
+    urlpatterns.extend(staticfiles_urlpatterns())
+    urlpatterns.append(url(r'^admin/', admin.site.urls))

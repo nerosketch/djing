@@ -1,15 +1,22 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'msg_app:home' %}">{% trans 'Private messages' %}</a></li>
         <li class="active">{{ conv.title }}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
+{% block page-header %}
+    <h3>{{ conv.title }}</h3>
+{% endblock %}
+
+
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{{ conv.title }}

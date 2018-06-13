@@ -108,5 +108,8 @@ msgstr "Звонки"
 msgid "Devices"
 msgstr "Устройства"
 
-msgid "Language"
-msgstr "Язык"
+# msgid "Language"
+# msgstr "Язык"
+
+msgid "Ip pool"
+msgstr "IP пул"

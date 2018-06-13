@@ -1,13 +1,20 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Private messages' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+
+{% block page_header %}
+    <h3>{% trans 'Conversations' %}</h3>
+{% endblock %}
+
+{% block main %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -57,7 +64,5 @@
             </div>
         </div>
     </div>
-
-    {% include 'pagination.html' %}
 
 {% endblock %}

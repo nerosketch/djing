@@ -1,24 +1,24 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li><a href="{% url 'abonapp:people_list' group.pk %}">{{ group.title }}</a></li>
         <li class="active">{{ abon.fio }}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <h3>{{ abon.fio|default:_("Long name") }}
+        <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
+            <b>{{ abon.ballance|floatformat:2 }}</b>
+        </small>
+    </h3>
+{% endblock %}
 
-    <div class="page-header">
-        <h2>{{ abon.fio|default:_("Long name") }}
-            <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
-                <b>{{ abon.ballance|floatformat:2 }}</b>
-            </small>
-        </h2>
-    </div>
-
+{% block main %}
     <ul class="nav nav-tabs nav-justified">
 
         {% url 'abonapp:abon_home' group.pk abon.username as abon_home %}
@@ -65,5 +65,4 @@
             {% block content %}{% endblock %}
         </div>
     </div>
-
 {% endblock %}

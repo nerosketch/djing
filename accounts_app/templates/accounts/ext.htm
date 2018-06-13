@@ -1,15 +1,19 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
         <li class="active">{{ userprofile.username }}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <h3>{% trans 'Profile' %}</h3>
+{% endblock %}
 
+{% block main %}
     <div class="row">
         <div class="col-sm-3">
             <div class="thumbnail">
@@ -74,5 +78,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

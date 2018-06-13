@@ -1,34 +1,34 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
+        {% if dev.group %}
+            <li><a href="{% url 'devapp:devs' dev.group.pk %}">{{ dev.group.title }}</a></li>
+        {% else %}
+            <li>{% trans 'Not assigned' %}</li>
+        {% endif %}
+        <li class="active">{{ dev.comment }}</li>
+    </ol>
+{% endblock %}
+
+
+{% block page-header %}
+    <h3>{{ dev.comment|default:_('Not assigned') }}</h3>
+{% endblock %}
+
+
 {% block main %}
-
-    {% block breadcrumb %}
-        <ol class="breadcrumb">
-            <li><span class="glyphicon glyphicon-home"></span></li>
-            <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
-            {% if dev.group %}
-                <li><a href="{% url 'devapp:devs' dev.group.pk %}">{{ dev.group.title }}</a></li>
-            {% else %}
-                <li>{% trans 'Not assigned' %}</li>
-            {% endif %}
-            <li class="active">{{ dev.comment }}</li>
-        </ol>
-    {% endblock %}
-
-    {% include 'message_block.html' %}
-
-    <div class="page-header">
-        {% block page-header %}
-            <h2>{{ dev.comment|default:_('Not assigned') }}</h2>
-        {% endblock %}
-    </div>
 
     <ul class="nav nav-tabs">
 
         {% url 'devapp:view' dev.group.pk|default:0 dev.pk as devapp_view %}
         <li{% if devapp_view == request.path %} class="active"{% endif %}>
             <a href="{{ devapp_view }}">
-                {% trans 'View' %} {{ dev.ip_address }}
+                {% trans 'View' %} {{ dev.ip_address|default:'' }}
             </a>
         </li>
 

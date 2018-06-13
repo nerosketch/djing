@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'User groups' %}</li>
     </ol>
+{% endblock %}
 
+{% block page-header %}
     <h3>{% trans 'User groups' %}</h3>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
@@ -70,7 +72,4 @@
             </tfoot>
         </table>
     </div>
-
-    {% include 'pagination.html' %}
-
 {% endblock %}

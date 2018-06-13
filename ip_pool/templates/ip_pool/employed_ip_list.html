@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'ip_pool:networks' %}">{% trans 'Ip pool' %}</a></li>
+        <li><a href="{% url 'ip_pool:net_edit' net.id %}">{{ net }}</a></li>
+        <li class="active">{% trans 'Ip list' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}{% trans 'Ip list' %}{% endblock %}
+
+{% block main %}
+    <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th class="col-sm-5">{% trans 'Ip' %}</th>
+            <th class="col-sm-3">{% trans 'Network' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ip in object_list %}
+            <tr>
+                <td>{{ ip.ip }}</td>
+                <td>{{ ip.network }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+            <td colspan="2">{% trans 'You have not any available dedicated ips in this network' %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

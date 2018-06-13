@@ -3,10 +3,11 @@ from typing import Optional, AnyStr
 from subprocess import run
 from django.db import models
 from django.conf import settings
+from django.shortcuts import resolve_url
 from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
 
-from djing.fields import MACAddressField, MyGenericIPAddressField
+from djing.fields import MACAddressField
 from djing.lib import MyChoicesAdapter
 from group_app.models import Group
 from . import dev_types
@@ -24,7 +25,7 @@ class DeviceMonitoringException(Exception):
 class Device(models.Model):
     _cached_manager = None
 
-    ip_address = MyGenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
+    ip_address = models.GenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     comment = models.CharField(_('Comment'), max_length=256)
     DEVICE_TYPES = (
@@ -120,6 +121,9 @@ class Device(models.Model):
             if self.parent_dev and self.parent_dev.extra_data is not None:
                 return mng.register_device(self.parent_dev.extra_data)
         return mng.register_device(self.extra_data)
+
+    def get_absolute_url(self):
+        return resolve_url('devapp:edit', self.group.pk, self.pk)
 
 
 class Port(models.Model):

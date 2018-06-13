@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
@@ -9,9 +9,9 @@
         <li><a href="{% url 'abonapp:abon_home' group.id abon.username %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Add debt' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Add receipt for' %}
@@ -52,5 +52,4 @@
             </form>
         </div>
     </div>
-
 {% endblock %}

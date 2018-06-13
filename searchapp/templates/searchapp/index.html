@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Search' %}</li>
+    </ol>
+{% endblock %}
+
+
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
@@ -93,5 +101,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

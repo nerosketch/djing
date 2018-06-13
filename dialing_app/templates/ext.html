@@ -1,17 +1,21 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Last calls' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
-    <div class="page-header">
-        <h3>{{ title }}</h3>
-    </div>
+{% block page-header %}
+    <legend>{{ title }}</legend>
+{% endblock %}
+
+
+{% block main %}
 
     <ul class="nav nav-tabs">
 
@@ -42,7 +46,6 @@
                 {% trans 'Inbox sms' %}
             </a>
         </li>
-
 
     </ul>
 

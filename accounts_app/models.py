@@ -124,5 +124,6 @@ class UserProfile(BaseAccount):
             im.save(self.avatar.path)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        r = super().save(*args, **kwargs)
         self._thumbnail_avatar()
+        return r

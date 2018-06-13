@@ -1,8 +1,8 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'tarifs:periodic_pays' %}">{% trans 'Services' %}</a></li>
@@ -12,18 +12,21 @@
             <li class="active">{% trans 'Add new periodic pay' %}</li>
         {% endif %}
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
-    {% if pay_instance %}
-        <div class="page-header">
-            <h2>{{ pay_instance.name }}</h2>
-        </div>
-        {% url 'tarifs:periodic_pay_edit' pay_instance.id as form_url %}
-    {% else %}
-        {% url 'tarifs:periodic_pay_add' as form_url %}
-    {% endif %}
+{% if pay_instance %}
+    {% block page-header %}
+        <h3>{{ pay_instance.name }}</h3>
+    {% endblock %}
+    {% url 'tarifs:periodic_pay_edit' pay_instance.id as form_url %}
+{% else %}
+    {% url 'tarifs:periodic_pay_add' as form_url %}
+{% endif %}
 
+
+
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Pay details' %}</h3>
@@ -47,5 +50,4 @@
             </form>
         </div>
     </div>
-
 {% endblock %}

@@ -102,11 +102,9 @@ class AbonCreateView(CreateView):
     group = None
     abon = None
     form_class = forms.AbonForm
+    model = models.Abon
     template_name = 'abonapp/addAbon.html'
     context_object_name = 'group'
-
-    def get_success_url(self):
-        return resolve_url('abonapp:abon_home', self.group.id, self.abon.username)
 
     def dispatch(self, request, *args, **kwargs):
         group = get_object_or_404(Group, pk=self.kwargs.get('gid'))
@@ -348,13 +346,6 @@ class AbonHomeUpdateView(UpdateView):
         }
         context.update(kwargs)
         return super(AbonHomeUpdateView, self).get_context_data(**context)
-
-    def get_success_url(self):
-        abon = self.object
-        return resolve_url('abonapp:abon_home',
-                           gid=getattr(abon.group, 'pk', 0),
-                           uname=abon.username
-                           )
 
 
 @transaction.atomic
@@ -1091,13 +1082,11 @@ class EditSibscriberMarkers(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
     form_class = forms.MarkersForm
+    model = models.Abon
 
     def get_object(self, queryset=None):
         obj = models.Abon.objects.get(username=self.kwargs.get('uname'))
         return obj
-
-    def get_success_url(self):
-        return resolve_url('abonapp:abon_home', self.kwargs.get('gid'), self.kwargs.get('uname'))
 
     def get_context_data(self, **kwargs):
         context = super(EditSibscriberMarkers, self).get_context_data(**kwargs)
@@ -1123,7 +1112,7 @@ def abons(request):
     ablist = ({
         'id': abn.pk,
         'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
-        'ip': abn.ip_address.int_ip(),
+        'ip': lib.ip2int(abn.ip_address),
         'is_active': abn.is_active
     } for abn in models.Abon.objects.all())
 

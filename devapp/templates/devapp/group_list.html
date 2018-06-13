@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Groups' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Group title' %}</h3>
@@ -39,7 +39,4 @@
             </tfoot>
         </table>
     </div>
-
-    {% include 'pagination.html' %}
-
 {% endblock %}

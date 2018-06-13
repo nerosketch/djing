@@ -1,20 +1,20 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Tasks' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <h3>{% trans 'Tasks to be performed' %}</h3>
+{% endblock %}
 
-    <div class="page-header">
-        <h2>{% block pagetitle %}
-            {% trans 'Tasks to be performed' %}
-            {% endblock %}
-        </h2>
-    </div>
+
+{% block main %}
 
     <ul class="nav nav-tabs">
 

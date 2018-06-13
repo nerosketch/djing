@@ -1,0 +1,30 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Ip pool' %}</li>
+    </ol>
+{% endblock %}
+
+
+{% block main %}
+
+    <ul class="nav nav-tabs">
+        {% url 'taskapp:home' as taskhome %}
+        <li{% if taskhome == request.path %} class="active"{% endif %}>
+            <a href="{{ taskhome }}">
+                {% trans 'New tasks' %}
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+{% endblock %}

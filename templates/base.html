@@ -33,33 +33,45 @@
             <li{% if abon_groups_link in request.path %} class="active"{% endif %}>
                 <a href="{{ abon_groups_link }}">
                     <span class="glyphicon glyphicon-user"></span> {% trans 'Subscribers' %}
-                </a></li>
+                </a>
+            </li>
 
             {% url 'taskapp:home' as task_home %}
             <li{% if task_home in request.path %} class="active"{% endif %}>
                 <a href="{{ task_home }}">
                     <span class="glyphicon glyphicon-tasks"></span> {% trans 'Tasks' %}
                     {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
-                </a></li>
+                </a>
+            </li>
 
             {% url 'group_app:group_list' as group_list_link %}
             <li{% if group_list_link in request.path %} class="active"{% endif %}>
                 <a href="{{ group_list_link }}">
                     <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Groups' %}
-                </a></li>
+                </a>
+            </li>
 
             {% url 'tarifs:home' as tarifs_home %}
             <li{% if tarifs_home in request.path %} class="active"{% endif %}>
                 <a href="{{ tarifs_home }}">
                     <span class="glyphicon glyphicon-usd"></span> {% trans 'Services' %}
-                </a></li>
+                </a>
+            </li>
+
+            {% url 'ip_pool:networks' as ippool_home %}
+            <li{% if ippool_home in request.path %} class="active"{% endif %}>
+                <a href="{{ ippool_home }}">
+                    <span class="glyphicon glyphicon-compressed"></span> {% trans 'Ip pool' %}
+                </a>
+            </li>
 
             {% if request.user.is_superuser %}
                 {% url 'mapapp:options' as mapapp_ops %}
                 <li{% if mapapp_ops in request.path %} class="active"{% endif %}>
                     <a href="{{ mapapp_ops }}">
                         <span class="glyphicon glyphicon-map-marker"></span> {% trans 'Map settings' %}
-                    </a></li>
+                    </a>
+                </li>
             {% endif %}
 
             {% url 'msg_app:home' as privmsg_home %}
@@ -69,21 +81,24 @@
                     {% if new_messages_count > 0 %}
                         <span class="badge">{{ new_messages_count }}</span>
                     {% endif %}
-    		</a></li>
+    		    </a>
+            </li>
 
             {% if perms.dialing_app.change_asteriskcdr %}
             {% url 'dialapp:home' as dialhome %}
             <li{% if dialhome in request.path %} class="active"{% endif %}>
                 <a href="{{ dialhome }}">
                     <span class="glyphicon glyphicon-phone-alt"></span> {% trans 'Dialing' %}
-                </a></li>
+                </a>
+            </li>
             {% endif %}
 
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_groups }}">
                     <span class="glyphicon glyphicon-hdd"></span> {% trans 'Devices' %}
-                </a></li>
+                </a>
+            </li>
 
         </ul>
 
@@ -96,7 +111,21 @@
             <button type="button" data-toggle="offcanvas"></button>
         </p>
 
+        {% block breadcrumb %}
+            <ol class="breadcrumb">
+                <li><span class="glyphicon glyphicon-home"></span></li>
+            </ol>
+        {% endblock %}
+
+        {% include 'message_block.html' %}
+
+        <div class="page-header">
+            <h3>{% block page-header %}{% endblock %}</h3>
+        </div>
+
         {% block main %}{% endblock %}
+
+        {% include 'pagination.html' %}
 
     </div>
     <!-- END Main content -->

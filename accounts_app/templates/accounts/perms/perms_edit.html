@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load guardian_tags %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
@@ -12,11 +12,15 @@
         </li>
         <li class="active">{{ obj }}</li>
     </ol>
+{% endblock %}
 
+
+{% block page-header %}
     <h3>{% trans 'Pick object for edit permissions' %}</h3>
+{% endblock %}
 
-    {% include 'message_block.html' %}
 
+{% block main %}
     {% if userprofile.is_superuser %}
         <div class="alert alert-info alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -67,5 +71,4 @@
             </form>
         </div>
     </div>
-
 {% endblock %}

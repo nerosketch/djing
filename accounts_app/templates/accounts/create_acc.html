@@ -1,16 +1,16 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load globaltags %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
         <li class="active">{% trans 'Add' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Create new account' %}</h3>
@@ -97,5 +97,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

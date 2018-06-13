@@ -1,22 +1,18 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
+        <li><a href="{% url 'mapapp:edit_dot' dot.pk %}">{{ dot.title }}</a></li>
+        <li class="active">{% trans 'Add devices' %}</li>
+    </ol>
+{% endblock %}
+
+
 {% block main %}
-
-<ol class="breadcrumb">
-    <li><span class="glyphicon glyphicon-home"></span></li>
-    <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
-    <li><a href="{% url 'mapapp:edit_dot' dot.pk %}">{{ dot.title }}</a></li>
-    <li class="active">{% trans 'Add devices' %}</li>
-</ol>
-
-{% include 'message_block.html' %}
-
-<script type="text/javascript">
-
-</script>
-
-
 <div class="row">
     <div class="col-sm-4">
         <div class="panel panel-default">
@@ -45,7 +41,6 @@
                 });
             });
         </script>
-
     </div>
     <div class="col-sm-8">
         <form role="form" action="{% url 'mapapp:add_dev' dot.pk %}?grp={{ grp }}" method="post">{% csrf_token %}
@@ -66,5 +61,4 @@
         </form>
     </div>
 </div>
-
 {% endblock %}

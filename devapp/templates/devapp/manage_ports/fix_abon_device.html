@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'devapp:group_list' %}">{% trans 'Groups' %}</a></li>
@@ -9,13 +9,13 @@
         <li><a href="{% url 'devapp:view' group.pk device.pk %}">{{ device.comment }}</a></li>
         <li class="active">{% trans 'Fix subscriber ports conflict' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}
+    <legend>{% trans 'Fix subscriber ports conflict' %}</legend>
+{% endblock %}
 
-    <div class="page-header">
-        <h2>{% trans 'Fix subscriber ports conflict' %}</h2>
-    </div>
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% trans 'Subscribers list on port' %}</h3>
@@ -32,5 +32,4 @@
             {% endfor %}
         </div>
     </div>
-
 {% endblock %}

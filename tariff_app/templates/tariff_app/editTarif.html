@@ -1,8 +1,8 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 {% load bootstrap3 %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'tarifs:home' %}">{% trans 'Tarifs' %}</a></li>
@@ -14,9 +14,9 @@
             {% endif %}
         </li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">{% if tarif_id == 0 %}{% trans 'Create' %}{% else %}{% trans 'Edit' %}{% endif %} {% trans 'tariff' %}</h3>
@@ -56,5 +56,4 @@
             </form>
         </div>
     </div>
-
 {% endblock %}

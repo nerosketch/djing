@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load dpagination %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
         <li class="active">{{ group.title }}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block main %}
     <div class="row">
         <div class="col-lg-10 col-md-8">
             <div class="panel panel-default">
@@ -174,7 +174,4 @@
             </div>
         </div>
     </div>
-
-    {% include 'pagination.html' %}
-
 {% endblock %}

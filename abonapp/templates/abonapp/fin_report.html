@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li class="active">{% trans 'Fin report' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
-
+{% block page-header %}
     <h3>{% trans 'Money by days' %}</h3>
+{% endblock %}
+
+{% block main %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
@@ -43,7 +46,4 @@
 
         </table>
     </div>
-
-    {# {% include 'toolbar_page.html' with pag=logs %} #}
-
 {% endblock %}

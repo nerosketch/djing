@@ -8,6 +8,7 @@ from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
 from django.db.models.signals import post_delete, pre_delete, post_init
 from django.dispatch import receiver
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
@@ -15,7 +16,6 @@ from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import ip2int, LogicError
-from djing.fields import MyGenericIPAddressField
 from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
@@ -135,7 +135,7 @@ class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
-    ip_address = MyGenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
+    ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
@@ -288,6 +288,9 @@ class Abon(BaseAccount):
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
+
+    def get_absolute_url(self):
+        return resolve_url('abonapp:abon_home', self.group.id, self.username)
 
 
 class PassportInfo(models.Model):

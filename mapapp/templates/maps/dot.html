@@ -2,22 +2,29 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% load globaltags %}
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
+        {% if dot.id %}
+        <li class="active">{{ dot.title }}</li>
+        {% url 'mapapp:edit_dot' dot.id as form_url %}
+        {% else %}
+        <li class="active">{% trans 'Add new point' %}</li>
+        {% url 'mapapp:add_dot' as form_url %}
+        {% endif %}
+    </ol>
+{% endblock %}
+
+
+{% block page-header %}
+    <h3>{% trans 'Map point' %}</h3>
+{% endblock %}
+
+
 {% block main %}
-
-<ol class="breadcrumb">
-    <li><span class="glyphicon glyphicon-home"></span></li>
-    <li><a href="{% url 'mapapp:options' %}">{% trans 'Map settings' %}</a></li>
-    {% if dot.id %}
-    <li class="active">{{ dot.title }}</li>
-    {% url 'mapapp:edit_dot' dot.id as form_url %}
-    {% else %}
-    <li class="active">{% trans 'Add new point' %}</li>
-    {% url 'mapapp:add_dot' as form_url %}
-    {% endif %}
-</ol>
-
-{% include 'message_block.html' %}
-
 <div class="row">
     <div class="{% if dot.id %}col-sm-6{% else %}col-sm-12{% endif %}">
         <form role="form" action="{{ form_url }}" method="post" enctype="multipart/form-data">{% csrf_token %}
