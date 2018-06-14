@@ -49,12 +49,14 @@ class DevBase(object, metaclass=ABCMeta):
     def get_template_name(self) -> AnyStr:
         """Return path to html template for device"""
 
+    @property
     @abstractmethod
     def has_attachable_to_subscriber(self) -> bool:
         """Can connect device to subscriber"""
 
-    @abstract_static_method
-    def is_use_device_port() -> bool:
+    @property
+    @abstractmethod
+    def is_use_device_port(self) -> bool:
         """True if used device port while opt82 authorization"""
 
     # fixme: only that is abstract static

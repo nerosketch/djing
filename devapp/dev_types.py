@@ -60,6 +60,9 @@ class DLinkPort(BasePort):
 
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = True
+    is_use_device_port = True
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
@@ -103,13 +106,6 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'ports.html'
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return True
-
     @staticmethod
     def validate_extra_snmp_info(v: str) -> None:
         # Dlink has no require snmp info
@@ -142,6 +138,9 @@ class ONUdev(BasePort):
 
 
 class OLTDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = False
+    is_use_device_port = False
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
@@ -187,13 +186,6 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'olt.html'
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return False
-
-    @staticmethod
-    def is_use_device_port():
-        return False
-
     @staticmethod
     def validate_extra_snmp_info(v: str) -> None:
         # Olt has no require snmp info
@@ -208,6 +200,9 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 
 class OnuDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = True
+    is_use_device_port = False
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         dev_ip_addr = None
@@ -241,13 +236,6 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
     def get_template_name(self):
         return "onu.html"
-
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return False
 
     def get_details(self):
         if self.db_instance is None:
@@ -330,6 +318,9 @@ class EltexPort(BasePort):
 
 
 class EltexSwitch(DLinkDevice):
+    has_attachable_to_subscriber = True
+    is_use_device_port = False
+
     @staticmethod
     def description():
         return _('Eltex switch')
@@ -354,13 +345,6 @@ class EltexSwitch(DLinkDevice):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
         tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
-
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return False
 
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance

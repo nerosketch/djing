@@ -602,7 +602,8 @@ def clear_dev(request, gid, uname):
         abon = models.Abon.objects.get(username=uname)
         abon.device = None
         abon.dev_port = None
-        abon.save(update_fields=('device', 'dev_port'))
+        abon.is_dynamic_ip = False
+        abon.save(update_fields=('device', 'dev_port', 'is_dynamic_ip'))
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))

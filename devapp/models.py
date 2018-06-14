@@ -73,11 +73,11 @@ class Device(models.Model):
         return self.status
 
     def get_manager_klass(self):
-        klasses = tuple(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
-        if len(klasses) > 0:
-            res = klasses[0][1]
-            if issubclass(res, DevBase):
-                return res
+        klasses = next(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
+        if klasses:
+            code, dev_class = klasses
+            if issubclass(dev_class, DevBase):
+                return dev_class
         raise TypeError('one of types is not subclass of DevBase. '
                         'Or implementation of that device type is not found')
 
@@ -89,8 +89,8 @@ class Device(models.Model):
 
     # Can attach device to subscriber in subscriber page
     def has_attachable_to_subscriber(self) -> bool:
-        mngr = self.get_manager_object()
-        return mngr.has_attachable_to_subscriber()
+        mngr = self.get_manager_klass()
+        return mngr.has_attachable_to_subscriber
 
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
