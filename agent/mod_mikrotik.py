@@ -197,6 +197,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         for k, v in self.talk_iter(cmd):
             if k == '!done':
                 break
+            elif k == '!trap':
+                raise NasFailedResult(v.get('=message'))
             r[k] = v or None
         return r
 
@@ -204,7 +206,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         if not isinstance(cmd, (list, tuple)):
             raise TypeError
         for k, v in self.talk_iter(cmd):
-            if k == '!trap':
+            if k == '!done':
+                break
+            elif k == '!trap':
                 raise NasFailedResult(v.get('=message'))
             if v:
                 yield v
@@ -226,20 +230,21 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
                 res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 1000 ** 2
             return res
 
-        speeds = info['=max-limit'].split('/')
+        dat = info.get('!re')
+        speeds = dat.get('=max-limit').split('/')
         t = TariffStruct(
             speed_in=parse_speed(speeds[1]),
             speed_out=parse_speed(speeds[0])
         )
         try:
             a = AbonStruct(
-                uid=int(info['=name'][3:]),
+                uid=int(dat['=name'][3:]),
                 # FIXME: тут в разных микротиках или =target-addresses или =target
-                ip=info['=target'][:-3],
+                ip=dat['=target'][:-3],
                 tariff=t,
-                is_active=False if info['=disabled'] == 'false' else True
+                is_active=False if dat['=disabled'] == 'false' else True
             )
-            a.queue_id = info['=.id']
+            a.queue_id = dat['=.id']
             return a
         except ValueError:
             pass
@@ -250,16 +255,16 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
 
     # Find queue by name
     def find_queue(self, name: str) -> Optional[AbonStruct]:
-        ret = self._exec_cmd(('/queue/simple/print', '?name=%s' % name))
-        if len(ret) > 1:
-            return self._build_shape_obj(ret[0])
+        r = self._exec_cmd(('/queue/simple/print', '?name=%s' % name))
+        if r:
+            return self._build_shape_obj(r)
 
     def add_queue(self, user: AbonStruct) -> None:
         if not isinstance(user, AbonStruct):
             raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
-        r = self._exec_cmd((
+        self._exec_cmd((
             '/queue/simple/add',
             '=name=uid%d' % user.uid,
             # FIXME: тут в разных микротиках или =target-addresses или =target
@@ -268,7 +273,6 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
             '=burst-time=1/1'
         ))
-        print(r)
 
     def remove_queue(self, user: AbonStruct) -> None:
         if not isinstance(user, AbonStruct):
@@ -284,9 +288,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
                 print(r)
 
     def remove_queue_range(self, q_ids: Iterable[str]):
-        # FIXME: check result from _exec_cmd
-        r = self._exec_cmd(('/queue/simple/remove', '=numbers=' + ','.join(q_ids)))
-        return r
+        self._exec_cmd(('/queue/simple/remove', '=numbers=' + ','.join(q_ids)))
 
     def update_queue(self, user: AbonStruct):
         if not isinstance(user, AbonStruct):
@@ -313,9 +315,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             return r
 
     def read_queue_iter(self) -> Generator:
-        for code, dat in self._exec_cmd_iter(('/queue/simple/print', '=detail')):
-            if code == '!done':
-                return
+        for dat in self._exec_cmd_iter(('/queue/simple/print', '=detail')):
             sobj = self._build_shape_obj(dat)
             if sobj is not None:
                 yield sobj
@@ -332,8 +332,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             '=list=%s' % list_name,
             '=address=%s' % ip
         )
-        r = self._exec_cmd(commands)
-        return r
+        return self._exec_cmd(commands)
 
     def remove_ip(self, mk_id):
         return self._exec_cmd((
@@ -352,11 +351,12 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
     def find_ip(self, ip: IpStruct, list_name: str):
         if not isinstance(ip, IpStruct):
             raise TypeError
-        return self._exec_cmd((
+        r = self._exec_cmd((
             '/ip/firewall/address-list/print', 'where',
             '?list=%s' % list_name,
             '?address=%s' % ip
         ))
+        return r.get('!re')
 
     def read_ips_iter(self, list_name: str) -> Generator:
         ips = self._exec_cmd_iter((
@@ -364,9 +364,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             '?list=%s' % list_name,
             '?dynamic=no'
         ))
-        for code, dat in ips:
-            if dat != {}:
-                yield IpAddressListObj(dat['=address'], dat['=.id'])
+        for dat in ips:
+            yield IpAddressListObj(dat.get('=address'), dat.get('=.id'))
 
     #################################################
     #         BaseTransmitter implementation
@@ -383,8 +382,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         self.remove_queue_range(queue_ids)
         for ip in (user.ip for user in users if isinstance(user, AbonStruct)):
             ip_list_entity = self.find_ip(ip, LIST_USERS_ALLOWED)
-            if ip_list_entity is not None and len(ip_list_entity) > 1:
-                self.remove_ip(ip_list_entity[0]['=.id'])
+            if ip_list_entity:
+                self.remove_ip(ip_list_entity.get('=.id'))
 
     def add_user(self, user: AbonStruct, *args):
         if not isinstance(user.ip, IpStruct):
@@ -405,8 +404,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
         firewall_ip_list_obj = self.find_ip(user.ip, LIST_USERS_ALLOWED)
-        if firewall_ip_list_obj is not None and len(firewall_ip_list_obj) > 1:
-            self.remove_ip(firewall_ip_list_obj[0]['=.id'])
+        if firewall_ip_list_obj:
+            self.remove_ip(firewall_ip_list_obj.get('=.id'))
 
     def update_user(self, user: AbonStruct, *args):
         if not isinstance(user.ip, IpStruct):
@@ -416,9 +415,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         if not user.is_active:
             # если не активен - то и обновлять не надо
             # но и выключить на всяк случай надо, а то вдруг был включён
-            if len(find_res) > 1:
+            if find_res:
                 # и если найден был - то удалим ip из разрешённых
-                self.remove_ip(find_res[0]['=.id'])
+                self.remove_ip(find_res.get('=.id'))
             if queue is not None:
                 self.remove_queue(user)
             return
@@ -429,8 +428,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
                 self.remove_queue(user)
             return
 
-        # если не найден (mikrotik возвращает пустой словарь в списке если ничего нет)
-        if len(find_res) < 2:
+        # если не найден
+        if find_res is None:
             # добавим запись об абоненте
             self.add_ip(LIST_USERS_ALLOWED, user.ip)
 

@@ -311,10 +311,10 @@ class ManageResponsibilityGroups(ListView):
         return context
 
     def post(self, request, *args, **kwargs):
-        checked_groups = tuple(int(ag) for ag in request.POST.getlist('grp', default=0))
+        checked_groups = (int(ag) for ag in request.POST.getlist('grp'))
         profile = self.object
         profile.responsibility_groups.clear()
-        profile.responsibility_groups.add(*(int(g) for g in checked_groups))
+        profile.responsibility_groups.add(*checked_groups)
         profile.save()
         messages.success(request, _('Responsibilities has been updated'))
         return HttpResponseRedirect(self.get_success_url())

@@ -34,10 +34,11 @@ if __name__ == '__main__':
     )
     cursor = db.cursor()
 
-    sql = r'SELECT abonent.ip_address, acc.username ' \
-          r'FROM abonent ' \
-          r'LEFT JOIN base_accounts AS acc ON (acc.id = abonent.baseaccount_ptr_id) ' \
-          r'WHERE abonent.ip_address != 0'
+    sql = (
+        'SELECT abonent.ip_address, acc.username  FROM abonent '
+        'LEFT JOIN base_accounts AS acc ON (acc.id = abonent.baseaccount_ptr_id) '
+        'WHERE abonent.ip_address != 0'
+    )
     ln = cursor.execute(sql)
     with open(tmp_ipuser_file, 'w') as f:
         f.write("count: %d\n" % ln)
