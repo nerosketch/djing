@@ -16,7 +16,7 @@ def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
 
     try:
         models.Abon.objects.get(username=username)
-        return generate_random_username(length=length, chars=chars, split=split, delimiter=delimiter)
+        return generate_random_chars(length=length, chars=chars, split=split, delimiter=delimiter)
     except models.Abon.DoesNotExist:
         return username
 
