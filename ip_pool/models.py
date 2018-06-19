@@ -7,6 +7,15 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+IP_SUBNET_RE = (
+    '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/'
+    '(3[0-2]|2\d|1\d|\d))|(\/(3[0-2]|2\d|1\d|\d))$'
+)
+
+
 class NetworkModel(models.Model):
     _netw_cache = None
 
@@ -18,7 +27,8 @@ class NetworkModel(models.Model):
     mask = models.PositiveSmallIntegerField(
         _('Mask'),
         help_text=_('For example: 24, if network is 192.168.1.0/24'),
-        default=24
+        default=24,
+        validators=()
     )
     work_range_start_ip = models.GenericIPAddressField(
         verbose_name=_('Work range start ip'),
@@ -28,6 +38,16 @@ class NetworkModel(models.Model):
         verbose_name=_('Work range end ip'),
         help_text=_('Ip may be used until 192.168.1.254')
     )
+
+    NETWORK_KINDS = (
+        ('inet', _('Internet')),
+        ('guest', _('Guest')),
+        ('trust', _('Trusted')),
+        ('device', _('Devices')),
+        ('admin', _('Admin'))
+    )
+    kind = models.CharField(_('Kind of network'), max_length=6, choices=NETWORK_KINDS, default='guest')
+
     description = models.CharField(_('Description'), max_length=64)
 
     def __str__(self):

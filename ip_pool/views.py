@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import resolve_url, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView
@@ -12,9 +12,16 @@ from ip_pool import models, forms
 
 @method_decorator(login_required, name='dispatch')
 class NetworksListView(BaseOrderedFilteringList):
+    device_kind_code = None
     template_name = 'ip_pool/network_list.html'
-    context_object_name = 'networks'
+    context_object_name = 'networks_list'
     model = models.NetworkModel
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if isinstance(self.device_kind_code, str):
+            return qs.filter(kind=self.device_kind_code)
+        return qs
 
 
 @method_decorator(login_required, name='dispatch')

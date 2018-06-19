@@ -1,6 +1,6 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-
+{% load ip_pool_tags %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">
@@ -9,16 +9,30 @@
     </ol>
 {% endblock %}
 
+{% block page-header %}
+    {% trans 'Networks' %}
+{% endblock %}
+
 
 {% block main %}
 
     <ul class="nav nav-tabs">
-        {% url 'taskapp:home' as taskhome %}
-        <li{% if taskhome == request.path %} class="active"{% endif %}>
-            <a href="{{ taskhome }}">
-                {% trans 'New tasks' %}
+        {% url 'ip_pool:networks' as net_list_url %}
+        <li{% if net_list_url == request.path %} class="active"{% endif %}>
+            <a href="{{ net_list_url }}">
+                {% trans 'All networks' %}
             </a>
         </li>
+
+        {% get_device_kinds as device_kinds_codes %}
+        {% for dev_kind_code_url, dev_kind_descr in device_kinds_codes %}
+            <li{% if dev_kind_code_url == request.path %} class="active"{% endif %}>
+                <a href="{{ dev_kind_code_url }}">
+                    {% trans dev_kind_descr %}
+                </a>
+            </li>
+        {% endfor %}
+
     </ul>
 
     <div class="tab-content">

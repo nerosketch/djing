@@ -1,15 +1,20 @@
 from netaddr import IPNetwork, AddrFormatError, IPAddress
 from django import forms
 from django.core.exceptions import ValidationError
+
 from ip_pool import models
 
 
 class NetworkForm(forms.ModelForm):
+    mask = forms.CharField(max_length=39, min_length=7, widget=forms.TextInput())
 
-    def clean_network(self):
-        network = self.cleaned_data.get('network')
+    def clean_mask(self):
         try:
-            return IPAddress(network)
+            network = IPAddress(self.data.get('network'))
+            mask = self.data.get('mask')
+            net = IPNetwork('%s/%s' % (network, mask))
+            ip, new_mask = str(net.cidr).split('/')
+            return new_mask
         except AddrFormatError as e:
             raise ValidationError(e, code='invalid')
 
