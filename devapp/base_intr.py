@@ -5,15 +5,13 @@ from easysnmp import Session
 
 from django.utils.translation import gettext
 
-from djing.lib.decorators import abstract_static_method
-
 ListOrError = Union[
     Iterable,
     Union[Exception, Iterable]
 ]
 
 
-class DeviceImplementationError(Exception):
+class DeviceImplementationError(NotImplementedError):
     pass
 
 
@@ -25,9 +23,14 @@ class DevBase(object, metaclass=ABCMeta):
     def __init__(self, dev_instance=None):
         self.db_instance = dev_instance
 
-    @abstract_static_method
-    def description() -> AnyStr:
+    @property
+    @abstractmethod
+    def description(self) -> AnyStr:
         pass
+
+    @classmethod
+    def get_description(cls):
+        return cls.description
 
     @abstractmethod
     def reboot(self):
@@ -49,23 +52,29 @@ class DevBase(object, metaclass=ABCMeta):
     def get_template_name(self) -> AnyStr:
         """Return path to html template for device"""
 
+    @property
     @abstractmethod
     def has_attachable_to_subscriber(self) -> bool:
         """Can connect device to subscriber"""
 
-    @abstract_static_method
-    def is_use_device_port() -> bool:
+    @property
+    @abstractmethod
+    def is_use_device_port(self) -> bool:
         """True if used device port while opt82 authorization"""
 
-    # fixme: only that is abstract static
-    @abstract_static_method
-    def validate_extra_snmp_info(v: str) -> None:
+    @classmethod
+    def get_is_use_device_port(cls) -> bool:
+        return cls.is_use_device_port
+
+    @classmethod
+    def validate_extra_snmp_info(cls, v: str) -> None:
         """
         Validate extra snmp field for each device.
         If validation failed then raise en exception from djing.lib.tln.ValidationError
         with description of error.
         :param v: String value for validate
         """
+        raise NotImplementedError
 
     @abstractmethod
     def register_device(self, extra_data: Dict):

@@ -31,8 +31,8 @@ def home(request):
     dots = Dot.objects.all()
     groups = Group.objects.all()
     return render(request, 'maps/ya_index.html', {
-        'dots': dots,
-        'groups': groups
+        'dots': dots.iterator(),
+        'groups': groups.iterator()
     })
 
 
@@ -49,7 +49,7 @@ class OptionsListView(BaseListView):
 
 
 @login_required
-def dot(request, did=0):
+def dot_edit(request, did=0):
     if not request.user.is_superuser:
         return redirect('/')
     try:
@@ -101,9 +101,9 @@ def remove(request, did):
 def get_dots(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
-    dots = Dot.objects.prefetch_related('devices').annotate(devcount=Count('devices')).defer('attachment')
+    dots = Dot.objects.prefetch_related('devices').annotate(devcount=Count('devices')).defer('attachment').iterator()
 
-    def fill_dev(dev):
+    def fill_dev(dev: Device):
         return {
             'status': dev.status,
             'comment': dev.comment
@@ -169,15 +169,15 @@ def modal_add_dot(request):
 def preload_devices(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
-    grp = request.GET.get('grp')
-    dot = request.GET.get('dot')
-    all_devices = Device.objects.filter(group__id=grp)
-    dot_devices = Device.objects.filter(dot__id=dot)
-
-    dot_devices_ids = [dev.pk for dev in dot_devices]
+    grp_id = request.GET.get('grp')
+    dot_id = request.GET.get('dot')
+    all_devices = Device.objects.filter(group__id=grp_id)
+    dot_devices = Device.objects.filter(dot__id=dot_id)
+    dot_devices_ids = tuple(dev.pk for dev in dot_devices.iterator())
+    del dot_devices
 
     ret = render_to_text('maps/preload_devices_tmpl.html', {
-        'all_devices': all_devices,
+        'all_devices': all_devices.iterator(),
         'dot_devices_ids': dot_devices_ids
     })
     return HttpResponse(ret, content_type='text/html')
@@ -195,7 +195,7 @@ def dot_tooltip(request):
     except Dot.DoesNotExist:
         pass
     return render_to_text('maps/map_tooltip.html', {
-        'devs': devs,
+        'devs': devs.iterator(),
         'dot': dot
     })
 
@@ -213,8 +213,8 @@ def add_dev(request, did):
         selected_user_group = safe_int(request.POST.get('selected_user_group'))
 
         existing_devs = Device.objects.filter(group__id=selected_user_group or param_user_group)
-        if existing_devs.count() > 0:
-            dot.devices.remove(*[dev.pk for dev in existing_devs])
+        if existing_devs.exists():
+            dot.devices.remove(*(dev.pk for dev in existing_devs.iterator()))
         dot.devices.add(*selected_devs)
 
         url = resolve_url('mapapp:add_dev', did=dot.pk)
@@ -222,9 +222,9 @@ def add_dev(request, did):
     else:
         existing_devs = Device.objects.filter(group=param_user_group)
     return render(request, 'maps/add_device.html', {
-        'groups': groups,
+        'groups': groups.iterator(),
         'dot': dot,
-        'existing_devs': existing_devs,
+        'existing_devs': existing_devs.iterator(),
         'grp': param_user_group,
         'dot_devices_ids': [dev.pk for dev in Device.objects.filter(dot=dot)]
     })

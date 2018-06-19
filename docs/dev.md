@@ -47,10 +47,9 @@ class EltexPort(BasePort):
 Теперь реализация для свича:
 ```python
 class EltexSwitch(DLinkDevice):
-
-    @staticmethod
-    def description():
-        return _('Eltex switch')
+    has_attachable_to_subscriber = False
+    description = _('Eltex switch')
+    is_use_device_port = False
 
     def get_ports(self):
         #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
@@ -77,14 +76,8 @@ class EltexSwitch(DLinkDevice):
         tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
         return tm
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return False
-
-    @staticmethod
-    def is_use_device_port():
-        return False
 ```
-Метод **@description** Просто отображает человекопонятное название вашего устройства в биллинге.
+Свойство **@description** Просто отображает человекопонятное название вашего устройства в биллинге.
 Заметьте что строка на английском и заключена в процедуру **_** (это ugettext_lazy, см. в импорте вверху файла),
 это локализация для текущего языка. Про локализацию можно почитать в соответствующем разделе [django translation](https://docs.djangoproject.com/en/1.11/topics/i18n/translation/).
 
@@ -98,11 +91,11 @@ class EltexSwitch(DLinkDevice):
 Метод **@uptime**, понятно что возвращает, укажите нужный OID. Вернётся тип *RuTimedelta*, это переопределённый тип **timedelta**, я его реализовал
 для локализации временного промежутка на русский.
 
-Метод **@has_attachable_to_subscriber** возвращает правду если это устройство можно привязать к абоненту.
+Свойство **@has_attachable_to_subscriber** возвращает правду если это устройство можно привязать к абоненту.
 Например у Dlink стоит True потому что Dlink стоит во многих местах на доступе, и его порты принадлежат
 абонентам при авторизации.
 
-Статический метод **@is_use_device_port** используется в DHCP чтоб понять что мы используем для привязки к абоненту всё устройство или
+Свойство **@is_use_device_port** используется в DHCP чтоб понять что мы используем для привязки к абоненту всё устройство или
 только порт устройства. Например, если у устройства только 1 порт абонента (PON ONU), и мы привязываем этого абонента ко всему устройству
 а не к порту, то нужно вернуть False, На обычных свичах где мы авторизуем абонента на порту возвращаем True.
 

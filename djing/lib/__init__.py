@@ -38,24 +38,16 @@ def safe_int(i):
 # классы передавать для того чтоб по значению кода из базы понять какой класс нужно взять для нужной функциональности.
 # Например по коду в базе вам нужно определять как считать тариф абонента, что реализовано в возвращаемом классе.
 class MyChoicesAdapter(Iterator):
-    chs = tuple()
-    current_index = 0
-    _max_index = 0
+    _chs = None
 
     # На вход принимает кортеж кортежей, вложенный из 2х элементов: кода и класса, как: TARIFF_CHOICES
     def __init__(self, choices):
-        self._max_index = len(choices)
-        self.chs = choices
+        self._chs = iter(choices)
 
     def __next__(self):
-        if self.current_index >= self._max_index:
-            raise StopIteration
-        else:
-            e = self.chs
-            ci = self.current_index
-            res = e[ci][0], e[ci][1].description()
-            self.current_index += 1
-            return res
+        obj = next(self._chs)
+        choice_code, choice_class = obj
+        return choice_code, choice_class.get_description()
 
 
 # Russian localized timedelta

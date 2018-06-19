@@ -162,7 +162,7 @@ class Abon(BaseAccount):
         Return icon list of set flags from self.markers
         :return: ['m-icon-donkey', 'm-icon-tv', ...]
         """
-        return ["m-%s" % name for name, state in self.markers if state]
+        return tuple("m-%s" % name for name, state in self.markers if state)
 
     def is_markers_empty(self):
         return int(self.markers) == 0

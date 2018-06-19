@@ -60,13 +60,13 @@ class DLinkPort(BasePort):
 
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = True
+    description = _('DLink switch')
+    is_use_device_port = True
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
-
-    @staticmethod
-    def description():
-        return _('DLink switch')
 
     def reboot(self):
         return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
@@ -103,15 +103,8 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'ports.html'
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return True
-
-    @staticmethod
-    def validate_extra_snmp_info(v: str) -> None:
+    @classmethod
+    def validate_extra_snmp_info(cls, v: str) -> None:
         # Dlink has no require snmp info
         pass
 
@@ -142,13 +135,13 @@ class ONUdev(BasePort):
 
 
 class OLTDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = False
+    description = _('PON OLT')
+    is_use_device_port = False
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
-
-    @staticmethod
-    def description():
-        return gettext('PON OLT')
 
     def reboot(self):
         pass
@@ -187,15 +180,8 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'olt.html'
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return False
-
-    @staticmethod
-    def is_use_device_port():
-        return False
-
-    @staticmethod
-    def validate_extra_snmp_info(v: str) -> None:
+    @classmethod
+    def validate_extra_snmp_info(cls, v: str) -> None:
         # Olt has no require snmp info
         pass
 
@@ -208,6 +194,10 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 
 class OnuDevice(DevBase, SNMPBaseWorker):
+    has_attachable_to_subscriber = True
+    description = _('PON ONU')
+    is_use_device_port = False
+
     def __init__(self, dev_instance):
         DevBase.__init__(self, dev_instance)
         dev_ip_addr = None
@@ -223,15 +213,11 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             ))
         SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
 
-    @staticmethod
-    def description() -> AnyStr:
-        return gettext('PON ONU')
-
     def reboot(self):
         pass
 
     def get_ports(self) -> ListOrError:
-        return []
+        return ()
 
     def get_device_name(self):
         pass
@@ -241,13 +227,6 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
     def get_template_name(self):
         return "onu.html"
-
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return False
 
     def get_details(self):
         if self.db_instance is None:
@@ -274,7 +253,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
     @staticmethod
-    def validate_extra_snmp_info(v: str) -> None:
+    def validate_extra_snmp_info(cls, v: str) -> None:
         # DBCOM Onu have en integer snmp port
         try:
             int(v)
@@ -330,9 +309,8 @@ class EltexPort(BasePort):
 
 
 class EltexSwitch(DLinkDevice):
-    @staticmethod
-    def description():
-        return _('Eltex switch')
+    description = _('Eltex switch')
+    is_use_device_port = False
 
     def get_ports(self) -> ListOrError:
         res = []
@@ -355,13 +333,6 @@ class EltexSwitch(DLinkDevice):
         tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
         return tm
 
-    def has_attachable_to_subscriber(self) -> bool:
-        return True
-
-    @staticmethod
-    def is_use_device_port():
-        return False
-
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance
         return plain_ip_device_mon_template(device)
@@ -378,9 +349,7 @@ def conv_signal(lvl: int) -> float:
 
 
 class Olt_ZTE_C320(OLTDevice):
-    @staticmethod
-    def description():
-        return gettext('OLT ZTE C320')
+    description = _('OLT ZTE C320')
 
     def get_fibers(self):
         fibers = ({
@@ -443,9 +412,7 @@ class Olt_ZTE_C320(OLTDevice):
 
 
 class ZteOnuDevice(OnuDevice):
-    @staticmethod
-    def description():
-        return _('ZTE PON ONU')
+    description = _('ZTE PON ONU')
 
     def get_details(self) -> Optional[Dict]:
         if self.db_instance is None:
@@ -472,8 +439,8 @@ class ZteOnuDevice(OnuDevice):
     def get_template_name(self):
         return 'onu_for_zte.html'
 
-    @staticmethod
-    def validate_extra_snmp_info(v: str) -> None:
+    @classmethod
+    def validate_extra_snmp_info(cls, v: str) -> None:
         # for example 268501760.5
         try:
             fiber_num, onu_port = v.split('.')

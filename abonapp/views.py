@@ -30,16 +30,11 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
 from djing import lib
-from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
-
-
-class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
-    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-    http_method_names = ('get',)
+from djing.global_base_views import BaseOrderedFilteringList, SecureApiView
 
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
-class PeoplesListView(BaseAbonListView):
+class PeoplesListView(BaseOrderedFilteringList):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
 
@@ -84,7 +79,7 @@ class PeoplesListView(BaseAbonListView):
 
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
-class GroupListView(BaseAbonListView):
+class GroupListView(BaseOrderedFilteringList):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
     queryset = Group.objects.annotate(usercount=Count('abon'))
@@ -212,7 +207,7 @@ def abonamount(request, gid, uname):
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
-class DebtsListView(BaseAbonListView):
+class DebtsListView(BaseOrderedFilteringList):
     context_object_name = 'invoices'
     template_name = 'abonapp/invoiceForPayment.html'
 
@@ -230,7 +225,7 @@ class DebtsListView(BaseAbonListView):
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
-class PayHistoryListView(BaseAbonListView):
+class PayHistoryListView(BaseOrderedFilteringList):
     context_object_name = 'pay_history'
     template_name = 'abonapp/payHistory.html'
 
@@ -756,7 +751,7 @@ def abon_ping(request):
 
 
 @method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
-class DialsListView(BaseAbonListView):
+class DialsListView(BaseOrderedFilteringList):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
 

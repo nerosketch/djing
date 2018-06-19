@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
-from typing import AnyStr
 
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -11,6 +10,8 @@ from random import uniform
 
 
 class TariffDefault(TariffBase):
+    description = _('Base calculate functionality')
+
     def __init__(self, abon_tariff):
         # assert isinstance(abon_tariff, AbonTariff)
         self.abon_tariff = abon_tariff
@@ -44,35 +45,26 @@ class TariffDefault(TariffBase):
                                    hour=23, minute=59, second=59)
         return last_month_date
 
-    @staticmethod
-    def description() -> AnyStr:
-        return _('Base calculate functionality')
-
 
 class TariffDp(TariffDefault):
+    description = 'IS'
     # в IS снимается вся стоимость тарифа вне зависимости от времени использования
 
     # просто возвращаем всю стоимость тарифа
     def calc_amount(self) -> float:
         return float(self.abon_tariff.tariff.amount)
 
-    @staticmethod
-    def description() -> AnyStr:
-        return 'IS'
-
 
 # Как в IS только не на время, а на 10 лет
 class TariffCp(TariffDp):
+    description = _('Private service')
+
     def calc_deadline(self) -> datetime:
         # делаем время окончания услуги на 10 лет вперёд
         nw = timezone.now()
         long_long_time = datetime(year=nw.year + 10, month=nw.month, day=nw.day,
                                   hour=23, minute=59, second=59)
         return long_long_time
-
-    @staticmethod
-    def description() -> AnyStr:
-        return _('Private service')
 
 
 # Первый - всегда по умолчанию
@@ -84,6 +76,8 @@ TARIFF_CHOICES = (
 
 
 class PeriodicPayCalcDefault(PeriodicPayCalcBase):
+    description = _('Default periodic pay')
+
     def calc_amount(self, model_object) -> float:
         return model_object.amount
 
@@ -91,22 +85,16 @@ class PeriodicPayCalcDefault(PeriodicPayCalcBase):
         # TODO: решить какой будет расёт периодических платежей
         return datetime.now() + timedelta(days=30)
 
-    @staticmethod
-    def description() -> AnyStr:
-        return _('Default periodic pay')
-
 
 class PeriodicPayCalcCustom(PeriodicPayCalcDefault):
+    description = _('Custom periodic pay')
+
     def calc_amount(self, model_object) -> float:
         """
         :param model_object: it is a instance of models.PeriodicPay model
         :return: float: amount for the service
         """
         return uniform(1, 10)
-
-    @staticmethod
-    def description() -> AnyStr:
-        return _('Custom periodic pay')
 
 
 PERIODIC_PAY_CHOICES = (

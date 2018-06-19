@@ -90,8 +90,8 @@ class Device(models.Model):
 
     # Can attach device to subscriber in subscriber page
     def has_attachable_to_subscriber(self) -> bool:
-        mngr = self.get_manager_object()
-        return mngr.has_attachable_to_subscriber()
+        mngr = self.get_manager_klass()
+        return mngr.has_attachable_to_subscriber
 
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')

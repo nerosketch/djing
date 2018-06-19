@@ -55,13 +55,3 @@ def hash_auth_view(fn):
         else:
             return HttpResponseForbidden('Access Denied')
     return wrapped
-
-
-class abstract_static_method(staticmethod):
-    __slots__ = ()
-
-    def __init__(self, func):
-        super(abstract_static_method, self).__init__(func)
-        func.__isabstractmethod__ = True
-
-    __isabstractmethod__ = True

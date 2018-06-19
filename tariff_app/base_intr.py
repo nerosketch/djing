@@ -14,13 +14,17 @@ class TariffBase(metaclass=ABCMeta):
         """Calculate deadline date"""
         raise NotImplementedError
 
-    @staticmethod
-    def description() -> AnyStr:
+    @property
+    @abstractmethod
+    def description(self) -> AnyStr:
         """
         Usage in djing.lib.MyChoicesAdapter for choices fields.
         :return: human readable description
         """
-        raise NotImplementedError
+
+    @classmethod
+    def get_description(cls):
+        return cls.description
 
     @staticmethod
     def manage_access(abon) -> bool:
@@ -51,8 +55,12 @@ class PeriodicPayCalcBase(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def description() -> AnyStr:
+    @property
+    @abstractmethod
+    def description(self) -> AnyStr:
         """Return text description.
         Uses in djing.lib.MyChoicesAdapter for CHOICES fields"""
-        raise NotImplementedError
+
+    @classmethod
+    def get_description(cls):
+        return cls.description
