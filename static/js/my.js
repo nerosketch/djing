@@ -77,7 +77,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 		var def_play = function(e){
 			var audiotag = e.data['audiotag'][0];
 
-			if(audiotag.readyState == 0){
+			if(audiotag.readyState === 0){
 				$(this).prop('disabled', true);
 				return;
 			}else
@@ -143,13 +143,13 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 // Ajax form
 (function ($){
     $.fn.ajform = function(opt){
+    	var on_response_default = function(){
+            alert('You must assign callback function for response');
+        };
+
         var settings = $.extend({
 			on_response	: on_response_default
 		}, opt);
-
-        var on_response_default = function(r){
-            alert('You must assign callback function for response');
-        };
 
         var on_submit = function(e){
             e.preventDefault();
@@ -183,24 +183,24 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
         var notifShow = function(title, content){
             if(!settings.news_url) return;
             var perm = Notification.permission.toLowerCase();
-            if(perm == "granted"){
+            if(perm === "granted"){
                 curnotify = new Notification(title, {
                     tag: 'djing-notify',
                     body: content,
                     icon: '/static/img/noticon.png'}
                 );
-            }else if(perm == "default"){
+            }else if(perm === "default"){
                 Notification.requestPermission(on_ask_perm);
             }
-        }
+        };
 
         var on_ask_perm = function(r){
             console.log("Thanks for letting notify you");
-        }
+        };
 
         var check_news = function(){
             var perm = Notification.permission.toLowerCase();
-            if(perm == "granted" && settings.news_url){
+            if("granted" === perm && settings.news_url){
                 $.getJSON(settings.news_url, function(r){
                     if(r.auth){
                         if(r.exist){
@@ -211,7 +211,7 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
                     }
                 });
             }
-        }
+        };
 
         if(settings.news_url){
             // once per minute check news

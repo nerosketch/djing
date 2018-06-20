@@ -3,6 +3,10 @@
 {% load bootstrap3 %}
 {% load globaltags %}
 
+{% block additional_link %}
+    <script src="/static/js/cidr.js"></script>
+{% endblock %}
+
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
@@ -15,9 +19,9 @@
 
 {% block main %}
     <form action="{% url 'ip_pool:net_add' %}" method="post">{% csrf_token %}
-    <div class="panel panel-default">
+    <div class="panel panel-default cidr-contain">
         <div class="panel-heading">
-            <h3 class="panel-title">{% trans 'Add network' %}</h3>
+            <h3 class="panel-title">{% trans 'Add network' %} <span></span></h3>
         </div>
         <div class="panel-body">
             {% bootstrap_form form %}

@@ -29,21 +29,23 @@ class ValidationError(ValueError):
 
 
 MAC_ADDR_REGEX = b'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
-IP_ADDR_REGEX = '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
-                '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+IP_ADDR_REGEX = (
+    '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+)
 ONU_SN_REGEX = b'^ZTEG[A-F\d]{8}$'
 
 
 class TelnetApi(Telnet):
-    config_level = []
 
     def __init__(self, *args, **kwargs):
         timeout = kwargs.get('timeout')
         if timeout:
             self._timeout = timeout
         self._prompt_string = b'ZTE-C320-PKP#'
+        self.config_level = []
         super().__init__(*args, **kwargs)
 
     def write(self, buffer: bytes) -> None:

@@ -7,28 +7,18 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-IP_SUBNET_RE = (
-    '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
-    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
-    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
-    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/'
-    '(3[0-2]|2\d|1\d|\d))|(\/(3[0-2]|2\d|1\d|\d))$'
-)
-
-
 class NetworkModel(models.Model):
     _netw_cache = None
 
     network = models.GenericIPAddressField(
         verbose_name=_('IP network'),
-        help_text=_('Dot separated ip address of network. For example: 192.168.1.0'),
+        help_text=_('Ip address of network. For example: 192.168.1.0 or fde8:6789:1234:1::'),
         unique=True
     )
     mask = models.PositiveSmallIntegerField(
         _('Mask'),
-        help_text=_('For example: 24, if network is 192.168.1.0/24'),
+        help_text=_('Net mask bits length for ipv4 or prefix length for ipv6'),
         default=24,
-        validators=()
     )
     work_range_start_ip = models.GenericIPAddressField(
         verbose_name=_('Work range start ip'),
@@ -55,7 +45,9 @@ class NetworkModel(models.Model):
 
     def get_network(self) -> IPNetwork:
         if self._netw_cache is None:
-            self._netw_cache = IPNetwork("%s/%s" % (self.network, self.mask or 32))
+            self._netw_cache = IPNetwork(self.network)
+            if self.mask:
+                self._netw_cache.prefixlen = self.mask
         return self._netw_cache
 
     def get_absolute_url(self):
