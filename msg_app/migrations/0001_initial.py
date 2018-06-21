@@ -109,6 +109,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='messagestatus',
-            unique_together=set([('msg', 'user', 'state')]),
+            unique_together={('msg', 'user', 'state')},
         ),
     ]

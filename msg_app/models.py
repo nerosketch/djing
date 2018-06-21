@@ -123,7 +123,8 @@ class ConversationManager(models.Manager):
         )
         return conversation
 
-    def get_new_messages_count(self, account):
+    @staticmethod
+    def get_new_messages_count(account):
         if isinstance(account, UserProfile):
             return MessageStatus.objects.filter(user=account, state='new').count()
         else:
@@ -176,7 +177,8 @@ class Conversation(models.Model):
         except ChatException as e:
             raise MessageError(e)
 
-    def remove_message(self, msg):
+    @staticmethod
+    def remove_message(msg):
         if isinstance(msg, Message):
             m = msg
         else:

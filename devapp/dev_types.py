@@ -103,14 +103,14 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'ports.html'
 
-    @classmethod
-    def validate_extra_snmp_info(cls, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # Dlink has no require snmp info
         pass
 
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance
-        return plain_ip_device_mon_template(device, *args, **kwargs)
+        return plain_ip_device_mon_template(device)
 
     def register_device(self, extra_data: Dict):
         pass
@@ -180,8 +180,8 @@ class OLTDevice(DevBase, SNMPBaseWorker):
     def get_template_name(self):
         return 'olt.html'
 
-    @classmethod
-    def validate_extra_snmp_info(cls, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # Olt has no require snmp info
         pass
 
@@ -253,7 +253,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
 
     @staticmethod
-    def validate_extra_snmp_info(cls, v: str) -> None:
+    def validate_extra_snmp_info(v: str) -> None:
         # DBCOM Onu have en integer snmp port
         try:
             int(v)
@@ -439,8 +439,8 @@ class ZteOnuDevice(OnuDevice):
     def get_template_name(self):
         return 'onu_for_zte.html'
 
-    @classmethod
-    def validate_extra_snmp_info(cls, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         # for example 268501760.5
         try:
             fiber_num, onu_port = v.split('.')

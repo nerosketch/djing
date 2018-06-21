@@ -147,15 +147,16 @@ def handle_shutdown(event, mngr):
 
 
 def signal_handler(signum, frame):
-    if signum != 10: return
+    if signum != 10:
+        return
     global outbox_messages
     outbox_messages = True
 
 
-def handle_inbox_long_sms_message(event, manager):
+def handle_inbox_long_sms_message(event, mngr):
     if event.has_header('Message'):
         pdu = event.get_header('Message')
-        pdu = re.sub(r'^\+CMGR\:\s\d\,\,\d{1,3}\\r\\n', '', pdu)
+        pdu = re.sub(r'^\+CMGR:\s\d,,\d{1,3}\\r\\n', '', pdu)
         sd = SmsDeliver(pdu)
         data = sd.data
         chunks_count = data.get('cnt')
@@ -166,10 +167,10 @@ def handle_inbox_long_sms_message(event, manager):
         )
         if chunks_count is not None:
             # more than 1 message
-            manager.push_text(sms=sms, ref=data.get('ref'), cnt=chunks_count)
+            mngr.push_text(sms=sms, ref=data.get('ref'), cnt=chunks_count)
         else:
             # one message
-            manager.save_sms(sms)
+            mngr.save_sms(sms)
 
 
 @pidfile(pidname='dialing.py.pid', piddir='/run')

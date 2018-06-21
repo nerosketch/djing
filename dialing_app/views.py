@@ -164,7 +164,7 @@ class SmsManager(SecureApiView):
     http_method_names = ('get',)
 
     @staticmethod
-    def bad_cmd(**kwargs) -> JSONType:
+    def bad_cmd() -> JSONType:
         return {'text': 'Command is not allowed'}
 
     @method_decorator(json_view)
@@ -198,7 +198,7 @@ class SmsManager(SecureApiView):
         return {'text': 'Bad mid parameter'}
 
     @staticmethod
-    def get_new(**kwargs) -> JSONType:
+    def get_new() -> JSONType:
         msgs = SMSOut.objects.filter(status='nw').defer('status')
         res = [{
             'when': round(m.timestamp),

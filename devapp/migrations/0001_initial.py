@@ -20,8 +20,7 @@ class Migration(migrations.Migration):
             name='Device',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                (
-                'ip_address', MyGenericIPAddressField(max_length=8, protocol='ipv4', verbose_name='Ip address')),
+                ('ip_address', MyGenericIPAddressField(max_length=8, protocol='ipv4', verbose_name='Ip address')),
                 ('mac_addr', djing.fields.MACAddressField(blank=True, integer=True, null=True, unique=True,
                                                           verbose_name='Mac address')),
                 ('comment', models.CharField(max_length=256, verbose_name='Comment')),
@@ -66,6 +65,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='port',
-            unique_together=set([('device', 'num')]),
+            unique_together={('device', 'num')},
         ),
     ]

@@ -66,8 +66,8 @@ class DevBase(object, metaclass=ABCMeta):
     def get_is_use_device_port(cls) -> bool:
         return cls.is_use_device_port
 
-    @classmethod
-    def validate_extra_snmp_info(cls, v: str) -> None:
+    @staticmethod
+    def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
         If validation failed then raise en exception from djing.lib.tln.ValidationError

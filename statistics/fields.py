@@ -35,7 +35,8 @@ class UnixDateTimeField(models.DateTimeField):
         else:
             return datetime.datetime.fromtimestamp(float(val))
 
-    def _is_string(value, val):
+    @staticmethod
+    def _is_string(val):
         return isinstance(val, str)
 
     def get_db_prep_value(self, val, *args, **kwargs):
