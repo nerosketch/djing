@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -1096,6 +1096,13 @@ class EditSibscriberMarkers(UpdateView):
     def get_object(self, queryset=None):
         obj = models.Abon.objects.get(username=self.kwargs.get('uname'))
         return obj
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(EditSibscriberMarkers, self).dispatch(request, *args, **kwargs)
+        except ValidationError as e:
+            messages.error(request, e)
+            return self.render_to_response(self.get_context_data())
 
     def get_success_url(self):
         return resolve_url('abonapp:abon_home', self.kwargs.get('gid'), self.kwargs.get('uname'))
