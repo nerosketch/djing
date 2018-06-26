@@ -9,6 +9,17 @@ from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 
 
 class DeviceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Move comment from value to placeholder in HTML form
+        """
+        initial = kwargs.get('initial')
+        comment = initial.get('comment')
+        del initial['comment']
+        super(DeviceForm, self).__init__(*args, **kwargs)
+        self.fields['comment'].widget.attrs['placeholder'] = comment
+
     mac_addr = forms.CharField(widget=forms.TextInput(attrs={
         'pattern': MAC_ADDR_REGEX,
         'required': True
