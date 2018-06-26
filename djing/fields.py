@@ -91,11 +91,11 @@ class MACAddressField(models.Field):
                 return self.get_prep_value(value)
             except AddrFormatError:
                 return None
-        elif lookup_type in ('in'):
+        elif lookup_type == 'in':
             try:
                 macs = []
                 for mac in value:
-                    macs += [self.get_prep_value(mac)]
+                    macs.extend(self.get_prep_value(mac))
                 return macs
             except AddrFormatError:
                 return None
@@ -106,7 +106,7 @@ class MACAddressField(models.Field):
 try:
     from south.modelsinspector import add_introspection_rules
 
-    add_introspection_rules([], ["^macaddress\.fields\.MACAddressField"])
+    add_introspection_rules((), ("^macaddress\.fields\.MACAddressField",))
 except ImportError:
     pass
 

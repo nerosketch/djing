@@ -23,16 +23,18 @@ def home(request):
             devices = Device.objects.filter(ip_address=s)
         else:
             abons = Abon.objects.filter(
-                Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s)
+                Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s) |
+                Q(additional_telephones__telephone__icontains=s)
             )
+
             if re.match(MAC_ADDR_REGEX, s):
                 devices = Device.objects.filter(mac_addr=s)
             else:
                 devices = Device.objects.filter(comment__icontains=s)
 
     else:
-        abons = []
-        devices = []
+        abons = ()
+        devices = ()
 
     for abn in abons:
         abn.fio = replace_without_case(escape(abn.fio), s, "<b>%s</b>" % s)
