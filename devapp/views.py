@@ -30,13 +30,8 @@ from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 
 
-class BaseDeviceListView(global_base_views.BaseListWithFiltering):
-    http_method_names = ('get',)
-    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-
-
 @method_decorator((login_required, only_admins), name='dispatch')
-class DevicesListView(global_base_views.OrderingMixin, BaseDeviceListView):
+class DevicesListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
 
@@ -63,7 +58,7 @@ class DevicesListView(global_base_views.OrderingMixin, BaseDeviceListView):
 
 
 @method_decorator((login_required, only_admins), name='dispatch')
-class DevicesWithoutGroupsListView(global_base_views.OrderingMixin, BaseDeviceListView):
+class DevicesWithoutGroupsListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
     queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
@@ -516,7 +511,7 @@ def toggle_port(request, device_id: int, portid: int, status=0):
 
 
 @method_decorator((login_required, only_admins), name='dispatch')
-class GroupsListView(BaseDeviceListView):
+class GroupsListView(global_base_views.OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'devapp/group_list.html'
     model = Group

@@ -30,10 +30,10 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
 from djing import lib
-from djing.global_base_views import OrderingMixin, BaseListWithFiltering, SecureApiView
+from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 
-class BaseAbonListView(OrderingMixin, BaseListWithFiltering):
+class BaseAbonListView(OrderedFilteredList):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
 

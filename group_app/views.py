@@ -1,6 +1,6 @@
 from django.db.models import Count
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, UpdateView, CreateView, DeleteView
+from django.views.generic import UpdateView, CreateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -8,12 +8,14 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
+
+from djing.global_base_views import OrderedFilteredList
 from . import models
 from . import forms
 
 
 @method_decorator(login_required, name='dispatch')
-class GroupListView(ListView):
+class GroupListView(OrderedFilteredList):
     http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'group_app/group_list.html'

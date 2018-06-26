@@ -1,5 +1,6 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,tariff_app/ext.html' %}
 {% load i18n %}
+{% load dpagination %}
 {% block content %}
 
     <div class="table-responsive">
@@ -7,25 +8,25 @@
             <thead>
             <tr>
                 <th>
-                    <a href="{% url 'tarifs:home' %}?order_by=title&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'tarifs:home' %}?{% url_order_by request order_by='title' %}">
                         {% trans 'tariff' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs:home' %}?order_by=speedIn&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'tarifs:home' %}?{% url_order_by request order_by='speedIn' %}">
                         {% trans 'Speed In' %}
                     </a>
                     {% if order_by == 'speedIn' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs:home' %}?order_by=speedOut&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'tarifs:home' %}?{% url_order_by request order_by='speedOut' %}">
                         {% trans 'Speed Out' %}
                     </a>
                     {% if order_by == 'speedOut' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th>
-                    <a href="{% url 'tarifs:home' %}?order_by=amount&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'tarifs:home' %}?{% url_order_by request order_by='amount' %}">
                         {% trans 'Price' %}
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}

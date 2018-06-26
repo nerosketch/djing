@@ -1,28 +1,21 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.shortcuts import render_to_text
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.views.generic import ListView, DeleteView
-from django.conf import settings
+from django.views.generic import DeleteView
 from guardian.decorators import permission_required_or_403 as permission_required
 
-from djing.global_base_views import OrderingMixin
+from djing.global_base_views import OrderedFilteredList
 from .models import Tariff, PeriodicPay
 from djing import lib
 from . import forms
 
 
-class BaseServiceListView(ListView):
-    http_method_names = ('get',)
-    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-
-
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
-class TariffsListView(BaseServiceListView, OrderingMixin):
+class TariffsListView(OrderedFilteredList):
     """
     Show Services(Tariffs) list
     """
@@ -80,7 +73,7 @@ class TariffDeleteView(DeleteView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(permission_required('tariff_app.delete_tariff'), name='dispatch')
-class PeriodicPaysListView(BaseServiceListView):
+class PeriodicPaysListView(OrderedFilteredList):
     context_object_name = 'pays'
     model = PeriodicPay
     template_name = 'tariff_app/periodic_pays/list.html'
