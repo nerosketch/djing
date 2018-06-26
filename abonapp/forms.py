@@ -106,17 +106,6 @@ class PassportForm(forms.ModelForm):
         }
 
 
-class ExtraFieldForm(forms.ModelForm):
-    class Meta:
-        model = models.ExtraFieldsModel
-        fields = '__all__'
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'field_type': forms.Select(attrs={'class': 'form-control'}),
-            'data': forms.TextInput(attrs={'class': 'form-control'})
-        }
-
-
 class AbonStreetForm(forms.ModelForm):
     class Meta:
         model = models.AbonStreet

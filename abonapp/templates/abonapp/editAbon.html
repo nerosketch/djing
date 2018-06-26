@@ -194,51 +194,36 @@
                 </div>
             </div>
             {% endif %}
-            {% if perms.abonapp.add_extrafieldsmodel %}
+
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'Extra fields' %}</h3>
+                    <h3 class="panel-title">{% trans 'Ip addresses' %}</h3>
                 </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" action="{% url 'abonapp:extra_field_edit' group.pk abon.username %}" method="post">{% csrf_token %}
-
-                        {% for ef in abon.extra_fields.all %}
-                        <div class="form-group-sm">
-                            <label class="col-sm-4 control-label">{{ ef.title }}</label>
-                            <div class="col-sm-8">
-
-                                <div class="input-group input-group-sm">
-                                    <input type="text" value="{{ ef.data|default:_('Not assigned') }}" class="form-control" pattern="{{ ef.get_regexp }}" name="ex">
-                                    <input type="hidden" value="{{ ef.pk }}" name="ed">
-                                    <span class="input-group-btn">
-                                        <a href="{% url 'abonapp:extra_field_delete' group.pk abon.username ef.pk %}" class="btn btn-danger" title="{% trans 'Delete' %}">
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </a>
-                                    </span>
-                                </div>
-
-                            </div>
-                        </div>
-                        {% empty %}
-                            <h3>{% trans 'Extra field does not exist' %}</h3>
-                        {% endfor %}
-
-                        <div class="form-group-sm">
-                            <div class="col-sm-offset-4 col-sm-8 btn-group btn-group-sm">
-                                <a href="{% url 'abonapp:extra_field' group.pk abon.username %}" class="btn btn-success btn-modal" title="{% trans 'Add extra field' %}">
-                                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
-                                </a>
-
-                                <button class="btn btn-primary" type="submit">
-                                    <span class="glyphicon glyphicon-edit"></span> {% trans 'Save' %}
-                                </button>
-                            </div>
-                        </div>
-
-                    </form>
+                <ul class="list-group">
+                    {% for lease in abon.ip_addresses.all %}
+                        <li class="list-group-item">
+                            {% if lease.is_active %}
+                                <a href="{% url 'abonapp:user_session_free' group.pk abon.username lease.pk %}" class="btn btn-default btn-sm" title="{% trans 'Free session' %}">&times;</a>
+                            {% else %}
+                                <a href="#" disabled class="btn btn-default btn-sm">&times;</a>
+                            {% endif %}
+                            <span{{ lease.is_active|yesno:', class="text-muted"'|safe }}>
+                                <b>{{ lease }}</b>
+                                <small>{% trans 'Leased by:' %} {{ lease.lease_time|date:'d-m H:i:s' }}</small>
+                            </span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">{% trans 'Leases does not found' %}</li>
+                    {% endfor %}
+                </ul>
+                <div class="panel-footer">
+                    <a href="#" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <span class="hidden-xs">{% trans 'Add' %}</span>
+                    </a>
                 </div>
             </div>
-            {% endif %}
+
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'User flags' %}</h3>

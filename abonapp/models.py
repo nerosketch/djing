@@ -16,7 +16,6 @@ from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import ip2int, LogicError
-from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
@@ -84,48 +83,6 @@ class AbonStreet(models.Model):
         ordering = ('name',)
 
 
-class ExtraFieldsModel(models.Model):
-    DYNAMIC_FIELD_TYPES = (
-        ('int', _('Digital field')),
-        ('str', _('Text field')),
-        ('dbl', _('Floating field')),
-        ('ipa', _('Ip Address'))
-    )
-
-    title = models.CharField(max_length=16, default='no title')
-    field_type = models.CharField(max_length=3, choices=DYNAMIC_FIELD_TYPES, default='str')
-    data = models.CharField(max_length=64, null=True, blank=True)
-
-    def get_regexp(self):
-        if self.field_type == 'int':
-            return r'^[+-]?\d+$'
-        elif self.field_type == 'dbl':
-            return r'^[-+]?\d+[,.]\d+$'
-        elif self.field_type == 'str':
-            return r'^[a-zA-ZА-Яа-я0-9]+$'
-        elif self.field_type == 'ipa':
-            return IP_ADDR_REGEX
-
-    def clean(self):
-        d = self.data
-        if self.field_type == 'int':
-            validators.validate_integer(d)
-        elif self.field_type == 'dbl':
-            try:
-                float(d)
-            except ValueError:
-                raise ValidationError(_('Double invalid value'), code='invalid')
-        elif self.field_type == 'str':
-            str_validator = validators.MaxLengthValidator(64)
-            str_validator(d)
-
-    def __str__(self):
-        return "%s: %s" % (self.get_field_type_display(), self.data)
-
-    class Meta:
-        db_table = 'abon_extra_fields'
-
-
 class AbonManager(MyUserManager):
     def get_queryset(self):
         return super(MyUserManager, self).get_queryset().filter(is_admin=False)
@@ -139,7 +96,6 @@ class Abon(BaseAccount):
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
-    extra_fields = models.ManyToManyField(ExtraFieldsModel, blank=True)
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(default=False)

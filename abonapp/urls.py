@@ -15,10 +15,7 @@ subscriber_patterns = [
     url(r'^passport_view/$', views.PassportUpdateView.as_view(), name='passport_view'),
     url(r'^chart/$', views.charts, name='charts'),
     url(r'^dials/$', views.DialsListView.as_view(), name='dials'),
-    url(r'^reset_ip/$', views.reset_ip, name='reset_ip'),
-    url(r'^extra_field/$', views.make_extra_field, name='extra_field'),
-    url(r'^extra_field/(?P<fid>\d+)/delete$', views.extra_field_delete, name='extra_field_delete'),
-    url(r'^extra_field/edit$', views.extra_field_change, name='extra_field_edit'),
+    # url(r'^reset_ip/$', views.reset_ip, name='reset_ip'),
     url(r'^unsubscribe_service(?P<abon_tariff_id>\d+)/$', views.unsubscribe_service, name='unsubscribe_service'),
     url(r'^dev/$', views.dev, name='dev'),
     url(r'^del$', views.DelAbonDeleteView.as_view(), name='del_abon'),
@@ -47,21 +44,13 @@ group_patterns = [
 ]
 
 urlpatterns = [
-
     url(r'^$', views.GroupListView.as_view(), name='group_list'),
-
     url(r'^fin_report$', views.fin_report, name='fin_report'),
-
     url(r'^(?P<gid>\d+)/', include(group_patterns)),
-
     url(r'^log$', views.LogListView.as_view(), name='log'),
-
     url(r'^pay$', views.terminal_pay, name='terminal_pay'),
-
     url(r'^debtors$', views.DebtorsListView.as_view(), name='debtors'),
-
     url(r'^ping$', views.abon_ping, name='ping'),
-
     # Api's
     url(r'^api/abons$', views.abons),
     url(r'^api/abon_filter$', views.search_abon),

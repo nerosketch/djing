@@ -647,65 +647,6 @@ def charts(request, gid, uname):
 
 
 @login_required
-@permission_required('abonapp.add_extrafieldsmodel')
-def make_extra_field(request, gid, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    try:
-        if request.method == 'POST':
-            frm = forms.ExtraFieldForm(request.POST)
-            if frm.is_valid():
-                field_instance = frm.save()
-                abon.extra_fields.add(field_instance)
-                messages.success(request, _('Extra field successfully created'))
-            else:
-                messages.error(request, _('fix form errors'))
-            return redirect('abonapp:abon_home', gid=gid, username=uname)
-        else:
-            frm = forms.ExtraFieldForm()
-
-    except (NasNetworkError, NasFailedResult) as e:
-        messages.error(request, e)
-        frm = forms.ExtraFieldForm()
-    except lib.MultipleException as errs:
-        for err in errs.err_list:
-            messages.error(request, err)
-        frm = forms.ExtraFieldForm()
-    return render_to_text('abonapp/modal_extra_field.html', {
-        'abon': abon,
-        'gid': gid,
-        'frm': frm
-    }, request=request)
-
-
-@login_required
-@permission_required('abonapp.change_extra_fields_model')
-def extra_field_change(request, gid, uname):
-    try:
-        for ed, ex in zip(request.POST.getlist('ed'), request.POST.getlist('ex')):
-            extra_field = models.ExtraFieldsModel.objects.get(pk=ed)
-            extra_field.data = ex
-            extra_field.save(update_fields=('data',))
-        messages.success(request, _("Extra fields has been saved"))
-    except models.ExtraFieldsModel.DoesNotExist:
-        messages.error(request, _('One or more extra fields has not been saved'))
-    return redirect('abonapp:abon_home', gid=gid, uname=uname)
-
-
-@login_required
-@permission_required('abonapp.delete_extra_fields_model')
-def extra_field_delete(request, gid, uname, fid):
-    abon = get_object_or_404(models.Abon, username=uname)
-    try:
-        extra_field = models.ExtraFieldsModel.objects.get(pk=fid)
-        abon.extra_fields.remove(extra_field)
-        extra_field.delete()
-        messages.success(request, _('Extra field successfully deleted'))
-    except models.ExtraFieldsModel.DoesNotExist:
-        messages.warning(request, _('Extra field does not exist'))
-    return redirect('abonapp:abon_home', gid=gid, uname=uname)
-
-
-@login_required
 @permission_required('abonapp.can_ping')
 @json_view
 def abon_ping(request):
