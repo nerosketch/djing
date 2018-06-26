@@ -15,8 +15,11 @@ class DeviceForm(forms.ModelForm):
         Move comment from value to placeholder in HTML form
         """
         initial = kwargs.get('initial')
-        comment = initial.get('comment')
-        del initial['comment']
+        if initial:
+            comment = initial.get('comment')
+            del initial['comment']
+        else:
+            comment = None
         super(DeviceForm, self).__init__(*args, **kwargs)
         self.fields['comment'].widget.attrs['placeholder'] = comment
 
