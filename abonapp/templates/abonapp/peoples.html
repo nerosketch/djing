@@ -31,13 +31,7 @@
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="hidden-xs">{% trans 'Last traffic' %}</th>
-                        <th class="col-xs-1 hidden-md">
-                            <a href="{% url 'abonapp:people_list' group.pk %}?{% url_replace request order_by='ip_address' dir=dir|default:'down' %}">
-                                {% trans 'Ip address' %}
-                            </a>
-                            {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
-                        </th>
-                        <th class="col-xs-2">
+                        <th class="col-xs-3">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_replace request order_by='fio' dir=dir|default:'down' %}">
                                 {% trans 'fio' %}
                             </a>
@@ -93,7 +87,6 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td class="col-xs-1 hidden-md">{{ human.ip_address|default:_('Not assigned') }}</td>
                         <td class="col-xs-2">{{ human.fio }}</td>
                         <td class="col-xs-2">{{ human.street|default:_('Not assigned') }}</td>
                         <td class="col-xs-1">{{ human.house|default:'-' }}</td>
@@ -123,7 +116,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="12">
+                            <td colspan="11">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' group.pk %}">{% trans 'Add abon' %}</a>

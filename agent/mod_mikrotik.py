@@ -2,8 +2,9 @@ import re
 import socket
 import binascii
 from hashlib import md5
+from ipaddress import ip_network
 from typing import Iterable, Optional, Tuple, Generator, Dict
-from djing.lib import safe_int
+
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings
@@ -240,9 +241,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             a = AbonStruct(
                 uid=int(dat['=name'][3:]),
                 # FIXME: тут в разных микротиках или =target-addresses или =target
-                ip=dat['=target'][:-3],
+                ips=(int(ip_network(ip).network_address) for ip in dat['=target'].split(',')),
                 tariff=t,
-                is_active=False if dat['=disabled'] == 'false' else True
+                is_access=False if dat['=disabled'] == 'false' else True
             )
             a.queue_id = dat['=.id']
             return a
@@ -268,24 +269,24 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             '/queue/simple/add',
             '=name=uid%d' % user.uid,
             # FIXME: тут в разных микротиках или =target-addresses или =target
-            '=target=%s' % user.ip,
+            '=target=%s' % ','.join(str(i) for i in user.ips),
             '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
             '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
             '=burst-time=1/1'
         ))
 
-    def remove_queue(self, user: AbonStruct) -> None:
+    def remove_queue(self, user: AbonStruct, queue: AbonStruct=None) -> None:
         if not isinstance(user, AbonStruct):
             raise TypeError
-        q = self.find_queue('uid%d' % user.uid)
-        if q is not None:
-            queue_id = safe_int(getattr(q, 'queue_id'))
-            if queue_id != 0:
-                r = self._exec_cmd((
+        if queue is None:
+            queue = self.find_queue('uid%d' % user.uid)
+        if queue is not None:
+            queue_id = getattr(queue, 'queue_id')
+            if queue_id is not None:
+                self._exec_cmd((
                     '/queue/simple/remove',
-                    '=.id=%d' % queue_id
+                    '=.id=%s' % queue_id
                 ))
-                print(r)
 
     def remove_queue_range(self, q_ids: Iterable[str]):
         self._exec_cmd(('/queue/simple/remove', '=numbers=' + ','.join(q_ids)))
@@ -299,18 +300,18 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         if queue is None:
             return self.add_queue(user)
         else:
-            mk_id = safe_int(getattr(queue, 'queue_id', 0))
+            mk_id = getattr(queue, 'queue_id')
             cmd = [
                 '/queue/simple/set',
                 '=name=uid%d' % user.uid,
                 '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                 # FIXME: тут в разных микротиках или =target-addresses или =target
-                '=target=%s' % user.ip,
+                '=target=%s' % ','.join(str(i) for i in user.ips),
                 '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
                 '=burst-time=1/1'
             ]
-            if mk_id != 0:
-                cmd.insert(1, '=.id=%d' % mk_id)
+            if mk_id is not None:
+                cmd.insert(1, '=.id=%s' % mk_id)
             r = self._exec_cmd(cmd)
             return r
 
@@ -340,13 +341,11 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             '=.id=*' + str(mk_id).replace('*', '')
         ))
 
-    def remove_ip_range(self, items: Iterable[IpAddressListObj]):
-        ids = tuple(ip.mk_id for ip in items if isinstance(ip, IpAddressListObj))
-        if len(ids) > 0:
-            return self._exec_cmd((
-                '/ip/firewall/address-list/remove',
-                '=numbers=*%s' % ',*'.join(ids)
-            ))
+    def remove_ip_range(self, ip_firewall_ids: Iterable[str]):
+        return self._exec_cmd((
+            '/ip/firewall/address-list/remove',
+            '=numbers=%s' % ','.join(ip_firewall_ids)
+        ))
 
     def find_ip(self, ip: IpStruct, list_name: str):
         if not isinstance(ip, IpStruct):
@@ -380,58 +379,56 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
             raise ValueError('*users* is used twice, generator does not fit')
         queue_ids = (usr.queue_id for usr in users if usr is not None)
         self.remove_queue_range(queue_ids)
-        for ip in (user.ip for user in users if isinstance(user, AbonStruct)):
-            ip_list_entity = self.find_ip(ip, LIST_USERS_ALLOWED)
-            if ip_list_entity:
-                self.remove_ip(ip_list_entity.get('=.id'))
+        for user in users:
+            if isinstance(user, AbonStruct):
+                for ip in user.ips:
+                    ip_list_entity = self.find_ip(ip, LIST_USERS_ALLOWED)
+                    if ip_list_entity:
+                        self.remove_ip(ip_list_entity.get('=.id'))
 
     def add_user(self, user: AbonStruct, *args):
-        if not isinstance(user.ip, IpStruct):
-            raise TypeError
         if user.tariff is None:
             return
         if not isinstance(user.tariff, TariffStruct):
             raise TypeError
-        try:
-            self.add_queue(user)
-        except (NasNetworkError, NasFailedResult) as e:
-            print('Error:', e)
-        try:
-            self.add_ip(LIST_USERS_ALLOWED, user.ip)
-        except (NasNetworkError, NasFailedResult) as e:
-            print('Error:', e)
+        self.add_queue(user)
+        for ip in user.ips:
+            if not isinstance(ip, IpStruct):
+                raise TypeError
+            self.add_ip(LIST_USERS_ALLOWED, ip)
 
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
-        firewall_ip_list_obj = self.find_ip(user.ip, LIST_USERS_ALLOWED)
-        if firewall_ip_list_obj:
-            self.remove_ip(firewall_ip_list_obj.get('=.id'))
+        firewall_ip_list_ids = (self.find_ip(ip, LIST_USERS_ALLOWED).get('=.id') for ip in user.ips)
+        self.remove_ip_range(firewall_ip_list_ids)
 
     def update_user(self, user: AbonStruct, *args):
-        if not isinstance(user.ip, IpStruct):
-            raise TypeError
-        find_res = self.find_ip(user.ip, LIST_USERS_ALLOWED)
+        # queue is instance of AbonStruct
         queue = self.find_queue('uid%d' % user.uid)
-        if not user.is_active:
-            # если не активен - то и обновлять не надо
-            # но и выключить на всяк случай надо, а то вдруг был включён
-            if find_res:
-                # и если найден был - то удалим ip из разрешённых
-                self.remove_ip(find_res.get('=.id'))
-            if queue is not None:
-                self.remove_queue(user)
-            return
+        for ip in user.ips:
+            if not isinstance(ip, IpStruct):
+                raise TypeError
+            nas_ip = self.find_ip(ip, LIST_USERS_ALLOWED)
+            if user.is_access:
+                if nas_ip is None:
+                    self.add_ip(LIST_USERS_ALLOWED, ip)
+            else:
+                # если не активен - то и обновлять не надо
+                # но и выключить на всяк случай надо, а то вдруг был включён
+                if nas_ip:
+                    # и если найден был - то удалим ip из разрешённых
+                    self.remove_ip(nas_ip.get('=.id'))
+                if queue is not None:
+                    self.remove_queue(user, queue)
+                queue = None
 
         # если нет услуги то её не должно быть и в nas
         if user.tariff is None:
             if queue is not None:
-                self.remove_queue(user)
+                self.remove_queue(user, queue)
             return
-
-        # если не найден
-        if find_res is None:
-            # добавим запись об абоненте
-            self.add_ip(LIST_USERS_ALLOWED, user.ip)
+        if not user.is_access:
+            return
 
         # Проверяем шейпер
         if queue is None:
@@ -470,15 +467,15 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
     def remove_tariff(self, tid: int):
         pass
 
-    def read_users(self) -> Iterable[AbonStruct]:
+    def read_users(self) -> VectorAbon:
         # shapes is ShapeItem
-        allowed_ips = set(self.read_ips_iter(LIST_USERS_ALLOWED))
-        queues = tuple(q for q in self.read_queue_iter() if q.ip in allowed_ips)
-
-        ips_from_queues = set((q.ip, q) for q in queues)
+        allowed_ips = tuple(self.read_ips_iter(LIST_USERS_ALLOWED))
+        queues = tuple(q for q in self.read_queue_iter() if set(q.ips).issubset(allowed_ips))
+        # TODO: Make clean old ip addresses in other place
+        #ips_from_queues = set((q.ip, q) for q in queues)
 
         # delete ip addresses that are in firewall/address-list and there are no corresponding in queues
-        diff = tuple(allowed_ips - ips_from_queues)
-        if len(diff) > 0:
-            self.remove_ip_range(diff)
+        #diff = tuple(allowed_ips - ips_from_queues)
+        #if len(diff) > 0:
+        #    self.remove_ip_range(diff)
         return queues

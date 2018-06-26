@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db import transaction
 from django.db.models import signals
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
+from ip_pool.models import IpLeaseModel
 from agent import Transmitter, NasNetworkError, NasFailedResult
 from djing.lib import LogicError
 
@@ -48,6 +49,10 @@ def main():
         .prefetch_related('account', 'periodic_pay')
     for pay in ppays:
         pay.payment_for_service(now=now)
+
+    # Remove old inactive ip leases
+    old_leases = IpLeaseModel.objects.expired()
+    old_leases.delete()
 
 
 if __name__ == "__main__":

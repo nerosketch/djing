@@ -27,7 +27,7 @@
         {% with can_ch_net=perms.ip_pool.change_networkmodel %}
         {% for netw in networks_list %}
             <tr>
-                <td><a href="{% url 'ip_pool:ip_list' netw.id %}">{{ netw }}</a></td>
+                <td><a href="{% url 'ip_pool:ip_leases_list' netw.id %}">{{ netw }}</a></td>
                 <td>{{ netw.work_range_start_ip }}</td>
                 <td>{{ netw.work_range_end_ip }}</td>
                 <td class="btn-group btn-group-sm btn-group-justified">
@@ -42,7 +42,7 @@
                             <span class="hidden-xs hidden-sm">{% trans 'Edit' %}</span>
                         </a>
                     {% endif %}
-                    <a href="{% url 'ip_pool:ip_list' netw.pk %}" class="btn btn-default">
+                    <a href="{% url 'ip_pool:ip_leases_list' netw.pk %}" class="btn btn-default">
                         <span class="glyphicon glyphicon-eye-open"></span>
                         <span class="hidden-xs hidden-sm">{% trans 'View employed' %}</span>
                     </a>

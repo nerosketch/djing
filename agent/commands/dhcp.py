@@ -2,6 +2,7 @@ from typing import Optional
 from django.core.exceptions import MultipleObjectsReturned
 from abonapp.models import Abon
 from devapp.models import Device, Port
+from ip_pool.models import IpLeaseModel
 
 
 def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: int) -> Optional[str]:
@@ -16,11 +17,16 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
         else:
             abon = Abon.objects.get(device=dev)
         if not abon.is_dynamic_ip:
-            print('D:', 'User settings is not dynamic')
-            return
-        if abon.ip_address != client_ip:
-            abon.ip_address = client_ip
-            abon.save(update_fields=('ip_address',))
+            return 'User settings is not dynamic'
+        existed_client_ips = tuple(l.ip for l in abon.ip_addresses.all())
+        if client_ip not in existed_client_ips:
+            lease = IpLeaseModel.objects.create_from_ip(
+                ip=client_ip,
+            )
+            if lease is None:
+                return 'Subnet not found'
+            abon.ip_addresses.add(lease)
+            abon.save()
             if abon.is_access():
                 abon.sync_with_nas(created=False)
             else:
@@ -38,15 +44,18 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
         return 'MultipleObjectsReturned:' + ' '.join((type(e), e, str(switch_port)))
 
 
-def dhcp_expiry(client_ip) -> Optional[str]:
+def dhcp_expiry(client_ip: str) -> Optional[str]:
     try:
-        abon = Abon.objects.get(ip_address=client_ip)
-        abon.ip_address = None
-        abon.save(update_fields=('ip_address',))
+        lease = IpLeaseModel.objects.get(ip=client_ip)
+        lease.is_active = False
+        lease.save(update_fields=('is_active',))
+        abon = Abon.objects.filter(ip_addresses=lease).first()
+        if abon is None:
+            return "Subscriber with ip %s does not exist" % client_ip
         abon.sync_with_nas(created=False)
-    except Abon.DoesNotExist:
-        return "Subscriber with ip %s does not exist" % client_ip
+    except IpLeaseModel.DoesNotExist:
+        pass
 
 
-def dhcp_release(client_ip) -> Optional[str]:
+def dhcp_release(client_ip: str) -> Optional[str]:
     return dhcp_expiry(client_ip)

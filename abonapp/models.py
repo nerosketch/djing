@@ -1,9 +1,9 @@
 from datetime import datetime
+from ipaddress import ip_address
 from typing import Optional
 
 from django.conf import settings
 from django.core import validators
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
 from django.db.models.signals import post_delete, pre_delete, post_init
@@ -15,7 +15,8 @@ from django.utils.translation import ugettext_lazy as _, gettext
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
-from djing.lib import ip2int, LogicError
+from djing.lib import LogicError
+from ip_pool.models import IpLeaseModel
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
@@ -92,7 +93,8 @@ class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
-    ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
+    ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
+    # ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
@@ -213,23 +215,24 @@ class Abon(BaseAccount):
 
     # make subscriber from agent structure
     def build_agent_struct(self):
-        if self.ip_address:
-            user_ip = ip2int(self.ip_address)
-        else:
+        abon_addresses = tuple(ip_address(i.ip) for i in self.ip_addresses.filter(is_active=True))
+        if not abon_addresses:
             return
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
-            return
-        trf = abon_tariff.tariff
-        agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
-        return AbonStruct(self.pk, user_ip, agent_trf, bool(self.is_active))
+            agent_trf = None
+        else:
+            trf = abon_tariff.tariff
+            agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
+        return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
 
-    def clean(self):
-        # check if ip address already busy
-        if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
-                pk=self.pk).count() > 0:
-            raise ValidationError({'ip_address': (gettext('Ip address already exist'),)})
-        return super(Abon, self).clean()
+    # def clean(self):
+    #     # check if ip address already busy
+    #     abon_addresses = tuple(p.ip for p in self.ip_addresses.all().iterator())
+    #     if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
+    #             pk=self.pk).count() > 0:
+    #         raise ValidationError({'ip_address': (gettext('Ip address already exist'),)})
+    #     return super(Abon, self).clean()
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()
@@ -244,6 +247,13 @@ class Abon(BaseAccount):
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
+
+    # def disable_on_nas(self):
+    #     agent_abon = self.build_agent_struct()
+    #     if agent_abon is None:
+    #         return
+    #     tm = Transmitter()
+    #     tm.remove_user(agent_abon)
 
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)

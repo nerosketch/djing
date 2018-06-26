@@ -39,6 +39,7 @@ class PeoplesListView(BaseOrderedFilteringList):
     template_name = 'abonapp/peoples.html'
 
     def get_queryset(self):
+        # TODO: optimize that query
         street_id = lib.safe_int(self.request.GET.get('street'))
         gid = lib.safe_int(self.kwargs.get('gid'))
         peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
@@ -48,10 +49,11 @@ class PeoplesListView(BaseOrderedFilteringList):
             peoples_list = peoples_list.filter(group__pk=gid)
 
         try:
-            for abon in peoples_list:
-                if abon.ip_address is not None:
+            for abon in peoples_list.iterator():
+                ips = tuple(p.ip for p in abon.ip_addresses.filter(is_active=True))
+                if len(ips) > 0:
                     try:
-                        abon.stat_cache = StatCache.objects.get(ip=abon.ip_address)
+                        abon.stat_cache = StatCache.objects.get(ip__in=ips)
                     except StatCache.DoesNotExist:
                         pass
         except lib.LogicError as e:
@@ -438,9 +440,9 @@ def pick_tariff(request, gid, uname):
 @permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uname, abon_tariff_id):
     try:
-        abon = get_object_or_404(models.Abon, username=uname)
+        #abon = get_object_or_404(models.Abon, username=uname)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
-        abon.sync_with_nas(created=False)
+        #abon.disable_on_nas()
         abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
@@ -938,18 +940,18 @@ def abon_export(request, gid):
     }, request=request)
 
 
-@login_required
-@permission_required('abonapp.change_abon')
-@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-@json_view
-def reset_ip(request, gid, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    abon.ip_address = None
-    abon.save(update_fields=('ip_address',))
-    return {
-        'status': 0,
-        'dat': "<span class='glyphicon glyphicon-refresh'></span>"
-    }
+# @login_required
+# @permission_required('abonapp.change_abon')
+# @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
+# @json_view
+# def reset_ip(request, gid, uname):
+#     abon = get_object_or_404(models.Abon, username=uname)
+#     abon.ip_address = None
+#     abon.save(update_fields=('ip_address',))
+#     return {
+#         'status': 0,
+#         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
+#     }
 
 
 @login_required
@@ -1040,6 +1042,23 @@ class EditSibscriberMarkers(UpdateView):
         return v
 
 
+@login_required
+@lib.decorators.only_admins
+def user_session_toggle(request, gid, uname, lease_id, action=None):
+    abon = get_object_or_404(models.Abon, username=uname)
+    lease = abon.ip_addresses.get(pk=lease_id)
+    if action == 'free':
+        lease.free()
+    elif action == 'start':
+        lease.start()
+    err = abon.sync_with_nas(created=False)
+    if err is not None:
+        messages.error(request, err)
+    else:
+        messages.success(request, _('Ip lease has been freed'))
+    return redirect('abonapp:abon_home', gid, uname)
+
+
 # API's
 @login_required
 @lib.decorators.only_admins
@@ -1048,7 +1067,7 @@ def abons(request):
     ablist = ({
         'id': abn.pk,
         'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
-        'ip': lib.ip2int(abn.ip_address),
+        'ips': ','.join(str(i.ip) for i in abn.ip_addresses.filter(is_active=True)),
         'is_active': abn.is_active
     } for abn in models.Abon.objects.all())
 

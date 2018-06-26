@@ -5,7 +5,6 @@ from random import choice
 from string import digits, ascii_lowercase
 from . import models
 from django.conf import settings
-from djing import IP_ADDR_REGEX
 
 
 def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
@@ -42,8 +41,8 @@ class AbonForm(forms.ModelForm):
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
-        if instance is not None and instance.is_dynamic_ip:
-            self.fields['ip_address'].widget.attrs['readonly'] = True
+        #if instance is not None and instance.is_dynamic_ip:
+        #    self.fields['ip_address'].widget.attrs['readonly'] = True
 
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
                                widget=forms.TextInput(attrs={
@@ -56,13 +55,13 @@ class AbonForm(forms.ModelForm):
         'type': 'password', 'autocomplete': 'new-password'
     }), label=_('Password'))
 
-    ip_address = forms.CharField(widget=forms.TextInput(attrs={
-        'pattern': IP_ADDR_REGEX
-    }), label=_('Ip Address'), required=False)
+    # ip_address = forms.CharField(widget=forms.TextInput(attrs={
+    #     'pattern': IP_ADDR_REGEX
+    # }), label=_('Ip Address'), required=False)
 
     class Meta:
         model = models.Abon
-        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'ip_address')
+        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active')
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),
@@ -72,8 +71,7 @@ class AbonForm(forms.ModelForm):
                 'placeholder': _('telephone placeholder'),
                 'pattern': getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
             }),
-            'description': forms.Textarea(attrs={'rows': '4'}),
-            'is_active': forms.NullBooleanSelect(attrs={'class': 'form-control'})
+            'description': forms.Textarea(attrs={'rows': '4'})
         }
 
     def save(self, commit=True):
@@ -141,7 +139,7 @@ class ExportUsersForm(forms.Form):
     FIELDS_CHOICES = (
         ('username', _('profile username')),
         ('fio', _('fio')),
-        ('ip_address', _('Ip Address')),
+        #('ip_address', _('Ip Address')),
         ('description', _('Comment')),
         ('street__name', _('Street')),
         ('house', _('House')),

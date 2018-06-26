@@ -8,11 +8,11 @@
 
         var net_inp = this.find('#id_network');
         var mask_inp = this.find('#id_mask');
-        /*var wrsi = this.children('#id_work_range_start_ip');
-        var wrei = this.children('#id_work_range_end_ip');*/
 
         var validate_ip_by_key = function(){
             var v = this.value;
+            if(v === undefined)
+                return;
             var o = $(this).closest('.form-group-sm,.form-group');
             o.removeClass('has-error has-success');
             if(v.match(IP4_REG) !== null){
@@ -25,8 +25,7 @@
             }else
                 o.addClass('has-error');
         };
-        var validate_ip_by_focus_lost = function(){
-            console.log('Lost');
+        var validate_ip_by_focus = function(){
             var v = this.value;
             if(v.includes('/')){
                 var chunks = v.split('/');
@@ -38,8 +37,15 @@
             }else {
                 settings.res_label.text(v + '/' + mask_inp.val());
             }
+            $(this).trigger('keyup');
         };
-        net_inp.on('keyup', validate_ip_by_key).on('focusout', validate_ip_by_focus_lost);
+        net_inp.on('keyup focusin', validate_ip_by_key);
+        net_inp.on('focusout', validate_ip_by_focus);
+
+        var validate_mask = function(){
+
+        };
+        mask_inp.on('change', validate_mask);
     };
 })(jQuery);
 

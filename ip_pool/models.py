@@ -1,34 +1,25 @@
-from typing import Optional
+from datetime import timedelta
+from ipaddress import ip_network, ip_address
 
+from django.conf import settings
 from django.shortcuts import resolve_url
-from netaddr import IPNetwork, IPAddress
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+
+from djing.fields import MACAddressField
+from ip_pool.fields import GenericIpAddressWithPrefix
 
 
 class NetworkModel(models.Model):
     _netw_cache = None
 
-    network = models.GenericIPAddressField(
+    network = GenericIpAddressWithPrefix(
         verbose_name=_('IP network'),
         help_text=_('Ip address of network. For example: 192.168.1.0 or fde8:6789:1234:1::'),
         unique=True
     )
-    mask = models.PositiveSmallIntegerField(
-        _('Mask'),
-        help_text=_('Net mask bits length for ipv4 or prefix length for ipv6'),
-        default=24,
-    )
-    work_range_start_ip = models.GenericIPAddressField(
-        verbose_name=_('Work range start ip'),
-        help_text=_('For example 192.168.1.2, this is first ip that may be used')
-    )
-    work_range_end_ip = models.GenericIPAddressField(
-        verbose_name=_('Work range end ip'),
-        help_text=_('Ip may be used until 192.168.1.254')
-    )
-
     NETWORK_KINDS = (
         ('inet', _('Internet')),
         ('guest', _('Guest')),
@@ -37,17 +28,14 @@ class NetworkModel(models.Model):
         ('admin', _('Admin'))
     )
     kind = models.CharField(_('Kind of network'), max_length=6, choices=NETWORK_KINDS, default='guest')
-
     description = models.CharField(_('Description'), max_length=64)
 
     def __str__(self):
-        return "%s: %s/%d" % (self.description, self.network, self.mask)
+        return "%s: %s" % (self.description, self.network)
 
-    def get_network(self) -> IPNetwork:
+    def get_network(self):
         if self._netw_cache is None:
-            self._netw_cache = IPNetwork(self.network)
-            if self.mask:
-                self._netw_cache.prefixlen = self.mask
+            self._netw_cache = ip_network(self.network)
         return self._netw_cache
 
     def get_absolute_url(self):
@@ -60,28 +48,61 @@ class NetworkModel(models.Model):
         ordering = ('description',)
 
 
-class EmployedIpManager(models.Manager):
+class IpLeaseManager(models.Manager):
 
-    def get_free_ip(self, network: NetworkModel) -> Optional[IPAddress]:
-        netw = IPNetwork(network)
+    def get_free_ip(self, network: NetworkModel):
+        netw = ip_network(network)
         employed_ip_queryset = self.filter(network=network)
-        free_ip = next(IPAddress(net) for ip, net in zip(
+        free_ip = next(ip_address(net) for ip, net in zip(
             employed_ip_queryset, netw
         ) if ip != net)
         return free_ip
 
+    def create_from_ip(self, ip: str, cidr_subnet: int):
+        # FIXME: get subnet
+        raise NotImplementedError
+        net = ip_network((ip, cidr_subnet), strict=False)
+        netw_instance = NetworkModel.objects.filter(network=str(net)).first()
+        if netw_instance is not None:
+            return self.create(
+                ip=ip,
+                network=netw_instance,
+                is_dynamic=True,
+                is_active=True
+            )
 
-class EmployedIpModel(models.Model):
+    def expired(self):
+        lease_live_time = getattr(settings, 'LEASE_LIVE_TIME')
+        if lease_live_time is None:
+            raise ImproperlyConfigured('You must specify LEASE_LIVE_TIME in settings')
+        senility = now() - timedelta(seconds=lease_live_time)
+        return self.filter(lease_time__lt=senility, is_active=False)
+
+
+class IpLeaseModel(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True)
     network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE, verbose_name=_('Parent network'))
+    lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
+    is_dynamic = models.BooleanField(_('Is dynamic'), default=False)
+    is_active = models.BooleanField(_('Is active'), default=True)
 
-    objects = EmployedIpManager()
+    objects = IpLeaseManager()
 
     def __str__(self):
         return self.ip
 
+    def free(self):
+        if self.is_active:
+            self.is_active = False
+            self.save(update_fields=('is_active',))
+
+    def start(self):
+        if not self.is_active:
+            self.is_active = True
+            self.save(update_fields=('is_active',))
+
     def clean(self):
-        ip = IPAddress(self.ip)
+        ip = ip_address(self.ip)
         network = self.network.get_network()
 
         if ip not in network:
@@ -90,14 +111,15 @@ class EmployedIpModel(models.Model):
                 'net': network
             }, code='invalid')
 
-        start_allowed_ip = IPAddress(self.network.work_range_start_ip)
-        end_allowed_ip = IPAddress(self.network.work_range_end_ip)
-        if not start_allowed_ip <= ip <= end_allowed_ip:
-            raise ValidationError(_('Ip address that you entered is not in work range'), code='invalid')
-
     class Meta:
         db_table = 'ip_pool_employed_ip'
         verbose_name = _('Employed ip')
         verbose_name_plural = _('Employed ip addresses')
         ordering = ('-id',)
         unique_together = ('ip', 'network')
+
+
+# class LeasesHistory(models.Model):
+#     ip = models.GenericIPAddressField(verbose_name=_('Ip address'))
+#     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
+#     mac_addr = MACAddressField(_('Mac address'), null=True, blank=True)

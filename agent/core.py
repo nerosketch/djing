@@ -74,7 +74,7 @@ class BaseTransmitter(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def read_users(self) -> Iterable[AbonStruct]:
+    def read_users(self) -> VectorAbon:
         pass
 
     def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:

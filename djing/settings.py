@@ -212,3 +212,8 @@ BOOTSTRAP3 = {
     # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
 }
+
+# Inactive ip lease time in seconds.
+# If lease time more than time of create, and lease is inactive
+# then delete it. Used in ip_pool app.
+LEASE_LIVE_TIME = 86400

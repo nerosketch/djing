@@ -64,27 +64,30 @@ class TariffStruct(BaseStruct):
 
 # Абонент из базы
 class AbonStruct(BaseStruct):
-    __slots__ = ('uid', 'ip', 'tariff', 'is_active', 'queue_id')
+    __slots__ = ('uid', 'ips', 'tariff', 'is_access', 'queue_id')
 
-    def __init__(self, uid=0, ip=None, tariff=None, is_active=True):
+    def __init__(self, uid=0, ips=None, tariff=None, is_access=True):
         self.uid = int(uid or 0)
-        self.ip = IpStruct(ip)
+        if ips is None:
+            self.ips = ()
+        else:
+            self.ips = tuple(IpStruct(ip) for ip in ips)
         self.tariff = tariff
-        self.is_active = is_active
+        self.is_access = is_access
         self.queue_id = 0
 
     def __eq__(self, other):
         if not isinstance(other, AbonStruct):
             raise TypeError
-        r = self.uid == other.uid and self.ip == other.ip
+        r = self.uid == other.uid and self.ips == other.ips
         r = r and self.tariff == other.tariff
         return r
 
     def __str__(self):
-        return "uid=%d, ip=%s, tariff=%s" % (self.uid, self.ip, self.tariff or '<No Service>')
+        return "uid=%d, ips=[%s], tariff=%s" % (self.uid, ';'.join(self.ips), self.tariff or '<No Service>')
 
     def __hash__(self):
-        return hash(int(self.ip) + hash(self.tariff)) if self.tariff is not None else 0
+        return hash(hash(self.ips) + hash(self.tariff)) if self.tariff is not None else 0
 
 
 # Правило шейпинга в фаере, или ещё можно сказать услуга абонента на NAS
