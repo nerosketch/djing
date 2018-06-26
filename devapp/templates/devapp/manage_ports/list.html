@@ -27,7 +27,7 @@
                             {% else %}
                                 <td>{{ port.num_abons }}</td>
                             {% endif %}
-                            <td class="btn-group btn-group-sm">
+                            <td class="btn-group btn-group-sm btn-group-justified">
                                 <a href="{% url 'devapp:show_subscriber_on_port' gid did port.id %}" class="btn btn-default btn-modal" title="{% trans 'Show subscriber on port' %}" data-toggle="tooltip">
                                     <span class="glyphicon glyphicon-eye-open"></span>
                                 </a>

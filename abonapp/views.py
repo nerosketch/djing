@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from django.contrib.gis.shortcuts import render_to_text
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
@@ -590,7 +590,8 @@ def clear_dev(request, gid, uname):
         abon = models.Abon.objects.get(username=uname)
         abon.device = None
         abon.dev_port = None
-        abon.save(update_fields=('device', 'dev_port'))
+        abon.is_dynamic_ip = False
+        abon.save(update_fields=('device', 'dev_port', 'is_dynamic_ip'))
         messages.success(request, _('Device has successfully unattached'))
     except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
@@ -1025,6 +1026,13 @@ class EditSibscriberMarkers(UpdateView):
     def get_object(self, queryset=None):
         obj = models.Abon.objects.get(username=self.kwargs.get('uname'))
         return obj
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(EditSibscriberMarkers, self).dispatch(request, *args, **kwargs)
+        except ValidationError as e:
+            messages.error(request, e)
+            return self.render_to_response(self.get_context_data())
 
     def get_context_data(self, **kwargs):
         context = super(EditSibscriberMarkers, self).get_context_data(**kwargs)

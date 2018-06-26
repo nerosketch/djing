@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load dpagination %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">
@@ -9,7 +10,7 @@
 {% endblock %}
 
 {% block page-header %}
-    <h3>{% trans 'User groups' %}</h3>
+    {% trans 'User groups' %}
 {% endblock %}
 
 {% block main %}
@@ -19,7 +20,7 @@
             <tr>
                 <th width="50">#</th>
                 <th>
-                    <a href="{% url 'abonapp:group_list' %}?order_by=title&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'abonapp:group_list' %}?{% url_order_by request order_by='title' %}">
                         {% trans 'Group title' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}

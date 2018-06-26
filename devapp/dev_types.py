@@ -311,6 +311,7 @@ class EltexPort(BasePort):
 class EltexSwitch(DLinkDevice):
     description = _('Eltex switch')
     is_use_device_port = False
+    has_attachable_to_subscriber = True
 
     def get_ports(self) -> ListOrError:
         res = []

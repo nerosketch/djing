@@ -93,6 +93,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'globaltags': 'djing.templatetags.globaltags',
+                'dpagination': 'djing.templatetags.dpagination'
             }
         },
     },

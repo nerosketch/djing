@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load dpagination %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">
@@ -22,7 +23,7 @@
                 <th width="50">#</th>
                 <th width="50">{% trans 'TeCo' %}</th>
                 <th>
-                    <a href="{% url 'group_app:group_list' %}?order_by=title&dir={{ dir|default:'down' }}">
+                    <a href="{% url 'group_app:group_list' %}?{% url_order_by request order_by='title' %}">
                         {% trans 'Title' %}
                     </a>
                     {% if order_by == 'title' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}

@@ -21,20 +21,20 @@
             <tr>
                 <th>#</th>
                 <th class="col-md-2">
-                    <a href="{% url 'devapp:devs' group.pk %}?{% url_replace request order_by='ip_address' dir=dir|default:'down' %}">
+                    <a href="{% url 'devapp:devs' group.pk %}?{% url_order_by request order_by='ip_address' %}">
                         {% trans 'Ip address' %}
                     </a>
                     {% if order_by == 'ip_address' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-md-5">
-                    <a href="{% url 'devapp:devs' group.pk %}?{% url_replace request order_by='comment' dir=dir|default:'down' %}">
+                    <a href="{% url 'devapp:devs' group.pk %}?{% url_order_by request order_by='comment' %}">
                         {% trans 'Comment' %}
                     </a>
                     {% if order_by == 'comment' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
                 <th class="col-md-3">{% trans 'Mac address' %}</th>
                 <th class="col-md-1">
-                    <a href="{% url 'devapp:devs' group.pk %}?{% url_replace request order_by='devtype' dir=dir|default:'down' %}">
+                    <a href="{% url 'devapp:devs' group.pk %}?{% url_order_by request order_by='devtype' %}">
                         {% trans 'Device type' %}
                     </a>
                     {% if order_by == 'devtype' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}

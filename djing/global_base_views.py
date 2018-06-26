@@ -80,14 +80,6 @@ class OrderingMixin(object):
     def get_context_data(self, **kwargs):
         context = super(OrderingMixin, self).get_context_data(**kwargs)
         context['order_by'] = self.request.GET.get('order_by')
-        direction = self.request.GET.get('dir')
-        if direction == 'down':
-            direction = 'up'
-        elif direction == 'up':
-            direction = 'down'
-        else:
-            direction = ''
-        context['dir'] = direction
         return context
 
     def get_ordering(self):
@@ -149,5 +141,5 @@ class BaseListWithFiltering(RedirectWhenErrorMixin, ListView):
             })
 
 
-class BaseOrderedFilteringList(OrderingMixin, BaseListWithFiltering):
+class OrderedFilteredList(OrderingMixin, BaseListWithFiltering):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)

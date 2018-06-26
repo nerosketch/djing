@@ -51,18 +51,18 @@
                 <a href="{{ client_side_services }}">{% trans 'Services' %}</a>
                 </li>
 
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Language' %} <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        {% url 'set_language' as set_language_url %}
-                        {% for lang in LANGUAGES %}
-                        <li><a href="#" id="langfrm_{{ lang.0 }}" onclick="document.setLang{{ lang.0 }}.submit();">{{ lang.1 }}</a></li>
-                        <form name="setLang{{ lang.0}}" action="{{ set_language_url }}" method="POST" class="hidden">{% csrf_token %}
-                            <input type="hidden" name="language" value="{{ lang.0 }}">
-                        </form>
-                        {% endfor %}
-                    </ul>
-                </li>
+{#                <li class="dropdown">#}
+{#                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Language' %} <b class="caret"></b></a>#}
+{#                    <ul class="dropdown-menu">#}
+{#                        {% url 'set_language' as set_language_url %}#}
+{#                        {% for lang in LANGUAGES %}#}
+{#                        <li><a href="#" id="langfrm_{{ lang.0 }}" onclick="document.setLang{{ lang.0 }}.submit();">{{ lang.1 }}</a></li>#}
+{#                        <form name="setLang{{ lang.0}}" action="{{ set_language_url }}" method="POST" class="hidden">{% csrf_token %}#}
+{#                            <input type="hidden" name="language" value="{{ lang.0 }}">#}
+{#                        </form>#}
+{#                        {% endfor %}#}
+{#                    </ul>#}
+{#                </li>#}
 
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
