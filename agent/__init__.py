@@ -6,4 +6,5 @@ from .structs import TariffStruct, AbonStruct
 # Transmitter мы будем импортировать в других местах
 # Тут надо указать какой у нас будет NAS
 # т.е. какой класс будет управлять доступом в интернет
+# TODO: Transmitter can be lazy init
 Transmitter = MikrotikTransmitter

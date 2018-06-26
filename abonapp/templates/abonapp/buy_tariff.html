@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
-{% block main %}
 
+{% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
@@ -9,8 +9,11 @@
         <li><a href="{% url 'abonapp:abon_home' group.pk abon.username %}">{{ abon.fio }}</a></li>
         <li class="active">{% trans 'Pick a service' %}</li>
     </ol>
+{% endblock %}
 
-    {% include 'message_block.html' %}
+{% block page-header %}{% trans 'Pick a service' %}{% endblock %}
+
+{% block main %}
 
     <div class="panel panel-default">
         <div class="panel-heading">

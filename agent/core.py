@@ -82,7 +82,7 @@ class BaseTransmitter(metaclass=ABCMeta):
         :param users_from_db: QuerySet of all subscribers that can have service
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
-        users_struct_list = [ab.build_agent_struct() for ab in users_from_db if ab.is_access()]
+        users_struct_list = (ab.build_agent_struct() for ab in users_from_db if ab.is_access())
         users_struct_set = set([ab for ab in users_struct_list if ab is not None and ab.tariff is not None])
         users_from_nas = set(self.read_users())
         list_for_del = (users_struct_set ^ users_from_nas) - users_struct_set

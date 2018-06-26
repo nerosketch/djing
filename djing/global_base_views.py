@@ -1,3 +1,4 @@
+from ipaddress import ip_address, ip_network
 from json import dumps
 
 from django.utils.decorators import method_decorator
@@ -6,7 +7,6 @@ from django.http.response import HttpResponseForbidden, Http404, HttpResponseRed
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.views.generic import ListView
-from netaddr import IPNetwork, IPAddress
 from django.core.paginator import InvalidPage, EmptyPage
 from djing.lib.decorators import hash_auth_view
 
@@ -50,17 +50,17 @@ class AllowedSubnetMixin(object):
         Check if user ip in allowed subnet.
         Return 403 denied otherwise.
         """
-        ip = IPAddress(request.META.get('REMOTE_ADDR'))
+        ip = ip_address(request.META.get('REMOTE_ADDR'))
         api_auth_subnet = getattr(settings, 'API_AUTH_SUBNET')
         if type(api_auth_subnet) is str:
-            if ip in IPNetwork(api_auth_subnet):
+            if ip in ip_network(api_auth_subnet):
                 return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         try:
             for subnet in api_auth_subnet:
-                if ip in IPNetwork(subnet):
+                if ip in ip_network(subnet):
                     return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         except TypeError:
-            if ip in IPNetwork(str(api_auth_subnet)):
+            if ip in ip_network(str(api_auth_subnet)):
                 return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         return HttpResponseForbidden('Access Denied')
 

@@ -39,9 +39,9 @@ class NetworkUpdateView(UpdateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class IpEmployedListView(BaseOrderedFilteringList):
-    template_name = 'ip_pool/employed_ip_list.html'
-    model = models.EmployedIpModel
+class IpLeasesListView(BaseOrderedFilteringList):
+    template_name = 'ip_pool/ip_leases_list.html'
+    model = models.IpLeaseModel
 
     def get_context_data(self, **kwargs):
         net_id = self.kwargs.get('net_id')
