@@ -291,12 +291,13 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
     def remove_queue_range(self, q_ids: Iterable[str]):
         self._exec_cmd(('/queue/simple/remove', '=numbers=' + ','.join(q_ids)))
 
-    def update_queue(self, user: AbonStruct):
+    def update_queue(self, user: AbonStruct, queue=None):
         if not isinstance(user, AbonStruct):
             raise TypeError
         if user.tariff is None:
             return
-        queue = self.find_queue('uid%d' % user.uid)
+        if queue is None:
+            queue = self.find_queue('uid%d' % user.uid)
         if queue is None:
             return self.add_queue(user)
         else:
@@ -338,7 +339,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
     def remove_ip(self, mk_id):
         return self._exec_cmd((
             '/ip/firewall/address-list/remove',
-            '=.id=*' + str(mk_id).replace('*', '')
+            '=.id=%s' % mk_id
         ))
 
     def remove_ip_range(self, ip_firewall_ids: Iterable[str]):
@@ -479,3 +480,21 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos):
         #if len(diff) > 0:
         #    self.remove_ip_range(diff)
         return queues
+
+    def lease_free(self, user: AbonStruct, lease: IpStruct):
+        ip = self.find_ip(lease, LIST_USERS_ALLOWED)
+        if ip is not None:
+            self.remove_ip(ip.get('=.id'))
+        queue = self.find_queue('uid%d' % user.uid)
+        if queue is not None:
+            user.ips = tuple(i for i in user.ips if i != lease)
+            self.update_queue(user, queue)
+
+    def lease_start(self, user: AbonStruct, lease: IpStruct):
+        ip = self.find_ip(lease, LIST_USERS_ALLOWED)
+        if ip is None:
+            self.add_ip(LIST_USERS_ALLOWED, lease)
+        queue = self.find_queue('uid%d' % user.uid)
+        if queue is not None:
+            user.ips += lease,
+            self.update_queue(user, queue)

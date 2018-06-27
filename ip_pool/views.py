@@ -6,12 +6,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView
 
 from guardian.decorators import permission_required_or_403 as permission_required
-from djing.global_base_views import BaseOrderedFilteringList
+from djing.global_base_views import OrderedFilteredList
 from ip_pool import models, forms
 
 
 @method_decorator(login_required, name='dispatch')
-class NetworksListView(BaseOrderedFilteringList):
+class NetworksListView(OrderedFilteredList):
     device_kind_code = None
     template_name = 'ip_pool/network_list.html'
     context_object_name = 'networks_list'
@@ -39,7 +39,7 @@ class NetworkUpdateView(UpdateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class IpLeasesListView(BaseOrderedFilteringList):
+class IpLeasesListView(OrderedFilteredList):
     template_name = 'ip_pool/ip_leases_list.html'
     model = models.IpLeaseModel
 

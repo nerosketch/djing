@@ -17,9 +17,9 @@
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
-            <th class="col-sm-5">{% trans 'Network' %}</th>
-            <th class="col-sm-3">{% trans 'Work range start ip' %}</th>
-            <th class="col-sm-3">{% trans 'Work range end ip' %}</th>
+            <th class="col-sm-3">{% trans 'Network' %}</th>
+            <th class="col-sm-3">{% trans 'Kind' %}</th>
+            <th class="col-sm-5">{% trans 'Description' %}</th>
             <th class="col-sm-1"></th>
         </tr>
         </thead>
@@ -28,8 +28,8 @@
         {% for netw in networks_list %}
             <tr>
                 <td><a href="{% url 'ip_pool:ip_leases_list' netw.id %}">{{ netw }}</a></td>
-                <td>{{ netw.work_range_start_ip }}</td>
-                <td>{{ netw.work_range_end_ip }}</td>
+                <td>{{ netw.get_kind_display }}</td>
+                <td>{{ netw.description }}</td>
                 <td class="btn-group btn-group-sm btn-group-justified">
                     {% if can_ch_net %}
                         <a href="{% url 'ip_pool:net_edit' netw.pk %}" class="btn btn-primary">

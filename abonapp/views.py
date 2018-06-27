@@ -15,6 +15,7 @@ from django.conf import settings
 from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
+from agent.structs import IpStruct
 from statistics.models import StatCache
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
@@ -30,11 +31,11 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
 from djing import lib
-from djing.global_base_views import BaseOrderedFilteringList, SecureApiView
+from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
-class PeoplesListView(BaseOrderedFilteringList):
+class PeoplesListView(OrderedFilteredList):
     context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
 
@@ -81,7 +82,7 @@ class PeoplesListView(BaseOrderedFilteringList):
 
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
-class GroupListView(BaseOrderedFilteringList):
+class GroupListView(OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
     queryset = Group.objects.annotate(usercount=Count('abon'))
@@ -209,7 +210,7 @@ def abonamount(request, gid, uname):
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
-class DebtsListView(BaseOrderedFilteringList):
+class DebtsListView(OrderedFilteredList):
     context_object_name = 'invoices'
     template_name = 'abonapp/invoiceForPayment.html'
 
@@ -227,7 +228,7 @@ class DebtsListView(BaseOrderedFilteringList):
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
-class PayHistoryListView(BaseOrderedFilteringList):
+class PayHistoryListView(OrderedFilteredList):
     context_object_name = 'pay_history'
     template_name = 'abonapp/payHistory.html'
 
@@ -695,7 +696,7 @@ def abon_ping(request):
 
 
 @method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
-class DialsListView(BaseOrderedFilteringList):
+class DialsListView(OrderedFilteredList):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
 
@@ -1055,15 +1056,18 @@ class EditSibscriberMarkers(UpdateView):
 def user_session_toggle(request, gid, uname, lease_id, action=None):
     abon = get_object_or_404(models.Abon, username=uname)
     lease = abon.ip_addresses.get(pk=lease_id)
+    tm = Transmitter()
+    abon_nas_obj = abon.build_agent_struct()
+    res_text = '#Parameter needed#'
     if action == 'free':
         lease.free()
+        tm.lease_free(abon_nas_obj, IpStruct(lease.ip))
+        res_text = _('Ip lease has been freed')
     elif action == 'start':
         lease.start()
-    err = abon.sync_with_nas(created=False)
-    if err is not None:
-        messages.error(request, err)
-    else:
-        messages.success(request, _('Ip lease has been freed'))
+        tm.lease_start(abon_nas_obj, IpStruct(lease.ip))
+        res_text = _('Ip lease has been started')
+    messages.success(request, res_text)
     return redirect('abonapp:abon_home', gid, uname)
 
 

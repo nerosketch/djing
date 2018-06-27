@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
-from typing import Iterator, Any, Tuple, Optional, Iterable
+from typing import Iterator, Any, Tuple, Optional
 
-from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
+from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff, IpStruct
 
 
 # Raised if NAS has returned failed result
@@ -76,6 +76,20 @@ class BaseTransmitter(metaclass=ABCMeta):
     @abstractmethod
     def read_users(self) -> VectorAbon:
         pass
+
+    @abstractmethod
+    def lease_free(self, user: AbonStruct, lease: IpStruct):
+        """
+        Remove ip lease from allowed to network
+        :return:
+        """
+
+    @abstractmethod
+    def lease_start(self, user: AbonStruct, lease: IpStruct):
+        """
+        Starts ip lease to allowed to network
+        :return:
+        """
 
     def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:
         """

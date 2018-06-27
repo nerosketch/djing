@@ -248,13 +248,6 @@ class Abon(BaseAccount):
             print('ERROR:', e)
             return e
 
-    # def disable_on_nas(self):
-    #     agent_abon = self.build_agent_struct()
-    #     if agent_abon is None:
-    #         return
-    #     tm = Transmitter()
-    #     tm.remove_user(agent_abon)
-
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
 
