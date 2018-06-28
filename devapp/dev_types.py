@@ -334,7 +334,7 @@ class EltexSwitch(DLinkDevice):
                                  self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                                 int(speed),
+                                 int(speed) if speed != 'NOSUCHINSTANCE' else 0,
                                  ))
         return res
 
