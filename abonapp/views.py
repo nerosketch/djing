@@ -191,12 +191,13 @@ class DelAbonDeleteView(DeleteView):
 @transaction.atomic
 def abonamount(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
+    frm = None
     try:
         if request.method == 'POST':
-            abonuname = request.POST.get('abonuname')
-            if abonuname == uname:
-                amnt = lib.safe_float(request.POST.get('amount'))
-                comment = request.POST.get('comment')
+            frm = forms.AmountMoneyForm(request.POST)
+            if frm.is_valid():
+                amnt = frm.cleaned_data.get('amount')
+                comment = frm.cleaned_data.get('comment')
                 if not comment:
                     comment = _('fill account through admin side')
                 abon.add_ballance(request.user, amnt, comment=comment)
@@ -205,6 +206,8 @@ def abonamount(request, gid, uname):
                 return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
             else:
                 messages.error(request, _('I not know the account id'))
+        else:
+            frm = forms.AmountMoneyForm()
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
     except lib.MultipleException as errs:
@@ -212,7 +215,8 @@ def abonamount(request, gid, uname):
             messages.error(request, err)
     return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
-        'group_id': gid
+        'group_id': gid,
+        'form': frm
     }, request=request)
 
 

@@ -178,3 +178,11 @@ class MarkersForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super(MarkersForm, self).save(commit=False)
         return instance.save(update_fields=('markers',))
+
+
+class AmountMoneyForm(forms.Form):
+    amount = forms.FloatField(max_value=50000, label=_('Amount of money'))
+    comment = forms.CharField(max_length=128, label=_('Comment'), required=False)
+
+    def save(self):
+        pass
