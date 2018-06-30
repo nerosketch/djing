@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Iterator, Any, Tuple, Optional
 
 from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff, IpStruct
@@ -15,7 +15,7 @@ class NasNetworkError(Exception):
 
 
 # Communicate with NAS
-class BaseTransmitter(metaclass=ABCMeta):
+class BaseTransmitter(ABC):
     @abstractmethod
     def add_user_range(self, user_list: VectorAbon):
         """add subscribers list to NAS"""
@@ -106,12 +106,6 @@ class BaseTransmitter(metaclass=ABCMeta):
     def sync_nas(self, users_from_db: Iterator):
         list_for_add, list_for_del = self._diff_users(users_from_db)
         if len(list_for_del) > 0:
-            print('FOR DELETE')
-            for ld in list_for_del:
-                print(ld)
             self.remove_user_range(list_for_del)
         if len(list_for_add) > 0:
-            print('FOR ADD')
-            for la in list_for_add:
-                print(la)
             self.add_user_range(list_for_add)

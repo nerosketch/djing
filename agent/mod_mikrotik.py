@@ -1,10 +1,12 @@
 import re
 import socket
 import binascii
+from abc import ABCMeta
 from hashlib import md5
 from ipaddress import ip_network
 from typing import Iterable, Optional, Tuple, Generator, Dict
 
+from djing.lib.decorators import LazyInitMetaclass
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
 from django.conf import settings
@@ -29,8 +31,6 @@ class ApiRos(object):
                 port = local_settings.NAS_PORT
             sk.connect((ip, port or 8728))
             self.sk = sk
-
-        self.currenttag = 0
 
     def login(self, username, pwd):
         if self.is_login:
@@ -172,7 +172,7 @@ class IpAddressListObj(IpStruct):
         self.mk_id = str(mk_id).replace('*', '')
 
 
-class MikrotikTransmitter(BaseTransmitter, ApiRos):
+class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs', (ABCMeta, LazyInitMetaclass), {})):
 
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or getattr(local_settings, 'NAS_IP')
