@@ -15,6 +15,14 @@
             </div>
         </div>
         <input type="hidden" name="abonuname" value="{{ abon.username }}"><br>
+        <div class="form-group-sm">
+            <label for="comment">{% trans 'Comment' %}</label>
+
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-pencil"></span></span>
+                <input id="comment" type="text" name="comment" class="form-control">
+            </div>
+        </div>
 
         <div class="btn-group">
             <button type="submit" class="btn btn-sm btn-primary">

@@ -3,6 +3,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
+from django.http.request import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
@@ -195,7 +196,10 @@ def abonamount(request, gid, uname):
             abonuname = request.POST.get('abonuname')
             if abonuname == uname:
                 amnt = lib.safe_float(request.POST.get('amount'))
-                abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
+                comment = request.POST.get('comment')
+                if not comment:
+                    comment = _('fill account through admin side')
+                abon.add_ballance(request.user, amnt, comment=comment)
                 abon.save(update_fields=('ballance',))
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
                 return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
