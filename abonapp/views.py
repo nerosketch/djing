@@ -1165,8 +1165,7 @@ def search_abon(request):
     if not word:
         return None
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = ({'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results)
-    return results
+    return list({'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results)
 
 
 class DhcpLever(SecureApiView):
