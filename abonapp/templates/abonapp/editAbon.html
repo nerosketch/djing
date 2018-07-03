@@ -37,8 +37,6 @@
                             {% bootstrap_field form.telephone form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
                         {% endwith %}
 
-                        {% bootstrap_field form.is_active form_group_class='form-group-sm' %}
-
                         {# Ip address field #}
 {#                        {% trans 'Reset ip' as tx %}#}
 {#                        {% url 'abonapp:reset_ip' group.pk abon.username as url %}#}
@@ -48,6 +46,7 @@
 
                         {% bootstrap_field form.street form_group_class='form-group-sm' %}
                         {% bootstrap_field form.house form_group_class='form-group-sm' %}
+                        {% bootstrap_field form.is_active form_group_class='form-group-sm' %}
                         {% bootstrap_field form.group form_group_class='form-group-sm' %}
 
 
@@ -82,7 +81,7 @@
                                 {% endif %}
 
                                 {% if perms.taskapp.add_task %}
-                                    <a href="{% url 'taskapp:add' %}?uid={{ abon.username }}" class="btn btn-success" title="{% trans 'Add new task' %}">
+                                    <a href="{% url 'taskapp:add' %}?uname={{ abon.username }}" class="btn btn-success" title="{% trans 'Add new task' %}">
 					                    <span class="glyphicon glyphicon-plus"></span>
                                         {% trans 'Add new task' %}
                                     </a>
@@ -221,7 +220,7 @@
                     {% endfor %}
                 </ul>
                 <div class="panel-footer">
-                    <a href="#" class="btn btn-success btn-sm">
+                    <a href="#" class="btn btn-success btn-sm" {{ abon.is_dynamic_ip|yesno:'disabled,' }}>
                         <span class="glyphicon glyphicon-plus"></span>
                         <span class="hidden-xs">{% trans 'Add' %}</span>
                     </a>

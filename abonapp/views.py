@@ -167,8 +167,8 @@ class DelAbonDeleteView(DeleteView):
         try:
             abon = self.get_object()
             gid = abon.group.id
-            abon.delete()
             abon.sync_with_nas(created=False)
+            abon.delete()
             messages.success(request, _('delete abon success msg'))
             return redirect('abonapp:people_list', gid=gid)
         except NasNetworkError as e:
