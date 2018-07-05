@@ -1,4 +1,6 @@
 from typing import Optional, AnyStr
+
+from astroid import exceptions
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
@@ -64,13 +66,11 @@ class Device(models.Model):
         ordering = ('id',)
 
     def get_manager_klass(self):
-        klasses = next(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
-        if klasses:
-            code, dev_class = klasses
-            if issubclass(dev_class, DevBase):
-                return dev_class
-        raise TypeError('one of types is not subclass of DevBase. '
-                        'Or implementation of that device type is not found')
+        try:
+            return next(klass for code, klass in self.DEVICE_TYPES if code == self.devtype)
+        except StopIteration:
+            raise TypeError('one of types is not subclass of DevBase. '
+                            'Or implementation of that device type is not found')
 
     def get_manager_object(self) -> DevBase:
         man_klass = self.get_manager_klass()
@@ -89,7 +89,9 @@ class Device(models.Model):
     @staticmethod
     def update_dhcp():
         from .onu_register import onu_register
-        onu_register(Device.objects.exclude(group=None).select_related('group').only('mac_addr', 'group__code').iterator())
+        onu_register(
+            Device.objects.exclude(group=None).select_related('group').only('mac_addr', 'group__code').iterator()
+        )
 
     def generate_config_template(self) -> Optional[AnyStr]:
         mng = self.get_manager_object()
