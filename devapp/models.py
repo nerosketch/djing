@@ -88,7 +88,7 @@ class Device(models.Model):
 
     def update_dhcp(self):
         from .onu_register import onu_register
-        onu_register(self.objects.exclude(group=None).iterator())
+        onu_register(Device.objects.exclude(group=None).select_related('group').only('mac_addr', 'group__code').iterator())
 
     def generate_config_template(self) -> Optional[AnyStr]:
         mng = self.get_manager_object()
