@@ -76,7 +76,7 @@ class DeviceDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         res = super().delete(request, *args, **kwargs)
         try:
-            self.object.update_dhcp(remove=True)
+            self.object.update_dhcp()
         except DeviceDBException as e:
             messages.error(request, e)
         messages.success(request, _('Device successfully deleted'))

@@ -1,8 +1,5 @@
-import os
 from typing import Optional, AnyStr
-from subprocess import run
 from django.db import models
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from jsonfield import JSONField
 
@@ -66,12 +63,6 @@ class Device(models.Model):
         verbose_name_plural = _('Devices')
         ordering = ('id',)
 
-    def get_abons(self):
-        pass
-
-    def get_status(self):
-        return self.status
-
     def get_manager_klass(self):
         klasses = next(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
         if klasses:
@@ -95,20 +86,9 @@ class Device(models.Model):
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
-    def update_dhcp(self, remove=False):
-        # FIXME: Remove static list of registrable device types
-        if self.devtype not in ('On', 'Dl', 'Zo'):
-            return
-        if self.group is None:
-            raise DeviceDBException(_('Device does not have a group, please fix that'))
-        code = self.group.code
-        newmac = str(self.mac_addr)
-        filepath = os.path.join(settings.BASE_DIR, 'devapp', 'onu_register.sh')
-        if remove:
-            param = 'del'
-        else:
-            param = 'update'
-        run((filepath, param, newmac, code))
+    def update_dhcp(self):
+        from .onu_register import onu_register
+        onu_register(self.objects.exclude(group=None).iterator())
 
     def generate_config_template(self) -> Optional[AnyStr]:
         mng = self.get_manager_object()
