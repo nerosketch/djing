@@ -86,9 +86,10 @@ class Device(models.Model):
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
-    def update_dhcp(self):
+    @staticmethod
+    def update_dhcp():
         from .onu_register import onu_register
-        onu_register(self.objects.exclude(group=None).iterator())
+        onu_register(Device.objects.exclude(group=None).select_related('group').only('mac_addr', 'group__code').iterator())
 
     def generate_config_template(self) -> Optional[AnyStr]:
         mng = self.get_manager_object()
