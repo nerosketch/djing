@@ -61,6 +61,7 @@ class DLinkPort(BasePort):
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = True
+    tech_code = 'dlink_sw'
     is_use_device_port = True
 
     def __init__(self, dev_instance):
@@ -201,6 +202,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 class OnuDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = True
+    tech_code = 'bdcom_onu'
     is_use_device_port = False
 
     def __init__(self, dev_instance):
@@ -319,6 +321,7 @@ class EltexPort(BasePort):
 
 class EltexSwitch(DLinkDevice):
     has_attachable_to_subscriber = True
+    tech_code = 'eltex_sw'
     is_use_device_port = False
 
     @staticmethod
@@ -427,6 +430,8 @@ class Olt_ZTE_C320(OLTDevice):
 
 
 class ZteOnuDevice(OnuDevice):
+    tech_code = 'zte_onu'
+
     @staticmethod
     def description():
         return _('ZTE PON ONU')
