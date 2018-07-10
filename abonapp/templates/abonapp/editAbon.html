@@ -41,7 +41,9 @@
                         {# Ip address field #}
                         {% trans 'Reset ip' as tx %}
                         {% url 'abonapp:reset_ip' group.pk abon.username as url %}
-                        {% bootstrap_button '' button_type='link' icon='refresh' button_class='btn-default btn-cmd' id='iprefreshbtn' href=url size='sm' title=tx as bt %}
+                        {% if abon.is_dynamic_ip %}
+                            {% bootstrap_button '' button_type='link' icon='refresh' button_class='btn-default btn-cmd' id='iprefreshbtn' href=url size='sm' title=tx as bt %}
+                        {% endif %}
                         {% bootstrap_field form.ip_address form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
 
 
