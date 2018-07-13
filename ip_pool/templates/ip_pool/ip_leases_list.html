@@ -28,7 +28,7 @@
             <tr>
                 <td>{{ ip.ip }}</td>
                 <td>{{ ip.lease_time|date:'j:n H:i:s' }}</td>
-                <td>{{ ip.network }}</td>
+                <td>{{ ip.get_network }}</td>
                 <td><input type="checkbox" {{ ip.is_dynamic|yesno:'checked,' }}></td>
             </tr>
         {% empty %}

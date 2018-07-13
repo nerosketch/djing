@@ -14,7 +14,7 @@ from django.views.generic import DetailView, DeleteView, UpdateView, CreateView
 
 from devapp.base_intr import DeviceImplementationError
 from djing.lib.decorators import only_admins, hash_auth_view
-from djing.lib import safe_int, ProcessLocked
+from djing.lib import safe_int, ProcessLocked, DuplicateEntry
 from abonapp.models import Abon
 from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, ZteOltLoginFailed
 from group_app.models import Group
@@ -386,7 +386,7 @@ def edit_single_port(request, group_id, device_id, port_id):
         }, request=request)
     except Port.DoesNotExist:
         messages.error(request, _('Port does not exist'))
-    except DeviceDBException as e:
+    except (DeviceDBException, DuplicateEntry) as e:
         messages.error(request, e)
     return redirect('devapp:manage_ports', group_id, device_id)
 
@@ -416,7 +416,7 @@ def add_single_port(request, group_id, device_id):
         }, request=request)
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
-    except DeviceDBException as e:
+    except (DeviceDBException, DuplicateEntry) as e:
         messages.error(request, e)
     return redirect('devapp:manage_ports', group_id, device_id)
 

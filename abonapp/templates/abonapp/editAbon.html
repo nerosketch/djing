@@ -220,10 +220,20 @@
                     {% endfor %}
                 </ul>
                 <div class="panel-footer">
-                    <a href="#" class="btn btn-success btn-sm" {{ abon.is_dynamic_ip|yesno:'disabled,' }}>
-                        <span class="glyphicon glyphicon-plus"></span>
-                        <span class="hidden-xs">{% trans 'Add' %}</span>
-                    </a>
+                    <div class="btn-group btn-group-sm">
+                        {% if abon.is_dynamic_ip %}
+                            <a href="#" class="btn btn-success" disabled>
+                        {% else %}
+                            <a href="{% url 'abonapp:lease_add' group.pk abon.username %}" class="btn btn-success btn-modal">
+                        {% endif %}
+                            <span class="glyphicon glyphicon-plus"></span>
+                            <span class="hidden-xs">{% trans 'Add' %}</span>
+                        </a>
+                        <a href="{% url 'abonapp:active_nets' group.pk %}" class="btn btn-default btn-modal">
+                            <span class="glyphicon glyphicon-globe"></span>
+                            <span class="hidden-sm hidden-xs">{% trans 'Active networks' %}</span>
+                        </a>
+                   </div>
                 </div>
             </div>
 

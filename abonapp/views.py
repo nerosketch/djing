@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+from datetime import datetime, date, timedelta
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
@@ -22,11 +23,12 @@ from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
 from . import models
 from devapp.models import Device, Port as DevPort
-from datetime import datetime, date, timedelta
 from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel
 from group_app.models import Group
+from ip_pool.models import IpLeaseModel, NetworkModel
+from ip_pool.forms import LeaseForm
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
@@ -545,7 +547,7 @@ def chgroup_tariff(request, gid):
     if request.method == 'POST':
         tr = request.POST.getlist('tr')
         grp.tariff_set.clear()
-        grp.tariff_set.add(*(int(d) for d in tr))
+        grp.tariff_set.add(*tr)
         grp.save()
         messages.success(request, _('Successfully saved'))
         return redirect('abonapp:ch_group_tariff', gid)
@@ -837,6 +839,15 @@ def street_del(request, gid, sid):
 
 
 @login_required
+@permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
+def active_nets(request, gid):
+    nets = NetworkModel.objects.filter(groups__id=gid)
+    return render(request, 'abonapp/modal_current_networks.html', {
+        'networks': nets
+    })
+
+
+@login_required
 @permission_required('abonapp.can_view_additionaltelephones')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def tels(request, gid, uname):
@@ -1069,6 +1080,44 @@ def user_session_toggle(request, gid, uname, lease_id, action=None):
         res_text = _('Ip lease has been started')
     messages.success(request, res_text)
     return redirect('abonapp:abon_home', gid, uname)
+
+
+@login_required
+@lib.decorators.only_admins
+@permission_required('change_abon')
+def lease_add(request, gid, uname):
+    group = get_object_or_404(Group, pk=gid)
+    if request.method == 'POST':
+        frm = LeaseForm(request.POST)
+        if frm.is_valid():
+            try:
+                abon = get_object_or_404(models.Abon, username=uname)
+                cleaned = frm.clean()
+                ip = cleaned.get('ip_addr')
+                is_dynamic = cleaned.get('is_dynamic')
+                network_id = cleaned.get('possible_networks')  # str(int)
+                network = get_object_or_404(NetworkModel, pk=network_id)
+                lease = IpLeaseModel.objects.create_from_ip(ip, net=network, is_dynamic=is_dynamic)
+                abon.ip_addresses.add(lease)
+                messages.success(request, _('Ip lease has been created'))
+                return redirect('abonapp:abon_home', gid, uname)
+            except lib.DuplicateEntry as e:
+                messages.error(request, e)
+        else:
+            messages.error(request, _('Check form errors'))
+    else:
+        first_network = NetworkModel.objects.filter(groups=group).first()
+        if first_network is not None:
+            free_ip = IpLeaseModel.objects.get_free_ip(first_network)
+            initial = {'ip_addr': free_ip}
+        else:
+            initial = None
+        frm = LeaseForm(initial=initial)
+    return render(request, 'abonapp/modal_add_lease.html', {
+        'form': frm,
+        'group': group,
+        'uname': uname
+    })
 
 
 # API's

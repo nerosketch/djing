@@ -1,0 +1,25 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block content %}
+<form role="form" action="{% url 'abonapp:lease_add' group.id uname %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-compressed"></span>{% trans 'Add ip lease' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        {% bootstrap_form form %}
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+            </button>
+            <button type="reset" class="btn btn-default">
+                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+            </button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}

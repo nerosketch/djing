@@ -1,0 +1,26 @@
+{% load i18n %}
+<div class="modal-header primary">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title"><span class="glyphicon glyphicon-globe"></span>{% trans 'Available networks' %}</h4>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>{% trans 'Network' %}</th>
+        <th>{% trans 'Scope' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for net_item in networks %}
+        <tr>
+            <td><a href="#" class="btn btn-link">{{ net_item }}</a></td>
+            <td>{{ net_item.get_scope }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">{% trans 'Available networks not found' %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

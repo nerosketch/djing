@@ -19,17 +19,19 @@
         <tr>
             <th class="col-sm-3">{% trans 'Network' %}</th>
             <th class="col-sm-3">{% trans 'Kind' %}</th>
-            <th class="col-sm-5">{% trans 'Description' %}</th>
+            <th class="col-sm-4">{% trans 'Description' %}</th>
+            <th class="col-sm-2">{% trans 'Scope' %}</th>
             <th class="col-sm-1"></th>
         </tr>
         </thead>
         <tbody>
-        {% with can_ch_net=perms.ip_pool.change_networkmodel %}
+        {% with can_ch_net=perms.ip_pool.change_networkmodel can_del_net=perms.ip_poo.delete_networkmodel %}
         {% for netw in networks_list %}
             <tr>
-                <td><a href="{% url 'ip_pool:ip_leases_list' netw.id %}">{{ netw }}</a></td>
+                <td><a href="{% url 'ip_pool:ip_leases_list' netw.id %}">{{ netw.get_network }}</a></td>
                 <td>{{ netw.get_kind_display }}</td>
                 <td>{{ netw.description }}</td>
+                <td>{{ netw.get_scope }}</td>
                 <td class="btn-group btn-group-sm btn-group-justified">
                     {% if can_ch_net %}
                         <a href="{% url 'ip_pool:net_edit' netw.pk %}" class="btn btn-primary">
@@ -42,6 +44,17 @@
                             <span class="hidden-xs hidden-sm">{% trans 'Edit' %}</span>
                         </a>
                     {% endif %}
+                    {% if can_del_net %}
+                        <a href="{% url 'ip_pool:net_delete' netw.pk %}" class="btn btn-danger btn-modal">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            <span class="hidden-xs hidden-sm">{% trans 'Remove' %}</span>
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-danger" disabled>
+                            <span class="glyphicon glyphicon-remove"></span>
+                            <span class="hidden-xs hidden-sm">{% trans 'Permission denied' %}</span>
+                        </a>
+                    {% endif %}
                     <a href="{% url 'ip_pool:ip_leases_list' netw.pk %}" class="btn btn-default">
                         <span class="glyphicon glyphicon-eye-open"></span>
                         <span class="hidden-xs hidden-sm">{% trans 'View employed' %}</span>
@@ -50,14 +63,14 @@
             </tr>
         {% empty %}
             <tr>
-            <td colspan="4">{% trans 'You have not any networks available' %}</td>
+            <td colspan="5">{% trans 'You have not any networks available' %}</td>
             </tr>
         {% endfor %}
         {% endwith %}
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="4">
+            <td colspan="5">
                 <a href="{% url 'ip_pool:net_add' %}" class="btn btn-success">
                     <span class="glyphicon glyphicon-plus"></span>
                     {% trans 'Add' %}

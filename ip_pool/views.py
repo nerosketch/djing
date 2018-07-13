@@ -1,13 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import UpdateView, CreateView
+from django.views.generic import UpdateView, CreateView, DeleteView
 
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing.global_base_views import OrderedFilteredList
 from ip_pool import models, forms
+from group_app.models import Group
 
 
 @method_decorator(login_required, name='dispatch')
@@ -39,6 +41,18 @@ class NetworkUpdateView(UpdateView):
 
 
 @method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('ip_pool.delete_networkmodel'), name='dispatch')
+class NetworkDeleteView(DeleteView):
+    model = models.NetworkModel
+    pk_url_kwarg = 'net_id'
+    success_url = reverse_lazy('ip_pool:networks')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, _('Network has been deleted'))
+        return super(NetworkDeleteView, self).delete(request, *args, **kwargs)
+
+
+@method_decorator(login_required, name='dispatch')
 class IpLeasesListView(OrderedFilteredList):
     template_name = 'ip_pool/ip_leases_list.html'
     model = models.IpLeaseModel
@@ -65,3 +79,22 @@ class NetworkCreateView(CreateView):
         r = super().form_valid(form)
         messages.success(self.request, _('Network has been created'))
         return r
+
+
+@login_required
+def network_in_groups(request, net_id):
+    network = get_object_or_404(models.NetworkModel, pk=net_id)
+    if request.method == 'POST':
+        gr = request.POST.getlist('gr')
+        network.groups.clear()
+        network.groups.add(*gr)
+        network.save()
+        messages.success(request, _('Successfully saved'))
+        return redirect('ip_pool:net_groups', net_id)
+
+    selected_grps = tuple(pk[0] for pk in network.groups.only('pk').values_list('pk'))
+    return render(request, 'ip_pool/network_groups_available.html', {
+        'object': network,
+        'selected_grps': selected_grps,
+        'groups': Group.objects.all().iterator()
+    })

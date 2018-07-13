@@ -1,0 +1,33 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'ip_pool:networks' %}">{% trans 'Ip pool' %}</a></li>
+        <li><a href="{% url 'ip_pool:net_edit' object.id %}">{{ object }}</a></li>
+        <li class="active">{% trans 'Belonging networks for groups' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    <h3>{% trans 'Make that pool available in specified groups' %}</h3>
+{% endblock %}
+
+{% block main %}
+    <form action="{% url 'ip_pool:net_groups' object.pk %}" method="post">{% csrf_token %}
+        {% for group in groups %}
+            <div class="checkbox">
+                <label>
+                    {% if group.pk in selected_grps %}
+                        <input name="gr" type="checkbox" value="{{ group.pk }}" checked/>
+                    {% else %}
+                        <input name="gr" type="checkbox" value="{{ group.pk }}"/>
+                    {% endif %}
+                    {{ group }}
+                </label>
+            </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-primary" value="{% trans 'Save' %}">
+    </form>
+{% endblock %}

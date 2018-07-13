@@ -41,7 +41,7 @@ class AbonForm(forms.ModelForm):
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
-        #if instance is not None and instance.is_dynamic_ip:
+        # if instance is not None and instance.is_dynamic_ip:
         #    self.fields['ip_address'].widget.attrs['readonly'] = True
 
     username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
@@ -139,7 +139,7 @@ class ExportUsersForm(forms.Form):
     FIELDS_CHOICES = (
         ('username', _('profile username')),
         ('fio', _('fio')),
-        #('ip_address', _('Ip Address')),
+        # ('ip_address', _('Ip Address')),
         ('description', _('Comment')),
         ('street__name', _('Street')),
         ('house', _('House')),
@@ -160,7 +160,7 @@ class ExportUsersForm(forms.Form):
 class MarkersForm(forms.ModelForm):
     class Meta:
         model = models.Abon
-        fields = ('markers',)
+        fields = 'markers',
 
     def save(self, commit=True):
         instance = super(MarkersForm, self).save(commit=False)

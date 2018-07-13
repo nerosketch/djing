@@ -1,0 +1,19 @@
+{% extends 'base_delete_modal.html' %}
+{% load i18n %}
+
+{% block modal_form_url %}
+    {% url 'ip_pool:net_delete' object.pk %}
+{% endblock %}
+
+{% block modal_form_title %}
+    {% trans 'Remove network' %}
+{% endblock %}
+
+{% block modal_form_text %}
+    <h4>{% blocktrans trimmed with network_name=object %}
+        To delete network '{{ network_name }}'?
+    {% endblocktrans %}</h4>
+    <p>{% blocktrans trimmed %}
+        Attention! All leases in that network will be removed and services finished.
+    {% endblocktrans %}</p>
+{% endblock %}

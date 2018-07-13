@@ -30,7 +30,8 @@ subscriber_patterns = [
     url(r'^session/(?P<lease_id>\d+)/start$', views.user_session_toggle, {'action': 'start'}, name='user_session_start'),
     url(r'^periodic_pay$', views.add_edit_periodic_pay, name='add_periodic_pay'),
     url(r'^periodic_pay(?P<periodic_pay_id>\d+)/$', views.add_edit_periodic_pay, name='add_periodic_pay'),
-    url(r'^periodic_pay(?P<periodic_pay_id>\d+)/del/$', views.del_periodic_pay, name='del_periodic_pay')
+    url(r'^periodic_pay(?P<periodic_pay_id>\d+)/del/$', views.del_periodic_pay, name='del_periodic_pay'),
+    url(r'^lease/add/$', views.lease_add, name='lease_add')
 ]
 
 group_patterns = [
@@ -42,6 +43,7 @@ group_patterns = [
     url(r'^street/add$', views.street_add, name='street_add'),
     url(r'^street/edit', views.street_edit, name='street_edit'),
     url(r'^street/(?P<sid>\d+)/delete$', views.street_del, name='street_del'),
+    url(r'^active_networks/$', views.active_nets, name='active_nets'),
     url(r'^(?P<uname>\w{1,127})/', include(subscriber_patterns))
 ]
 

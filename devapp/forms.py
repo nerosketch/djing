@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 
+from djing.lib import DuplicateEntry
 from djing.lib.tln.tln import ValidationError as TlnValidationError
 from . import models
 from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
@@ -82,6 +83,6 @@ class PortForm(forms.ModelForm):
             super(PortForm, self).save(commit)
         except IntegrityError as e:
             if "Duplicate entry" in str(e):
-                raise models.DeviceDBException(_('Port number on device must be unique'))
+                raise DuplicateEntry(_('Port number on device must be unique'))
             else:
                 raise models.DeviceDBException(e)

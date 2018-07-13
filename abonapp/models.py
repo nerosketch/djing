@@ -138,8 +138,6 @@ class Abon(BaseAccount):
             ('can_add_ballance', _('fill account')),
             ('can_ping', _('Can ping'))
         )
-        # TODO: Fix when duplicates already in database
-        # unique_together = ('device', 'dev_port')
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
         ordering = ('fio',)
@@ -250,6 +248,15 @@ class Abon(BaseAccount):
 
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
+
+    def add_lease(self, ip: str):
+        existed_client_ips = tuple(l.ip for l in self.ip_addresses.all())
+        if ip not in existed_client_ips:
+            lease = IpLeaseModel.objects.create_from_ip(ip=ip)
+            if lease is None:
+                return 'Subnet not found'
+            self.ip_addresses.add(lease)
+            #self.save()
 
 
 class PassportInfo(models.Model):

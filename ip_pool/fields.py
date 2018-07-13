@@ -56,7 +56,7 @@ class GenericIpAddressWithPrefix(models.GenericIPAddressField):
         value = value.strip()
         if ':' in value:
             ip = ip_network(value)
-            return ip.compressed
+            return ip.with_prefixlen
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):

@@ -18,19 +18,14 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             abon = Abon.objects.get(device=dev)
         if not abon.is_dynamic_ip:
             return 'User settings is not dynamic'
-        existed_client_ips = tuple(l.ip for l in abon.ip_addresses.all())
-        if client_ip not in existed_client_ips:
-            lease = IpLeaseModel.objects.create_from_ip(
-                ip=client_ip,
-            )
-            if lease is None:
-                return 'Subnet not found'
-            abon.ip_addresses.add(lease)
-            abon.save()
+        add_lease_result = abon.add_lease(client_ip)
+        if add_lease_result is None:
             if abon.is_access():
                 abon.sync_with_nas(created=False)
             else:
-                print('D:', 'User %s is not access to service' % abon.username)
+                return 'User %s is not access to service' % abon.username
+        else:
+            return add_lease_result
     except Abon.DoesNotExist:
         return "User with device with mac '%s' does not exist" % switch_mac
     except Device.DoesNotExist:
