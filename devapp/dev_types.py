@@ -61,6 +61,7 @@ class DLinkPort(BasePort):
 
 class DLinkDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = True
+    tech_code = 'dlink_sw'
     description = _('DLink switch')
     is_use_device_port = True
 
@@ -196,6 +197,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 class OnuDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = True
     description = _('PON ONU')
+    tech_code = 'bdcom_onu'
     is_use_device_port = False
 
     def __init__(self, dev_instance):
@@ -312,6 +314,7 @@ class EltexSwitch(DLinkDevice):
     description = _('Eltex switch')
     is_use_device_port = False
     has_attachable_to_subscriber = True
+    tech_code = 'eltex_sw'
 
     def get_ports(self) -> ListOrError:
         res = []
@@ -322,7 +325,7 @@ class EltexSwitch(DLinkDevice):
                                  self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                                 int(speed),
+                                 int(speed) if speed != 'NOSUCHINSTANCE' else 0,
                                  ))
         return res
 
@@ -414,6 +417,7 @@ class Olt_ZTE_C320(OLTDevice):
 
 class ZteOnuDevice(OnuDevice):
     description = _('ZTE PON ONU')
+    tech_code = 'zte_onu'
 
     def get_details(self) -> Optional[Dict]:
         if self.db_instance is None:

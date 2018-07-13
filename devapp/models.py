@@ -1,11 +1,9 @@
-import os
 from typing import Optional, AnyStr
-from subprocess import run
+
+from jsonfield import JSONField
 from django.db import models
-from django.conf import settings
 from django.shortcuts import resolve_url
 from django.utils.translation import gettext_lazy as _
-from jsonfield import JSONField
 
 from djing.fields import MACAddressField
 from djing.lib import MyChoicesAdapter
@@ -67,20 +65,12 @@ class Device(models.Model):
         verbose_name_plural = _('Devices')
         ordering = ('id',)
 
-    def get_abons(self):
-        pass
-
-    def get_status(self):
-        return self.status
-
     def get_manager_klass(self):
-        klasses = next(kl for kl in self.DEVICE_TYPES if kl[0] == self.devtype)
-        if klasses:
-            code, dev_class = klasses
-            if issubclass(dev_class, DevBase):
-                return dev_class
-        raise TypeError('one of types is not subclass of DevBase. '
-                        'Or implementation of that device type is not found')
+        try:
+            return next(klass for code, klass in self.DEVICE_TYPES if code == self.devtype)
+        except StopIteration:
+            raise TypeError('one of types is not subclass of DevBase. '
+                            'Or implementation of that device type is not found')
 
     def get_manager_object(self) -> DevBase:
         man_klass = self.get_manager_klass()
@@ -96,20 +86,12 @@ class Device(models.Model):
     def __str__(self):
         return "%s: (%s) %s %s" % (self.comment, self.get_devtype_display(), self.ip_address or '', self.mac_addr or '')
 
-    def update_dhcp(self, remove=False):
-        # FIXME: Remove static list of registrable device types
-        if self.devtype not in ('On', 'Dl', 'Zo'):
-            return
-        if self.group is None:
-            raise DeviceDBException(_('Device does not have a group, please fix that'))
-        code = self.group.code
-        newmac = str(self.mac_addr)
-        filepath = os.path.join(settings.BASE_DIR, 'devapp', 'onu_register.sh')
-        if remove:
-            param = 'del'
-        else:
-            param = 'update'
-        run((filepath, param, newmac, code))
+    @staticmethod
+    def update_dhcp():
+        from .onu_register import onu_register
+        onu_register(
+            Device.objects.exclude(group=None).select_related('group').only('mac_addr', 'group__code').iterator()
+        )
 
     def generate_config_template(self) -> Optional[AnyStr]:
         mng = self.get_manager_object()

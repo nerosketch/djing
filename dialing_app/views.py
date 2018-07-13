@@ -49,7 +49,7 @@ class LastCallsListView(BaseListView):
 @login_required
 @only_admins
 def to_abon(request, tel):
-    abon = Abon.objects.filter(telephone=tel)
+    abon = Abon.objects.filter(Q(telephone__icontains=tel) | Q(additional_telephones__telephone__icontains=tel))
     abon_count = abon.count()
     if abon_count > 1:
         messages.warning(request, _('Multiple users with the telephone number'))

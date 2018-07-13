@@ -4,6 +4,7 @@ from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
+from django.http.request import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
@@ -188,17 +189,23 @@ class DelAbonDeleteView(DeleteView):
 @transaction.atomic
 def abonamount(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
+    frm = None
     try:
         if request.method == 'POST':
-            abonuname = request.POST.get('abonuname')
-            if abonuname == uname:
-                amnt = lib.safe_float(request.POST.get('amount'))
-                abon.add_ballance(request.user, amnt, comment=_('fill account through admin side'))
+            frm = forms.AmountMoneyForm(request.POST)
+            if frm.is_valid():
+                amnt = frm.cleaned_data.get('amount')
+                comment = frm.cleaned_data.get('comment')
+                if not comment:
+                    comment = _('fill account through admin side')
+                abon.add_ballance(request.user, amnt, comment=comment)
                 abon.save(update_fields=('ballance',))
                 messages.success(request, _('Account filled successfully on %.2f') % amnt)
                 return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
             else:
                 messages.error(request, _('I not know the account id'))
+        else:
+            frm = forms.AmountMoneyForm()
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
     except lib.MultipleException as errs:
@@ -206,7 +213,8 @@ def abonamount(request, gid, uname):
             messages.error(request, err)
     return render_to_text('abonapp/modal_abonamount.html', {
         'abon': abon,
-        'group_id': gid
+        'group_id': gid,
+        'form': frm
     }, request=request)
 
 
@@ -1154,8 +1162,7 @@ def search_abon(request):
     if not word:
         return None
     results = models.Abon.objects.filter(fio__icontains=word)[:8]
-    results = ({'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results)
-    return results
+    return list({'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)} for usr in results)
 
 
 class DhcpLever(SecureApiView):
