@@ -62,6 +62,8 @@ urlpatterns = [
 
     url(r'^ping$', views.abon_ping, name='ping'),
 
+    url(r'contacts/vcards/$', views.vcards, name='vcards'),
+
     # Api's
     url(r'^api/abons$', views.abons),
     url(r'^api/abon_filter$', views.search_abon),
