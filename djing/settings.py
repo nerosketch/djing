@@ -209,3 +209,13 @@ BOOTSTRAP3 = {
     # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
 }
+
+
+# Email config
+EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
+EMAIL_HOST = local_settings.EMAIL_HOST
+EMAIL_PORT = local_settings.EMAIL_PORT
+EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
+EMAIL_USE_SSL = getattr(local_settings, 'EMAIL_USE_SSL', True)
+
+SERVER_EMAIL = EMAIL_HOST_USER

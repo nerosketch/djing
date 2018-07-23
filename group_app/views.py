@@ -69,7 +69,6 @@ class DeleteGroupView(DeleteView):
         group_with_subscribers = models.Group.objects.annotate(
             subscribers_count=Count('abon')
         ).filter(subscribers_count__gt=0, pk=group_id).first()
-        print('group_with_subscribers:', group_with_subscribers)
         if group_with_subscribers is not None:
             messages.error(request, _('Group is contain subscribers. Remove them before delete group'))
             return HttpResponseRedirect(self.success_url)
