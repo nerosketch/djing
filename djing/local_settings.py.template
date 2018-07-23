@@ -68,4 +68,4 @@ EMAIL_HOST_USER = 'YOUR-EMAIL@mailserver.com'
 EMAIL_HOST = 'smtp.mailserver.com'
 EMAIL_PORT = 587
 EMAIL_HOST_PASSWORD = 'password'
-EMAIL_USE_SSL = True
+EMAIL_USE_TLS = True
