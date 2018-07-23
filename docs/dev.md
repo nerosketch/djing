@@ -287,7 +287,7 @@ def add_tariff_range(self, tariff_list):
 Для того чтоб оправить важное сообщение работнику через все возможные настроенные системы(смс, телеграм, браузер) мы можем
 воспользоваться одной процедурой из модуля **chatbot**.
 ```python
-from chatbot.telebot import send_notify
+from chatbot.send_func import send_notify
 
 send_notify(msg_text='Text message',account=employee_profile, tag='apptag')
 ```

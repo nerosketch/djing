@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import gettext as _
-from chatbot.telebot import send_notify
+from chatbot.send_func import send_notify
 from chatbot.models import ChatException
 from djing.lib import MultipleException
 

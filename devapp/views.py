@@ -22,7 +22,7 @@ from accounts_app.models import UserProfile
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
-from chatbot.telebot import send_notify
+from chatbot.send_func import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
 from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
