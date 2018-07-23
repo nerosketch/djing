@@ -40,9 +40,9 @@ def edit_tarif(request, tarif_id=0):
     if request.method == 'POST':
         frm = forms.TariffForm(request.POST, instance=tarif)
         if frm.is_valid():
-            frm.save()
+            new_service = frm.save()
             messages.success(request, _('Service has been saved'))
-            return redirect('tarifs:edit', tarif_id=tarif_id)
+            return redirect('tarifs:edit', tarif_id=new_service.pk)
         else:
             messages.warning(request, _('Some fields were filled incorrect, please try again'))
     else:

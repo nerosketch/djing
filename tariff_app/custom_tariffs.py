@@ -75,11 +75,26 @@ class TariffCp(TariffDp):
         return _('Private service')
 
 
+# Daily service
+class TariffDaily(TariffDp):
+
+    def calc_deadline(self):
+        nw = timezone.now()
+        # next day in the same time
+        one_day = timedelta(days=1)
+        return nw + one_day
+
+    @staticmethod
+    def description() -> AnyStr:
+        return _('IS Daily service')
+
+
 # Первый - всегда по умолчанию
 TARIFF_CHOICES = (
     ('Df', TariffDefault),
     ('Dp', TariffDp),
-    ('Cp', TariffCp)
+    ('Cp', TariffCp),
+    ('Dl', TariffDaily)
 )
 
 

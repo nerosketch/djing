@@ -429,8 +429,7 @@ def pick_tariff(request, gid, uname):
             if deadline == '' or deadline is None:
                 abon.pick_tariff(trf, request.user, comment=log_comment)
             else:
-                deadline = datetime.strptime(deadline, '%Y-%m-%d')
-                deadline += timedelta(hours=23, minutes=59, seconds=59)
+                deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
             abon.sync_with_nas(created=False)
             messages.success(request, _('Tariff has been picked'))
