@@ -1,4 +1,5 @@
 from datetime import datetime
+from ipaddress import ip_address
 from typing import Optional
 
 from django.conf import settings
@@ -14,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _, gettext
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
-from djing.lib import ip2int, LogicError
+from djing.lib import LogicError
 from djing.fields import MyGenericIPAddressField
 from djing import IP_ADDR_REGEX
 from tariff_app.models import Tariff, PeriodicPay
@@ -258,7 +259,7 @@ class Abon(BaseAccount):
     # make subscriber from agent structure
     def build_agent_struct(self):
         if self.ip_address:
-            user_ip = ip2int(self.ip_address)
+            user_ip = ip_address(self.ip_address)
         else:
             return
         abon_tariff = self.active_tariff()

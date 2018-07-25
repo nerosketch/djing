@@ -4,19 +4,19 @@ import socket
 import binascii
 from abc import ABCMeta
 from hashlib import md5
+from ipaddress import _BaseAddress
 from typing import Iterable, Optional, Tuple
-from .core import BaseTransmitter, NasFailedResult, NasNetworkError
-from djing.lib import Singleton
-from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
-from . import settings as local_settings
 from django.conf import settings
+from .core import NasFailedResult, NasNetworkError, BaseTransmitter
+from djing.lib import Singleton
+from .structs import TariffStruct, AbonStruct, VectorAbon, VectorTariff
+from . import settings as local_settings
 from djing import ping
-from agent.core import NasNetworkError, NasFailedResult
 
 DEBUG = getattr(settings, 'DEBUG', False)
 
 LIST_USERS_ALLOWED = 'DjingUsersAllowed'
-#LIST_USERS_BLOCKED = 'DjingUsersBlocked'
+# LIST_USERS_BLOCKED = 'DjingUsersBlocked'
 
 
 class ApiRos(metaclass=Singleton):
@@ -221,21 +221,29 @@ class TransmitterManager(BaseTransmitter, metaclass=ABCMeta):
                 res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 1000 ** 2
             return res
 
-        speeds = info['=max-limit'].split('/')
+        speed_out, speed_in = info['=max-limit'].split('/')
         t = TariffStruct(
-            speed_in=parse_speed(speeds[1]),
-            speed_out=parse_speed(speeds[0])
+            speed_in=parse_speed(speed_in),
+            speed_out=parse_speed(speed_out)
         )
         try:
-            a = AbonStruct(
-                uid=int(info['=name'][3:]),
-                # FIXME: тут в разных микротиках или =target-addresses или =target
-                ip=info['=target'][:-3],
-                tariff=t,
-                is_active=False if info['=disabled'] == 'false' else True
-            )
-            a.queue_id = info['=.id']
-            return a
+            target = info.get('=target')
+            if target is None:
+                target = info.get('=target-addresses')
+            name = info.get('=name')
+            disabled = info.get('=disabled')
+            if disabled is not None:
+                disabled = True if disabled == 'true' else False
+            if target is not None and name is not None:
+                target_ip, target_net = target.split('/')
+                a = AbonStruct(
+                    uid=int(name[3:]),
+                    ip=target_ip,
+                    tariff=t,
+                    is_active=disabled or False
+                )
+                a.queue_id = info.get('=.id')
+                return a
         except ValueError:
             pass
 
@@ -330,15 +338,9 @@ class QueueManager(TransmitterManager, metaclass=ABCMeta):
             return self._exec_cmd(('/queue/simple/enable', '=.id=*' + getattr(q, 'queue_id', '')))
 
 
-class IpAddressListObj(IpStruct):
-    def __init__(self, ip, mk_id):
-        super(IpAddressListObj, self).__init__(ip)
-        self.mk_id = str(mk_id).replace('*', '')
-
-
 class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
-    def add(self, list_name: str, ip: IpStruct):
-        if not isinstance(ip, IpStruct):
+    def add(self, list_name: str, ip):
+        if not issubclass(ip.__class__, _BaseAddress):
             raise TypeError
         commands = (
             '/ip/firewall/address-list/add',
@@ -350,19 +352,19 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
     def remove(self, mk_id):
         return self._exec_cmd((
             '/ip/firewall/address-list/remove',
-            '=.id=*' + str(mk_id).replace('*', '')
+            '=.id=%s' % mk_id
         ))
 
-    def remove_range(self, items: Iterable[IpAddressListObj]):
-        ids = tuple(ip.mk_id for ip in items if isinstance(ip, IpAddressListObj))
+    def remove_range(self, items):
+        ids = tuple(ip_mkid.mkid for ip_mkid in items)
         if len(ids) > 0:
             return self._exec_cmd([
                 '/ip/firewall/address-list/remove',
-                '=numbers=*%s' % ',*'.join(ids)
+                '=numbers=%s' % ','.join(ids)
             ])
 
-    def find(self, ip: IpStruct, list_name: str):
-        if not isinstance(ip, IpStruct):
+    def find(self, ip, list_name: str):
+        if not issubclass(ip.__class__, _BaseAddress):
             raise TypeError
         return self._exec_cmd((
             '/ip/firewall/address-list/print', 'where',
@@ -378,7 +380,7 @@ class IpAddressListManager(TransmitterManager, metaclass=ABCMeta):
         ))
         for code, dat in ips:
             if dat != {}:
-                yield IpAddressListObj(dat['=address'], dat['=.id'])
+                yield dat.get('=address'), dat.get('=.id')
 
     def disable(self, user: AbonStruct):
         r = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
@@ -415,7 +417,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
                 IpAddressListManager.remove(self, ip_list_entity[0]['=.id'])
 
     def add_user(self, user: AbonStruct, *args):
-        if not isinstance(user.ip, IpStruct):
+        if not issubclass(user.ip.__class__, _BaseAddress):
             raise TypeError
         if user.tariff is None:
             return
@@ -437,7 +439,7 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
             IpAddressListManager.remove(self, firewall_ip_list_obj[0]['=.id'])
 
     def update_user(self, user: AbonStruct, *args):
-        if not isinstance(user.ip, IpStruct):
+        if not issubclass(user.ip.__class__, _BaseAddress):
             raise TypeError
 
         find_res = IpAddressListManager.find(self, user.ip, LIST_USERS_ALLOWED)
@@ -507,14 +509,30 @@ class MikrotikTransmitter(QueueManager, IpAddressListManager):
         pass
 
     def read_users(self) -> Iterable[AbonStruct]:
-        # shapes is ShapeItem
-        allowed_ips = set(IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED))
-        queues = tuple(q for q in QueueManager.read_queue_iter(self) if q.ip in allowed_ips)
 
-        ips_from_queues = set(q.ip for q in queues)
+        class ip_mkid_struct(object):
+            __slots__ = ('ip', 'mkid')
+
+            def __init__(self, ip, mkid):
+                self.ip = ip
+                self.mkid = mkid
+
+            def __eq__(self, other):
+                if isinstance(other, ip_mkid_struct):
+                    return self.ip == other.ip
+                return self.ip == str(other)
+
+            def __hash__(self):
+                return hash(self.ip)
+
+        # shapes is ShapeItem
+        all_ips = set(ip_mkid_struct(ip, mkid) for ip, mkid in IpAddressListManager.read_ips_iter(self, LIST_USERS_ALLOWED))
+        queues = tuple(q for q in QueueManager.read_queue_iter(self) if str(q.ip) in all_ips)
+
+        ips_from_queues = set(str(q.ip) for q in queues)
 
         # delete ip addresses that are in firewall/address-list and there are no corresponding in queues
-        diff = tuple(allowed_ips - ips_from_queues)
+        diff = tuple(all_ips - ips_from_queues)
         if len(diff) > 0:
             IpAddressListManager.remove_range(self, diff)
 

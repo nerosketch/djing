@@ -1227,7 +1227,7 @@ class DhcpLever(SecureApiView):
     def on_dhcp_event(data: Dict) -> Optional[str]:
         """
         data = {
-            'client_ip': ip2int('127.0.0.1'),
+            'client_ip': ip_address('127.0.0.1'),
             'client_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_port': 3,

@@ -1,78 +1,23 @@
-# -*- coding: utf-8 -*-
-from abc import ABCMeta, abstractmethod
-from struct import pack, unpack, calcsize
-from typing import Iterable, Optional
-from djing.lib import int2ip, ip2int
+from abc import ABCMeta
+from ipaddress import ip_address, _BaseAddress
+from typing import Iterable
 
 
 class BaseStruct(object, metaclass=ABCMeta):
-    @abstractmethod
-    def serialize(self) -> Optional[bytes]:
-        """make binary"""
-
-    @abstractmethod
-    def deserialize(self, data: bytes, *args):
-        """restore from binary"""
 
     def __ne__(self, other):
         return not self == other
 
 
-class IpStruct(BaseStruct):
-    def __init__(self, ip):
-        if type(ip) is int:
-            self.__ip = ip
-        else:
-            self.__ip = ip2int(str(ip))
-
-    def serialize(self) -> Optional[bytes]:
-        dt = pack("!I", int(self.__ip))
-        return dt
-
-    def deserialize(self, data: bytes, *args):
-        dt = unpack("!I", data)
-        self.__ip = int(dt[0])
-        return self
-
-    def get_int(self):
-        return self.__ip
-
-    def __eq__(self, other):
-        if not isinstance(other, IpStruct):
-            raise TypeError('Instance must be IpStruct')
-        return self.__ip == other.__ip
-
-    def __int__(self):
-        return self.__ip
-
-    def __str__(self):
-        return int2ip(self.__ip)
-
-    def __hash__(self):
-        return hash(self.__ip)
-
-
-# Как обслуживается абонент
 class TariffStruct(BaseStruct):
     def __init__(self, tariff_id=0, speed_in=None, speed_out=None):
         self.tid = int(tariff_id)
         self.speedIn = speed_in or 0
         self.speedOut = speed_out or 0
 
-    def serialize(self) -> Optional[bytes]:
-        dt = pack("!Iff", int(self.tid), float(self.speedIn), float(self.speedOut))
-        return dt
-
-    # Да, если все значения нулевые
+    # Yes, if all variables is zeroed
     def is_empty(self):
-        return self.tid == 0 and self.speedIn == 0.001 and self.speedOut == 0.001
-
-    def deserialize(self, data: bytes, *args):
-        dt = unpack("!Iff", data)
-        self.tid = int(dt[0])
-        self.speedIn = float(dt[1])
-        self.speedOut = float(dt[2])
-        return self
+        return self.tid == 0 and self.speedIn == 0 and self.speedOut == 0
 
     def __eq__(self, other):
         # не сравниваем id, т.к. тарифы с одинаковыми скоростями для NAS одинаковы
@@ -88,34 +33,18 @@ class TariffStruct(BaseStruct):
         return hash(str(self.speedIn) + str(self.speedOut))
 
 
-# Абонент из базы
+# Abon from database
 class AbonStruct(BaseStruct):
+    __slots__ = ('ip', 'uid', 'tariff', 'is_active', 'queue_id')
+
     def __init__(self, uid=0, ip=None, tariff=None, is_active=True):
         self.uid = int(uid or 0)
-        self.ip = IpStruct(ip)
+        if issubclass(ip.__class__, _BaseAddress):
+            self.ip = ip
+        else:
+            self.ip = ip_address(ip)
         self.tariff = tariff
         self.is_active = is_active
-
-    def serialize(self) -> Optional[bytes]:
-        if self.tariff is None:
-            return
-        if not isinstance(self.tariff, TariffStruct):
-            raise TypeError('Instance must be TariffStruct')
-        if not isinstance(self.ip, IpStruct):
-            raise TypeError('Instance must be IpStruct')
-        dt = pack("!LII?", self.uid, int(self.ip), self.tariff.tid, self.is_active)
-        return dt
-
-    def deserialize(self, data: bytes, tariff=None):
-        dt = unpack("!LII?", data)
-        self.uid = dt[0]
-        self.ip = IpStruct(dt[1])
-        if tariff is not None:
-            if not isinstance(tariff, TariffStruct):
-                raise TypeError
-            self.tariff = tariff
-        self.is_active = dt['3']
-        return self
 
     def __eq__(self, other):
         if not isinstance(other, AbonStruct):
@@ -131,23 +60,11 @@ class AbonStruct(BaseStruct):
         return hash(int(self.ip) + hash(self.tariff)) if self.tariff is not None else 0
 
 
-# Правило шейпинга в фаере, или ещё можно сказать услуга абонента на NAS
+# Shape rule from NAS(Network Access Server)
 class ShapeItem(BaseStruct):
     def __init__(self, abon, sid):
         self.abon = abon
         self.sid = sid
-
-    def serialize(self) -> Optional[bytes]:
-        abon_pack = self.abon.serialize()
-        dt = pack('!L', self.sid)
-        return dt + abon_pack
-
-    def deserialize(self, data: bytes, *args):
-        sz = calcsize('!L')
-        dt = unpack('!L', data[:sz])
-        self.sid = dt
-        self.abon.deserialize(data[sz:])
-        return self
 
     def __eq__(self, other):
         if not isinstance(other, ShapeItem):

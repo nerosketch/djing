@@ -16,7 +16,7 @@ def die(text):
 
 '''
 obj = {
-    'client_ip': ip2int('127.0.0.1'),
+    'client_ip': ip_address('127.0.0.1'),
     'client_mac': 'aa:bb:cc:dd:ee:ff',
     'switch_mac': 'aa:bb:cc:dd:ee:ff',
     'switch_port': 3,

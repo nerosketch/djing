@@ -39,9 +39,9 @@ def main():
     try:
         tm = Transmitter()
         users = Abon.objects.filter(is_active=True).exclude(current_tariff=None)
-        tm.sync_nas(users)
-    except NasNetworkError as e:
-        print('NetworkTrouble:', e)
+        tm.sync_nas(users.iterator())
+    except NasNetworkError as er:
+        print('NetworkTrouble:', er)
 
     # manage periodic pays
     ppays = PeriodicPayForId.objects.filter(next_pay__lt=now) \
