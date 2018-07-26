@@ -121,7 +121,8 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
     def get_prep_value(self, value):
         # strIp to Int
         value = super(MyGenericIPAddressField, self).get_prep_value(value)
-        return int(ip_address(value))
+        if value:
+            return int(ip_address(value))
 
     def to_python(self, value):
         return value
