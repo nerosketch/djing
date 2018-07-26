@@ -534,7 +534,7 @@ def search_dev(request):
         qs = Q(comment__icontains=word)
         try:
             ip = ip_address(word)
-            qs |= Q(ip_address=ip)
+            qs |= Q(ip_address=str(ip))
         except ValueError:
             pass
         results = Device.objects.filter(qs).only('pk', 'ip_address', 'comment')[:16]
