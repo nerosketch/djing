@@ -59,7 +59,7 @@
                             {% endif %}
                         </a>
                     </td>
-                    <td><a href="{{ viewurl }}">{{ dev.ip_address }}</a></td>
+                    <td><a href="{{ viewurl }}">{{ dev.ip_address|default:'' }}</a></td>
                     <td>{{ dev.comment }}</td>
                     <td>{{ dev.mac_addr|default:_('Not assigned') }}</td>
                     <td>{{ dev.get_devtype_display }}</td>

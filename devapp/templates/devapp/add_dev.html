@@ -51,7 +51,7 @@
 
                         {% if selected_parent_dev %}
                             <button class="selectajax-btn form-control btn btn-default">
-                                {{ selected_parent_dev.ip_address }}: {{ selected_parent_dev.comment }}
+                                {{ selected_parent_dev.ip_address|default:'' }}: {{ selected_parent_dev.comment }}
                             </button>
                         {% else %}
                             <button class="selectajax-btn form-control btn btn-default hidden"></button>

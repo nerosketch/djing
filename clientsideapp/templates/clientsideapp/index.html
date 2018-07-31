@@ -18,7 +18,7 @@
             <dd>{{ user.telephone }}</dd>
 
             <dt>{% trans 'Ip Address' %}</dt>
-            <dd>{{ user.ip_address }}</dd>
+            <dd>{{ user.ip_address|default:'' }}</dd>
 
             {% if user.street %}
                 <dt>{% trans 'Address' %}</dt>
