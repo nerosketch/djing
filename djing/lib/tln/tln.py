@@ -39,11 +39,11 @@ ONU_SN_REGEX = b'^ZTEG[A-F\d]{8}$'
 class TelnetApi(Telnet):
     config_level = []
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, prompt_string: bytes, *args, **kwargs):
         timeout = kwargs.get('timeout')
         if timeout:
             self._timeout = timeout
-        self._prompt_string = b'ZTE-C320-PKP#'
+        self._prompt_string = prompt_string or b'ZTE#'
         super().__init__(*args, **kwargs)
 
     def write(self, buffer: bytes) -> None:
@@ -104,8 +104,9 @@ def parse_onu_name(onu_name: bytes, name_regexp=re.compile(b'[/:_]')) -> Dict[st
 
 class OltZTERegister(TelnetApi):
 
-    def __init__(self, screen_size: Tuple[int, int], *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, screen_size: Tuple[int, int], prompt_title: bytes, *args, **kwargs):
+        super().__init__(prompt_string=prompt_title, *args, **kwargs)
+        self.prompt_title = prompt_title
         self.resize_screen(*screen_size)
 
     def enter(self, username: bytes, passw: bytes) -> None:
@@ -151,7 +152,7 @@ class OltZTERegister(TelnetApi):
         return last_onu
 
     def enter_to_config_mode(self) -> bool:
-        prompt = b'ZTE-C320-PKP(config)#'
+        prompt = b'%s(config)#' % self.prompt_title
         self.set_prompt_string(prompt)
         res = tuple(self.command_to(b'config terminal'))
         if res[1].startswith(b'Enter configuration commands'):
@@ -160,7 +161,7 @@ class OltZTERegister(TelnetApi):
         return False
 
     def go_to_olt_interface(self, stack_num: int, rack_num: int, fiber_num: int) -> Tuple:
-        self.set_prompt_string(b'ZTE-C320-PKP(config-if)#')
+        self.set_prompt_string(b'%s(config-if)#' % self.prompt_title)
         return tuple(self.command_to(b'interface gpon-olt_%d/%d/%d' % (
             stack_num,
             rack_num,
@@ -168,7 +169,7 @@ class OltZTERegister(TelnetApi):
         )))
 
     def go_to_onu_interface(self, stack_num: int, rack_num: int, fiber_num: int, onu_port_num: int) -> Tuple:
-        self.set_prompt_string(b'ZTE-C320-PKP(config-if)#')
+        self.set_prompt_string(b'%s(config-if)#' % self.prompt_title)
         return tuple(self.command_to(b'interface gpon-onu_%d/%d/%d:%d' % (
             stack_num,
             rack_num,
@@ -202,7 +203,7 @@ class OltZTERegister(TelnetApi):
 
 
 @process_lock
-def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes) -> Tuple:
+def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes, prompt_title: bytes) -> Tuple:
     onu_type = b'ZTE-F660'
     line_profile = b'ZTE-F660-LINE'
     remote_profile = b'ZTE-F660-ROUTER'
@@ -213,7 +214,7 @@ def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes,
     if not re.match(ONU_SN_REGEX, onu_sn):
         raise ValidationError
 
-    tn = OltZTERegister(host=olt_ip, timeout=2, screen_size=(120, 128))
+    tn = OltZTERegister(host=olt_ip, timeout=2, screen_size=(120, 128), prompt_title=prompt_title)
     tn.enter(*login_passwd)
 
     unregistered_onu = tn.get_unregistered_onu(onu_sn)
