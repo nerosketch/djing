@@ -12,10 +12,10 @@
 
 Затем установим зависимости
 ```
-# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config
+# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config curl-devel
 ```
 
-Лучше чтоб версия python по умолчанию была третья:
+Необходимо чтоб версия python по умолчанию была третья:
 ```
 # ln -sf python3 /usr/bin/python
 ```
@@ -27,6 +27,7 @@
 # cd /var/www
 # pip3 install --upgrade pip
 # git clone https://github.com/nerosketch/djing.git
+# export PYCURL_SSL_LIBRARY=openssl
 # pip3 install -r djing/requirements.txt
 ```
 
