@@ -121,9 +121,9 @@ class TaskUpdateView(UpdateView):
     def get_object(self, queryset=None):
         task_id = safe_int(self.kwargs.get('task_id'))
         if task_id == 0:
-            uid = safe_int(self.request.GET.get('uid'))
-            if uid != 0:
-                self.selected_abon = Abon.objects.get(username=str(uid))
+            uname = self.request.GET.get('uid')
+            if uname:
+                self.selected_abon = Abon.objects.get(username=uname)
             return
         else:
             task = get_object_or_404(Task, pk=task_id)
