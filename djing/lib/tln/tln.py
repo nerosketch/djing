@@ -107,6 +107,7 @@ class OltZTERegister(TelnetApi):
     def __init__(self, screen_size: Tuple[int, int], prompt_title: bytes, *args, **kwargs):
         super().__init__(prompt_string=prompt_title, *args, **kwargs)
         self.prompt_title = prompt_title
+        self.set_prompt_string(b'%s#' % prompt_title)
         self.resize_screen(*screen_size)
 
     def enter(self, username: bytes, passw: bytes) -> None:
@@ -203,7 +204,7 @@ class OltZTERegister(TelnetApi):
 
 
 @process_lock
-def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes, prompt_title: bytes) -> Tuple:
+def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes, bytes], onu_mac: bytes, prompt_title: bytes, vlan_id: int) -> Tuple:
     onu_type = b'ZTE-F660'
     line_profile = b'ZTE-F660-LINE'
     remote_profile = b'ZTE-F660-ROUTER'
@@ -253,7 +254,7 @@ def register_onu_ZTE_F660(olt_ip: str, onu_sn: bytes, login_passwd: Tuple[bytes,
     r = tn.go_to_onu_interface(stack_num, rack_num, fiber_num, new_onu_port_num)
     print(r)
 
-    tn.apply_conf_to_onu(onu_mac, 145)
+    tn.apply_conf_to_onu(onu_mac, vlan_id)
     sleep(1)
     return stack_num, rack_num, fiber_num, new_onu_port_num
 

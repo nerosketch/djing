@@ -522,7 +522,7 @@ class ZteOnuDevice(OnuDevice):
                                                ' prompt for telnet access in extra_data')
             stack_num, rack_num, fiber_num, new_onu_port_num = register_onu_ZTE_F660(
                 olt_ip=ip, onu_sn=sn, login_passwd=(login.encode(), password.encode()),
-                onu_mac=mac, prompt_title=prompt.encode()
+                onu_mac=mac, prompt_title=prompt.encode(), vlan_id=132
             )
             bin_snmp_fiber_number = "10000{0:08b}{1:08b}00000000".format(rack_num, fiber_num)
             snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
