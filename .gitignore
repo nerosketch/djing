@@ -13,4 +13,4 @@ gmap/fixtures
 *.bak
 *.mo
 agent/netflow/djing_flow
-
+venv/

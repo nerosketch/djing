@@ -8,6 +8,7 @@ netaddr
 
 # for testing required xmltodict
 xmltodict
+dicttoxml
 
 # Django recommended mysql client
 mysqlclient
