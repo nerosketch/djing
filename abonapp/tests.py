@@ -11,6 +11,7 @@ from xmltodict import parse
 from abonapp.models import Abon, AbonStreet, PassportInfo
 from abonapp.pay_systems import allpay
 from group_app.models import Group
+from tariff_app.models import Tariff
 
 rf = RequestFactory()
 
@@ -330,3 +331,105 @@ class PassportTestCase(TestCase):
         self.client.post(url)
         passport = PassportInfo.objects.filter(abon=self.abon).first()
         self.assertIsNone(passport)
+
+
+class AbonServiceTestCase(TestCase):
+    def _client_get_check_login(self, url):
+        """
+        Checks if url is protected from unauthorized access
+        :param url:
+        :return: authorized response
+        """
+        r = self.client.get(url)
+        self.assertRedirects(r, "%s?next=%s" % (getattr(settings, 'LOGIN_URL'), url))
+        self.client.force_login(self.adminuser)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        return r
+
+    def setUp(self):
+        grp = Group.objects.create(title='Grp1')
+        a1 = Abon.objects.create_user(
+            telephone='+79781234567',
+            username='abon',
+            password='passw1'
+        )
+        a1.group = grp
+        a1.save(update_fields=('group',))
+        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
+        tariff1 = Tariff.objects.create(
+            title='trf',
+            descr='descr',
+            speedIn=2,
+            speedOut=5,
+            amount=1,
+            calc_type='Dp'
+        )
+        tariff1.groups.add(grp)
+        tariff1.save()
+        tariff2 = Tariff.objects.create(
+            title='trf2',
+            descr='descr2',
+            speedIn=10,
+            speedOut=10,
+            amount=2,
+            calc_type='Dp'
+        )
+        tariff2.groups.add(grp)
+        tariff2.save()
+        self.adminuser = my_admin
+        self.abon = a1
+        self.group = grp
+        self.tariff1 = tariff1
+        self.tariff2 = tariff2
+
+    def test_refill_account(self):
+        print('test_deposit_account')
+        url = resolve_url('abonapp:abon_amount', gid=self.group.pk, uname=self.abon.username)
+        self._client_get_check_login(url)
+        self.client.post(url, data={
+            'amount': 10.0,
+            'comment': 'Test pay'
+        })
+        updated_abon = Abon.objects.get(username=self.abon.username)
+        self.assertEqual(updated_abon.ballance, 10.0, msg='Account has no money')
+
+    def test_attach_services_to_groups(self):
+        print('test_attach_to_groups')
+        url = resolve_url('abonapp:ch_group_tariff', gid=self.group.pk)
+        self._client_get_check_login(url)
+        self.client.post(url, data={
+            'tr': ('1', '2')
+        })
+        updated_group = Group.objects.get(pk=self.group.pk)
+        trfs_list = tuple(int(t.pk) for t in updated_group.tariff_set.all())
+        self.assertTupleEqual((1, 2), trfs_list)
+
+    def test_pick_service(self):
+        print('test_pick_service')
+        url = resolve_url('abonapp:pick_tariff', gid=self.group.pk, uname=self.abon.username)
+        self._client_get_check_login(url)
+
+        self.client.post(url, data={
+            'tariff': self.tariff1.pk,
+            'deadline': self.tariff1.calc_deadline()
+        })
+        # not enough money
+        updated_abon = Abon.objects.get(username=self.abon.username)
+        self.assertIsNone(updated_abon.current_tariff)
+
+        # Try buying with positive ballance
+        updated_abon.add_ballance(self.adminuser, 10, comment='Test amount')
+        updated_abon.save(update_fields=('ballance',))
+        self.client.post(url, data={
+            'tariff': self.tariff1.pk,
+            'deadline': self.tariff1.calc_deadline().strftime('%Y-%m-%d')
+        })
+        updated_abon = Abon.objects.get(username=self.abon.username)
+        self.assertEqual(
+            updated_abon.current_tariff.tariff.pk,
+            self.tariff1.pk
+        )
+        self.assertEqual(
+            updated_abon.ballance, 9.0
+        )
