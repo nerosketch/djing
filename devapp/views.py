@@ -1,4 +1,5 @@
 import re
+from ipaddress import ip_address
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied
@@ -22,7 +23,7 @@ from accounts_app.models import UserProfile
 from django.conf import settings
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
-from chatbot.telebot import send_notify
+from chatbot.send_func import send_notify
 from chatbot.models import ChatException
 from jsonview.decorators import json_view
 from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
@@ -519,9 +520,13 @@ def search_dev(request):
     if word is None or word == '':
         results = [{'id': 0, 'text': ''}]
     else:
-        results = Device.objects.filter(
-            Q(comment__icontains=word) | Q(ip_address=word)
-        ).only('pk', 'ip_address', 'comment')[:16]
+        qs = Q(comment__icontains=word)
+        try:
+            ip = ip_address(word)
+            qs |= Q(ip_address=str(ip))
+        except ValueError:
+            pass
+        results = Device.objects.filter(qs).only('pk', 'ip_address', 'comment')[:16]
         results = [{
             'id': device.pk,
             'text': "%s: %s" % (device.ip_address or '', device.comment)

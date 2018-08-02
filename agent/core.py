@@ -97,8 +97,10 @@ class BaseTransmitter(ABC):
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
         users_struct_list = (ab.build_agent_struct() for ab in users_from_db if ab.is_access())
-        users_struct_set = set([ab for ab in users_struct_list if ab is not None and ab.tariff is not None])
+        users_struct_set = set(ab for ab in users_struct_list if ab is not None and ab.tariff is not None)
         users_from_nas = set(self.read_users())
+        if len(users_from_nas) < 1:
+            print('WARNING: Not have users from NAS')
         list_for_del = (users_struct_set ^ users_from_nas) - users_struct_set
         list_for_add = users_struct_set - users_from_nas
         return list_for_add, list_for_del

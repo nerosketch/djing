@@ -1,11 +1,11 @@
 #
 # I got it on https://github.com/django-macaddress/django-macaddress
 #
+from ipaddress import ip_address
+from netaddr import EUI, AddrFormatError
 from django.core.exceptions import ValidationError
 from django.db import models
-from netaddr import EUI, AddrFormatError
 
-from djing.lib import ip2int, int2ip
 from .formfields import MACAddressField as MACAddressFormField
 from . import default_dialect
 import warnings
@@ -121,7 +121,8 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
     def get_prep_value(self, value):
         # strIp to Int
         value = super(MyGenericIPAddressField, self).get_prep_value(value)
-        return ip2int(value)
+        if value:
+            return int(ip_address(value))
 
     def to_python(self, value):
         return value
@@ -131,7 +132,8 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
 
     @staticmethod
     def from_db_value(value, expression, connection, context):
-        return int2ip(value) if value != 0 else None
+        if value:
+            return str(ip_address(value))
 
     def int_ip(self):
-        return ip2int(self)
+        return int(ip_address(self))

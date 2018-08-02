@@ -55,6 +55,8 @@ urlpatterns = [
     url(r'^pay$', views.terminal_pay, name='terminal_pay'),
     url(r'^debtors$', views.DebtorsListView.as_view(), name='debtors'),
     url(r'^ping$', views.abon_ping, name='ping'),
+    url(r'^contacts/vcards/$', views.vcards, name='vcards'),
+
     # Api's
     url(r'^api/abons$', views.abons),
     url(r'^api/abon_filter$', views.search_abon),

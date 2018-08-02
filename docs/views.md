@@ -22,8 +22,8 @@ class PaysListView(ListView):
 
 ```
 
-Тогда в шаблоне с bootstrap вы можете увидеть примерно такую пагинацию которую
-вы конечно же можете изменить на свою.
+Тогда в шаблоне с bootstrap вы можете подключить шаблон пагинации *templates/pagination.html* и
+увидеть примерно такую пагинацию которую вы конечно же можете изменить на свою.
 ![paginator](./img/pagination.png).
 
 
@@ -53,4 +53,4 @@ class PaysListView(ListView, OrderingMixin):
     pass
 ```
 
-Примесь *OrderingMixin* добавляет в контекст переменные *order_by* и *dir* для использования в шалоне.
+Примесь *OrderingMixin* добавляет в контекст переменные *order_by* и *dir* для использования в шаблоне.

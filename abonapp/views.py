@@ -1,10 +1,9 @@
 from typing import Dict, Optional
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
-from django.http.request import QueryDict
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
@@ -420,8 +419,7 @@ def pick_tariff(request, gid, uname):
             if deadline == '' or deadline is None:
                 abon.pick_tariff(trf, request.user, comment=log_comment)
             else:
-                deadline = datetime.strptime(deadline, '%Y-%m-%d')
-                deadline += timedelta(hours=23, minutes=59, seconds=59)
+                deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
             abon.sync_with_nas(created=False)
             messages.success(request, _('Tariff has been picked'))
@@ -705,7 +703,49 @@ def abon_ping(request):
     }
 
 
-@method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
+@login_required
+def vcards(r):
+    abons = models.Abon.objects.exclude(group=None).select_related('group', 'street').only(
+        'username', 'fio', 'group__title', 'telephone',
+        'street__name', 'house'
+    )
+    additional_tels = models.AdditionalTelephone.objects.select_related('abon', 'abon__group', 'abon__street')
+    response = HttpResponse(content_type='text/x-vcard')
+    response['Content-Disposition'] = 'attachment; filename="contacts.vcard"'
+    tmpl = ("BEGIN:VCARD\r\n"
+            "VERSION:4.0\r\n"
+            "FN:%(uname)s. %(group_name)s, %(street)s %(house)s\r\n"
+            "IMPP:sip:%(abon_telephone)s@dial.lo\r\n"
+            "END:VCARD\r\n")
+
+    def _make_vcard():
+        for ab in abons.iterator():
+            tel = ab.telephone
+            if tel:
+                yield tmpl % {
+                    'uname': ab.get_full_name(),
+                    'group_name': ab.group.title,
+                    'street': ab.street.name if ab.street else '',
+                    'house': ab.house,
+                    'abon_telephone': tel
+                }
+        if not additional_tels.exists():
+            return
+        for add_tel in additional_tels.iterator():
+            abon = add_tel.abon
+            yield tmpl % {
+                'uname': "%s (%s)" % (add_tel.owner_name, abon.get_full_name()),
+                'group_name': abon.group.title,
+                'abon_telephone': add_tel.telephone,
+                'street': abon.street.name if abon.street else '',
+                'house': abon.house
+            }
+
+    response.content = _make_vcard()
+    return response
+
+
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 class DialsListView(OrderedFilteredList):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
@@ -1183,7 +1223,7 @@ class DhcpLever(SecureApiView):
     def on_dhcp_event(data: Dict) -> Optional[str]:
         """
         data = {
-            'client_ip': ip2int('127.0.0.1'),
+            'client_ip': ip_address('127.0.0.1'),
             'client_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_port': 3,

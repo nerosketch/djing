@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
-# from .handle import handle as task_handle
+from .handle import handle as task_handle
 
 TASK_PRIORITIES = (
     ('A', _('Higher')),
@@ -100,15 +100,14 @@ class Task(models.Model):
         self.save(update_fields=('state',))
 
     def send_notification(self):
-        pass
-        #if self.abon:
-        #    group = self.abon.group
-        #else:
-        #    group = ''
-        #task_handle(
-        #    self, self.author,
-        #    self.recipients.all(), group
-        #)
+        if self.abon:
+           group = self.abon.group
+        else:
+           group = ''
+        task_handle(
+           self, self.author,
+           self.recipients.all(), group
+        )
 
     def get_attachment_fname(self):
         return os.path.basename(self.attachment.name)

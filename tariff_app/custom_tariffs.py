@@ -67,11 +67,23 @@ class TariffCp(TariffDp):
         return long_long_time
 
 
+# Daily service
+class TariffDaily(TariffDp):
+    description = _('IS Daily service')
+
+    def calc_deadline(self):
+        nw = timezone.now()
+        # next day in the same time
+        one_day = timedelta(days=1)
+        return nw + one_day
+
+
 # Первый - всегда по умолчанию
 TARIFF_CHOICES = (
     ('Df', TariffDefault),
     ('Dp', TariffDp),
-    ('Cp', TariffCp)
+    ('Cp', TariffCp),
+    ('Dl', TariffDaily)
 )
 
 

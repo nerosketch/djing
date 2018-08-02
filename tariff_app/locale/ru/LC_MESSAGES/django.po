@@ -212,3 +212,6 @@ msgstr "Периодический платёж изменён"
 
 msgid "Are you sure you want to delete tariff?"
 msgstr "Вы уверены что хотите удалить тариф?"
+
+msgid "IS Daily service"
+msgstr "Услуга на сутки"

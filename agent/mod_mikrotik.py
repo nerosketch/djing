@@ -3,13 +3,14 @@ import socket
 import binascii
 from abc import ABCMeta
 from hashlib import md5
-from ipaddress import ip_network
+from ipaddress import ip_network, _BaseAddress
 from typing import Iterable, Optional, Tuple, Generator, Dict
+
+from django.conf import settings
 
 from djing.lib.decorators import LazyInitMetaclass
 from .structs import TariffStruct, AbonStruct, IpStruct, VectorAbon, VectorTariff
 from . import settings as local_settings
-from django.conf import settings
 from djing import ping
 from agent.core import BaseTransmitter, NasNetworkError, NasFailedResult
 
@@ -231,22 +232,29 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
                 res = float(re.sub(r'[a-zA-Z]', '', text_speed)) / 1000 ** 2
             return res
 
-        dat = info.get('!re')
-        speeds = dat.get('=max-limit').split('/')
+        speed_out, speed_in = info['=max-limit'].split('/')
         t = TariffStruct(
-            speed_in=parse_speed(speeds[1]),
-            speed_out=parse_speed(speeds[0])
+            speed_in=parse_speed(speed_in),
+            speed_out=parse_speed(speed_out)
         )
         try:
-            a = AbonStruct(
-                uid=int(dat['=name'][3:]),
-                # FIXME: тут в разных микротиках или =target-addresses или =target
-                ips=(int(ip_network(ip).network_address) for ip in dat['=target'].split(',')),
-                tariff=t,
-                is_access=False if dat['=disabled'] == 'false' else True
-            )
-            a.queue_id = dat['=.id']
-            return a
+            target = info.get('=target')
+            if target is None:
+                target = info.get('=target-addresses')
+            name = info.get('=name')
+            disabled = info.get('=disabled')
+            if disabled is not None:
+                disabled = True if disabled == 'true' else False
+            if target is not None and name is not None:
+                target_ip, target_net = target.split('/')
+                a = AbonStruct(
+                    uid=int(name[3:]),
+                    ip=target_ip,
+                    tariff=t,
+                    is_active=disabled or False
+                )
+                a.queue_id = info.get('=.id')
+                return a
         except ValueError:
             pass
 
@@ -348,8 +356,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             '=numbers=%s' % ','.join(ip_firewall_ids)
         ))
 
-    def find_ip(self, ip: IpStruct, list_name: str):
-        if not isinstance(ip, IpStruct):
+    def find_ip(self, ip, list_name: str):
+        if not issubclass(ip.__class__, _BaseAddress):
             raise TypeError
         r = self._exec_cmd((
             '/ip/firewall/address-list/print', 'where',
@@ -407,7 +415,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         # queue is instance of AbonStruct
         queue = self.find_queue('uid%d' % user.uid)
         for ip in user.ips:
-            if not isinstance(ip, IpStruct):
+            if not issubclass(ip.__class__, _BaseAddress):
                 raise TypeError
             nas_ip = self.find_ip(ip, LIST_USERS_ALLOWED)
             if user.is_access:
@@ -469,14 +477,28 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         pass
 
     def read_users(self) -> VectorAbon:
+        class ip_mkid_struct(object):
+            __slots__ = ('ip', 'mkid')
+
+            def __init__(self, ip, mkid):
+                self.ip = ip
+                self.mkid = mkid
+
+            def __eq__(self, other):
+                if isinstance(other, ip_mkid_struct):
+                    return self.ip == other.ip
+                return self.ip == str(other)
+
+            def __hash__(self):
+                return hash(self.ip)
         # shapes is ShapeItem
-        allowed_ips = tuple(self.read_ips_iter(LIST_USERS_ALLOWED))
-        queues = tuple(q for q in self.read_queue_iter() if set(q.ips).issubset(allowed_ips))
-        # TODO: Make clean old ip addresses in other place
-        #ips_from_queues = set((q.ip, q) for q in queues)
+        all_ips = set(ip_mkid_struct(ip, mkid) for ip, mkid in self.read_ips_iter(LIST_USERS_ALLOWED))
+        queues = (q for q in self.read_queue_iter() if str(q.ip) in all_ips)
+
+        # ips_from_queues = set(str(q.ip) for q in queues)
 
         # delete ip addresses that are in firewall/address-list and there are no corresponding in queues
-        #diff = tuple(allowed_ips - ips_from_queues)
+        #diff = tuple(all_ips - ips_from_queues)
         #if len(diff) > 0:
         #    self.remove_ip_range(diff)
         return queues

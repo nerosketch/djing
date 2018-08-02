@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from accounts_app.models import UserProfile
-from chatbot.telebot import send_notify
+from chatbot.send_func import send_notify
 from chatbot.models import ChatException
 
 

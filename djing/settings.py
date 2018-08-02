@@ -131,11 +131,11 @@ SESSION_COOKIE_HTTPONLY = True
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
 
 LANGUAGES = (
     ('ru', _('Russian')),
-    #('en', _('English'))
+    ('en', _('English'))
 )
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -213,6 +213,16 @@ BOOTSTRAP3 = {
     # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
 }
+
+
+# Email config
+EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
+EMAIL_HOST = local_settings.EMAIL_HOST
+EMAIL_PORT = local_settings.EMAIL_PORT
+EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = getattr(local_settings, 'EMAIL_USE_TLS', True)
+
+SERVER_EMAIL = EMAIL_HOST_USER
 
 # Inactive ip lease time in seconds.
 # If lease time more than time of create, and lease is inactive

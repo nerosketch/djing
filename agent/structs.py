@@ -44,9 +44,9 @@ class TariffStruct(BaseStruct):
         self.speedIn = speed_in or 0
         self.speedOut = speed_out or 0
 
-    # Да, если все значения нулевые
+    # Yes, if all variables is zeroed
     def is_empty(self):
-        return self.tid == 0 and self.speedIn == 0.001 and self.speedOut == 0.001
+        return self.tid == 0 and self.speedIn == 0 and self.speedOut == 0
 
     def __eq__(self, other):
         # не сравниваем id, т.к. тарифы с одинаковыми скоростями для NAS одинаковы
@@ -62,7 +62,7 @@ class TariffStruct(BaseStruct):
         return hash(str(self.speedIn) + str(self.speedOut))
 
 
-# Абонент из базы
+# Abon from database
 class AbonStruct(BaseStruct):
     __slots__ = ('uid', 'ips', 'tariff', 'is_access', 'queue_id')
 
@@ -90,7 +90,7 @@ class AbonStruct(BaseStruct):
         return hash(hash(self.ips) + hash(self.tariff)) if self.tariff is not None else 0
 
 
-# Правило шейпинга в фаере, или ещё можно сказать услуга абонента на NAS
+# Shape rule from NAS(Network Access Server)
 class ShapeItem(BaseStruct):
     __slots__ = ('abon', 'sid')
 

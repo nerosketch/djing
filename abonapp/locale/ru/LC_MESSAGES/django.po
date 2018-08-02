@@ -1157,3 +1157,6 @@ msgstr "История задач"
 
 msgid "Charts"
 msgstr "Графики"
+
+msgid "Export vCards"
+msgstr "Экспорт в vCards"

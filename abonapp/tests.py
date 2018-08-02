@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from hashlib import md5
 from datetime import date
 
@@ -6,12 +7,15 @@ from django.shortcuts import resolve_url
 from django.test import TestCase, RequestFactory
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import escape
+from django.utils.translation import gettext_lazy as _
 from xmltodict import parse
 
 from abonapp.models import Abon, AbonStreet, PassportInfo
 from abonapp.pay_systems import allpay
 from group_app.models import Group
 from tariff_app.models import Tariff
+from ip_pool.models import NetworkModel
 
 rf = RequestFactory()
 
@@ -24,7 +28,36 @@ def _make_sign(act: int, pay_account: str, serv_id: str, pay_id):
     return md.hexdigest()
 
 
-class AllPayTestCase(TestCase):
+class MyBaseTestCase(metaclass=ABCMeta):
+    def _client_get_check_login(self, url):
+        """
+        Checks if url is protected from unauthorized access
+        :param url:
+        :return: authorized response
+        """
+        r = self.client.get(url)
+        self.assertRedirects(r, "%s?next=%s" % (getattr(settings, 'LOGIN_URL'), url))
+        self.client.force_login(self.adminuser)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        return r
+
+    def setUp(self):
+        grp = Group.objects.create(title='Grp1')
+        a1 = Abon.objects.create_user(
+            telephone='+79781234567',
+            username='abon',
+            password='passw1'
+        )
+        a1.group = grp
+        a1.save(update_fields=('group',))
+        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
+        self.adminuser = my_admin
+        self.abon = a1
+        self.group = grp
+
+
+class AllPayTestCase(MyBaseTestCase, TestCase):
     pay_url = '/'
     time_format = '%d.%m.%Y %H:%M'
 
@@ -57,18 +90,19 @@ class AllPayTestCase(TestCase):
             }
         ))
         r = r.content.decode('utf-8')
-        self.assertXMLEqual(r, ''.join((
+        o = ''.join((
             "<pay-response>",
                 "<balance>-13.12</balance>",
                 "<name>Test Name</name>",
                 "<account>pay_account1</account>",
-                "<service_id>%s</service_id>" % service_id,
+                "<service_id>%s</service_id>" % escape(service_id),
                 "<min_amount>10.0</min_amount>",
                 "<max_amount>5000</max_amount>",
                 "<status_code>21</status_code>",
-                "<time_stamp>%s</time_stamp>" % current_date,
+                "<time_stamp>%s</time_stamp>" % escape(current_date),
             "</pay-response>"
-        )))
+        ))
+        self.assertXMLEqual(r, o)
 
     def user_pay_pay(self):
         print('test_user_pay_pay')
@@ -88,10 +122,10 @@ class AllPayTestCase(TestCase):
         xml = ''.join((
             "<pay-response>",
                 "<pay_id>840ab457-e7d1-4494-8197-9570da035170</pay_id>",
-                "<service_id>%s</service_id>" % service_id,
+                "<service_id>%s</service_id>" % escape(service_id),
                 "<amount>18.21</amount>",
                 "<status_code>22</status_code>",
-                "<time_stamp>%s</time_stamp>" % current_date,
+                "<time_stamp>%s</time_stamp>" % escape(current_date),
             "</pay-response>"
         ))
         self.test_pay_time = current_date
@@ -113,13 +147,13 @@ class AllPayTestCase(TestCase):
         xml = ''.join((
             "<pay-response>",
                 "<status_code>11</status_code>",
-                "<time_stamp>%s</time_stamp>" % current_date,
+                "<time_stamp>%s</time_stamp>" % escape(current_date),
                 "<transaction>",
                     "<pay_id>840ab457-e7d1-4494-8197-9570da035170</pay_id>",
-                    "<service_id>%s</service_id>" % service_id,
+                    "<service_id>%s</service_id>" % escape(service_id),
                     "<amount>18.21</amount>",
                     "<status>111</status>",
-                    "<time_stamp>%s</time_stamp>" % self.test_pay_time,
+                    "<time_stamp>%s</time_stamp>" % escape(self.test_pay_time),
                 "</transaction>"
             "</pay-response>"
         ))
@@ -160,7 +194,7 @@ class AllPayTestCase(TestCase):
         self.assertXMLEqual(r, ''.join((
             "<pay-response>",
                 "<status_code>-40</status_code>",
-                "<time_stamp>%s</time_stamp>" % current_date,
+                "<time_stamp>%s</time_stamp>" % escape(current_date),
             "</pay-response>"
         )))
 
@@ -195,7 +229,7 @@ class AllPayTestCase(TestCase):
         xml = ''.join((
             "<pay-response>",
                 "<status_code>-10</status_code>",
-                "<time_stamp>%s</time_stamp>" % current_date,
+                "<time_stamp>%s</time_stamp>" % escape(current_date),
             "</pay-response>"
         ))
         self.assertXMLEqual(r, xml)
@@ -209,29 +243,26 @@ class AllPayTestCase(TestCase):
         self.non_existing_pay()
 
 
-class StreetTestCase(TestCase):
+class StreetTestCase(MyBaseTestCase, TestCase):
     group = None
     street = None
 
     def setUp(self):
-        grp = Group.objects.create(title='Grp1')
+        super(StreetTestCase, self).setUp()
+        grp = self.group
         self.street = AbonStreet.objects.create(name='test_street', group=grp)
         AbonStreet.objects.create(name='test_street1', group=grp)
         AbonStreet.objects.create(name='test_street2', group=grp)
         AbonStreet.objects.create(name='test_street3', group=grp)
         AbonStreet.objects.create(name='test_street4', group=grp)
         AbonStreet.objects.create(name='test_street5', group=grp)
-        self.group = grp
-        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
-        # self.client.login(username=my_admin.username, password=my_admin.password)
-        self.adminuser = my_admin
 
     def test_street_make_cyrillic(self):
         print('test_make_cyrillic_street')
         # title = ''.join(chr(n) for n in range(1072, 1104))
         cyrrilic = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
-        self.client.force_login(self.adminuser)
         url = resolve_url('abonapp:street_add', self.group.pk)
+        self._client_get_check_login(url)
         r = self.client.post(url, {
             'name': cyrrilic,
             'group': self.group.pk
@@ -243,7 +274,7 @@ class StreetTestCase(TestCase):
         print('test_edit_steet')
         url = resolve_url('abonapp:street_edit', self.group.pk)
         streets = AbonStreet.objects.exclude(pk=self.street.pk)
-        self.client.force_login(self.adminuser)
+        self._client_get_check_login(url)
         r = self.client.post(url, {
             'sid': tuple(s.id for s in streets),
             'sname': tuple('%s_' % s.name for s in streets)
@@ -264,28 +295,17 @@ class StreetTestCase(TestCase):
         self.assertEqual(after_count, 0)
 
 
-class PassportTestCase(TestCase):
+class PassportTestCase(MyBaseTestCase, TestCase):
     def setUp(self):
-        grp = Group.objects.create(title='Grp1')
-        a1 = Abon.objects.create_user(
-            telephone='+79781234567',
-            username='pay_account1',
-            password='passw1'
-        )
-        a1.group = grp
-        a1.save(update_fields=('group',))
+        super(PassportTestCase, self).setUp()
         passport_item = PassportInfo.objects.create(
             series='1243',
             number='738517',
             distributor='Distributor',
             date_of_acceptance=date(year=2014, month=9, day=14),
-            abon=a1
+            abon=self.abon
         )
-        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
-        self.adminuser = my_admin
         self.passport = passport_item
-        self.abon = a1
-        self.group = grp
 
     def test_create_update_delete(self):
         self.passport_make()
@@ -295,7 +315,7 @@ class PassportTestCase(TestCase):
     def passport_make(self):
         print('passport_make')
         url = resolve_url('abonapp:passport_view', self.group.pk, self.abon.username)
-        self.client.force_login(self.adminuser)
+        self._client_get_check_login(url)
         self.client.post(url, {
             'series': '1232',
             'number': '123456',
@@ -311,7 +331,6 @@ class PassportTestCase(TestCase):
     def passport_change(self):
         print('passport_change')
         url = resolve_url('abonapp:passport_view', self.group.pk, self.abon.username)
-        self.client.force_login(self.adminuser)
         self.client.post(url, {
             'series': '9876',
             'number': '987654',
@@ -327,36 +346,15 @@ class PassportTestCase(TestCase):
     def passport_remove_item_with_user(self):
         print('passport_remove_item_with_user')
         url = resolve_url('abonapp:del_abon', self.group.pk, self.abon.username)
-        self.client.force_login(self.adminuser)
         self.client.post(url)
         passport = PassportInfo.objects.filter(abon=self.abon).first()
         self.assertIsNone(passport)
 
 
-class AbonServiceTestCase(TestCase):
-    def _client_get_check_login(self, url):
-        """
-        Checks if url is protected from unauthorized access
-        :param url:
-        :return: authorized response
-        """
-        r = self.client.get(url)
-        self.assertRedirects(r, "%s?next=%s" % (getattr(settings, 'LOGIN_URL'), url))
-        self.client.force_login(self.adminuser)
-        r = self.client.get(url)
-        self.assertEqual(r.status_code, 200)
-        return r
+class AbonServiceTestCase(MyBaseTestCase, TestCase):
 
     def setUp(self):
-        grp = Group.objects.create(title='Grp1')
-        a1 = Abon.objects.create_user(
-            telephone='+79781234567',
-            username='abon',
-            password='passw1'
-        )
-        a1.group = grp
-        a1.save(update_fields=('group',))
-        my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
+        super().setUp()
         tariff1 = Tariff.objects.create(
             title='trf',
             descr='descr',
@@ -365,7 +363,7 @@ class AbonServiceTestCase(TestCase):
             amount=1,
             calc_type='Dp'
         )
-        tariff1.groups.add(grp)
+        tariff1.groups.add(self.group)
         tariff1.save()
         tariff2 = Tariff.objects.create(
             title='trf2',
@@ -375,11 +373,8 @@ class AbonServiceTestCase(TestCase):
             amount=2,
             calc_type='Dp'
         )
-        tariff2.groups.add(grp)
+        tariff2.groups.add(self.group)
         tariff2.save()
-        self.adminuser = my_admin
-        self.abon = a1
-        self.group = grp
         self.tariff1 = tariff1
         self.tariff2 = tariff2
 
@@ -423,7 +418,7 @@ class AbonServiceTestCase(TestCase):
         updated_abon.save(update_fields=('ballance',))
         self.client.post(url, data={
             'tariff': self.tariff1.pk,
-            'deadline': self.tariff1.calc_deadline().strftime('%Y-%m-%d')
+            'deadline': self.tariff1.calc_deadline().strftime('%Y-%m-%d %H:%M:%S')
         })
         updated_abon = Abon.objects.get(username=self.abon.username)
         self.assertEqual(
@@ -433,3 +428,62 @@ class AbonServiceTestCase(TestCase):
         self.assertEqual(
             updated_abon.ballance, 9.0
         )
+
+
+class ClientLeasesTestCase(MyBaseTestCase, TestCase):
+    def setUp(self):
+        super(ClientLeasesTestCase, self).setUp()
+        netw = NetworkModel.objects.create(
+            network='192.168.0.0/24',
+            kind='inet',
+            description='Descr',
+            ip_start='192.168.0.3',
+            ip_end='192.168.0.6'
+        )
+        netw.groups.add(self.group.pk)
+        netw.save()
+        self.network = netw
+
+    def test_add_static_ipv4_lease(self):
+        print('test_add_static_ipv4_lease')
+        url = resolve_url('abonapp:lease_add', gid=self.group.pk, uname=self.abon.username)
+        self._client_get_check_login(url)
+
+        # Checks if lease not in allowed range
+        r = self.client.post(url, data={
+            'ip_addr': '192.168.0.255',
+            'is_dynamic': False,
+            'possible_networks': self.network.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you have passed is greater than allowed network range'))
+
+        # Not valid ipv4 address
+        r = self.client.post(url, data={
+            'ip_addr': '192.168.3.213123',
+            'is_dynamic': False,
+            'possible_networks': self.network.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Enter a valid IPv4 or IPv6 address.'))
+
+        # different subnet
+        r = self.client.post(url, data={
+            'ip_addr': '192.168.4.2',
+            'is_dynamic': False,
+            'possible_networks': self.network.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you typed is not in subnet that you have selected'))
+
+        # another subnet
+        netw = NetworkModel.objects.create(
+            network='192.168.1.0/24',
+            kind='inet',
+            description='Descr',
+            ip_start='192.168.1.3',
+            ip_end='192.168.1.6'
+        )
+        r = self.client.post(url, data={
+            'ip_addr': '192.168.0.9',
+            'is_dynamic': False,
+            'possible_networks': netw.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you typed is not in subnet that you have selected'))
