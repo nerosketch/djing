@@ -443,6 +443,16 @@ class ClientLeasesTestCase(MyBaseTestCase, TestCase):
         netw.groups.add(self.group.pk)
         netw.save()
         self.network = netw
+        netw6 = NetworkModel.objects.create(
+            network='fde8:86a9:f132:1::/64',
+            kind='inet',
+            description='Descr',
+            ip_start='fde8:86a9:f132:1::1',
+            ip_end='fde8:86a9:f132:1::2f'
+        )
+        netw6.groups.add(self.group.pk)
+        netw6.save()
+        self.network6 = netw6
 
     def test_add_static_ipv4_lease(self):
         print('test_add_static_ipv4_lease')
@@ -487,3 +497,69 @@ class ClientLeasesTestCase(MyBaseTestCase, TestCase):
             'possible_networks': netw.pk
         })
         self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you typed is not in subnet that you have selected'))
+
+        # successfully apply
+        r = self.client.post(url, data={
+            'ip_addr': '192.168.0.3',
+            'is_dynamic': False,
+            'possible_networks': self.network.pk
+        })
+        self.assertRedirects(r, resolve_url('abonapp:abon_home', self.group.pk, self.abon.username))
+        updated_abon = Abon.objects.get(username=self.abon.username)
+        ip_addr = updated_abon.ip_addresses.all().first()
+        self.assertEqual('192.168.0.3', ip_addr.ip)
+
+    def test_add_static_ipv6_lease(self):
+        print('test_add_static_ipv6_lease')
+        url = resolve_url('abonapp:lease_add', gid=self.group.pk, uname=self.abon.username)
+        self._client_get_check_login(url)
+
+        # Checks if lease not in allowed range
+        r = self.client.post(url, data={
+            'ip_addr': 'fde8:86a9:f132:1::3f',
+            'is_dynamic': False,
+            'possible_networks': self.network6.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you have passed is greater than allowed network range'))
+
+        # Not valid ipv4 address
+        r = self.client.post(url, data={
+            'ip_addr': 'fde8:86a9:f132:1::dsf',
+            'is_dynamic': False,
+            'possible_networks': self.network6.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('This is not a valid IPv6 address.'))
+
+        # different subnet
+        r = self.client.post(url, data={
+            'ip_addr': 'fde8:86a9:f232:1::7',
+            'is_dynamic': False,
+            'possible_networks': self.network6.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you typed is not in subnet that you have selected'))
+
+        # another subnet
+        netw = NetworkModel.objects.create(
+            network='fde8:86a9:f132:1::1',
+            kind='inet',
+            description='Descr',
+            ip_start='fde8:86a9:f132:1::2',
+            ip_end='fde8:86a9:f132:1::ff12'
+        )
+        r = self.client.post(url, data={
+            'ip_addr': 'fde8:86a9:f1c6:1::1',
+            'is_dynamic': False,
+            'possible_networks': netw.pk
+        })
+        self.assertFormError(r, form='form', field='ip_addr', errors=_('Ip that you typed is not in subnet that you have selected'))
+
+        # successfully apply
+        r = self.client.post(url, data={
+            'ip_addr': 'fde8:86a9:f132:1::7',
+            'is_dynamic': False,
+            'possible_networks': self.network6.pk
+        })
+        self.assertRedirects(r, resolve_url('abonapp:abon_home', self.group.pk, self.abon.username))
+        updated_abon = Abon.objects.get(username=self.abon.username)
+        ip_addr = updated_abon.ip_addresses.all().first()
+        self.assertEqual('fde8:86a9:f132:1::7', ip_addr.ip)
