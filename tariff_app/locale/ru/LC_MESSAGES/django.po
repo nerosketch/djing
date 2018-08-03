@@ -215,3 +215,6 @@ msgstr "Вы уверены что хотите удалить тариф?"
 
 msgid "IS Daily service"
 msgstr "Услуга на сутки"
+
+msgid "Service with this Speed In, Speed Out, Price and Script already exists."
+msgstr "Услуга с такой скоростью, ценой и логикой уже есть"

@@ -24,6 +24,8 @@
         <div class="panel-body">
             <form action="{% url 'tarifs:edit' tarif_id %}" method="post">{% csrf_token %}
 
+                {% bootstrap_form_errors form %}
+
                 {% bootstrap_icon 'tag' as ic %}
                 {% bootstrap_field form.title addon_before=ic %}
 

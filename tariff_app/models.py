@@ -54,6 +54,7 @@ class Tariff(models.Model):
         ordering = ('title',)
         verbose_name = _('Service')
         verbose_name_plural = _('Services')
+        unique_together = ('speedIn', 'speedOut', 'amount', 'calc_type')
 
 
 class PeriodicPay(models.Model):
