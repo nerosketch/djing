@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterator, Any, Tuple, Optional
 
-from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff, IpStruct
+from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
 
 
 # Raised if NAS has returned failed result
@@ -78,14 +78,14 @@ class BaseTransmitter(ABC):
         pass
 
     @abstractmethod
-    def lease_free(self, user: AbonStruct, lease: IpStruct):
+    def lease_free(self, user: AbonStruct, lease):
         """
         Remove ip lease from allowed to network
         :return:
         """
 
     @abstractmethod
-    def lease_start(self, user: AbonStruct, lease: IpStruct):
+    def lease_start(self, user: AbonStruct, lease):
         """
         Starts ip lease to allowed to network
         :return:

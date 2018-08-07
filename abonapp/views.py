@@ -1,3 +1,4 @@
+from ipaddress import ip_address
 from typing import Dict, Optional
 from datetime import datetime, date
 from django.contrib.gis.shortcuts import render_to_text
@@ -16,7 +17,6 @@ from django.conf import settings
 from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
-from agent.structs import IpStruct
 from statistics.models import StatCache
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
@@ -1117,16 +1117,20 @@ def user_session_toggle(request, gid, uname, lease_id, action=None):
     lease = abon.ip_addresses.get(pk=lease_id)
     tm = Transmitter()
     abon_nas_obj = abon.build_agent_struct()
-    res_text = '#Parameter needed#'
-    if action == 'free':
-        lease.free()
-        tm.lease_free(abon_nas_obj, IpStruct(lease.ip))
-        res_text = _('Ip lease has been freed')
-    elif action == 'start':
-        lease.start()
-        tm.lease_start(abon_nas_obj, IpStruct(lease.ip))
-        res_text = _('Ip lease has been started')
-    messages.success(request, res_text)
+    try:
+        if action == 'free':
+            if abon.ip_addresses.filter(is_active=True).count() > 1:
+                tm.lease_free(abon_nas_obj, ip_address(lease.ip))
+                lease.free()
+                messages.success(request, _('Ip lease has been freed'))
+            else:
+                messages.error(request, _('You cannot disable last session'))
+        elif action == 'start':
+            tm.lease_start(abon_nas_obj, ip_address(lease.ip))
+            lease.start()
+            messages.success(request, _('Ip lease has been started'))
+    except NasFailedResult as e:
+        messages.error(request, e)
     return redirect('abonapp:abon_home', gid, uname)
 
 

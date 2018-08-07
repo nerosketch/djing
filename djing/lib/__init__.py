@@ -1,23 +1,8 @@
 import socket
-import struct
 from functools import wraps
 from hashlib import sha256
 from datetime import timedelta
 from collections import Iterator
-
-
-def ip2int(addr):
-    try:
-        return struct.unpack("!I", socket.inet_aton(addr))[0]
-    except:
-        return 0
-
-
-def int2ip(addr):
-    try:
-        return socket.inet_ntoa(struct.pack("!I", addr))
-    except:
-        return ''
 
 
 def safe_float(fl):

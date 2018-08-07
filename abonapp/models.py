@@ -215,8 +215,8 @@ class Abon(BaseAccount):
     # make subscriber from agent structure
     def build_agent_struct(self):
         abon_addresses = tuple(ip_address(i.ip) for i in self.ip_addresses.filter(is_active=True))
-        if not abon_addresses:
-            return
+        # if not abon_addresses:
+        #     return
         abon_tariff = self.active_tariff()
         if abon_tariff is None:
             agent_trf = None

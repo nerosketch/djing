@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
+from djing.fields import MACAddressField
 from djing.lib import DuplicateEntry
 from ip_pool.fields import GenericIpAddressWithPrefix
 from group_app.models import Group
@@ -162,9 +163,11 @@ class IpLeaseManager(models.Manager):
 class IpLeaseModel(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True)
     network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE, verbose_name=_('Parent network'))
+    mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
     is_dynamic = models.BooleanField(_('Is dynamic'), default=False)
     is_active = models.BooleanField(_('Is active'), default=True)
+    device_info = models.CharField(null=True, blank=True, default=None, max_length=128)
 
     objects = IpLeaseManager()
 

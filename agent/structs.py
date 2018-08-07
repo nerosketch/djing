@@ -1,38 +1,10 @@
-# -*- coding: utf-8 -*-
 from abc import ABCMeta
+from ipaddress import ip_address
 from typing import Iterable
-from djing.lib import int2ip, ip2int
 
 
 class BaseStruct(object, metaclass=ABCMeta):
     __slots__ = ()
-
-
-class IpStruct(BaseStruct):
-    __slots__ = ('__ip',)
-
-    def __init__(self, ip):
-        if type(ip) is int:
-            self.__ip = ip
-        else:
-            self.__ip = ip2int(str(ip))
-
-    def get_int(self):
-        return self.__ip
-
-    def __eq__(self, other):
-        if not isinstance(other, IpStruct):
-            raise TypeError('Instance must be IpStruct')
-        return self.__ip == other.__ip
-
-    def __int__(self):
-        return self.__ip
-
-    def __str__(self):
-        return int2ip(self.__ip)
-
-    def __hash__(self):
-        return hash(self.__ip)
 
 
 # Как обслуживается абонент
@@ -71,7 +43,7 @@ class AbonStruct(BaseStruct):
         if ips is None:
             self.ips = ()
         else:
-            self.ips = tuple(IpStruct(ip) for ip in ips)
+            self.ips = tuple(ip_address(ip) for ip in ips)
         self.tariff = tariff
         self.is_access = is_access
         self.queue_id = 0
