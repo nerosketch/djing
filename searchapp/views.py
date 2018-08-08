@@ -19,7 +19,7 @@ def home(request):
 
     if s:
         if re.match(IP_ADDR_REGEX, s):
-            abons = Abon.objects.filter(ip_address=s)
+            abons = Abon.objects.filter(ip_addresses__ip=s)
             devices = Device.objects.filter(ip_address=s)
         else:
             abons = Abon.objects.filter(
