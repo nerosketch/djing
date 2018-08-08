@@ -250,10 +250,10 @@ class Abon(BaseAccount):
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
 
-    def add_lease(self, ip: str):
+    def add_lease(self, ip: str, mac_addr=None):
         existed_client_ips = tuple(l.ip for l in self.ip_addresses.all())
         if ip not in existed_client_ips:
-            lease = IpLeaseModel.objects.create_from_ip(ip=ip)
+            lease = IpLeaseModel.objects.create_from_ip(ip=ip, net=None, mac=mac_addr)
             if lease is None:
                 return 'Subnet not found'
             self.ip_addresses.add(lease)

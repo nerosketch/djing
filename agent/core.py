@@ -96,8 +96,8 @@ class BaseTransmitter(ABC):
         :param users_from_db: QuerySet of all subscribers that can have service
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
-        users_struct_list = (ab.build_agent_struct() for ab in users_from_db if ab.is_access())
-        users_struct_set = set(ab for ab in users_struct_list if ab is not None and ab.tariff is not None)
+        users_struct_gen = (ab.build_agent_struct() for ab in users_from_db if ab.is_access())
+        users_struct_set = set(ab for ab in users_struct_gen if ab is not None and ab.tariff is not None)
         users_from_nas = set(self.read_users())
         if len(users_from_nas) < 1:
             print('WARNING: Not have users from NAS')
@@ -108,6 +108,12 @@ class BaseTransmitter(ABC):
     def sync_nas(self, users_from_db: Iterator):
         list_for_add, list_for_del = self._diff_users(users_from_db)
         if len(list_for_del) > 0:
+            print('List for del:')
+            for ld in list_for_del:
+                print('\t', ld.ips)
             self.remove_user_range(list_for_del)
         if len(list_for_add) > 0:
+            print('List for add:')
+            for la in list_for_add:
+                print('\t', la.ips)
             self.add_user_range(list_for_add)

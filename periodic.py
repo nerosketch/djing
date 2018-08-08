@@ -39,8 +39,12 @@ def main():
     # sync subscribers on NAS
     try:
         tm = Transmitter()
-        users = Abon.objects.filter(is_active=True).exclude(current_tariff=None)
-        tm.sync_nas(users.iterator())
+        users = Abon.objects\
+            .filter(is_active=True)\
+            .exclude(current_tariff=None)\
+            .prefetch_related('ip_addresses')\
+            .iterator()
+        tm.sync_nas(users)
     except NasNetworkError as er:
         print('NetworkTrouble:', er)
 

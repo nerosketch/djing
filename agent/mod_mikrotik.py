@@ -168,7 +168,6 @@ class ApiRos(object):
 
 
 class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs', (ABCMeta, LazyInitMetaclass), {})):
-
     def __init__(self, login=None, password=None, ip=None, port=None):
         ip = ip or getattr(local_settings, 'NAS_IP')
         if ip is None or ip == '<NAS IP>':
@@ -473,30 +472,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         pass
 
     def read_users(self) -> VectorAbon:
-        class ip_mkid_struct(object):
-            __slots__ = ('ip', 'mkid')
-
-            def __init__(self, ip, mkid):
-                self.ip = ip
-                self.mkid = mkid
-
-            def __eq__(self, other):
-                if isinstance(other, ip_mkid_struct):
-                    return self.ip == other.ip
-                return self.ip == str(other)
-
-            def __hash__(self):
-                return hash(self.ip)
         # shapes is ShapeItem
-        all_ips = set(ip_mkid_struct(ip, mkid) for ip, mkid in self.read_ips_iter(LIST_USERS_ALLOWED))
-        queues = (q for q in self.read_queue_iter() if str(q.ip) in all_ips)
-
-        # ips_from_queues = set(str(q.ip) for q in queues)
-
-        # delete ip addresses that are in firewall/address-list and there are no corresponding in queues
-        #diff = tuple(all_ips - ips_from_queues)
-        #if len(diff) > 0:
-        #    self.remove_ip_range(diff)
+        all_ips = set(ip for ip, mkid in self.read_ips_iter(LIST_USERS_ALLOWED))
+        queues = (q for q in self.read_queue_iter() if all_ips.issuperset(q.ips))
         return queues
 
     def lease_free(self, user: AbonStruct, lease):

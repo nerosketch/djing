@@ -1,6 +1,6 @@
 from datetime import timedelta
 from ipaddress import ip_network, ip_address
-from typing import AnyStr
+from typing import Optional
 
 from django.conf import settings
 from django.db.utils import IntegrityError
@@ -85,7 +85,7 @@ class NetworkModel(models.Model):
                 })
                 raise ValidationError(errs)
 
-    def get_scope(self) -> AnyStr:
+    def get_scope(self) -> str:
         net = self.get_network()
         if net.is_global:
             return _('Global')
@@ -138,14 +138,15 @@ class IpLeaseManager(models.Manager):
                 if work_range_start_ip <= net <= work_range_end_ip:
                     return net
 
-    def create_from_ip(self, ip: str, net: NetworkModel, is_dynamic=True):
+    def create_from_ip(self, ip: str, net: Optional[NetworkModel], mac=None, is_dynamic=True):
         # ip = ip_address(ip)
         try:
             return self.create(
                 ip=ip,
                 network=net,
                 is_dynamic=is_dynamic,
-                is_active=True
+                is_active=True,
+                mac_addr=mac
             )
         except IntegrityError as e:
             if 'Duplicate entry' in str(e):
