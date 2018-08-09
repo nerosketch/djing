@@ -42,7 +42,6 @@ class NetworksTestCase(MyBaseTestCase, TestCase):
             ip_end='192.168.23.254'
         )
         netw.groups.add(self.group.pk)
-        netw.save()
         self.network = netw
 
     def test_add_network(self):

@@ -62,7 +62,6 @@ def restore_info_to_new_scheme(apps, _):
             abon_db = Abon.objects.filter(pk=abon['pk']).first()
             if abon_db is not None:
                 abon_db.ip_addresses.add(ip_lease.pk)
-                abon_db.save()
                 print('\tUser %s: %s updated' % (abon_db.username, abon_db.fio))
             else:
                 print('\tUser with pk=%s not found' % abon['pk'])

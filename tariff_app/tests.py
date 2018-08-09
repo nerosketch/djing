@@ -42,7 +42,6 @@ class ServiceTestCase(MyBaseTestCase, TestCase):
             calc_type='Df'
         )
         trf.groups.add(self.group.pk)
-        trf.save()
         self.tariff = trf
 
     def test_add_same_services(self):

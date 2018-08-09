@@ -315,6 +315,5 @@ class ManageResponsibilityGroups(ListView):
         profile = self.object
         profile.responsibility_groups.clear()
         profile.responsibility_groups.add(*checked_groups)
-        profile.save()
         messages.success(request, _('Responsibilities has been updated'))
         return HttpResponseRedirect(self.get_success_url())

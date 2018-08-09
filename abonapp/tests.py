@@ -364,7 +364,6 @@ class AbonServiceTestCase(MyBaseTestCase, TestCase):
             calc_type='Dp'
         )
         tariff1.groups.add(self.group)
-        tariff1.save()
         tariff2 = Tariff.objects.create(
             title='trf2',
             descr='descr2',
@@ -374,7 +373,6 @@ class AbonServiceTestCase(MyBaseTestCase, TestCase):
             calc_type='Dp'
         )
         tariff2.groups.add(self.group)
-        tariff2.save()
         self.tariff1 = tariff1
         self.tariff2 = tariff2
 
@@ -441,7 +439,6 @@ class ClientLeasesTestCase(MyBaseTestCase, TestCase):
             ip_end='192.168.0.6'
         )
         netw.groups.add(self.group.pk)
-        netw.save()
         self.network = netw
         netw6 = NetworkModel.objects.create(
             network='fde8:86a9:f132:1::/64',
@@ -451,7 +448,6 @@ class ClientLeasesTestCase(MyBaseTestCase, TestCase):
             ip_end='fde8:86a9:f132:1::2f'
         )
         netw6.groups.add(self.group.pk)
-        netw6.save()
         self.network6 = netw6
 
     def test_add_static_ipv4_lease(self):

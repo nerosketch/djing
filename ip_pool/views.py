@@ -88,7 +88,6 @@ def network_in_groups(request, net_id):
         gr = request.POST.getlist('gr')
         network.groups.clear()
         network.groups.add(*gr)
-        network.save()
         messages.success(request, _('Successfully saved'))
         return redirect('ip_pool:net_groups', net_id)
 
