@@ -74,10 +74,10 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
     def get_ports(self) -> ListOrError:
         interfaces_count = safe_int(self.get_item('.1.3.6.1.2.1.2.1.0'))
-        nams = list(self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3'))
-        stats = list(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
-        macs = list(self.get_list('.1.3.6.1.2.1.2.2.1.6'))
-        speeds = list(self.get_list('.1.3.6.1.2.1.2.2.1.5'))
+        nams = tuple(self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3'))
+        stats = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
+        macs = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.6'))
+        speeds = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.5'))
         res = []
         try:
             for n in range(interfaces_count):
