@@ -123,8 +123,11 @@ class DeviceUpdate(UpdateView):
             pass
         r = super().form_valid(form)
         # change device info in dhcpd.conf
-        self.object.update_dhcp()
-        messages.success(self.request, _('Device info has been saved'))
+        try:
+            self.object.update_dhcp()
+            messages.success(self.request, _('Device info has been saved'))
+        except PermissionError as e:
+            messages.error(self.request, e)
         return r
 
     def dispatch(self, request, *args, **kwargs):
@@ -177,8 +180,11 @@ class DeviceCreateView(CreateView):
             pass
         r = super().form_valid(form)
         # change device info in dhcpd.conf
-        self.object.update_dhcp()
-        messages.success(self.request, _('Device info has been saved'))
+        try:
+            self.object.update_dhcp()
+            messages.success(self.request, _('Device info has been saved'))
+        except PermissionError as e:
+            messages.error(self.request, e)
         return r
 
     def dispatch(self, request, *args, **kwargs):

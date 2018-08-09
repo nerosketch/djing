@@ -421,8 +421,11 @@ def pick_tariff(request, gid, uname):
             else:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
-            abon.sync_with_nas(created=False)
-            messages.success(request, _('Tariff has been picked'))
+            r = abon.sync_with_nas(created=False)
+            if r is None:
+                messages.success(request, _('Tariff has been picked'))
+            else:
+                messages.error(request, r)
             return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
     except (lib.LogicError, NasFailedResult) as e:
         messages.error(request, e)
@@ -554,7 +557,6 @@ def chgroup_tariff(request, gid):
         tr = request.POST.getlist('tr')
         grp.tariff_set.clear()
         grp.tariff_set.add(*tr)
-        grp.save()
         messages.success(request, _('Successfully saved'))
         return redirect('abonapp:ch_group_tariff', gid)
     tariffs = Tariff.objects.all()
@@ -1001,20 +1003,6 @@ def abon_export(request, gid):
     }, request=request)
 
 
-# @login_required
-# @permission_required('abonapp.change_abon')
-# @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-# @json_view
-# def reset_ip(request, gid, uname):
-#     abon = get_object_or_404(models.Abon, username=uname)
-#     abon.ip_address = None
-#     abon.save(update_fields=('ip_address',))
-#     return {
-#         'status': 0,
-#         'dat': "<span class='glyphicon glyphicon-refresh'></span>"
-#     }
-
-
 @login_required
 @lib.decorators.only_admins
 def fin_report(request):
@@ -1151,6 +1139,11 @@ def lease_add(request, gid, uname):
                 network = get_object_or_404(NetworkModel, pk=network_id)
                 lease = IpLeaseModel.objects.create_from_ip(ip, net=network, is_dynamic=is_dynamic)
                 abon.ip_addresses.add(lease)
+                tm = Transmitter()
+                tm.lease_start(
+                    user=abon.build_agent_struct(),
+                    lease=lease.ip
+                )
                 messages.success(request, _('Ip lease has been created'))
                 return redirect('abonapp:abon_home', gid, uname)
             except lib.DuplicateEntry as e:
@@ -1233,19 +1226,24 @@ class DhcpLever(SecureApiView):
             'switch_port': 3,
             'cmd': 'commit'
         }"""
-        r = None
         try:
-            action = data['cmd']
+            action = data.get('cmd')
+            if action is None:
+                return '"cmd" parameter is missing'
+            client_ip = data.get('client_ip')
+            if client_ip is None:
+                return '"client_ip" parameter is missing'
             if action == 'commit':
-                r = dhcp_commit(
-                    data['client_ip'], data['client_mac'],
-                    data['switch_mac'], data['switch_port']
+                return dhcp_commit(
+                    client_ip, data.get('client_mac'),
+                    data.get('switch_mac'), data.get('switch_port')
                 )
             elif action == 'expiry':
-                r = dhcp_expiry(data['client_ip'])
+                return dhcp_expiry(client_ip)
             elif action == 'release':
-                r = dhcp_release(data['client_ip'])
+                return dhcp_release(client_ip)
+            else:
+                return '"cmd" parameter is invalid: %s' % action
         except lib.LogicError as e:
             print('LogicError', e)
-            r = str(e)
-        return r
+            return str(e)

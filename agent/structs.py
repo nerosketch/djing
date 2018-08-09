@@ -36,30 +36,38 @@ class TariffStruct(BaseStruct):
 
 # Abon from database
 class AbonStruct(BaseStruct):
-    __slots__ = ('uid', 'ips', 'tariff', 'is_access', 'queue_id')
+    __slots__ = ('uid', '_ips', 'tariff', 'is_access', 'queue_id')
 
     def __init__(self, uid=0, ips=None, tariff=None, is_access=True):
         self.uid = int(uid or 0)
         if ips is None:
-            self.ips = ()
+            self._ips = ()
         else:
-            self.ips = tuple(ip_address(ip) for ip in ips)
+            self._ips = tuple(ip_address(ip) for ip in ips)
         self.tariff = tariff
         self.is_access = is_access
         self.queue_id = 0
 
+    def get_ips(self):
+        return self._ips
+
+    def set_ips(self, v):
+        self._ips = set(v)
+
+    ips = property(get_ips, set_ips, doc='Ip addresses')
+
     def __eq__(self, other):
         if not isinstance(other, AbonStruct):
             raise TypeError
-        r = self.uid == other.uid and self.ips == other.ips
+        r = self.uid == other.uid and self._ips == other._ips
         r = r and self.tariff == other.tariff
         return r
 
     def __str__(self):
-        return "uid=%d, ips=[%s], tariff=%s" % (self.uid, ';'.join(self.ips), self.tariff or '<No Service>')
+        return "uid=%d, ips=[%s], tariff=%s" % (self.uid, ';'.join(str(i) for i in self._ips), self.tariff or '<No Service>')
 
     def __hash__(self):
-        return hash(hash(self.ips) + hash(self.tariff)) if self.tariff is not None else 0
+        return hash(hash(self._ips) + hash(self.tariff)) if self.tariff is not None else 0
 
 
 # Shape rule from NAS(Network Access Server)

@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from django.utils import timezone
 from django.db import transaction
-from django.db.models import signals
+from django.db.models import signals, Count
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
 from ip_pool.models import IpLeaseModel
 from agent import Transmitter, NasNetworkError, NasFailedResult
@@ -42,6 +42,8 @@ def main():
         users = Abon.objects\
             .filter(is_active=True)\
             .exclude(current_tariff=None)\
+            .annotate(ips_count=Count('ip_addresses'))\
+            .filter(ips_count__gt=0)\
             .prefetch_related('ip_addresses')\
             .iterator()
         tm.sync_nas(users)

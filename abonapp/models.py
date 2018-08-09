@@ -16,7 +16,7 @@ from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import LogicError
-from ip_pool.models import IpLeaseModel
+from ip_pool.models import IpLeaseModel, NetworkModel
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
@@ -225,18 +225,12 @@ class Abon(BaseAccount):
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
 
-    # def clean(self):
-    #     # check if ip address already busy
-    #     abon_addresses = tuple(p.ip for p in self.ip_addresses.all().iterator())
-    #     if self.ip_address is not None and Abon.objects.filter(ip_address=self.ip_address).exclude(
-    #             pk=self.pk).count() > 0:
-    #         raise ValidationError({'ip_address': (gettext('Ip address already exist'),)})
-    #     return super(Abon, self).clean()
-
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()
         if agent_abon is None:
             return
+        if len(agent_abon.ips) < 1:
+            return _('Account has no one ips')
         try:
             tm = Transmitter()
             if created:
@@ -250,14 +244,13 @@ class Abon(BaseAccount):
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
 
-    def add_lease(self, ip: str, mac_addr=None):
+    def add_lease(self, ip: str, network: Optional[NetworkModel], mac_addr=None):
         existed_client_ips = tuple(l.ip for l in self.ip_addresses.all())
         if ip not in existed_client_ips:
-            lease = IpLeaseModel.objects.create_from_ip(ip=ip, net=None, mac=mac_addr)
+            lease = IpLeaseModel.objects.create_from_ip(ip=ip, net=network, mac=mac_addr)
             if lease is None:
-                return 'Subnet not found'
+                return 'Error while creating a ip lease'
             self.ip_addresses.add(lease)
-            #self.save()
 
 
 class PassportInfo(models.Model):

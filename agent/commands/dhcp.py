@@ -18,7 +18,10 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             abon = Abon.objects.get(device=dev)
         if not abon.is_dynamic_ip:
             return 'User settings is not dynamic'
-        add_lease_result = abon.add_lease(client_ip)
+        client_ips = tuple(str(ip) for ip in abon.ip_addresses.all())
+        if client_ip in client_ips:
+            return 'Ip address already existed'
+        add_lease_result = abon.add_lease(client_ip, mac_addr=client_mac, network=None)
         if add_lease_result is None:
             if abon.is_access():
                 abon.sync_with_nas(created=False)

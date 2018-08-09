@@ -215,7 +215,11 @@
                             {% endif %}
                             <span{{ lease.is_active|yesno:', class="text-muted"'|safe }}>
                                 <b>{{ lease }}</b>
-                                <small>{% trans 'Leased by:' %} {{ lease.lease_time|date:'d-m H:i:s' }}</small>
+                                <small>{% trans 'Leased by:' %} {{ lease.lease_time|date:'d-m H:i:s' }}.
+                                    {% if lease.mac_addr %}
+                                        {% trans 'From' %}: {{ lease.mac_addr }}.
+                                    {% endif %}
+                                </small>
                             </span>
                         </li>
                     {% empty %}

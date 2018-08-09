@@ -108,12 +108,12 @@ class BaseTransmitter(ABC):
     def sync_nas(self, users_from_db: Iterator):
         list_for_add, list_for_del = self._diff_users(users_from_db)
         if len(list_for_del) > 0:
-            print('List for del:')
+            print('List for del:', len(list_for_del))
             for ld in list_for_del:
-                print('\t', ld.ips)
+                print('\t', ld)
             self.remove_user_range(list_for_del)
         if len(list_for_add) > 0:
-            print('List for add:')
+            print('List for add:', len(list_for_add))
             for la in list_for_add:
-                print('\t', la.ips)
+                print('\t', la)
             self.add_user_range(list_for_add)

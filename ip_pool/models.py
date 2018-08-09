@@ -163,7 +163,7 @@ class IpLeaseManager(models.Manager):
 
 class IpLeaseModel(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True)
-    network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE, verbose_name=_('Parent network'))
+    network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE, verbose_name=_('Parent network'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
     is_dynamic = models.BooleanField(_('Is dynamic'), default=False)

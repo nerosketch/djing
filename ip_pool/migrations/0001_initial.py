@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ipleasemodel',
             name='network',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ip_pool.NetworkModel', verbose_name='Parent network'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ip_pool.NetworkModel', verbose_name='Parent network', blank=True, null=True),
         ),
         migrations.AlterUniqueTogether(
             name='ipleasemodel',

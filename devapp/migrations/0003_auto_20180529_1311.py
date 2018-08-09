@@ -14,7 +14,7 @@ def snmp_backup_info(apps, _):
     Device = apps.get_model('devapp', 'Device')
     obs = Device.objects.only('snmp_item_num')
     with open(TMP_FILE, 'w') as f:
-        serializers.serialize('json', obs, stream=f)
+        serializers.serialize('json', obs, stream=f, fields=('snmp_item_num',))
 
 
 def snmp_restore_info_to_new_scheme(apps, _):
