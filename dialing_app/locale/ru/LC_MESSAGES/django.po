@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-24 23:27+0300\n"
+"POT-Creation-Date: 2018-08-09 14:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: \n"
@@ -19,165 +19,162 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: dialing_app/models.py:9 dialing_app/models.py:44
+#: models.py:9 models.py:44
 msgid "No answer"
 msgstr "Не отвечен"
 
-#: dialing_app/models.py:10 dialing_app/models.py:46 dialing_app/models.py:101
+#: models.py:10 models.py:46 models.py:101
 msgid "Failed"
 msgstr "С ошибкой"
 
-#: dialing_app/models.py:11 dialing_app/models.py:48
+#: models.py:11 models.py:48
 msgid "Busy"
 msgstr "Занято"
 
-#: dialing_app/models.py:12 dialing_app/models.py:50
+#: models.py:12 models.py:50
 msgid "Answered"
 msgstr "Отвечен"
 
-#: dialing_app/models.py:13 dialing_app/models.py:52
+#: models.py:13 models.py:52
 msgid "Unknown"
 msgstr "Не определён"
 
-#: dialing_app/models.py:84 dialing_app/models.py:108
+#: models.py:84 models.py:108
 msgid "Can view sms"
 msgstr "Может просматривать смс"
 
-#: dialing_app/models.py:86 dialing_app/models.py:87
+#: models.py:86 models.py:87
 msgid "SMS"
 msgstr "СМС"
 
-#: dialing_app/models.py:95
+#: models.py:95
 msgid "When"
 msgstr "Когда"
 
-#: dialing_app/models.py:96 dialing_app/templates/index.html:26
+#: models.py:96 templates/index.html:25
 msgid "Telephone"
 msgstr "Телефон"
 
-#: dialing_app/models.py:97
+#: models.py:97
 msgid "Text"
 msgstr "Текст"
 
-#: dialing_app/models.py:99
+#: models.py:99
 msgid "New"
 msgstr "Новое"
 
-#: dialing_app/models.py:100
+#: models.py:100
 msgid "Sent"
 msgstr "Отправленное"
 
-#: dialing_app/models.py:103
+#: models.py:103
 msgid "Status"
 msgstr "Статус"
 
-#: dialing_app/models.py:109
+#: models.py:109
 msgid "Can send sms"
 msgstr "Может отправлять смс"
 
-#: dialing_app/models.py:111 dialing_app/models.py:112
+#: models.py:111 models.py:112
 msgid "Out SMS"
 msgstr "Исходящие СМС"
 
-#: dialing_app/templates/ext.html:7 dialing_app/templates/ext.html:21
-#: dialing_app/views.py:44
+#: templates/ext.html:8 templates/ext.html:25 views.py:45
 msgid "Last calls"
 msgstr "Последние звонки"
 
-#: dialing_app/templates/ext.html:28 dialing_app/views.py:73
+#: templates/ext.html:32 views.py:74
 msgid "Voice mail request"
 msgstr "Заявки на подключение"
 
-#: dialing_app/templates/ext.html:35 dialing_app/views.py:82
+#: templates/ext.html:39 views.py:83
 msgid "Voice mail report"
 msgstr "Заявки на поломки"
 
-#: dialing_app/templates/ext.html:42 dialing_app/templates/inbox_sms.html:7
+#: templates/ext.html:46 templates/inbox_sms.html:7
 msgid "Inbox sms"
 msgstr "Входящие смс"
 
-#: dialing_app/templates/inbox_sms.html:23
+#: templates/inbox_sms.html:23
 msgid "Message history is empty"
 msgstr "История сообщений пуста"
 
-#: dialing_app/templates/inbox_sms.html:31
-#: dialing_app/templates/modal_send_sms.html:5
+#: templates/inbox_sms.html:31 templates/modal_send_sms.html:5
 msgid "Send sms"
 msgstr "Отправить смс"
 
-#: dialing_app/templates/index.html:10 dialing_app/templates/vmail.html:10
+#: templates/index.html:9 templates/vmail.html:10
 msgid "Play"
 msgstr "Слушать"
 
-#: dialing_app/templates/index.html:11 dialing_app/templates/index.html:37
-#: dialing_app/templates/vmail.html:11
+#: templates/index.html:10 templates/index.html:36 templates/vmail.html:11
 msgid "calldate"
 msgstr "дата звонка"
 
-#: dialing_app/templates/index.html:12 dialing_app/templates/vmail.html:12
+#: templates/index.html:11 templates/vmail.html:12
 msgid "src"
 msgstr "кто"
 
-#: dialing_app/templates/index.html:13
+#: templates/index.html:12
 msgid "dst"
 msgstr "куда"
 
-#: dialing_app/templates/index.html:14 dialing_app/templates/vmail.html:13
+#: templates/index.html:13 templates/vmail.html:13
 msgid "duration"
 msgstr "продолжительность"
 
-#: dialing_app/templates/index.html:15 dialing_app/templates/vmail.html:14
+#: templates/index.html:14 templates/vmail.html:14
 msgid "start"
 msgstr "начало"
 
-#: dialing_app/templates/index.html:16 dialing_app/templates/vmail.html:15
+#: templates/index.html:15 templates/vmail.html:15
 msgid "answer"
 msgstr "ответ"
 
-#: dialing_app/templates/index.html:17 dialing_app/templates/vmail.html:16
+#: templates/index.html:16 templates/vmail.html:16
 msgid "end"
 msgstr "конец"
 
-#: dialing_app/templates/index.html:18 dialing_app/templates/vmail.html:17
+#: templates/index.html:17 templates/vmail.html:17
 msgid "disposition"
 msgstr "состояние"
 
-#: dialing_app/templates/index.html:24 dialing_app/views.py:93
+#: templates/index.html:23 views.py:94
 msgid "Find dials"
 msgstr "Найти звонки"
 
-#: dialing_app/templates/index.html:35
+#: templates/index.html:34
 msgid "Find by dates"
 msgstr "Найти по дате"
 
-#: dialing_app/templates/index.html:65
+#: templates/index.html:64
 msgid "Download"
 msgstr "Скачать"
 
-#: dialing_app/templates/index.html:81 dialing_app/templates/vmail.html:42
+#: templates/index.html:80 templates/vmail.html:42
 msgid "Calls was not found"
 msgstr "Звонки не найдены"
 
-#: dialing_app/templates/modal_send_sms.html:19
+#: templates/modal_send_sms.html:19
 msgid "Send"
 msgstr "Отправить"
 
-#: dialing_app/views.py:54
+#: views.py:55
 msgid "Multiple users with the telephone number"
 msgstr "Несколько абонентов с указанным номером телефона"
 
-#: dialing_app/views.py:56
+#: views.py:57
 msgid "User with the telephone number not found"
 msgstr "Абонент с таким номером телефона не найден"
 
-#: dialing_app/views.py:113
+#: views.py:114
 msgid "Make sure that your date format is correct"
 msgstr "Убедитесь что формат времени корректен"
 
-#: dialing_app/views.py:137
+#: views.py:138
 msgid "Message was enqueued for sending"
 msgstr "Сообщение было поставлено в очередь для отправки"
 
-#: dialing_app/views.py:150
+#: views.py:151
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"

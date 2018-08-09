@@ -131,11 +131,11 @@ SESSION_COOKIE_HTTPONLY = True
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'ru'
 
 LANGUAGES = (
     ('ru', _('Russian')),
-    ('en', _('English'))
+    #('en', _('English'))
 )
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))

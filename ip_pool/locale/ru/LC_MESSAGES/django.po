@@ -1,0 +1,331 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-09 14:34+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: fields.py:35
+msgid "IP address with prefix length, or subnet for ipv4"
+msgstr "IP адрес с длиной префикса, или подсеть IPv4)"
+
+#: fields.py:40
+msgid "Enter a valid IPv4 or IPv6 address with prefix length."
+msgstr "Введите валидный IPv4 или IPv6 адрес с маской сети"
+
+#: forms.py:44
+msgid "Ip that you typed is not in subnet that you have selected"
+msgstr "Введённый вами IP не в выбранной подсети"
+
+#: forms.py:46
+msgid "Ip that you have passed is less than allowed network range"
+msgstr "IP который вы указали меньше чем разрешённый диапазон ip адресов"
+
+#: forms.py:48
+msgid "Ip that you have passed is greater than allowed network range"
+msgstr "IP который вы указали больше чем разрешённый диапазон ip адресов"
+
+#: forms.py:51 models.py:165
+msgid "Ip address"
+msgstr "IP адрес"
+
+#: forms.py:52 models.py:169 templates/ip_pool/ip_leases_list.html:23
+msgid "Is dynamic"
+msgstr "Динамичейский"
+
+#: forms.py:53
+msgid "Possible networks"
+msgstr "Доступные подсети"
+
+#: models.py:23
+msgid "IP network"
+msgstr "IP подсеть"
+
+#: models.py:24
+msgid "Ip address of network. For example: 192.168.1.0 or fde8:6789:1234:1::"
+msgstr "IP адрес подсети. На пример: 192.168.1.0 or fde8:6789:1234:1::"
+
+#: models.py:28
+msgid "Internet"
+msgstr "Интернет"
+
+#: models.py:29
+msgid "Guest"
+msgstr "Гостевая"
+
+#: models.py:30
+msgid "Trusted"
+msgstr "Доверенная"
+
+#: models.py:31
+msgid "Devices"
+msgstr "Устройства"
+
+#: models.py:32
+msgid "Admin"
+msgstr "Административная"
+
+#: models.py:34
+msgid "Kind of network"
+msgstr "Тип сети"
+
+#: models.py:35 templates/ip_pool/network_list.html:22
+msgid "Description"
+msgstr "Описание"
+
+#: models.py:36
+msgid "Groups"
+msgstr "Группы"
+
+#: models.py:39
+msgid "Start work ip range"
+msgstr "Начальный ip из диапазона"
+
+#: models.py:40
+msgid "End work ip range"
+msgstr "Конечный ip из диапазона"
+
+#: models.py:59
+msgid "Network is invalid"
+msgstr "Подсеть не правильная"
+
+#: models.py:63
+msgid "Ip start is invalid"
+msgstr "Начальный ip из диапазона не верный"
+
+#: models.py:67
+msgid "Start ip must be in subnet of specified network"
+msgstr "Начальный ip должен быть в указанной подсети"
+
+#: models.py:69
+msgid "Ip end is invalid"
+msgstr "Конечный ip из диапазона не верный"
+
+#: models.py:73 tests.py:60
+msgid "End ip must be in subnet of specified network"
+msgstr "Конечный ip должен быть в указанной подсети"
+
+#: models.py:83
+#, python-format
+msgid "Network is overlaps with %(other_network)s"
+msgstr "Подсеть пересекается с сетью '%(other_network)s'"
+
+#: models.py:91
+msgid "Global"
+msgstr "Глобальная"
+
+#: models.py:93
+msgid "Link local"
+msgstr ""
+
+#: models.py:95
+msgid "Loopback"
+msgstr "Локальное кольцо(loopback)"
+
+#: models.py:97
+msgid "Multicast"
+msgstr ""
+
+#: models.py:99
+msgid "Private"
+msgstr "Приватный"
+
+#: models.py:101
+msgid "Reserved"
+msgstr "Зарезервированный"
+
+#: models.py:103
+msgid "Site local"
+msgstr ""
+
+#: models.py:105
+msgid "Unspecified"
+msgstr "Не определён"
+
+#: models.py:110 templates/ip_pool/ip_leases_list.html:22
+#: templates/ip_pool/network_list.html:20
+msgid "Network"
+msgstr "Подсеть"
+
+#: models.py:111 templates/ip_pool/ext.html:13
+#: templates/ip_pool/network_list.html:12
+msgid "Networks"
+msgstr "Подсети"
+
+#: models.py:153
+msgid "Ip has already taken"
+msgstr "IP уже занят"
+
+#: models.py:166
+msgid "Parent network"
+msgstr "Родительская подсеть"
+
+#: models.py:167
+msgid "Mac address"
+msgstr "MAC адрес"
+
+#: models.py:168 templates/ip_pool/ip_leases_list.html:21
+msgid "Lease time"
+msgstr "Время аредны"
+
+#: models.py:170
+msgid "Is active"
+msgstr "Активный"
+
+#: models.py:192
+#, python-format
+msgid "Ip address %(ip)s not in %(net)s network"
+msgstr "IP адрес %(ip)s не в %(net)s сети"
+
+#: models.py:199
+msgid "Employed ip"
+msgstr "Занятый ip"
+
+#: models.py:200
+msgid "Employed ip addresses"
+msgstr "Занятые ip"
+
+#: templates/ip_pool/ext.html:8 templates/ip_pool/ip_leases_list.html:7
+#: templates/ip_pool/net_add.html:13 templates/ip_pool/net_edit.html:13
+#: templates/ip_pool/network_groups_available.html:7
+#: templates/ip_pool/network_list.html:7
+msgid "Ip pool"
+msgstr "IP пул"
+
+#: templates/ip_pool/ext.html:23
+msgid "All networks"
+msgstr "Все подсети"
+
+#: templates/ip_pool/ip_leases_list.html:9
+#: templates/ip_pool/ip_leases_list.html:13
+msgid "Ip leases list"
+msgstr "Список аренд ip"
+
+#: templates/ip_pool/ip_leases_list.html:20
+msgid "Ip"
+msgstr ""
+
+#: templates/ip_pool/ip_leases_list.html:36
+msgid "You have not any available dedicated ips in this network"
+msgstr "Нет ни одного выделенного ip в этой сети"
+
+#: templates/ip_pool/net_add.html:14 templates/ip_pool/net_add.html:24
+msgid "Add network"
+msgstr "Добавить сеть"
+
+#: templates/ip_pool/net_add.html:18
+msgid "Add new subnet"
+msgstr "Добавить подсеть"
+
+#: templates/ip_pool/net_add.html:32 templates/ip_pool/network_list.html:76
+msgid "Add"
+msgstr "Добавить"
+
+#: templates/ip_pool/net_add.html:35 templates/ip_pool/net_edit.html:39
+msgid "Back"
+msgstr "Назад"
+
+#: templates/ip_pool/net_edit.html:24
+msgid "Edit network"
+msgstr "Редактировать сеть"
+
+#: templates/ip_pool/net_edit.html:32
+#: templates/ip_pool/network_groups_available.html:31
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/ip_pool/net_edit.html:36 templates/ip_pool/network_list.html:50
+msgid "Remove"
+msgstr "Удалить"
+
+#: templates/ip_pool/net_edit.html:43 templates/ip_pool/network_list.html:60
+msgid "View employed"
+msgstr "Показать выделенные"
+
+#: templates/ip_pool/net_edit.html:47
+msgid "Groups available"
+msgstr "Доступные группы"
+
+#: templates/ip_pool/network_groups_available.html:9
+msgid "Belonging networks for groups"
+msgstr "Принадлежность сетей к группам"
+
+#: templates/ip_pool/network_groups_available.html:14
+msgid "Make that pool available in specified groups"
+msgstr "Сделать этот пул доступным в указанных группах"
+
+#: templates/ip_pool/network_list.html:21
+msgid "Kind"
+msgstr "Тип"
+
+#: templates/ip_pool/network_list.html:23
+msgid "Scope"
+msgstr "Масштаб"
+
+#: templates/ip_pool/network_list.html:39
+#: templates/ip_pool/network_list.html:44
+msgid "Edit"
+msgstr "Редактировать"
+
+#: templates/ip_pool/network_list.html:55
+msgid "Permission denied"
+msgstr "Не достаточно прав"
+
+#: templates/ip_pool/network_list.html:66
+msgid "You have not any networks available"
+msgstr "Нет ни одной доступной сети"
+
+#: templates/ip_pool/networkmodel_confirm_delete.html:9
+msgid "Remove network"
+msgstr "Удалить сеть"
+
+#: templates/ip_pool/networkmodel_confirm_delete.html:13
+#, python-format
+msgid "To delete network '%(network_name)s'?"
+msgstr "Удалить сеть '%(network_name)s'?"
+
+#: templates/ip_pool/networkmodel_confirm_delete.html:16
+msgid ""
+"Attention! All leases in that network will be removed and services finished."
+msgstr ""
+"Внимание! Все аренды ip в этой сети будут удалены, а услуги приостановлены."
+
+#: tests.py:71
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Введите валидный IPv4 или IPv6 адрес."
+
+#: tests.py:84
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Выберите правильный вариант. %(value)s не в одной из доступных вариантов."
+
+#: views.py:39
+msgid "Network successfully updated"
+msgstr "Сеть успешно обновлена"
+
+#: views.py:51
+msgid "Network has been deleted"
+msgstr "Сеть успешно удалена"
+
+#: views.py:80
+msgid "Network has been created"
+msgstr "Сеть создана"
+
+#: views.py:91
+msgid "Successfully saved"
+msgstr "Успешно сохранено"

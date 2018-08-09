@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-03 17:15+0300\n"
+"POT-Creation-Date: 2018-08-09 14:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -59,7 +59,7 @@ msgid "Your debt"
 msgstr "Ваши долги"
 
 #: templates/clientsideapp/debts.html:11
-#: templates/clientsideapp/tasklist.html:11
+#: templates/clientsideapp/tasklist.html:14
 msgid "State"
 msgstr "Состояние"
 
@@ -72,7 +72,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: templates/clientsideapp/debts.html:14
-#: templates/clientsideapp/tasklist.html:12
+#: templates/clientsideapp/tasklist.html:15
 msgid "Date of create"
 msgstr "Дата создания"
 
@@ -84,7 +84,7 @@ msgstr "Дата платежа"
 msgid "Pay"
 msgstr "Оплатить"
 
-#: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:78
+#: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:77
 #: templates/clientsideapp/modal_service_buy.html:19
 #: templates/clientsideapp/services.html:26
 #: templates/clientsideapp/services.html:55
@@ -115,32 +115,28 @@ msgstr "Платежи"
 msgid "Services"
 msgstr "Услуги"
 
-#: templates/clientsideapp/ext.html:55
-msgid "Language"
-msgstr "Язык"
-
-#: templates/clientsideapp/ext.html:69
+#: templates/clientsideapp/ext.html:68
 msgid "Other"
 msgstr "Другое"
 
-#: templates/clientsideapp/ext.html:71
+#: templates/clientsideapp/ext.html:70
 msgid "Show debts and pay it"
 msgstr "Посмотреть долги и оплатить"
 
-#: templates/clientsideapp/ext.html:72
+#: templates/clientsideapp/ext.html:71
 msgid "Show task history"
 msgstr "Посмотреть заявки"
 
-#: templates/clientsideapp/ext.html:73
+#: templates/clientsideapp/ext.html:72
 msgid "Quit"
 msgstr "Выйти"
 
-#: templates/clientsideapp/ext.html:78
+#: templates/clientsideapp/ext.html:77
 #, python-format
 msgid "Your balance is <b>%(ballance)s</b>"
 msgstr "Ваш балланс <b>%(ballance)s</b>"
 
-#: templates/clientsideapp/ext.html:89
+#: templates/clientsideapp/ext.html:88
 msgid ""
 "<strong>Attantion!</strong> You are is admin, and do not be active here, "
 "please back to admin side. Client side to you for reference only."
@@ -172,6 +168,10 @@ msgstr "ip адрес"
 #: templates/clientsideapp/index.html:24
 msgid "Address"
 msgstr "Адрес"
+
+#: templates/clientsideapp/index.html:29
+msgid "Num of active tasks"
+msgstr "Кол. активных заявок"
 
 #: templates/clientsideapp/modal_service_buy.html:5
 msgid "Pick service"
@@ -262,44 +262,44 @@ msgstr "Доступные для заказа услуги"
 msgid "No services available for ordering"
 msgstr "Нет доступных для заказа услуг"
 
-#: templates/clientsideapp/tasklist.html:6
+#: templates/clientsideapp/tasklist.html:7
 msgid "Task history"
 msgstr "История заявок"
 
-#: templates/clientsideapp/tasklist.html:13
+#: templates/clientsideapp/tasklist.html:16
 msgid "The nature of the damage"
 msgstr "Характер заявки"
 
-#: templates/clientsideapp/tasklist.html:14
+#: templates/clientsideapp/tasklist.html:17
 msgid "Expected or real completion date"
 msgstr "Ожидаемый или реальный срок выполнения"
 
-#: templates/clientsideapp/tasklist.html:36
+#: templates/clientsideapp/tasklist.html:43
 msgid "You didn't leave any requests for breakdowns."
 msgstr "Заявки по вашей учётной записи не найдены"
 
-#: views.py:51
+#: views.py:54
 #, python-format
 msgid "Buy the service via user side, service '%s'"
 msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
 
-#: views.py:54
+#: views.py:57
 #, python-format
 msgid "The service '%s' wan successfully activated"
 msgstr "Услуга '%s' успешно подключена"
 
-#: views.py:84
+#: views.py:87
 msgid "Are you not sure that you want buy the service?"
 msgstr "Вы не уверены что хотите оплатить долг?"
 
-#: views.py:86
+#: views.py:89
 msgid "Your account have not enough money"
 msgstr "Недостаточно средств на счету"
 
-#: views.py:89
+#: views.py:92
 #, python-format
 msgid "%(username)s paid the debt %(amount).2f"
 msgstr "%(username)s заплатил долг в размере %(amount).2f"
 
-msgid "Num of active tasks"
-msgstr "Кол. активных заявок"
+#~ msgid "Language"
+#~ msgstr "Язык"
