@@ -94,22 +94,6 @@
                                     </a>
                                 {% endif %}
 
-                                {% if form.ip_address.value %}
-                                    {% if perms.abonapp.can_ping %}
-                                        <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ form.ip_address.value }}">
-                                            <span class="glyphicon glyphicon-flash"></span> Ping
-                                        </a>
-                                    {% else %}
-                                        <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
-                                            <span class="glyphicon glyphicon-flash"></span> Ping
-                                        </a>
-                                    {% endif %}
-                                {% else %}
-                                    <a href="#" class="btn btn-default disabled">
-                                        <span class="glyphicon glyphicon-flash"></span> {% trans 'No have ip' %}
-                                    </a>
-                                {% endif %}
-
                                 {% if perms.dialing_app.can_send_sms %}
                                     <a href="{% url 'dialapp:send_sms' %}?path={{ request.path|urlencode }}&dst={{ form.telephone.value|urlencode }}" class="btn btn-default btn-modal">
                                         <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
@@ -202,17 +186,31 @@
                     <h3 class="panel-title">{% trans 'Ip addresses' %}</h3>
                 </div>
                 <ul class="list-group">
+                    {% with can_ping=perms.abonapp.can_ping %}
                     {% for lease in abon.ip_addresses.all %}
                         <li class="list-group-item">
-                            {% if lease.is_active %}
-                                <a href="{% url 'abonapp:user_session_free' group.pk abon.username lease.pk %}" class="btn btn-danger btn-xs" title="{% trans 'Free session' %}" data-toggle="tooltip">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                </a>
-                            {% else %}
-                                <a href="{% url 'abonapp:user_session_start' group.pk abon.username lease.pk %}" class="btn btn-success btn-xs" title="{% trans 'Start session' %}" data-toggle="tooltip">
-                                    <span class="glyphicon glyphicon-flash"></span>
-                                </a>
-                            {% endif %}
+                            <div class="btn-group btn-group-xs">
+                                {% if lease.is_active %}
+                                    <a href="{% url 'abonapp:user_session_free' group.pk abon.username lease.pk %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'abonapp:user_session_start' group.pk abon.username lease.pk %}" class="btn btn-success" title="{% trans 'Start session' %}" data-toggle="tooltip">
+                                        <span class="glyphicon glyphicon-flash"></span>
+                                    </a>
+                                {% endif %}
+
+                                {% if can_ping %}
+                                    <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ lease.ip }}">
+                                        <span class="glyphicon glyphicon-flash"></span> Ping
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
+                                        <span class="glyphicon glyphicon-flash"></span> Ping
+                                    </a>
+                                {% endif %}
+                            </div>
+
                             <span{{ lease.is_active|yesno:', class="text-muted"'|safe }}>
                                 <b>{{ lease }}</b>
                                 <small>{% trans 'Leased by:' %} {{ lease.lease_time|date:'d-m H:i:s' }}.
@@ -225,6 +223,7 @@
                     {% empty %}
                         <li class="list-group-item">{% trans 'Leases does not found' %}</li>
                     {% endfor %}
+                    {% endwith %}
                 </ul>
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm">

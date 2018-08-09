@@ -446,15 +446,17 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             '/ip/arp/print',
             '?address=%s' % host
         ))
-        if r == [{}]:
+        if r == {}:
             return
-        interface = r[0]['=interface']
+        interface = r['!re'].get('=interface')
         r = self._exec_cmd((
             '/ping', '=address=%s' % host, '=arp-ping=yes', '=interval=100ms', '=count=%d' % count,
             '=interface=%s' % interface
         ))
-        received, sent = int(r[-2:][0]['=received']), int(r[-2:][0]['=sent'])
-        return received, sent
+        res = r.get('!re')
+        if res is not None:
+            received, sent = int(res.get('=received')), int(res.get('=sent'))
+            return received, sent
 
     def add_tariff_range(self, tariff_list: VectorTariff):
         pass
