@@ -500,12 +500,15 @@ class ZteOnuDevice(OnuDevice):
             login = telnet.get('login')
             password = telnet.get('password')
             prompt = telnet.get('prompt')
+            default_vid = extra_data.get('default_vid')
             if login is None or password is None or prompt is None:
                 raise DeviceConfigurationError('For ZTE configuration needed login, password and'
                                                ' prompt for telnet access in extra_data')
+            if default_vid is None:
+                raise DeviceConfigurationError('Please specify default vlan id "default_vid" for configuration onu')
             stack_num, rack_num, fiber_num, new_onu_port_num = register_onu_ZTE_F660(
                 olt_ip=ip, onu_sn=sn, login_passwd=(login.encode(), password.encode()),
-                onu_mac=mac, prompt_title=prompt.encode(), vlan_id=132
+                onu_mac=mac, prompt_title=prompt.encode(), vlan_id=int(default_vid)
             )
             bin_snmp_fiber_number = "10000{0:08b}{1:08b}00000000".format(rack_num, fiber_num)
             snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
