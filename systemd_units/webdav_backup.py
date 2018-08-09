@@ -31,7 +31,7 @@ if __name__ == '__main__':
         else:
             client.upload_sync(
                 remote_path=os.path.join('ISBackups', reqfile),
-                local_path=os.path.join('var', 'backups', reqfile)
+                local_path=os.path.join(os.path.sep, 'var', 'backups', reqfile)
             )
     except wc.WebDavException as we:
         print(we, type(we))
