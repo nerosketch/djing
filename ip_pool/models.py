@@ -150,7 +150,7 @@ class IpLeaseManager(models.Manager):
             )
         except IntegrityError as e:
             if 'Duplicate entry' in str(e):
-                raise DuplicateEntry(_('Ip has already taken'))
+                raise DuplicateEntry("%s: %s" %(_('Ip has already taken'), str(e)))
             raise e
 
     def expired(self):

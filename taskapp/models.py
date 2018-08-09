@@ -3,6 +3,7 @@ from datetime import timedelta
 import os
 from django.db import models
 from django.conf import settings
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from abonapp.models import Abon
@@ -124,6 +125,9 @@ class ExtraComment(models.Model):
 
     def __str__(self):
         return self.text
+
+    def get_absolute_url(self):
+        return resolve_url('taskapp:edit', self.task.pk)
 
     class Meta:
         db_table = 'extra_comments'

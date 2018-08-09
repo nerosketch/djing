@@ -57,7 +57,7 @@ class AllowedSubnetMixin(object):
                 return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         try:
             for subnet in api_auth_subnet:
-                if ip in ip_network(subnet):
+                if ip in ip_network(subnet, strict=False):
                     return super(AllowedSubnetMixin, self).dispatch(request, *args, **kwargs)
         except TypeError:
             if ip in ip_network(str(api_auth_subnet)):

@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from django.conf import settings
+from djing.lib import DuplicateEntry
 from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
@@ -55,10 +56,7 @@ class PeoplesListView(OrderedFilteredList):
             for abon in peoples_list.iterator():
                 ips = tuple(p.ip for p in abon.ip_addresses.filter(is_active=True))
                 if len(ips) > 0:
-                    try:
-                        abon.stat_cache = StatCache.objects.get(ip__in=ips)
-                    except StatCache.DoesNotExist:
-                        pass
+                    abon.stat_cache = StatCache.objects.filter(ip__in=ips).first()
         except lib.LogicError as e:
             messages.warning(self.request, e)
         ordering = self.get_ordering()
@@ -1247,3 +1245,7 @@ class DhcpLever(SecureApiView):
         except lib.LogicError as e:
             print('LogicError', e)
             return str(e)
+        except DuplicateEntry as e:
+            print('Duplicate:', e)
+            return str(e)
+

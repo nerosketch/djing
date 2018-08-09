@@ -48,7 +48,8 @@ class ExtraCommentForm(forms.ModelForm):
         comment = super(ExtraCommentForm, self).save(commit=False)
         comment.author = author
         comment.task = task
-        return comment.save()
+        comment.save()
+        return comment
 
     def save(self, commit=True):
         raise Exception('You must use ExtraCommentForm.make_save() method')
