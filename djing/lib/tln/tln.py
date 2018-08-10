@@ -45,6 +45,7 @@ class TelnetApi(Telnet):
         if timeout:
             self._timeout = timeout
         self._prompt_string = prompt_string or b'ZTE#'
+        self.config_level = []
         super().__init__(*args, **kwargs)
 
     def write(self, buffer: bytes) -> None:
