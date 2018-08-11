@@ -225,13 +225,12 @@ class Abon(BaseAccount):
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         if len(abon_addresses) > 0:
             return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
+        raise LogicError(_('You have not any active leases'))
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()
-        if agent_abon is None:
-            return
-        if len(agent_abon.ips) < 1:
-            return _('Account has no one ips')
+        if agent_abon is None or len(agent_abon.ips) < 1:
+            return _('Account has no one active ips')
         try:
             tm = Transmitter()
             if created:

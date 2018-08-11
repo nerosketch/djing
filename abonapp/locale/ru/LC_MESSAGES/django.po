@@ -207,8 +207,8 @@ msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
 
 #: models.py:233
-msgid "Account has no one ips"
-msgstr "Учётная запись не имеет ни одного ip адреса"
+msgid "Account has no one active ips"
+msgstr "Учётная запись не имеет ни одного активного ip адреса"
 
 #: models.py:257
 msgid "Pasport serial"

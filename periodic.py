@@ -40,10 +40,9 @@ def main():
     try:
         tm = Transmitter()
         users = Abon.objects\
-            .filter(is_active=True)\
+            .filter(is_active=True, ips_count__gt=0)\
             .exclude(current_tariff=None)\
             .annotate(ips_count=Count('ip_addresses'))\
-            .filter(ips_count__gt=0)\
             .prefetch_related('ip_addresses')\
             .iterator()
         tm.sync_nas(users)

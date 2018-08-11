@@ -496,6 +496,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
     def lease_start(self, user: AbonStruct, lease):
         if not issubclass(lease.__class__, _BaseAddress):
             lease = ip_address(lease)
+        if not isinstance(user, AbonStruct):
+            raise TypeError
         ip = self.find_ip(lease, LIST_USERS_ALLOWED)
         if ip is None:
             self.add_ip(LIST_USERS_ALLOWED, lease)

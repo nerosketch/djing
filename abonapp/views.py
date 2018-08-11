@@ -1102,20 +1102,21 @@ def user_session_toggle(request, gid, uname, lease_id, action=None):
     abon = get_object_or_404(models.Abon, username=uname)
     lease = abon.ip_addresses.get(pk=lease_id)
     tm = Transmitter()
-    abon_nas_obj = abon.build_agent_struct()
     try:
         if action == 'free':
-            if abon.ip_addresses.filter(is_active=True).count() > 1:
+            try:
+                abon_nas_obj = abon.build_agent_struct()
                 tm.lease_free(abon_nas_obj, ip_address(lease.ip))
-                lease.free()
                 messages.success(request, _('Ip lease has been freed'))
-            else:
+                lease.free()
+            except lib.LogicError:
                 messages.error(request, _('You cannot disable last session'))
         elif action == 'start':
-            tm.lease_start(abon_nas_obj, ip_address(lease.ip))
             lease.start()
+            abon_nas_obj = abon.build_agent_struct()
+            tm.lease_start(abon_nas_obj, ip_address(lease.ip))
             messages.success(request, _('Ip lease has been started'))
-    except NasFailedResult as e:
+    except (NasFailedResult, lib.LogicError) as e:
         messages.error(request, e)
     return redirect('abonapp:abon_home', gid, uname)
 
