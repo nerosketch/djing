@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load i18n %}{% load acc_tags %}
+<!DOCTYPE html>{% load i18n %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
@@ -55,12 +55,6 @@
                     <button type="submit" class="btn btn-primary">
                         <span class="glyphicon glyphicon-log-in"></span> {% trans 'Login' %}
                     </button>
-                    {% is_abon request as is_private_abon %}
-                    {% if is_private_abon %}
-                        <a href="{% url 'abonapp:login_nopassw' %}" class="btn btn-default">
-                            <span class="glyphicon glyphicon-screenshot"></span> {% trans 'Login without password' %}
-                        </a>
-                    {% endif %}
                 </div>
 
             </form>

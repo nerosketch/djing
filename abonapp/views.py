@@ -132,7 +132,7 @@ class AbonCreateView(CreateView):
             assign_perm("abonapp.can_buy_tariff", me, abon)
             assign_perm("abonapp.can_view_passport", me, abon)
             assign_perm('abonapp.can_add_ballance', me, abon)
-            abon.sync_with_nas(created=True)
+            # abon.sync_with_nas(created=True)
             messages.success(self.request, _('create abon success msg'))
             self.abon = abon
             return super(AbonCreateView, self).form_valid(form)
