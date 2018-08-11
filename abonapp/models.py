@@ -228,10 +228,8 @@ class Abon(BaseAccount):
         raise LogicError(_('You have not any active leases'))
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
-        agent_abon = self.build_agent_struct()
-        if agent_abon is None or len(agent_abon.ips) < 1:
-            return _('Account has no one active ips')
         try:
+            agent_abon = self.build_agent_struct()
             tm = Transmitter()
             if created:
                 tm.add_user(agent_abon)
@@ -240,6 +238,8 @@ class Abon(BaseAccount):
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
+        except LogicError:
+            pass
 
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
@@ -425,7 +425,7 @@ def abon_del_signal(sender, **kwargs):
             return True
         tm = Transmitter()
         tm.remove_user(ab)
-    except (NasFailedResult, NasNetworkError):
+    except (NasFailedResult, NasNetworkError, LogicError):
         return True
 
 
