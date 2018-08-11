@@ -247,6 +247,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
                     tariff=t,
                     is_access=disabled or False
                 )
+                if len(a.ips) < 1:
+                    return
                 a.queue_id = info.get('=.id')
                 return a
         except ValueError as e:

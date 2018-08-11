@@ -223,7 +223,8 @@ class Abon(BaseAccount):
         else:
             trf = abon_tariff.tariff
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
-        return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
+        if len(abon_addresses) > 0:
+            return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
 
     def sync_with_nas(self, created: bool) -> Optional[Exception]:
         agent_abon = self.build_agent_struct()
