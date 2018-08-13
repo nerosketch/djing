@@ -31,6 +31,7 @@
                     </a>
                     {% if order_by == 'amount' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                 </th>
+                <th>{% trans 'Users count' %}</th>
                 <th width="250">{% trans 'Script' %}</th>
                 <th width="50">#</th>
             </tr>
@@ -49,6 +50,7 @@
                         <td>{{ tar.speedIn }}</td>
                         <td>{{ tar.speedOut }}</td>
                         <td>{{ tar.amount }} {% trans 'currency' %}</td>
+                        <td>{{ tar.usercount }}</td>
                         <td>{{ tar.get_calc_type_display }}</td>
                         <td>
                             {% if can_del_trf %}
@@ -60,7 +62,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6">{% trans 'Services does not exist yet' %}.
+                        <td colspan="7">{% trans 'Services does not exist yet' %}.
                             {% if perms.tariff_app.add_tariff %}
                                 <a href="{% url 'tarifs:add' %}" class="lgtbx">{% trans 'Create' %}</a>
                             {% endif %}
@@ -73,7 +75,7 @@
             {% if perms.tariff_app.add_tariff %}
                 <tfoot>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <a href="{% url 'tarifs:add' %}" class="btn btn-sm btn-success">
                             <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
                         </a>

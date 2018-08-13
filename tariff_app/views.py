@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -22,6 +23,7 @@ class TariffsListView(OrderedFilteredList):
     template_name = 'tariff_app/tarifs.html'
     context_object_name = 'tariflist'
     model = Tariff
+    queryset = Tariff.objects.annotate(usercount=Count('linkto_tariff__abon'))
 
 
 @login_required

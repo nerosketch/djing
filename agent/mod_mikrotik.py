@@ -405,7 +405,11 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
 
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
-        firewall_ip_list_ids = (self.find_ip(ip, LIST_USERS_ALLOWED).get('=.id') for ip in user.ips)
+        def _finder(ips):
+            for ip in ips:
+                r = self.find_ip(ip, LIST_USERS_ALLOWED)
+                if r: yield r.get('=.id')
+        firewall_ip_list_ids = _finder(user.ips)
         self.remove_ip_range(firewall_ip_list_ids)
 
     def update_user(self, user: AbonStruct, *args):
