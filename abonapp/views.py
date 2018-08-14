@@ -46,19 +46,16 @@ class PeoplesListView(OrderedFilteredList):
         # TODO: optimize that query
         street_id = lib.safe_int(self.request.GET.get('street'))
         gid = lib.safe_int(self.kwargs.get('gid'))
-        peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
+        peoples_list = models.Abon.objects.filter(group__pk=gid)
         if street_id > 0:
-            peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
-        else:
-            peoples_list = peoples_list.filter(group__pk=gid)
-
-        try:
-            for abon in peoples_list.iterator():
-                ips = tuple(p.ip for p in abon.ip_addresses.filter(is_active=True))
-                if len(ips) > 0:
-                    abon.stat_cache = StatCache.objects.filter(ip__in=ips).first()
-        except lib.LogicError as e:
-            messages.warning(self.request, e)
+            peoples_list = peoples_list.filter(street=street_id)
+        peoples_list = peoples_list.select_related(
+            'group', 'street', 'current_tariff', 'statcache'
+        ).only(
+            'group', 'street', 'current_tariff', 'statcache', 'fio',
+            'street', 'house', 'telephone', 'ballance', 'markers',
+            'username', 'is_active'
+        )
         ordering = self.get_ordering()
         if ordering and isinstance(ordering, str):
             ordering = (ordering,)

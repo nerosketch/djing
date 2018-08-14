@@ -69,7 +69,7 @@
                         {% else %}
                             <tr class="danger">
                         {% endif %}
-                        <td>{% if human.stat_cache and human.stat_cache.is_online %}
+                        <td>{% if human.statcache.is_online %}
                                 <span class="glyphicon glyphicon-ok text-success"></span>
                             {% else %}
                                 <span class="glyphicon glyphicon-remove-sign text-muted"></span>
@@ -79,11 +79,11 @@
                             <a href="{% url 'abonapp:abon_home' human.group.pk human.username %}">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
-                            {% if human.stat_cache %}
-                                {% if human.stat_cache.is_today %}
-                                    {{ human.stat_cache.last_time|date:"H:i" }}
+                            {% if human.statcache %}
+                                {% if human.statcache.is_today %}
+                                    {{ human.statcache.last_time|date:"H:i" }}
                                 {% else %}
-                                    {{ human.stat_cache.last_time|date:"D H:i" }}
+                                    {{ human.statcache.last_time|date:"D H:i" }}
                                 {% endif %}
                             {% endif %}
                         </td>

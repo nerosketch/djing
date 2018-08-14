@@ -94,7 +94,7 @@ class UserProfileManager(MyUserManager):
 
 
 class UserProfile(BaseAccount):
-    avatar = models.ImageField(_('Avatar'), upload_to=os.path.join('user', 'avatar'), null=True, default=None)
+    avatar = models.ImageField(_('Avatar'), upload_to=os.path.join('user', 'avatar'), null=True, default=None, blank=True)
     email = models.EmailField(default='')
     responsibility_groups = models.ManyToManyField(Group, blank=True, verbose_name=_('Responsibility groups'))
 
