@@ -63,7 +63,7 @@
                     </thead>
                     <tbody>
                     {% with can_ch_trf=perms.tariff_app.change_tariff can_del_abon=perms.abonapp.delete_abon %}
-                    {% for human in peoples %}
+                    {% for human in object_list %}
                         {% if human.is_active %}
                             <tr>
                         {% else %}
@@ -76,7 +76,7 @@
                             {% endif %}
                         </td>
                         <td class="col-xs-1">
-                            <a href="{% url 'abonapp:abon_home' human.group.pk human.username %}">{{ human.username }}</a>
+                            <a href="{% url 'abonapp:abon_home' human.group_id human.username %}">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
                             {% if human.statcache %}

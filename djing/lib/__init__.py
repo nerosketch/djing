@@ -128,6 +128,7 @@ def process_lock(fn):
                 s.close()
     return wrapped
 
+
 #
 # Raises when IntegrityError in db
 #
