@@ -5,6 +5,9 @@ import os
 from importlib import import_module
 
 
+USING_DB = 'default'
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("File name of netflow required")
@@ -24,12 +27,13 @@ if __name__ == '__main__':
 
     sys.path.append('../../')
     local_settings = import_module('djing.local_settings')
+    usedb = local_settings.DATABASES.get(USING_DB)
 
     db = MySQLdb.connect(
-        host=local_settings.DATABASES['default']['HOST'],
-        user=local_settings.DATABASES['default']['USER'],
-        passwd=local_settings.DATABASES['default']['PASSWORD'],
-        db=local_settings.DATABASES['default']['NAME'],
+        host=usedb['HOST'],
+        user=usedb['USER'],
+        passwd=usedb['PASSWORD'],
+        db=usedb['NAME'],
         charset='utf8'
     )
     cursor = db.cursor()
@@ -58,10 +62,10 @@ if __name__ == '__main__':
             'CUR_DIR': cur_dir,
             'TMP_IPUSER_FILE': tmp_ipuser_file,
             'TMP_DUMP': tmp_dump_file,
-            'DB_USER': local_settings.DATABASES['default']['USER'],
-            'HOST': local_settings.DATABASES['default']['HOST'],
-            'DB_NAME': local_settings.DATABASES['default']['NAME'],
-            'DB_PASSW': local_settings.DATABASES['default']['PASSWORD']
+            'DB_USER': usedb['USER'],
+            'HOST': usedb['HOST'],
+            'DB_NAME': usedb['NAME'],
+            'DB_PASSW': usedb['PASSWORD']
         })
 
     os.remove(tmp_dump_file)
