@@ -1061,16 +1061,14 @@ def del_periodic_pay(request, gid, uname, periodic_pay_id):
     return redirect('abonapp:abon_services', gid, uname)
 
 
-@method_decorator((login_required, lib.decorators.only_admins,), name='dispatch')
+@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 class EditSibscriberMarkers(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
     form_class = forms.MarkersForm
     model = models.Abon
-
-    def get_object(self, queryset=None):
-        obj = models.Abon.objects.get(username=self.kwargs.get('uname'))
-        return obj
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
 
     def dispatch(self, request, *args, **kwargs):
         try:

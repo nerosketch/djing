@@ -303,8 +303,10 @@ class AllTimePayLogManager(models.Manager):
     @staticmethod
     def by_days():
         cur = connection.cursor()
-        cur.execute(r'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
-                    r'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")')
+        cur.execute(
+            'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
+            'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")'
+        )
         while True:
             r = cur.fetchone()
             if r is None: break
@@ -388,9 +390,11 @@ class PeriodicPayForId(models.Model):
     next_pay = models.DateTimeField(_('Next time to pay'))
     account = models.ForeignKey(Abon, models.CASCADE, verbose_name=_('Account'))
 
-    def payment_for_service(self, author=None, now=None):
+    def payment_for_service(self, author: UserProfile=None, now=None):
         """
         Charge for the service and leave a log about it
+        :param now: Current date, if now is None than it calculates in here
+        :param author: instance of UserProfile
         """
         if now is None:
             now = timezone.now()

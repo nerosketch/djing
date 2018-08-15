@@ -7,7 +7,7 @@ from . import models
 from django.conf import settings
 
 
-def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
+def _generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
     username = ''.join(choice(chars) for i in range(length))
 
     if split:
@@ -15,18 +15,18 @@ def generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
 
     try:
         models.Abon.objects.get(username=username)
-        return generate_random_chars(length=length, chars=chars, split=split, delimiter=delimiter)
+        return _generate_random_chars(length=length, chars=chars, split=split, delimiter=delimiter)
     except models.Abon.DoesNotExist:
         return username
 
 
-def generate_random_username():
-    username = generate_random_chars(length=6, chars=digits)
+def _generate_random_username():
+    username = _generate_random_chars(length=6, chars=digits)
     return str(int(username))
 
 
-def generate_random_password():
-    return generate_random_chars(length=8, chars=digits + ascii_lowercase)
+def _generate_random_password():
+    return _generate_random_chars(length=8, chars=digits + ascii_lowercase)
 
 
 class AbonForm(forms.ModelForm):
@@ -41,23 +41,17 @@ class AbonForm(forms.ModelForm):
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
-        # if instance is not None and instance.is_dynamic_ip:
-        #    self.fields['ip_address'].widget.attrs['readonly'] = True
 
-    username = forms.CharField(max_length=127, required=False, initial=generate_random_username,
+    username = forms.CharField(max_length=127, required=False, initial=_generate_random_username,
                                widget=forms.TextInput(attrs={
                                    'placeholder': _('login'),
                                    'required': '',
                                    'pattern': r'^\w{1,127}$'
                                }), label=_('login'))
 
-    password = forms.CharField(max_length=64, initial=generate_random_password, widget=forms.TextInput(attrs={
+    password = forms.CharField(max_length=64, initial=_generate_random_password, widget=forms.TextInput(attrs={
         'type': 'password', 'autocomplete': 'new-password'
     }), label=_('Password'))
-
-    # ip_address = forms.CharField(widget=forms.TextInput(attrs={
-    #     'pattern': IP_ADDR_REGEX
-    # }), label=_('Ip Address'), required=False)
 
     class Meta:
         model = models.Abon
@@ -139,7 +133,6 @@ class ExportUsersForm(forms.Form):
     FIELDS_CHOICES = (
         ('username', _('profile username')),
         ('fio', _('fio')),
-        # ('ip_address', _('Ip Address')),
         ('description', _('Comment')),
         ('street__name', _('Street')),
         ('house', _('House')),
@@ -164,12 +157,10 @@ class MarkersForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(MarkersForm, self).save(commit=False)
-        return instance.save(update_fields=('markers',))
+        instance.save(update_fields=('markers',))
+        return instance
 
 
 class AmountMoneyForm(forms.Form):
     amount = forms.FloatField(max_value=50000, label=_('Amount of money'))
     comment = forms.CharField(max_length=128, label=_('Comment'), required=False)
-
-    def save(self):
-        pass
