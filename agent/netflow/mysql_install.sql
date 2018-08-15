@@ -1,3 +1,5 @@
+DROP TABLE `flowcache`;
+
 CREATE TABLE `flowcache` (
   `last_time` INT(10) UNSIGNED NOT NULL,
   `abon_id`   INT(11) DEFAULT NULL UNIQUE,
