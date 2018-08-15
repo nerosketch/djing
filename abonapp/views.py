@@ -18,7 +18,6 @@ from djing.lib import DuplicateEntry
 from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
-from statistics.models import StatCache
 from tariff_app.models import Tariff
 from agent import NasFailedResult, Transmitter, NasNetworkError
 from . import forms
@@ -39,26 +38,21 @@ from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
 class PeoplesListView(OrderedFilteredList):
-    context_object_name = 'peoples'
     template_name = 'abonapp/peoples.html'
 
     def get_queryset(self):
-        # TODO: optimize that query
         street_id = lib.safe_int(self.request.GET.get('street'))
         gid = lib.safe_int(self.kwargs.get('gid'))
-        peoples_list = models.Abon.objects.all().select_related('group', 'street', 'current_tariff')
+        peoples_list = models.Abon.objects.filter(group__pk=gid)
         if street_id > 0:
-            peoples_list = peoples_list.filter(group__pk=gid, street=street_id)
-        else:
-            peoples_list = peoples_list.filter(group__pk=gid)
-
-        try:
-            for abon in peoples_list.iterator():
-                ips = tuple(p.ip for p in abon.ip_addresses.filter(is_active=True))
-                if len(ips) > 0:
-                    abon.stat_cache = StatCache.objects.filter(ip__in=ips).first()
-        except lib.LogicError as e:
-            messages.warning(self.request, e)
+            peoples_list = peoples_list.filter(street=street_id)
+        peoples_list = peoples_list.select_related(
+            'group', 'street', 'statcache', 'current_tariff'
+        ).only(
+            'group', 'street', 'statcache', 'fio',
+            'street', 'house', 'telephone', 'ballance', 'markers',
+            'username', 'is_active', 'current_tariff'
+        )
         ordering = self.get_ordering()
         if ordering and isinstance(ordering, str):
             ordering = (ordering,)
@@ -75,7 +69,7 @@ class PeoplesListView(OrderedFilteredList):
 
         context = super(PeoplesListView, self).get_context_data(**kwargs)
 
-        context['streets'] = models.AbonStreet.objects.filter(group=gid)
+        context['streets'] = models.AbonStreet.objects.filter(group=gid).only('name')
         context['street_id'] = lib.safe_int(self.request.GET.get('street'))
         context['group'] = group
         return context
@@ -449,9 +443,7 @@ def pick_tariff(request, gid, uname):
 @permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uname, abon_tariff_id):
     try:
-        #abon = get_object_or_404(models.Abon, username=uname)
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
-        #abon.disable_on_nas()
         abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
@@ -704,7 +696,7 @@ def abon_ping(request):
 
 @login_required
 def vcards(r):
-    abons = models.Abon.objects.exclude(group=None).select_related('group', 'street').only(
+    users = models.Abon.objects.exclude(group=None).select_related('group', 'street').only(
         'username', 'fio', 'group__title', 'telephone',
         'street__name', 'house'
     )
@@ -718,7 +710,7 @@ def vcards(r):
             "END:VCARD\r\n")
 
     def _make_vcard():
-        for ab in abons.iterator():
+        for ab in users.iterator():
             tel = ab.telephone
             if tel:
                 yield tmpl % {
@@ -1215,7 +1207,7 @@ class DhcpLever(SecureApiView):
     @staticmethod
     def on_dhcp_event(data: Dict) -> Optional[str]:
         """
-        data = {
+        :param data = {
             'client_ip': ip_address('127.0.0.1'),
             'client_mac': 'aa:bb:cc:dd:ee:ff',
             'switch_mac': 'aa:bb:cc:dd:ee:ff',

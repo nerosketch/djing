@@ -14,7 +14,7 @@ def get_dates():
 
 
 class StatManager(models.Manager):
-    def chart(self, username, count_of_parts=12, want_date=date.today()):
+    def chart(self, user, count_of_parts=12, want_date=date.today()):
         def byte_to_mbit(x):
             return ((x / 60) * 8) / 2 ** 20
 
@@ -28,7 +28,7 @@ class StatManager(models.Manager):
             return sum(elements) / len(elements)
 
         try:
-            charts_data = self.filter(uname=username)
+            charts_data = self.filter(abon=user)
             charts_times = tuple(cd.cur_time.timestamp() * 1000 for cd in charts_data)
             charts_octets = tuple(cd.octets for cd in charts_data)
             if len(charts_octets) > 0 and len(charts_octets) == len(charts_times):
@@ -53,7 +53,7 @@ class StatManager(models.Manager):
 
 class StatElem(models.Model):
     cur_time = UnixDateTimeField(primary_key=True)
-    uname = models.CharField(max_length=127, blank=True, null=True, default=None)
+    abon = models.ForeignKey('abonapp.Abon', on_delete=models.CASCADE, null=True, default=None, blank=True)
     ip = MyGenericIPAddressField()
     octets = models.PositiveIntegerField(default=0)
     packets = models.PositiveIntegerField(default=0)
@@ -115,7 +115,8 @@ def getModel(want_date=now()):
 
 class StatCache(models.Model):
     last_time = UnixDateTimeField()
-    ip = MyGenericIPAddressField(primary_key=True)
+    # ip = MyGenericIPAddressField(primary_key=True)
+    abon = models.OneToOneField('abonapp.Abon', on_delete=models.CASCADE, primary_key=True)
     octets = models.PositiveIntegerField(default=0)
     packets = models.PositiveIntegerField(default=0)
 

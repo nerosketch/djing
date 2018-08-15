@@ -35,9 +35,11 @@ if __name__ == '__main__':
     cursor = db.cursor()
 
     sql = (
-        'SELECT abonent.ip_address, acc.username  FROM abonent '
+        'SELECT INET_ATON(emps.ip) as uip, acc.id FROM abonent '
         'LEFT JOIN base_accounts AS acc ON (acc.id = abonent.baseaccount_ptr_id) '
-        'WHERE abonent.ip_address != 0'
+        'LEFT JOIN abonent_ip_addresses AS ips ON (acc.id = ips.abon_id) '
+        'LEFT JOIN ip_pool_employed_ip AS emps ON (ips.ipleasemodel_id = emps.id) '
+        'WHERE INET_ATON(emps.ip) != 0;'
     )
     ln = cursor.execute(sql)
     with open(tmp_ipuser_file, 'w') as f:
@@ -46,7 +48,7 @@ if __name__ == '__main__':
             row = cursor.fetchone()
             if row is None:
                 break
-            f.write("%d-%s\n" % row)
+            f.write("%d-%d\n" % row)
     db.close()
 
     os.system(
