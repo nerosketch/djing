@@ -11,11 +11,9 @@
 {% endblock %}
 
 {% block page-header %}
-    <h3>{{ abon.fio|default:_("Long name") }}
-        <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
-            <b>{{ abon.ballance|floatformat:2 }}</b>
-        </small>
-    </h3>
+    <small>{% trans 'Ballance' %} <i class="glyphicon glyphicon-ruble"></i>
+        <b>{{ abon.ballance|floatformat:2 }}</b>
+    </small>
 {% endblock %}
 
 {% block main %}

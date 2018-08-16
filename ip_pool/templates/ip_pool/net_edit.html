@@ -15,7 +15,9 @@
     </ol>
 {% endblock %}
 
-{% block page-header %}{{ object }}{% endblock %}
+{% block page-header %}
+    {{ object }}
+{% endblock %}
 
 {% block main %}
     <form action="{% url 'ip_pool:net_edit' object.pk %}" method="post">{% csrf_token %}

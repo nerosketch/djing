@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block page-header %}
-    <legend>{{ group.title|default:_('Not assigned') }}</legend>
+    {{ group.title|default:_('Not assigned') }}
 {% endblock %}
 
 {% block main %}
