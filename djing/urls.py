@@ -17,7 +17,8 @@ urlpatterns = [
     url(r'^msg/', include('msg_app.urls', namespace='msg_app')),
     url(r'^dialing/', include('dialing_app.urls', namespace='dialapp')),
     url(r'^groups/', include('group_app.urls', namespace='group_app')),
-    url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool'))
+    url(r'^ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
+    url(r'^nas/', include('nas_app.urls', namespace='nas_app'))
 
     # Switch language
     #url(r'^i18n/', include('django.conf.urls.i18n')),

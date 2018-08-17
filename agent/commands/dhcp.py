@@ -24,7 +24,7 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
         add_lease_result = abon.add_lease(client_ip, mac_addr=client_mac, network=None)
         if add_lease_result is None:
             if abon.is_access():
-                abon.sync_with_nas(created=False)
+                abon.nas_sync_self()
             else:
                 return 'User %s is not access to service' % abon.username
         else:
@@ -50,7 +50,7 @@ def dhcp_expiry(client_ip: str) -> Optional[str]:
         abon = Abon.objects.filter(ip_addresses=lease).first()
         if abon is None:
             return "Subscriber with ip %s does not exist" % client_ip
-        abon.sync_with_nas(created=False)
+        abon.nas_sync_self()
     except IpLeaseModel.DoesNotExist:
         pass
 

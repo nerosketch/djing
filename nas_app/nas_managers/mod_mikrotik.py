@@ -1,6 +1,6 @@
+import binascii
 import re
 import socket
-import binascii
 from abc import ABCMeta
 from hashlib import md5
 from ipaddress import _BaseAddress, ip_address
@@ -8,12 +8,9 @@ from typing import Iterable, Optional, Tuple, Generator, Dict
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-
 from djing.lib.decorators import LazyInitMetaclass
-from .structs import TariffStruct, AbonStruct, VectorAbon, VectorTariff
-from . import settings as local_settings
-from djing import ping
-from agent.core import BaseTransmitter, NasNetworkError, NasFailedResult
+from nas_app.nas_managers.core import BaseTransmitter, NasNetworkError, NasFailedResult
+from nas_app.nas_managers.structs import TariffStruct, AbonStruct, VectorAbon, VectorTariff
 
 DEBUG = getattr(settings, 'DEBUG', False)
 
@@ -29,8 +26,6 @@ class ApiRos(object):
     def __init__(self, ip: str, port: int):
         if self.sk is None:
             sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            if port is None:
-                port = local_settings.NAS_PORT
             sk.connect((ip, port or 8728))
             self.sk = sk
 
@@ -168,20 +163,16 @@ class ApiRos(object):
 
 
 class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs', (ABCMeta, LazyInitMetaclass), {})):
-    def __init__(self, login=None, password=None, ip=None, port=None):
-        ip = ip or getattr(local_settings, 'NAS_IP')
-        if ip is None or ip == '<NAS IP>':
-            raise NasNetworkError('Ip address of NAS does not specified')
-        if not ping(ip):
-            raise NasNetworkError('NAS %(ip_addr)s does not pinged' % {
-                'ip_addr': ip
-            })
+    description = _('Mikrotik NAS')
+
+    def __init__(self, login: str, password: str, ip: str, port: int, *args, **kwargs):
         try:
-            super(MikrotikTransmitter, self).__init__(ip, port)
-            self.login(
-                login or getattr(local_settings, 'NAS_LOGIN'),
-                password or getattr(local_settings, 'NAS_PASSW')
-            )
+            ApiRos.__init__(self, ip, port)
+            MikrotikTransmitter.__init__(self,
+                                         login=login, password=password, ip=ip,
+                                         port=port, *args, **kwargs
+                                         )
+            self.login(username=login, pwd=password)
         except ConnectionRefusedError:
             raise NasNetworkError('Connection to %s is Refused' % ip)
 
@@ -280,7 +271,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             '=burst-time=1/1'
         ))
 
-    def remove_queue(self, user: AbonStruct, queue: AbonStruct=None) -> None:
+    def remove_queue(self, user: AbonStruct, queue: AbonStruct = None) -> None:
         if not isinstance(user, AbonStruct):
             raise TypeError
         if queue is None:
@@ -405,10 +396,12 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
 
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
+
         def _finder(ips):
             for ip in ips:
                 r = self.find_ip(ip, LIST_USERS_ALLOWED)
                 if r: yield r.get('=.id')
+
         firewall_ip_list_ids = _finder(user.ips)
         self.remove_ip_range(firewall_ip_list_ids)
 

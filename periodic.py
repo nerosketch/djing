@@ -9,7 +9,7 @@ from django.db import transaction
 from django.db.models import signals, Count
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
 from ip_pool.models import IpLeaseModel
-from agent import Transmitter, NasNetworkError, NasFailedResult
+from nas_app.nas_managers import NasNetworkError, NasFailedResult
 from djing.lib import LogicError
 
 

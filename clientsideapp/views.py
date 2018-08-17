@@ -9,7 +9,7 @@ from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from tariff_app.models import Tariff
 from taskapp.models import Task
 from djing.lib import LogicError
-from agent import NasFailedResult, NasNetworkError
+from nas_app.nas_managers import NasFailedResult, NasNetworkError
 
 
 @login_required
@@ -53,7 +53,7 @@ def buy_service(request, srv_id):
         if request.method == 'POST':
             abon.pick_tariff(service, None, _("Buy the service via user side, service '%s'")
                              % service)
-            abon.sync_with_nas(created=False)
+            abon.nas_sync_self()
             messages.success(request, _("The service '%s' wan successfully activated") % service.title)
         else:
             return render_to_text('clientsideapp/modal_service_buy.html', {

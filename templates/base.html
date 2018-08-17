@@ -100,6 +100,13 @@
                 </a>
             </li>
 
+            {% url 'nas_app:home' as nashome %}
+            <li{% if nashome in request.path %} class="active"{% endif %}>
+                <a href="{{ nashome }}">
+                    <span class="glyphicon glyphicon-globe"></span> {% trans 'NAS' %}
+                </a>
+            </li>
+
         </ul>
 
     </div>

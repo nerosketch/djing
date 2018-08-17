@@ -54,6 +54,10 @@
                     });
                 </script>
 
+                {# Nas server #}
+                {% bootstrap_icon 'globe' as ic %}
+                {% bootstrap_field form.nas addon_before=ic %}
+
                 <div class="btn-group">
                     <button type="submit" class="btn btn-sm btn-primary">
                         <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}

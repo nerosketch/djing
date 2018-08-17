@@ -31,7 +31,8 @@ subscriber_patterns = [
     url(r'^periodic_pay$', views.add_edit_periodic_pay, name='add_periodic_pay'),
     url(r'^periodic_pay(?P<periodic_pay_id>\d+)/$', views.add_edit_periodic_pay, name='add_periodic_pay'),
     url(r'^periodic_pay(?P<periodic_pay_id>\d+)/del/$', views.del_periodic_pay, name='del_periodic_pay'),
-    url(r'^lease/add/$', views.lease_add, name='lease_add')
+    url(r'^lease/add/$', views.lease_add, name='lease_add'),
+    url(r'^ping$', views.abon_ping, name='ping')
 ]
 
 group_patterns = [
@@ -44,6 +45,7 @@ group_patterns = [
     url(r'^street/edit', views.street_edit, name='street_edit'),
     url(r'^street/(?P<sid>\d+)/delete$', views.street_del, name='street_del'),
     url(r'^active_networks/$', views.active_nets, name='active_nets'),
+    url(r'^attach_nas/$', views.attach_nas, name='attach_nas'),
     url(r'^(?P<uname>\w{1,127})/', include(subscriber_patterns))
 ]
 
@@ -54,7 +56,6 @@ urlpatterns = [
     url(r'^log$', views.LogListView.as_view(), name='log'),
     url(r'^pay$', views.terminal_pay, name='terminal_pay'),
     url(r'^debtors$', views.DebtorsListView.as_view(), name='debtors'),
-    url(r'^ping$', views.abon_ping, name='ping'),
     url(r'^contacts/vcards/$', views.vcards, name='vcards'),
 
     # Api's

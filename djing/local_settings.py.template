@@ -16,7 +16,7 @@ SECRET_KEY = '!!!!!!!!!!!!!!!!!!!!!!!!YOUR SECRET KEY!!!!!!!!!!!!!!!!!!!!!!!!'
 DATABASES = {
     'default': {
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', default_storage_engine=INNODB",
             'isolation_level': 'read uncommitted'
         },
         #'ENGINE': 'django.db.backends.sqlite3',

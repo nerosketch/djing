@@ -1,0 +1,17 @@
+{% extends 'base_delete_modal.html' %}
+{% load i18n %}
+
+{% block modal_form_url %}
+    {% url 'nas_app:del' object.pk %}
+{% endblock %}
+
+{% block modal_form_title %}
+    {% trans 'Remove NAS' %}
+{% endblock %}
+
+{% block modal_form_text %}
+    {% blocktrans trimmed %}
+        <h4>If you remove this server, then all users than has been
+        attached to them will lost parent NAS server.</h4>
+    {% endblocktrans %}
+{% endblock %}

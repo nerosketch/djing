@@ -1,0 +1,42 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'nas_app:home' %}">{% trans 'Network access servers' %}</a></li>
+        <li class="active">{% trans 'Edit gateway' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Change gateways' %}
+{% endblock %}
+
+{% block main %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{% trans 'Change gateway' %}</h3>
+    </div>
+    <div class="panel-body">
+        <form action="{% url 'nas_app:edit' object.pk %}" method="post">{% csrf_token %}
+            {% bootstrap_form form %}
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                </button>
+                {% if perms.nas_app.delete_nasmodel %}
+                    <a href="{% url 'nas_app:del' object.pk %}" class="btn btn-danger btn-modal">
+                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-danger" title="{% trans 'Permission denied' %}">
+                        <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

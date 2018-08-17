@@ -18,8 +18,9 @@ from djing.lib import DuplicateEntry
 from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
+from nas_app.models import NASModel
 from tariff_app.models import Tariff
-from agent import NasFailedResult, Transmitter, NasNetworkError
+from nas_app.nas_managers import NasFailedResult, NasNetworkError
 from . import forms
 from . import models
 from devapp.models import Device, Port as DevPort
@@ -126,7 +127,6 @@ class AbonCreateView(CreateView):
             assign_perm("abonapp.can_buy_tariff", me, abon)
             assign_perm("abonapp.can_view_passport", me, abon)
             assign_perm('abonapp.can_add_ballance', me, abon)
-            # abon.sync_with_nas(created=True)
             messages.success(self.request, _('create abon success msg'))
             self.abon = abon
             return super(AbonCreateView, self).form_valid(form)
@@ -304,7 +304,7 @@ class AbonHomeUpdateView(UpdateView):
     def form_valid(self, form):
         r = super(AbonHomeUpdateView, self).form_valid(form)
         abon = self.object
-        res = abon.sync_with_nas(created=False)
+        res = abon.nas_sync_self()
         if isinstance(res, Exception):
             messages.warning(self.request, res)
         messages.success(self.request, _('edit abon success msg'))
@@ -412,7 +412,7 @@ def pick_tariff(request, gid, uname):
             else:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
-            r = abon.sync_with_nas(created=False)
+            r = abon.nas_sync_self()
             if r is None:
                 messages.success(request, _('Tariff has been picked'))
             else:
@@ -652,15 +652,22 @@ def charts(request, gid, uname):
 @login_required
 @permission_required('abonapp.can_ping')
 @json_view
-def abon_ping(request):
+def abon_ping(request, gid, uname):
     ip = request.GET.get('cmd_param')
     status = False
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         if ip is None:
             raise lib.LogicError(_('Ip not passed'))
-        tm = Transmitter()
-        ping_result = tm.ping(ip)
+
+        if abon.nas is None:
+            return {
+                'status': 1,
+                'dat': '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('NAS required')
+            }
+        mngr = abon.nas.get_nas_manager()
+        ping_result = mngr.ping(ip)
         if ping_result is None:
             if ping(ip, 10):
                 status = True
@@ -1089,8 +1096,11 @@ class EditSibscriberMarkers(UpdateView):
 @lib.decorators.only_admins
 def user_session_toggle(request, gid, uname, lease_id, action=None):
     abon = get_object_or_404(models.Abon, username=uname)
+    if abon.nas is None:
+        messages.error(request, _('NAS required'))
+        return redirect('abonapp:abon_home', gid, uname)
     lease = abon.ip_addresses.get(pk=lease_id)
-    tm = Transmitter()
+    tm = abon.nas.get_nas_manager()
     try:
         if action == 'free':
             try:
@@ -1105,6 +1115,8 @@ def user_session_toggle(request, gid, uname, lease_id, action=None):
             abon_nas_obj = abon.build_agent_struct()
             tm.lease_start(abon_nas_obj, ip_address(lease.ip))
             messages.success(request, _('Ip lease has been started'))
+        else:
+            messages.error(request, _('Unexpected action'))
     except (NasFailedResult, lib.LogicError) as e:
         messages.error(request, e)
     return redirect('abonapp:abon_home', gid, uname)
@@ -1127,12 +1139,15 @@ def lease_add(request, gid, uname):
                 network = get_object_or_404(NetworkModel, pk=network_id)
                 lease = IpLeaseModel.objects.create_from_ip(ip, net=network, is_dynamic=is_dynamic)
                 abon.ip_addresses.add(lease)
-                tm = Transmitter()
-                tm.lease_start(
-                    user=abon.build_agent_struct(),
-                    lease=lease.ip
-                )
-                messages.success(request, _('Ip lease has been created'))
+                if abon.nas is None:
+                    messages.error(request, _('NAS required'))
+                else:
+                    tm = abon.nas.get_nas_manager()
+                    tm.lease_start(
+                        user=abon.build_agent_struct(),
+                        lease=lease.ip
+                    )
+                    messages.success(request, _('Ip lease has been created'))
                 return redirect('abonapp:abon_home', gid, uname)
             except lib.DuplicateEntry as e:
                 messages.error(request, e)
@@ -1150,6 +1165,28 @@ def lease_add(request, gid, uname):
         'form': frm,
         'group': group,
         'uname': uname
+    })
+
+
+@login_required
+@lib.decorators.only_admins
+def attach_nas(request, gid):
+    if request.method == 'POST':
+        gateway_id = lib.safe_int(request.POST.get('gateway'))
+        if gateway_id:
+            nas = get_object_or_404(NASModel, pk=gateway_id)
+            abons = models.Abon.objects.filter(group__id=gid)
+            if abons.exists():
+                abons.update(nas=nas)
+                messages.success(request, _('Network access server for users in this group, has been updated'))
+                return redirect('abonapp:group_list')
+            else:
+                messages.warning(request, _('Users not found'))
+        else:
+            messages.error(request, _('You must select gateway'))
+    return render(request, 'abonapp/modal_attach_nas.html', {
+        'gid': gid,
+        'nas_list': NASModel.objects.all().iterator()
     })
 
 

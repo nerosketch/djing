@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
-from agent import Transmitter, AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
+from nas_app.nas_managers import AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import LogicError
 from ip_pool.models import IpLeaseModel, NetworkModel
@@ -33,7 +33,7 @@ class AbonLog(models.Model):
         permissions = (
             ('can_view_abonlog', _('Can view subscriber logs')),
         )
-        ordering = ('-date',)
+        ordering = '-date',
 
     def __str__(self):
         return self.comment
@@ -81,7 +81,7 @@ class AbonStreet(models.Model):
         db_table = 'abon_street'
         verbose_name = _('Street')
         verbose_name_plural = _('Streets')
-        ordering = ('name',)
+        ordering = 'name',
 
 
 class AbonManager(MyUserManager):
@@ -94,13 +94,13 @@ class Abon(BaseAccount):
     group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
-    # ip_address = models.GenericIPAddressField(blank=True, null=True, verbose_name=_('Ip Address'))
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(default=False)
+    nas = models.ForeignKey('nas_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('Network access server'), default=None)
 
     MARKER_FLAGS = (
         ('icon_donkey', _('Donkey')),
@@ -227,14 +227,51 @@ class Abon(BaseAccount):
             return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
         raise LogicError(_('You have not any active leases'))
 
-    def sync_with_nas(self, created: bool) -> Optional[Exception]:
+    def nas_sync_self(self) -> Optional[Exception]:
+        """
+        Synchronize user with gateway(NAS)
+        :return:
+        """
+        if self.nas is None:
+            raise LogicError(_('NAS required'))
         try:
             agent_abon = self.build_agent_struct()
-            tm = Transmitter()
-            if created:
-                tm.add_user(agent_abon)
-            else:
-                tm.update_user(agent_abon)
+            mngr = self.nas.get_nas_manager()
+            mngr.update_user(agent_abon)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return e
+        except LogicError:
+            pass
+
+    def nas_add_self(self):
+        """
+        Will add this user to network access server
+        :return:
+        """
+        if self.nas is None:
+            raise LogicError(_('NAS required'))
+        try:
+            agent_abon = self.build_agent_struct()
+            mngr = self.nas.get_nas_manager()
+            mngr.add_user(agent_abon)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return e
+        except LogicError:
+            pass
+
+    def nas_remove_self(self):
+        """
+        Will remove this user to network access server
+        :return:
+        """
+        if self.nas is None:
+            raise LogicError(_('NAS required'))
+        try:
+            agent_abon = self.build_agent_struct()
+            mngr = self.nas.get_nas_manager()
+            mngr.remove_user(agent_abon)
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
@@ -422,13 +459,11 @@ class PeriodicPayForId(models.Model):
 
 @receiver(post_delete, sender=Abon)
 def abon_del_signal(sender, **kwargs):
-    abon = kwargs["instance"]
+    abon = kwargs.get("instance")
+    if abon is None:
+        raise ValueError('Instance does not passed to a signal')
     try:
-        ab = abon.build_agent_struct()
-        if ab is None:
-            return True
-        tm = Transmitter()
-        tm.remove_user(ab)
+        abon.nas_remove_self()
     except (NasFailedResult, NasNetworkError, LogicError):
         return True
 
@@ -445,16 +480,13 @@ def abon_tariff_post_init(sender, **kwargs):
 
 @receiver(pre_delete, sender=AbonTariff)
 def abontariff_pre_delete(sender, **kwargs):
-    abon_tariff = kwargs["instance"]
+    abon_tariff = kwargs.get("instance")
+    if abon_tariff is None:
+        raise ValueError('Instance does not passed to a signal')
     try:
         abon = Abon.objects.get(current_tariff=abon_tariff)
-        ab = abon.build_agent_struct()
-        if ab is None:
-            return True
-        tm = Transmitter()
-        tm.remove_user(ab)
-    except Abon.DoesNotExist:
-        print('ERROR: Abon.DoesNotExist')
-    except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
-        print('NetErr:', e)
+        abon.nas_remove_self()
+    except (NasFailedResult, NasNetworkError, LogicError):
         return True
+    except Abon.DoesNotExist:
+        print('Error: abontariff_pre_delete - user not found')

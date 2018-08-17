@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from typing import Iterator, Any, Tuple, Optional
-
-from .structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
+from djing import ping
+from nas_app.nas_managers.structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
 
 
 # Raised if NAS has returned failed result
@@ -16,6 +16,22 @@ class NasNetworkError(Exception):
 
 # Communicate with NAS
 class BaseTransmitter(ABC):
+    @abstractproperty
+    def description(self):
+        """
+        :return: Returnd a description of nas implementation
+        """
+
+    def __init__(self, login: str, password: str, ip: str, port: int, *args, **kwargs):
+        if not ping(ip):
+            raise NasNetworkError('NAS %(ip_addr)s does not pinged' % {
+                'ip_addr': ip
+            })
+
+    @classmethod
+    def get_description(cls):
+        return cls.description
+
     @abstractmethod
     def add_user_range(self, user_list: VectorAbon):
         """add subscribers list to NAS"""

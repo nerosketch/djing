@@ -37,10 +37,12 @@
                     <td>{{ gr.pk }}</td>
                     <td><a href="{% url 'abonapp:people_list' gr.pk %}">{{ gr.title }}</a></td>
                     <td class="hidden-xs">{{ gr.usercount }}</td>
-                    <td class="btn-group">
-                        <a href="{% url 'abonapp:ch_group_tariff' gr.pk %}" class="btn btn-sm btn-default"
-                           title="{% trans 'User groups' %}">
+                    <td class="btn-group btn-group-sm">
+                        <a href="{% url 'abonapp:ch_group_tariff' gr.pk %}" class="btn btn-default" title="{% trans 'User groups' %}">
                             <span class="glyphicon glyphicon-cog"></span>
+                        </a>
+                        <a href="{% url 'abonapp:attach_nas' gr.pk %}" class="btn btn-default btn-modal" title="{% trans 'NAS' %}">
+                            <span class="glyphicon glyphicon-globe"></span>
                         </a>
                     </td>
                 </tr>

@@ -3,6 +3,8 @@ from django import forms
 from django.contrib.auth.hashers import make_password
 from random import choice
 from string import digits, ascii_lowercase
+
+from nas_app.models import NASModel
 from . import models
 from django.conf import settings
 
@@ -41,6 +43,8 @@ class AbonForm(forms.ModelForm):
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
+        if not instance:
+            self.initial['nas'] = NASModel.objects.filter(default=True).first()
 
     username = forms.CharField(max_length=127, required=False, initial=_generate_random_username,
                                widget=forms.TextInput(attrs={
@@ -55,7 +59,7 @@ class AbonForm(forms.ModelForm):
 
     class Meta:
         model = models.Abon
-        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active')
+        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'nas')
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),

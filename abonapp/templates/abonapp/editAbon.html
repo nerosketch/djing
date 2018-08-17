@@ -37,15 +37,6 @@
                             {% bootstrap_field form.telephone form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
                         {% endwith %}
 
-                        {# Ip address field #}
-{#                        {% trans 'Reset ip' as tx %}#}
-{#                        {% url 'abonapp:reset_ip' group.pk abon.username as url %}#}
-{#                        {% if abon.is_dynamic_ip %}#}
-{#                            {% bootstrap_button '' button_type='link' icon='refresh' button_class='btn-default btn-cmd' id='iprefreshbtn' href=url size='sm' title=tx as bt %}#}
-{#                        {% endif %} #}
-{#                        {% bootstrap_field form.ip_address form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}#}
-
-
                         {% bootstrap_field form.street form_group_class='form-group-sm' %}
                         {% bootstrap_field form.house form_group_class='form-group-sm' %}
                         {% bootstrap_field form.is_active form_group_class='form-group-sm' %}
@@ -70,6 +61,9 @@
                             });
                         </script>
 
+                        {% if perms.nas_app.change_nasmodel %}
+                            {% bootstrap_field form.nas form_group_class='form-group-sm' %}
+                        {% endif %}
                         {% bootstrap_field form.description form_group_class='form-group-sm' %}
 
                         <div class="form-group-sm">
@@ -201,7 +195,7 @@
                                 {% endif %}
 
                                 {% if can_ping %}
-                                    <a href="{% url 'abonapp:ping' %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ lease.ip }}">
+                                    <a href="{% url 'abonapp:ping' group.pk abon.username %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ lease.ip }}">
                                         <span class="glyphicon glyphicon-flash"></span> Ping
                                     </a>
                                 {% else %}

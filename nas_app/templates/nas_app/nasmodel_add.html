@@ -1,0 +1,31 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'nas_app:home' %}">{% trans 'Network access servers' %}</a></li>
+        <li class="active">{% trans 'Add gateway' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Add new gateway' %}
+{% endblock %}
+
+{% block main %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{% trans 'Add gateway' %}</h3>
+    </div>
+    <div class="panel-body">
+        <form action="{% url 'nas_app:add' %}" method="post">{% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary btn-sm">
+                <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
