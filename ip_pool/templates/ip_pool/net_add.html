@@ -15,7 +15,9 @@
     </ol>
 {% endblock %}
 
-{% block page-header %}{% trans 'Add new subnet' %}{% endblock %}
+{% block page-header %}
+    {% trans 'Add new subnet' %}
+{% endblock %}
 
 {% block main %}
     <form action="{% url 'ip_pool:net_add' %}" method="post">{% csrf_token %}

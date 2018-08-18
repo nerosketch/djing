@@ -17,7 +17,7 @@
 
 {% if pay_instance %}
     {% block page-header %}
-        <h3>{{ pay_instance.name }}</h3>
+        {{ pay_instance.name }}
     {% endblock %}
     {% url 'tarifs:periodic_pay_edit' pay_instance.id as form_url %}
 {% else %}

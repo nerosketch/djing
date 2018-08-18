@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block page-header %}
-    <legend>{{ dev.comment|default:_('Not assigned') }}</legend>
+    {{ dev.comment|default:_('Not assigned') }}
 {% endblock %}
 
 {% block main %}

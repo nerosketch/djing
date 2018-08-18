@@ -17,7 +17,7 @@
 
 
 {% block page-header %}
-    <h3>{{ dev.comment|default:_('Not assigned') }}</h3>
+    {{ dev.comment|default:_('Not assigned') }}
 {% endblock %}
 
 
