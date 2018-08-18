@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-09 14:20+0300\n"
+"POT-Creation-Date: 2018-08-18 13:59+0300\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -17,81 +17,81 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: forms.py:49 forms.py:52
+#: forms.py:51 forms.py:54
 msgid "login"
 msgstr "Логин"
 
-#: forms.py:56
+#: forms.py:58
 msgid "Password"
 msgstr "Пароль"
 
-#: forms.py:67 forms.py:141 templates/abonapp/peoples.html:36
+#: forms.py:65 forms.py:139 templates/abonapp/peoples.html:36
 msgid "fio"
 msgstr "ФИО"
 
-#: forms.py:71 forms.py:123
+#: forms.py:69 forms.py:121
 msgid "telephone placeholder"
 msgstr "+[7,8,9,3] и 10,11 цифр"
 
-#: forms.py:140
+#: forms.py:138
 msgid "profile username"
 msgstr "Логин"
 
-#: forms.py:143 forms.py:172 models.py:98 templates/abonapp/addInvoice.html:40
+#: forms.py:140 forms.py:170 models.py:97 templates/abonapp/addInvoice.html:40
 #: templates/abonapp/debtors.html:25
 #: templates/abonapp/invoiceForPayment.html:26 templates/abonapp/log.html:23
 #: templates/abonapp/payHistory.html:12 templates/abonapp/task_log.html:10
 msgid "Comment"
 msgstr "Комментарий"
 
-#: forms.py:144 models.py:82 models.py:99 templates/abonapp/peoples.html:42
+#: forms.py:141 models.py:82 models.py:98 templates/abonapp/peoples.html:42
 msgid "Street"
 msgstr "Улица"
 
-#: forms.py:145 models.py:100
+#: forms.py:142 models.py:99
 msgid "House"
 msgstr "Дом"
 
-#: forms.py:146
+#: forms.py:143
 msgid "birth day"
 msgstr "День рождения"
 
-#: forms.py:147
+#: forms.py:144
 msgid "Is active"
 msgstr "Активен"
 
-#: forms.py:148 models.py:364 templates/abonapp/modal_add_phone.html:10
+#: forms.py:145 models.py:403 templates/abonapp/modal_add_phone.html:10
 #: templates/abonapp/modal_additional_telephones.html:13
 #: templates/abonapp/modal_phonebook.html:10 templates/abonapp/peoples.html:52
 msgid "Telephone"
 msgstr "Телефон"
 
-#: forms.py:149
+#: forms.py:146
 msgid "Service title"
 msgstr "Название тарифа"
 
-#: forms.py:150 templates/abonapp/peoples.html:56
+#: forms.py:147 templates/abonapp/peoples.html:56
 msgid "Balance"
 msgstr "Балланс"
 
-#: forms.py:151 templates/abonapp/editAbon.html:135
-#: templates/abonapp/editAbon.html:146
+#: forms.py:148 templates/abonapp/editAbon.html:113
+#: templates/abonapp/editAbon.html:124
 msgid "Device"
 msgstr "Устройство"
 
-#: forms.py:152 templates/abonapp/editAbon.html:166
+#: forms.py:149 templates/abonapp/editAbon.html:144
 msgid "Device port"
 msgstr "Порт устройства"
 
-#: forms.py:153
+#: forms.py:150
 msgid "Is dynamic ip"
 msgstr "Динамический ip"
 
-#: forms.py:157
+#: forms.py:154
 msgid "Fields"
 msgstr "Поля"
 
-#: forms.py:171
+#: forms.py:169
 msgid "Amount of money"
 msgstr "Количество денег"
 
@@ -119,9 +119,13 @@ msgstr "Улицы"
 msgid "User group"
 msgstr "Группа"
 
-#: models.py:96 templates/abonapp/editAbon.html:202
+#: models.py:96 templates/abonapp/editAbon.html:180
 msgid "Ip addresses"
 msgstr "IP Адреса"
+
+#: models.py:103
+msgid "Network access server"
+msgstr "Сервер доступа в интернет"
 
 #: models.py:106
 msgid "Donkey"
@@ -206,77 +210,82 @@ msgstr "Не хватает денег на счету"
 msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
 
-#: models.py:233
-msgid "Account has no one active ips"
-msgstr "Учётная запись не имеет ни одного активного ip адреса"
+#: models.py:228
+msgid "You have not any active leases"
+msgstr "Учётная запись не имеет ни одной активной сессии"
 
-#: models.py:257
+#: models.py:236 models.py:253 models.py:270 views.py:667 views.py:1100
+#: views.py:1143
+msgid "NAS required"
+msgstr "Необходимо выбрать NAS"
+
+#: models.py:294
 msgid "Pasport serial"
 msgstr "Серия пас."
 
-#: models.py:258
+#: models.py:295
 msgid "Pasport number"
 msgstr "Номер пас."
 
-#: models.py:259
+#: models.py:296
 msgid "Distributor"
 msgstr "Кем выдан"
 
-#: models.py:265 models.py:266
+#: models.py:302 models.py:303
 msgid "Passport Info"
 msgstr "Паспортные данные"
 
-#: models.py:296
+#: models.py:333
 msgid "Can view invoice for payment"
 msgstr "Может видеть назначенные платежи"
 
-#: models.py:298
+#: models.py:335
 msgid "Debt"
 msgstr "Квитанция (долг)"
 
-#: models.py:299 templates/abonapp/invoiceForPayment.html:10
+#: models.py:336 templates/abonapp/invoiceForPayment.html:10
 #: templates/abonapp/payHistory.html:48
 msgid "Debts"
 msgstr "Квитанции (долги)"
 
-#: models.py:321
+#: models.py:360
 msgid "Trade point"
 msgstr "Терминал"
 
-#: models.py:322
+#: models.py:361
 msgid "Receipt number"
 msgstr "Номер пас."
 
-#: models.py:379
+#: models.py:418
 msgid "Can view additional telephones"
 msgstr "Может видеть дополнительные телефоны"
 
-#: models.py:381
+#: models.py:420
 msgid "Additional telephone"
 msgstr "Дополнительный телефон"
 
-#: models.py:382 templates/abonapp/editAbon.html:28
+#: models.py:421 templates/abonapp/editAbon.html:28
 #: templates/abonapp/modal_additional_telephones.html:4
 msgid "Additional telephones"
 msgstr "Дополнительные телефоны"
 
-#: models.py:386 templates/abonapp/service.html:122
+#: models.py:425 templates/abonapp/service.html:122
 msgid "Periodic pay"
 msgstr "Периодический платёж"
 
-#: models.py:387
+#: models.py:426
 msgid "Last pay time"
 msgstr "Последний платёж"
 
-#: models.py:388 templates/abonapp/service.html:131
+#: models.py:427 templates/abonapp/service.html:131
 msgid "Next time to pay"
 msgstr "Следующий платёж"
 
-#: models.py:389
+#: models.py:428
 msgid "Account"
 msgstr "Учётная запись"
 
-#: models.py:403
+#: models.py:444
 #, python-format
 msgid "Charge for \"%(service)s\""
 msgstr "Плата за \"%(service)s\""
@@ -288,7 +297,7 @@ msgstr "Удаление абонента"
 #: templates/abonapp/addAbon.html:8 templates/abonapp/addInvoice.html:7
 #: templates/abonapp/buy_tariff.html:7 templates/abonapp/debtors.html:7
 #: templates/abonapp/group_list.html:8 templates/abonapp/group_list.html:13
-#: templates/abonapp/group_list.html:42 templates/abonapp/group_tariffs.html:7
+#: templates/abonapp/group_list.html:41 templates/abonapp/group_tariffs.html:7
 #: templates/abonapp/invoiceForPayment.html:7 templates/abonapp/log.html:7
 #: templates/abonapp/peoples.html:8 templates/abonapp/peoples.html:138
 #: templates/abonapp/service.html:103 templates/abonapp/service.html:111
@@ -300,9 +309,9 @@ msgstr "Группы абонентов"
 msgid "Add abon"
 msgstr "Добавить абонента"
 
-#: templates/abonapp/addAbon.html:59 templates/abonapp/addInvoice.html:46
-#: templates/abonapp/buy_tariff.html:74 templates/abonapp/editAbon.html:78
-#: templates/abonapp/editAbon.html:190 templates/abonapp/group_tariffs.html:32
+#: templates/abonapp/addAbon.html:63 templates/abonapp/addInvoice.html:46
+#: templates/abonapp/buy_tariff.html:74 templates/abonapp/editAbon.html:72
+#: templates/abonapp/editAbon.html:168 templates/abonapp/group_tariffs.html:32
 #: templates/abonapp/modal_dev.html:31
 #: templates/abonapp/modal_editstreet.html:30
 #: templates/abonapp/modal_user_markers.html:28
@@ -310,7 +319,7 @@ msgstr "Добавить абонента"
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/abonapp/addAbon.html:62 templates/abonapp/addInvoice.html:49
+#: templates/abonapp/addAbon.html:66 templates/abonapp/addInvoice.html:49
 #: templates/abonapp/buy_tariff.html:77 templates/abonapp/group_tariffs.html:32
 #: templates/abonapp/modal_abonamount.html:18
 #: templates/abonapp/modal_add_lease.html:19
@@ -459,70 +468,66 @@ msgstr "Позвонить"
 msgid "Add telephone"
 msgstr "Добавить номер телефона"
 
-#: templates/abonapp/editAbon.html:86 templates/abonapp/editAbon.html:88
-#: templates/abonapp/editAbon.html:93
+#: templates/abonapp/editAbon.html:80 templates/abonapp/editAbon.html:82
+#: templates/abonapp/editAbon.html:87
 msgid "Add new task"
 msgstr "Добавить задачу"
 
-#: templates/abonapp/editAbon.html:91 templates/abonapp/editAbon.html:103
-#: templates/abonapp/editAbon.html:118 templates/abonapp/payHistory.html:43
+#: templates/abonapp/editAbon.html:85 templates/abonapp/editAbon.html:96
+#: templates/abonapp/editAbon.html:202 templates/abonapp/payHistory.html:43
 msgid "Permission denied"
 msgstr "Доступ запрещён"
 
-#: templates/abonapp/editAbon.html:109
-msgid "No have ip"
-msgstr "Нет ip адреса"
-
-#: templates/abonapp/editAbon.html:115 templates/abonapp/editAbon.html:119
+#: templates/abonapp/editAbon.html:93 templates/abonapp/editAbon.html:97
 msgid "Send sms"
 msgstr "Отправить смс"
 
-#: templates/abonapp/editAbon.html:137 templates/abonapp/modal_dev.html:13
+#: templates/abonapp/editAbon.html:115 templates/abonapp/modal_dev.html:13
 msgid "Select the device"
 msgstr "Выберите устройство"
 
-#: templates/abonapp/editAbon.html:149
+#: templates/abonapp/editAbon.html:127
 msgid "Mac Address"
 msgstr "Мак"
 
-#: templates/abonapp/editAbon.html:149 templates/abonapp/editAbon.html:169
+#: templates/abonapp/editAbon.html:127 templates/abonapp/editAbon.html:147
 #: templates/abonapp/peoples.html:91
 msgid "Not assigned"
 msgstr "&lt;Не назначен&gt;"
 
-#: templates/abonapp/editAbon.html:154
+#: templates/abonapp/editAbon.html:132
 msgid "Remove clutch"
 msgstr "Удалить муфту"
 
-#: templates/abonapp/editAbon.html:158 templates/abonapp/modal_dev.html:6
+#: templates/abonapp/editAbon.html:136 templates/abonapp/modal_dev.html:6
 msgid "Add clutch"
 msgstr "Добавить муфту"
 
-#: templates/abonapp/editAbon.html:183
+#: templates/abonapp/editAbon.html:161
 msgid "Is dynamic network settings"
 msgstr "Динамические настройки по dhcp"
 
-#: templates/abonapp/editAbon.html:208
+#: templates/abonapp/editAbon.html:188
 msgid "Free session"
 msgstr "Освободить сессию"
 
-#: templates/abonapp/editAbon.html:212
+#: templates/abonapp/editAbon.html:192
 msgid "Start session"
 msgstr "Запустить сессию"
 
-#: templates/abonapp/editAbon.html:218
+#: templates/abonapp/editAbon.html:210
 msgid "Leased by:"
 msgstr "Выделен из:"
 
-#: templates/abonapp/editAbon.html:220
+#: templates/abonapp/editAbon.html:212
 msgid "From"
 msgstr "От"
 
-#: templates/abonapp/editAbon.html:226
+#: templates/abonapp/editAbon.html:218
 msgid "Leases does not found"
 msgstr "Аренды ip не найдены"
 
-#: templates/abonapp/editAbon.html:237
+#: templates/abonapp/editAbon.html:230
 #: templates/abonapp/modal_add_lease.html:16
 #: templates/abonapp/modal_add_phone.html:27
 #: templates/abonapp/modal_addstreet.html:30
@@ -531,19 +536,19 @@ msgstr "Аренды ip не найдены"
 msgid "Add"
 msgstr "Добавить"
 
-#: templates/abonapp/editAbon.html:241
+#: templates/abonapp/editAbon.html:234
 msgid "Active networks"
 msgstr "Активные подсети"
 
-#: templates/abonapp/editAbon.html:249
+#: templates/abonapp/editAbon.html:242
 msgid "User flags"
 msgstr "Флаги абонента"
 
-#: templates/abonapp/editAbon.html:259 templates/abonapp/peoples.html:165
+#: templates/abonapp/editAbon.html:252 templates/abonapp/peoples.html:165
 msgid "Edit"
 msgstr "Редактировать"
 
-#: templates/abonapp/fin_report.html:7 templates/abonapp/group_list.html:68
+#: templates/abonapp/fin_report.html:7 templates/abonapp/group_list.html:70
 msgid "Fin report"
 msgstr "Финансовый отчёт"
 
@@ -578,19 +583,23 @@ msgstr "Название группы"
 msgid "Number of subscribers"
 msgstr "Количество абонентов"
 
-#: templates/abonapp/group_list.html:49
+#: templates/abonapp/group_list.html:44
+msgid "NAS"
+msgstr ""
+
+#: templates/abonapp/group_list.html:51
 msgid "Groups was not found"
 msgstr "Ещё нет групп"
 
-#: templates/abonapp/group_list.html:58 templates/abonapp/log.html:8
+#: templates/abonapp/group_list.html:60 templates/abonapp/log.html:8
 msgid "Subscribers actions"
 msgstr "История действий абонентов"
 
-#: templates/abonapp/group_list.html:63
+#: templates/abonapp/group_list.html:65
 msgid "List of debtors"
 msgstr "Список должников"
 
-#: templates/abonapp/group_list.html:73
+#: templates/abonapp/group_list.html:75
 msgid "Export vCards"
 msgstr "Экспорт в vCards"
 
@@ -666,6 +675,22 @@ msgstr "Добавить улицу"
 #: templates/abonapp/modal_addstreet.html:12
 msgid "Street title"
 msgstr "Название улицы"
+
+#: templates/abonapp/modal_attach_nas.html:5
+msgid "Attach gateway"
+msgstr "Привязать шлюз"
+
+#: templates/abonapp/modal_attach_nas.html:10
+msgid "Select gateway"
+msgstr "Выбрать шлюз"
+
+#: templates/abonapp/modal_attach_nas.html:15
+msgid "Gateways does not exist"
+msgstr "Шлюзы не найдены"
+
+#: templates/abonapp/modal_attach_nas.html:22
+msgid "Attach"
+msgstr "Привязать"
 
 #: templates/abonapp/modal_current_networks.html:4
 msgid "Available networks"
@@ -870,138 +895,138 @@ msgstr "IP который вы указали не в подсети котор�
 msgid "This is not a valid IPv6 address."
 msgstr "Это не правильный IPv6 адрес"
 
-#: views.py:119
+#: views.py:112
 msgid "Address"
 msgstr "Адрес"
 
-#: views.py:138
+#: views.py:130
 msgid "create abon success msg"
 msgstr "Абонент успешно создан"
 
-#: views.py:149 views.py:323 views.py:441 views.py:538 views.py:847
-#: views.py:926 views.py:996 views.py:1092
+#: views.py:141 views.py:314 views.py:432 views.py:527 views.py:843
+#: views.py:922 views.py:992 views.py:1086
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#: views.py:174
+#: views.py:165
 msgid "delete abon success msg"
 msgstr "Абонент успешно удалён"
 
-#: views.py:179
+#: views.py:170
 #, python-format
 msgid "NAS says: '%s'"
 msgstr "NAS сказал: '%s'"
 
-#: views.py:199
+#: views.py:190
 msgid "fill account through admin side"
 msgstr "Пополнение счёта через админку"
 
-#: views.py:202
+#: views.py:193
 #, python-format
 msgid "Account filled successfully on %.2f"
 msgstr "Счёт пополнен на %.2f"
 
-#: views.py:205
+#: views.py:196
 msgid "I not know the account id"
 msgstr "Счёт успешно пополнен на %.2f"
 
-#: views.py:266
+#: views.py:257
 msgid "User group id is not matches with group in url"
 msgstr "Группа абонента не совпадает с группой указанной в url"
 
-#: views.py:319
+#: views.py:310
 msgid "edit abon success msg"
 msgstr "Абонент успешно изменён"
 
-#: views.py:330
+#: views.py:321
 msgid "User device was not found"
 msgstr "Пользовательское устройство не найдено"
 
-#: views.py:343
+#: views.py:334
 msgid "User has not have password, and cannot login"
 msgstr "Для абонента не задан пароль, он не сможет войти в учётку"
 
-#: views.py:389
+#: views.py:380
 msgid "Receipt has been created"
 msgstr "Квитанция на оплату была создана"
 
-#: views.py:416
+#: views.py:407
 #, python-format
 msgid "Service '%(service_name)s' has connected via admin"
 msgstr "Услуга '%(service_name)s' подключена администратором"
 
-#: views.py:426
+#: views.py:417
 msgid "Tariff has been picked"
 msgstr "Тариф успешно выбран"
 
-#: views.py:436
+#: views.py:427
 msgid "Tariff your picked does not exist"
 msgstr "Тариф, который вы выбрали, не существует"
 
-#: views.py:459
+#: views.py:448
 msgid "User has been detached from service"
 msgstr "Абонент отвязан от услуги"
 
-#: views.py:529
+#: views.py:518
 msgid "Passport information has been saved"
 msgstr "Информация о паспорте сохранена"
 
-#: views.py:560
+#: views.py:549
 msgid "Successfully saved"
 msgstr "Успешно сохранено"
 
-#: views.py:580
+#: views.py:569
 msgid "Device has successfully attached"
 msgstr "Устройство успешно прикреплено"
 
-#: views.py:585
+#: views.py:574
 msgid "Device your selected already does not exist"
 msgstr "Устройство, выбранное вами, уже не существует"
 
-#: views.py:587 views.py:608 views.py:645
+#: views.py:576 views.py:597 views.py:634
 msgid "Abon does not exist"
 msgstr "Абонент не найден"
 
-#: views.py:606
+#: views.py:595
 msgid "Device has successfully unattached"
 msgstr "Устройство успешно откреплено"
 
-#: views.py:648
+#: views.py:637
 msgid "Group what you want doesn't exist"
 msgstr "Указанная вами группа не найдена"
 
-#: views.py:669
+#: views.py:658
 msgid "no ping"
 msgstr "не пингуется"
 
-#: views.py:672
+#: views.py:662
 msgid "Ip not passed"
 msgstr "Ip адрес не передан"
 
-#: views.py:678 views.py:694
+#: views.py:674 views.py:690
 msgid "ping ok"
 msgstr "пингуется"
 
-#: views.py:685
+#: views.py:681
 #, python-format
 msgid "IP Conflict! %(all)d/%(return)d results"
 msgstr "IP Конфликт! ping %(all)d из %(return)d"
 
-#: views.py:688
+#: views.py:684
 #, python-format
 msgid "ok ping, %(all)d/%(return)d loses"
 msgstr "пингуется, %(all)d/%(return)d"
 
-#: views.py:692
+#: views.py:688
 #, python-format
 msgid "no ping, %(all)d/%(return)d loses"
 msgstr "не пингуется, %(all)d/%(return)d"
 
-#: views.py:794
+#: views.py:790
 msgid "Method is not POST"
 msgstr "Метод не POST"
 
-#: views.py:811
+#: views.py:807
 #, python-format
 msgid ""
 "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this "
@@ -1010,97 +1035,116 @@ msgstr ""
 "<a href='%(user_url)s'>%(user_name)s</a> уже привязан к этому порту на этом "
 "устройстве"
 
-#: views.py:819
+#: views.py:815
 msgid "Multiple users on the same device port"
 msgstr "Несколько абонентов на одном и том же порту устройства"
 
-#: views.py:828
+#: views.py:824
 msgid "User port has been saved"
 msgstr "Порт абонента успешно выбран"
 
-#: views.py:830
+#: views.py:826
 msgid "Selected port does not exist"
 msgstr "Выбранный порт не существует"
 
-#: views.py:832
+#: views.py:828
 msgid "User does not exist"
 msgstr "Абонент не найден"
 
-#: views.py:844
+#: views.py:840
 msgid "Street successfully saved"
 msgstr "Улица успешно сохранена"
 
-#: views.py:866
+#: views.py:862
 msgid "Streets has been saved"
 msgstr "Улицы сохранены"
 
-#: views.py:874
+#: views.py:870
 msgid "One of these streets has not been found"
 msgstr "Одна из этих улиц не была найдена"
 
-#: views.py:885
+#: views.py:881
 msgid "The street successfully deleted"
 msgstr "Улица успешно удалена"
 
-#: views.py:887
+#: views.py:883
 msgid "The street has not been found"
 msgstr "Улица не найдена"
 
-#: views.py:923
+#: views.py:919
 msgid "New telephone has been saved"
 msgstr "Новый телефон сохранен"
 
-#: views.py:943
+#: views.py:939
 msgid "Additional telephone successfully deleted"
 msgstr "Номер телефона успешно удалён"
 
-#: views.py:945
+#: views.py:941
 msgid "Telephone not found"
 msgstr "Телефон не найден"
 
-#: views.py:993
+#: views.py:989
 #, python-format
 msgid "Unexpected format %(export_format)s"
 msgstr "Нежиданный формат %(export_format)s"
 
-#: views.py:1042
+#: views.py:1038
 msgid "Periodic pays has been designated"
 msgstr "Периодический платёж назначен"
 
-#: views.py:1044
+#: views.py:1040
 msgid "Something wrong in form"
 msgstr "Что-то не так в форме"
 
-#: views.py:1063
+#: views.py:1059
 msgid "Periodic pay successfully deleted"
 msgstr "Периодический платёж успешно удалён"
 
-#: views.py:1097
+#: views.py:1091
 msgid "User flags has changed successfully"
 msgstr "Флаги абонента изменены успешно"
 
-#: views.py:1113
+#: views.py:1109
 msgid "Ip lease has been freed"
 msgstr "Аренда ip освобождена"
 
-#: views.py:1115
+#: views.py:1112
 msgid "You cannot disable last session"
 msgstr "Вы не можете отключить последний ip"
 
-#: views.py:1119
+#: views.py:1117
 msgid "Ip lease has been started"
 msgstr "Аренда ip включена"
 
-#: views.py:1147
+#: views.py:1119
+msgid "Unexpected action"
+msgstr "Непредвиденное действие"
+
+#: views.py:1150
 msgid "Ip lease has been created"
 msgstr "Аренда ip создана"
 
-#: views.py:1152
+#: views.py:1155
 msgid "Check form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#~ msgid "Ip Address"
-#~ msgstr "IP Адрес"
+#: views.py:1181
+msgid "Network access server for users in this group, has been updated"
+msgstr "Сервер доступа в интернет привязан к пользователям в этой группе"
+
+#: views.py:1184
+msgid "Users not found"
+msgstr "Пользователи не найдены"
+
+#: views.py:1186
+msgid "You must select gateway"
+msgstr "Вы должны выбрать шлюз"
+
+msgid "No have ip"
+msgstr "Нет ip адреса"
+
+msgid "Ip Address"
+msgstr "IP Адрес"
 
 msgid "Sub information"
 msgstr "Инфо"

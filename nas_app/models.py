@@ -27,7 +27,6 @@ class NASModel(models.Model):
         klass = self.get_nas_manager_klass()
         if hasattr(self, '_nas_mngr'):
             o = getattr(self, '_nas_mngr')
-            setattr(self, '_nas_mngr', o)
         else:
             o = klass(
                 login=self.auth_login,

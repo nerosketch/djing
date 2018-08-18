@@ -1,0 +1,182 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-18 13:53+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: forms.py:16 tests.py:119
+msgid "Can be only one default gateway"
+msgstr "Может быть только один сервер доступа по умолчанию"
+
+#: models.py:12 templates/nas_app/nasmodel_list.html:25
+msgid "Title"
+msgstr "Название"
+
+#: models.py:13 templates/nas_app/nasmodel_list.html:26
+msgid "Ip address"
+msgstr "IP адрес"
+
+#: models.py:14 templates/nas_app/nasmodel_list.html:27
+msgid "Port"
+msgstr "Порт"
+
+#: models.py:15
+msgid "Login"
+msgstr "Логин"
+
+#: models.py:16
+msgid "Password"
+msgstr "Пароль"
+
+#: models.py:17
+msgid "Type"
+msgstr "Тип"
+
+#: models.py:18 templates/nas_app/nasmodel_list.html:31
+msgid "Is default"
+msgstr "По умолчанию"
+
+#: models.py:24
+msgid "One of nas types implementation is not found"
+msgstr "Не найден тип реализации NAS"
+
+#: models.py:49
+msgid "Network access server. Gateway"
+msgstr "Сервер доступа в интернет(NAS, Шлюз)"
+
+#: models.py:50
+msgid "Network access servers. Gateways"
+msgstr "Серверы доступа в интернет"
+
+#: models.py:53
+msgid "Can view NAS"
+msgstr "Может видеть NAS"
+
+#: models.py:63 tests.py:194
+msgid "You cannot remove default server"
+msgstr "Вы не можете удалить шлюз по умолчанию"
+
+#: nas_managers/mod_mikrotik.py:166
+msgid "Mikrotik NAS"
+msgstr ""
+
+#: nas_managers/mod_mikrotik.py:491
+msgid "You cannot disable last session"
+msgstr "Вы не можете выключить последнюю сессию"
+
+#: templates/nas_app/nasmodel_add.html:8 templates/nas_app/nasmodel_list.html:7
+#: templates/nas_app/nasmodel_update.html:8
+msgid "Network access servers"
+msgstr "Серверы доступа в интернет(NAS)"
+
+#: templates/nas_app/nasmodel_add.html:9 templates/nas_app/nasmodel_add.html:20
+msgid "Add gateway"
+msgstr "Добавить шлюз"
+
+#: templates/nas_app/nasmodel_add.html:14
+msgid "Add new gateway"
+msgstr "Добавить новый шлюз"
+
+#: templates/nas_app/nasmodel_add.html:26
+#: templates/nas_app/nasmodel_update.html:27
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/nas_app/nasmodel_confirm_delete.html:9
+msgid "Remove NAS"
+msgstr "Удалить NAS"
+
+#: templates/nas_app/nasmodel_confirm_delete.html:14
+msgid ""
+"If you remove this server, then all users than has been attached to them "
+"will lost parent NAS server."
+msgstr ""
+"Если вы удалите этот сервер, тогда все пользователи которые его используют "
+"потеряют интернет от этого сервера"
+
+#: templates/nas_app/nasmodel_list.html:12
+msgid "Gateways"
+msgstr "Шлюзы"
+
+#: templates/nas_app/nasmodel_list.html:28
+msgid "Auth login"
+msgstr "Логин для входа"
+
+#: templates/nas_app/nasmodel_list.html:29
+msgid "Auth password"
+msgstr "Пароль для входа"
+
+#: templates/nas_app/nasmodel_list.html:30
+msgid "NAS type"
+msgstr "Тип NAS"
+
+#: templates/nas_app/nasmodel_list.html:41
+msgid "View"
+msgstr "Посмотреть"
+
+#: templates/nas_app/nasmodel_list.html:49
+msgid "You don't have gateways"
+msgstr "У вас нет шлюзов"
+
+#: templates/nas_app/nasmodel_list.html:55
+msgid "Add"
+msgstr "Добавить"
+
+#: templates/nas_app/nasmodel_update.html:9
+msgid "Edit gateway"
+msgstr "Редактировать шлюз"
+
+#: templates/nas_app/nasmodel_update.html:14
+msgid "Change gateways"
+msgstr "Изменить шлюзы"
+
+#: templates/nas_app/nasmodel_update.html:20
+msgid "Change gateway"
+msgstr "Изменить шлюз"
+
+#: templates/nas_app/nasmodel_update.html:31
+#: templates/nas_app/nasmodel_update.html:35
+msgid "Delete"
+msgstr "Удалить"
+
+#: templates/nas_app/nasmodel_update.html:34
+msgid "Permission denied"
+msgstr "Не достаточно прав"
+
+#: tests.py:72 views.py:33
+msgid "New NAS has been created"
+msgstr "Новый NAS добавлен"
+
+#: tests.py:86
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Убедитесь что значение меньше или равно %(limit_value)s."
+
+#: tests.py:104 tests.py:131
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s с таким %(field_label)s уже существует."
+
+#: tests.py:154 views.py:65
+msgid "Update successfully"
+msgstr "Обновлено успешно"
+
+#: tests.py:182 views.py:47
+msgid "Server successfully removed"
+msgstr "Информация о сервере успешно удалена"

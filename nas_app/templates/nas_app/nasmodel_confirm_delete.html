@@ -10,8 +10,10 @@
 {% endblock %}
 
 {% block modal_form_text %}
-    {% blocktrans trimmed %}
-        <h4>If you remove this server, then all users than has been
-        attached to them will lost parent NAS server.</h4>
-    {% endblocktrans %}
+    <h4>
+        {% blocktrans trimmed %}
+            If you remove this server, then all users than has been
+            attached to them will lost parent NAS server.
+        {% endblocktrans %}
+    </h4>
 {% endblock %}
