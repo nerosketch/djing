@@ -17,7 +17,7 @@ def require_ssl(view):
     def wrapper(request, *args, **kwargs):
         debug = getattr(settings, 'DEBUG', False)
         if not debug and not request.is_secure():
-            target_url = "https://" + request.META['HTTP_HOST'] + request.path_info
+            target_url = "https://%s%s" % (request.META['HTTP_HOST'], request.path_info)
             return HttpResponseRedirect(target_url)
         return view(request, *args, **kwargs)
 
