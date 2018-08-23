@@ -113,3 +113,12 @@ msgstr "Устройства"
 
 msgid "Ip pool"
 msgstr "IP пул"
+
+msgid "Server error"
+msgstr "Ошибка сервера"
+
+msgid "500 - Server error"
+msgstr "500 - Ошибка сервера"
+
+msgid "A server has error occurred. Please contact the administrator."
+msgstr "На сервере произошла ошибка. Пожалуйста свяжитесь с системным администратором."
