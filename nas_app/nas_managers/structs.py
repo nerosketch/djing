@@ -67,21 +67,7 @@ class AbonStruct(BaseStruct):
         return "uid=%d, ips=[%s], tariff=%s" % (self.uid, ';'.join(str(i) for i in self._ips), self.tariff or '<No Service>')
 
     def __hash__(self):
-        return hash(hash(self._ips) + hash(self.tariff)) if self.tariff is not None else 0
-
-
-# Shape rule from NAS(Network Access Server)
-class ShapeItem(BaseStruct):
-    __slots__ = ('abon', 'sid')
-
-    def __init__(self, abon, sid):
-        self.abon = abon
-        self.sid = sid
-
-    def __eq__(self, other):
-        if not isinstance(other, ShapeItem):
-            raise TypeError
-        return self.sid == other.sid and self.abon == other.abon
+        return hash(hash(self._ips) + hash(self.tariff) if self.tariff is not None else 0)
 
 
 VectorAbon = Iterable[AbonStruct]

@@ -168,9 +168,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
     def __init__(self, login: str, password: str, ip: str, port: int, *args, **kwargs):
         try:
             BaseTransmitter.__init__(self,
-                                         login=login, password=password, ip=ip,
-                                         port=port, *args, **kwargs
-                                         )
+                                     login=login, password=password, ip=ip,
+                                     port=port, *args, **kwargs
+                                     )
             ApiRos.__init__(self, ip, port)
             self.login(username=login, pwd=password)
         except ConnectionRefusedError:
@@ -199,7 +199,6 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             if v:
                 yield v
 
-    # Build object ShapeItem from information from mikrotik
     @staticmethod
     def _build_shape_obj(info: Dict) -> AbonStruct:
         # Переводим приставку скорости Mikrotik в Mbit/s
@@ -226,7 +225,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             if target is None:
                 target = info.get('=target-addresses')
             name = info.get('=name')
-            disabled = info.get('=disabled')
+            disabled = info.get('=disabled', False)
             if disabled is not None:
                 disabled = True if disabled == 'true' else False
             if target is not None and name is not None:
@@ -236,7 +235,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
                     uid=int(name[3:]),
                     ips=ips,
                     tariff=t,
-                    is_access=disabled or False
+                    is_access=not disabled
                 )
                 if len(a.ips) < 1:
                     return
@@ -473,7 +472,6 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         pass
 
     def read_users(self) -> VectorAbon:
-        # shapes is ShapeItem
         all_ips = set(ip for ip, mkid in self.read_ips_iter(LIST_USERS_ALLOWED))
         queues = (q for q in self.read_queue_iter() if all_ips.issuperset(q.ips))
         return queues
