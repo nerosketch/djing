@@ -754,12 +754,14 @@ class DialsListView(OrderedFilteredList):
         self.abon = abon
         if abon.telephone is not None and abon.telephone != '':
             tel = abon.telephone.replace('+', '')
+            additional_tels = tuple(t.telephone for t in models.AdditionalTelephone.objects.filter(abon=abon).iterator())
             logs = AsteriskCDR.objects.filter(
-                Q(src__contains=tel) | Q(dst__contains=tel)
+                Q(src__contains=tel) | Q(dst__contains=tel) |
+                Q(src__in=additional_tels) | Q(dst__in=additional_tels)
             )
             return logs
         else:
-            return AsteriskCDR.objects.empty()
+            return AsteriskCDR.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super(DialsListView, self).get_context_data(**kwargs)
