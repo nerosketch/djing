@@ -63,7 +63,7 @@ class MACAddressField(models.Field):
             return 'BigIntegerField'
         return 'CharField'
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return self.to_python(value)
 
     def to_python(self, value):
@@ -131,7 +131,7 @@ class MyGenericIPAddressField(models.GenericIPAddressField):
         return 'PositiveIntegerField'
 
     @staticmethod
-    def from_db_value(value, expression, connection, context):
+    def from_db_value(value, expression, connection):
         if value:
             return str(ip_address(value))
 

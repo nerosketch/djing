@@ -1,12 +1,12 @@
 from json import dumps
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.shortcuts import render_to_text
+
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 from django.views.generic import ListView
 
 from chatbot.models import MessageQueue
@@ -37,9 +37,9 @@ def new_conversation(request):
             else:
                 messages.error(request, _('fix form errors'))
         else:
-            return render_to_text('msg_app/modal_new_conversation.html', {
+            return render_to_response('msg_app/modal_new_conversation.html', {
                 'form': frm
-            }, request=request)
+            })
     except MessageError as e:
         messages.error(request, e)
         return redirect('msg_app:home')

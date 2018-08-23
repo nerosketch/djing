@@ -10,7 +10,7 @@ class ChatException(Exception):
 
 
 class TelegramBot(models.Model):
-    user = models.ForeignKey(AUTH_USER_MODEL, models.CASCADE, verbose_name=_('Employee'))
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Employee'))
     chat_id = models.PositiveIntegerField(_('Telegram chat id'), default=0)
 
     def __str__(self):
@@ -24,7 +24,7 @@ class TelegramBot(models.Model):
 
 
 class MessageHistory(models.Model):
-    user = models.ForeignKey(AUTH_USER_MODEL, models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.CharField(max_length=255)
     date_sent = models.DateTimeField(auto_now_add=True)
 
@@ -51,7 +51,7 @@ class MessageQueueManager(models.Manager):
 
 
 class MessageQueue(models.Model):
-    target_employee = models.ForeignKey(AUTH_USER_MODEL, models.CASCADE, verbose_name=_('Target employee'))
+    target_employee = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('Target employee'))
     message = models.CharField(_('Message'), max_length=255)
     STATUSES = (
         ('n', 'New'),

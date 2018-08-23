@@ -6,7 +6,7 @@ register = template.Library()
 @register.simple_tag
 def url_page_replace(request, field, value):
     dict_ = request.GET.copy()
-    dict_[field] = value
+    dict_[field] = str(value)
     return dict_.urlencode()
 
 

@@ -1,12 +1,12 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 app_name = 'msg_app'
 
 urlpatterns = [
-    url(r'^$', views.ConversationsListView.as_view(), name='home'),
-    url(r'^new$', views.new_conversation, name='new_conversation'),
-    url(r'^(?P<conv_id>\d+)/$', views.to_conversation, name='to_conversation'),
-    url(r'^(?P<conv_id>\d+)/(?P<msg_id>\d+)/del$', views.remove_msg, name='remove_msg'),
-    url(r'^check_news$', views.check_news, name='check_news')
+    path('', views.ConversationsListView.as_view(), name='home'),
+    path('new/', views.new_conversation, name='new_conversation'),
+    path('<int:conv_id>/', views.to_conversation, name='to_conversation'),
+    path('<int:conv_id>/<int:msg_id>/del/', views.remove_msg, name='remove_msg'),
+    path('check_news/', views.check_news, name='check_news')
 ]

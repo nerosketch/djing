@@ -9,6 +9,6 @@ register = template.Library()
 @register.simple_tag
 def get_device_kinds():
     return ((
-        resolve_url('ip_pool:networks_%s' % kind_code),
+        resolve_url('ip_pool:networks_%s/' % kind_code),
         kind_descr
     )for kind_code, kind_descr in NetworkModel.NETWORK_KINDS)

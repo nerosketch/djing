@@ -1,11 +1,10 @@
 from ipaddress import ip_address
 from typing import Dict, Optional
 from datetime import datetime, date
-from django.contrib.gis.shortcuts import render_to_text
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
-from django.shortcuts import render, redirect, get_object_or_404, resolve_url
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url, render_to_response
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
@@ -201,11 +200,11 @@ def abonamount(request, gid, uname):
     except lib.MultipleException as errs:
         for err in errs.err_list:
             messages.error(request, err)
-    return render_to_text('abonapp/modal_abonamount.html', {
+    return render_to_response('abonapp/modal_abonamount.html', {
         'abon': abon,
         'group_id': gid,
         'form': frm
-    }, request=request)
+    })
 
 
 @method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
@@ -843,10 +842,10 @@ def street_add(request, gid):
             messages.error(request, _('fix form errors'))
     else:
         frm = forms.AbonStreetForm(initial={'group': gid})
-    return render_to_text('abonapp/modal_addstreet.html', {
+    return render_to_response('abonapp/modal_addstreet.html', {
         'form': frm,
         'gid': gid
-    }, request=request)
+    })
 
 
 @login_required
@@ -861,10 +860,10 @@ def street_edit(request, gid):
                 street.save()
             messages.success(request, _('Streets has been saved'))
         else:
-            return render_to_text('abonapp/modal_editstreet.html', {
+            return render_to_response('abonapp/modal_editstreet.html', {
                 'gid': gid,
                 'streets': models.AbonStreet.objects.filter(group=gid)
-            }, request=request)
+            })
 
     except models.AbonStreet.DoesNotExist:
         messages.error(request, _('One of these streets has not been found'))
@@ -899,11 +898,11 @@ def active_nets(request, gid):
 def tels(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     telephones = abon.additional_telephones.all()
-    return render_to_text('abonapp/modal_additional_telephones.html', {
+    return render_to_response('abonapp/modal_additional_telephones.html', {
         'telephones': telephones,
         'gid': gid,
         'uname': uname
-    }, request=request)
+    })
 
 
 @login_required
@@ -922,11 +921,11 @@ def tel_add(request, gid, uname):
             messages.error(request, _('fix form errors'))
     else:
         frm = forms.AdditionalTelephoneForm()
-    return render_to_text('abonapp/modal_add_phone.html', {
+    return render_to_response('abonapp/modal_add_phone.html', {
         'form': frm,
         'gid': gid,
         'uname': uname
-    }, request=request)
+    })
 
 
 @login_required
@@ -958,10 +957,10 @@ def phonebook(request, gid):
         for row in telephones:
             writer.writerow(row)
         return response
-    return render_to_text('abonapp/modal_phonebook.html', {
+    return render_to_response('abonapp/modal_phonebook.html', {
         'tels': telephones,
         'gid': gid
-    }, request=request)
+    })
 
 
 @login_required
@@ -993,10 +992,10 @@ def abon_export(request, gid):
             return redirect('abonapp:group_list')
     else:
         frm = forms.ExportUsersForm()
-    return render_to_text('abonapp/modal_export.html', {
+    return render_to_response('abonapp/modal_export.html', {
         'gid': gid,
         'form': frm
-    }, request=request)
+    })
 
 
 @login_required
@@ -1041,11 +1040,11 @@ def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
         return redirect('abonapp:abon_services', gid, uname)
     else:
         frm = forms.PeriodicPayForIdForm(instance=periodic_pay_instance)
-    return render_to_text('abonapp/modal_periodic_pay.html', {
+    return render_to_response('abonapp/modal_periodic_pay.html', {
         'form': frm,
         'gid': gid,
         'uname': uname
-    }, request=request)
+    })
 
 
 @login_required

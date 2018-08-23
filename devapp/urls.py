@@ -1,39 +1,39 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 from . import views
 
 app_name = 'devapp'
 
 urlpatterns = [
-    url(r'^$', views.GroupsListView.as_view(), name='group_list'),
-    url(r'^devices_without_groups$', views.DevicesWithoutGroupsListView.as_view(), name='devices_null_group'),
-    url(r'^fix_onu/$', views.fix_onu, name='fix_onu'),
-    url(r'^(?P<group_id>\d+)$', views.DevicesListView.as_view(), name='devs'),
-    url(r'^(?P<group_id>\d+)/add$', views.DeviceCreateView.as_view(), name='add'),
-    url(r'^(\d+)/(?P<device_id>\d+)$', views.devview, name='view'),
-    url(r'^(\d+)/(?P<device_id>\d+)/del$', views.DeviceDeleteView.as_view(), name='del'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/add$', views.add_single_port, name='add_port'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/edit$', views.DeviceUpdate.as_view(), name='edit'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/edit_extra$', views.DeviceUpdateExtra.as_view(), name='extra_data_edit'),
-    url(r'^(\d+)/(?P<device_id>\d+)/ports$', views.manage_ports, name='manage_ports'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/ports/(?P<port_id>\d+)/fix_port_conflict$', views.fix_port_conflict,
+    path('', views.GroupsListView.as_view(), name='group_list'),
+    path('devices_without_groups/', views.DevicesWithoutGroupsListView.as_view(), name='devices_null_group'),
+    path('fix_onu/', views.fix_onu, name='fix_onu'),
+    path('<int:group_id>/', views.DevicesListView.as_view(), name='devs'),
+    path('<int:group_id>/add/', views.DeviceCreateView.as_view(), name='add'),
+    path('<int>/<int:device_id>/', views.devview, name='view'),
+    path('<int>/<int:device_id>/del/', views.DeviceDeleteView.as_view(), name='del'),
+    path('<int:group_id>/<int:device_id>/add/', views.add_single_port, name='add_port'),
+    path('<int:group_id>/<int:device_id>/edit/', views.DeviceUpdate.as_view(), name='edit'),
+    path('<int:group_id>/<int:device_id>/edit_extra/', views.DeviceUpdateExtra.as_view(), name='extra_data_edit'),
+    path('<int>/<int:device_id>/ports/', views.manage_ports, name='manage_ports'),
+    path('<int:group_id>/<int:device_id>/ports/<int:port_id>/fix_port_conflict/', views.fix_port_conflict,
         name='fix_port_conflict'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/ports/(?P<port_id>\d+)/show_subscriber_on_port$',
+    path('<int:group_id>/<int:device_id>/ports/<int:port_id>/show_subscriber_on_port/',
         views.ShowSubscriberOnPort.as_view(), name='show_subscriber_on_port'),
-    url(r'^(\d+)/(?P<device_id>\d+)/ports_add/$', views.add_ports, name='add_ports'),
-    url(r'^(\d+)/(?P<device_id>\d+)/register_device/$', views.register_device, name='dev_register'),
-    url(r'^(\d+)/(?P<device_id>\d+)/(?P<portid>\d+)_(?P<status>[0-1]{1})$', views.toggle_port, name='port_toggle'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<portid>\d+)/del$', views.delete_single_port, name='del_port'),
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<port_id>\d+)/edit$', views.edit_single_port, name='edit_port'),
-    url(r'^fix_device_group/(?P<device_id>\d+)$', views.fix_device_group, name='fix_device_group'),
-    url(r'^search_dev$', views.search_dev),
+    path('<int>/<int:device_id>/ports_add/', views.add_ports, name='add_ports'),
+    path('<int>/<int:device_id>/register_device/', views.register_device, name='dev_register'),
+    re_path('^(\d+)/(?P<device_id>\d+)/(?P<portid>\d+)_(?P<status>[0-1]{1})$', views.toggle_port, name='port_toggle'),
+    path('<int:group_id>/<int:device_id>/<int:portid>/del/', views.delete_single_port, name='del_port'),
+    path('<int:group_id>/<int:device_id>/<int:portid>/edit/', views.edit_single_port, name='edit_port'),
+    path('fix_device_group/<int:device_id>/', views.fix_device_group, name='fix_device_group'),
+    path('search_dev/', views.search_dev),
 
     # ZTE ports under fibers
-    url(r'^(?P<group_id>\d+)/(?P<device_id>\d+)/(?P<fiber_id>\d+)$', views.zte_port_view_uncfg, name='zte_port_view_uncfg'),
+    path('<int:group_id>/<int:device_id>/<int:fiber_id>/', views.zte_port_view_uncfg, name='zte_port_view_uncfg'),
 
     # Monitoring api
-    url(r'^on_device_event/$', views.OnDeviceMonitoringEvent.as_view()),
+    path('on_device_event/', views.OnDeviceMonitoringEvent.as_view()),
 
     # Nagios mon generate
-    url(r'^nagios/hosts/$', views.nagios_objects_conf, name='nagios_objects_conf'),
-    url(r'^api/getall/$', views.DevicesGetListView.as_view(), name='nagios_get_all_hosts')
+    path('nagios/hosts/', views.nagios_objects_conf, name='nagios_objects_conf'),
+    path('api/getall/', views.DevicesGetListView.as_view(), name='nagios_get_all_hosts')
 ]

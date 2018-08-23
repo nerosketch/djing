@@ -1,14 +1,14 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 app_name = 'clientsideapp'
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^pays$', views.pays, name='pays'),
-    url(r'^services$', views.services, name='services'),
-    url(r'^services/(?P<srv_id>\d+)/buy$', views.buy_service, name='buy_service'),
-    url(r'^debts$', views.debts_list, name='debts'),
-    url(r'^debts/(?P<d_id>\d+)$', views.debt_buy, name='debt_buy'),
-    url(r'^tasks$', views.task_history, name='task_history')
+    path('', views.home, name='home'),
+    path('pays/', views.pays, name='pays'),
+    path('services/', views.services, name='services'),
+    path('services/<int:srv_id>/buy/', views.buy_service, name='buy_service'),
+    path('debts/', views.debts_list, name='debts'),
+    path('debts/<int:d_id>/', views.debt_buy, name='debt_buy'),
+    path('tasks/', views.task_history, name='task_history')
 ]

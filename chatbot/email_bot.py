@@ -1,3 +1,4 @@
+from _socket import gaierror
 from smtplib import SMTPException
 from django.core.mail import send_mail
 from django.conf import settings
@@ -17,3 +18,5 @@ def send_notify(msg_text, account, tag='none'):
         )
     except SMTPException as e:
         raise ChatException('SMTPException: %s' % e)
+    except gaierror as e:
+        raise ChatException('Socket error: %s' % e)

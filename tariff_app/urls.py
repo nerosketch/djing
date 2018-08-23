@@ -1,16 +1,16 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 app_name = 'tariff_app'
 
 urlpatterns = [
-    url(r'^$', views.TariffsListView.as_view(), name='home'),
-    url(r'^(?P<tarif_id>\d+)$', views.edit_tarif, name='edit'),
-    url(r'^add$', views.edit_tarif, name='add'),
-    url(r'^del(?P<tid>\d+)$', views.TariffDeleteView.as_view(), name='del'),
+    path('', views.TariffsListView.as_view(), name='home'),
+    path('<int:tarif_id>/', views.edit_tarif, name='edit'),
+    path('add/', views.edit_tarif, name='add'),
+    path('del/<int:tid>/', views.TariffDeleteView.as_view(), name='del'),
 
-    url(r'^periodic_pays$', views.PeriodicPaysListView.as_view(), name='periodic_pays'),
-    url(r'^periodic_pays/add$', views.periodic_pay, name='periodic_pay_add'),
-    url(r'^periodic_pays/(?P<pay_id>\d+)$', views.periodic_pay, name='periodic_pay_edit')
+    path('periodic_pays/', views.PeriodicPaysListView.as_view(), name='periodic_pays'),
+    path('periodic_pays/add/', views.periodic_pay, name='periodic_pay_add'),
+    path('periodic_pays/<int:pay_id>/', views.periodic_pay, name='periodic_pay_edit')
 ]

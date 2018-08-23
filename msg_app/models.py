@@ -10,8 +10,8 @@ class MessageError(Exception):
 
 
 class MessageStatus(models.Model):
-    msg = models.ForeignKey('Message', models.CASCADE, related_name='msg_statuses')
-    user = models.ForeignKey(UserProfile, models.CASCADE, related_name='usr_msg_status')
+    msg = models.ForeignKey('Message', on_delete=models.CASCADE, related_name='msg_statuses')
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='usr_msg_status')
     MESSAGE_STATES = (
         ('new', _('New')),
         ('old', _('Seen')),
@@ -34,8 +34,8 @@ class MessageStatus(models.Model):
 class Message(models.Model):
     text = models.TextField(_("Body"))
     sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
-    author = models.ForeignKey(UserProfile, models.CASCADE, related_name='messages')
-    conversation = models.ForeignKey('Conversation', models.CASCADE, verbose_name=_('Conversation'))
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='messages')
+    conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE, verbose_name=_('Conversation'))
     attachment = models.FileField(upload_to='messages_attachments/%Y_%m_%d', blank=True, null=True)
     account_status = models.ManyToManyField(UserProfile, through=MessageStatus, through_fields=('msg', 'user'))
 
@@ -73,8 +73,8 @@ class Message(models.Model):
 
 
 class ConversationMembership(models.Model):
-    account = models.ForeignKey(UserProfile, models.CASCADE, related_name='memberships')
-    conversation = models.ForeignKey('Conversation', models.CASCADE)
+    account = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='memberships')
+    conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE)
     PARTICIPANT_STATUS = (
         ('adm', _('Admin')),
         ('gst', _('Guest')),
@@ -82,7 +82,7 @@ class ConversationMembership(models.Model):
         ('inv', _('Inviter'))
     )
     status = models.CharField(max_length=3, choices=PARTICIPANT_STATUS, default='gst')
-    who_invite_that_user = models.ForeignKey(UserProfile, models.CASCADE, null=True, blank=True,
+    who_invite_that_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True,
                                              related_name='self_conversations')
 
     def __str__(self):
@@ -142,7 +142,7 @@ class Conversation(models.Model):
     participants = models.ManyToManyField(UserProfile, related_name='conversations',
                                           through='ConversationMembership',
                                           through_fields=('conversation', 'account'))
-    author = models.ForeignKey(UserProfile, models.CASCADE)
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_create = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -1,5 +1,5 @@
 urllib3
-Django==1.11
+Django>=2
 Pillow
 telepot
 

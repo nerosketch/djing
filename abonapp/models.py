@@ -22,9 +22,9 @@ from bitfield import BitField
 
 
 class AbonLog(models.Model):
-    abon = models.ForeignKey('Abon', models.CASCADE)
+    abon = models.ForeignKey('Abon', on_delete=models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, models.CASCADE, related_name='+', blank=True, null=True)
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='+', blank=True, null=True)
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -40,7 +40,7 @@ class AbonLog(models.Model):
 
 
 class AbonTariff(models.Model):
-    tariff = models.ForeignKey(Tariff, models.CASCADE, related_name='linkto_tariff')
+    tariff = models.ForeignKey(Tariff, on_delete=models.CASCADE, related_name='linkto_tariff')
 
     time_start = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -72,7 +72,7 @@ class AbonTariff(models.Model):
 
 class AbonStreet(models.Model):
     name = models.CharField(max_length=64)
-    group = models.ForeignKey(Group, models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -91,7 +91,7 @@ class AbonManager(MyUserManager):
 
 class Abon(BaseAccount):
     current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey(Group, models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
     description = models.TextField(_('Comment'), null=True, blank=True)
@@ -308,7 +308,7 @@ class PassportInfo(models.Model):
 
 
 class InvoiceForPayment(models.Model):
-    abon = models.ForeignKey(Abon, models.CASCADE)
+    abon = models.ForeignKey(Abon, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
     amount = models.FloatField(default=0.0)
     comment = models.CharField(max_length=128)
@@ -353,7 +353,7 @@ class AllTimePayLogManager(models.Manager):
 
 # Log for pay system "AllTime"
 class AllTimePayLog(models.Model):
-    abon = models.ForeignKey(Abon, models.SET_DEFAULT, blank=True, null=True, default=None)
+    abon = models.ForeignKey(Abon, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None)
     pay_id = models.CharField(max_length=36, unique=True, primary_key=True)
     date_add = models.DateTimeField(auto_now_add=True)
     summ = models.FloatField(default=0.0)
@@ -397,7 +397,7 @@ class AbonRawPassword(models.Model):
 
 
 class AdditionalTelephone(models.Model):
-    abon = models.ForeignKey(Abon, models.CASCADE, related_name='additional_telephones')
+    abon = models.ForeignKey(Abon, on_delete=models.CASCADE, related_name='additional_telephones')
     telephone = models.CharField(
         max_length=16,
         verbose_name=_('Telephone'),
@@ -422,10 +422,10 @@ class AdditionalTelephone(models.Model):
 
 
 class PeriodicPayForId(models.Model):
-    periodic_pay = models.ForeignKey(PeriodicPay, models.CASCADE, verbose_name=_('Periodic pay'))
+    periodic_pay = models.ForeignKey(PeriodicPay, on_delete=models.CASCADE, verbose_name=_('Periodic pay'))
     last_pay = models.DateTimeField(_('Last pay time'), blank=True, null=True)
     next_pay = models.DateTimeField(_('Next time to pay'))
-    account = models.ForeignKey(Abon, models.CASCADE, verbose_name=_('Account'))
+    account = models.ForeignKey(Abon, on_delete=models.CASCADE, verbose_name=_('Account'))
 
     def payment_for_service(self, author: UserProfile=None, now=None):
         """

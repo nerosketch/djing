@@ -39,7 +39,7 @@ TASK_TYPES = (
 
 
 class ChangeLog(models.Model):
-    task = models.ForeignKey('Task', models.CASCADE)
+    task = models.ForeignKey('Task', on_delete=models.CASCADE)
     ACT_CHOICES = (
         ('e', _('Change task')),
         ('c', _('Create task')),
@@ -49,7 +49,7 @@ class ChangeLog(models.Model):
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
-    who = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='+')
+    who = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
 
     def __str__(self):
         return self.get_act_type_display()
@@ -71,7 +71,7 @@ class Task(models.Model):
     state = models.CharField(_('Condition'), max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
     attachment = models.ImageField(_('Attached image'), upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
     mode = models.CharField(_('The nature of the damage'), max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
-    abon = models.ForeignKey(Abon, models.CASCADE, null=True, blank=True, verbose_name=_('Subscriber'))
+    abon = models.ForeignKey(Abon, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('Subscriber'))
 
     class Meta:
         db_table = 'task'
@@ -119,8 +119,8 @@ class Task(models.Model):
 
 class ExtraComment(models.Model):
     text = models.TextField(_('Text of comment'))
-    task = models.ForeignKey(Task, verbose_name=_('Owner task'))
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'))
+    task = models.ForeignKey(Task, verbose_name=_('Owner task'), on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'), on_delete=models.CASCADE)
     date_create = models.DateTimeField(_('Time of create'), auto_now_add=True)
 
     def __str__(self):

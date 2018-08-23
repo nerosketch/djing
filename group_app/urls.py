@@ -1,11 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
 app_name = 'group_app'
 
 urlpatterns = [
-    url(r'^$', views.GroupListView.as_view(), name='group_list'),
-    url(r'^add/$', views.AddGroupView.as_view(), name='add'),
-    url(r'^(?P<group_id>\d{1,6})/edit/$', views.EditGroupView.as_view(), name='edit'),
-    url(r'^(?P<group_id>\d{1,6})/del/$', views.DeleteGroupView.as_view(), name='del')
+    path('', views.GroupListView.as_view(), name='group_list'),
+    path('add/', views.AddGroupView.as_view(), name='add'),
+    path('<int:group_id>/edit/', views.EditGroupView.as_view(), name='edit'),
+    path('<int:group_id>/del/', views.DeleteGroupView.as_view(), name='del')
 ]

@@ -35,7 +35,7 @@ class HashAuthView(View):
 class AuthenticatedOrHashAuthView(HashAuthView):
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             if request.user.is_admin:
                 return View.dispatch(self, request, *args, **kwargs)
             else:

@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.shortcuts import render_to_text
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _, gettext
@@ -56,10 +55,10 @@ def buy_service(request, srv_id):
             abon.nas_sync_self()
             messages.success(request, _("The service '%s' wan successfully activated") % service.title)
         else:
-            return render_to_text('clientsideapp/modal_service_buy.html', {
+            return render_to_response('clientsideapp/modal_service_buy.html', {
                 'service': service,
                 'current_service': current_service.tariff if current_service is not None else None
-            }, request=request)
+            })
     except LogicError as e:
         messages.error(request, e)
     except NasFailedResult as e:

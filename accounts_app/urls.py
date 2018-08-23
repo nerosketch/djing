@@ -1,41 +1,39 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 app_name = 'account_app'
 
 urlpatterns = [
+    path('', views.AccountsListView.as_view(), name='accounts_list'),
+    path('login/', views.to_signin, name='login'),
+    path('logout/', views.SignOut.as_view(), name='logout'),
 
-    url(r'^login/', views.to_signin, name='login'),
-    url(r'^logout/', views.SignOut.as_view(), name='logout'),
+    path('me/', views.profile_show, name='profile'),
 
-    url(r'^me$', views.profile_show, name='profile'),
+    path('add/', views.create_profile, name='create_profile'),
 
-    url(r'^$', views.AccountsListView.as_view(), name='accounts_list'),
+    path('settings/', views.ch_info, name='setup_info'),
+    path('settings/change_ava/', views.AvatarUpdateView.as_view(), name='setup_avatar'),
 
-    url(r'^add$', views.create_profile, name='create_profile'),
+    path('<int:uid>/', views.profile_show, name='other_profile'),
+    path('<int:uid>/perms/', views.perms, name='setup_perms'),
 
-    url(r'^settings$', views.ch_info, name='setup_info'),
-    url(r'^settings/change_ava$', views.AvatarUpdateView.as_view(), name='setup_avatar'),
-
-    url(r'^(?P<uid>\d+)$', views.profile_show, name='other_profile'),
-    url(r'^(?P<uid>\d+)/perms$', views.perms, name='setup_perms'),
-
-    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)$',
+    re_path('^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/',
         views.PermissionClassListView.as_view(),
         name='perms_klasses'),
 
-    url(r'^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)$',
+    re_path('^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)/',
         views.perms_edit,
         name='perms_edit'),
 
-    url(r'^(?P<uid>\d+)/del$', views.delete_profile, name='delete_profile'),
+    path('<int:uid>/del/', views.delete_profile, name='delete_profile'),
 
-    url(r'^(?P<uid>\d+)/user_group_access$',
+    path('<int:uid>/user_group_access/',
         views.set_abon_groups_permission,
         name='set_abon_groups_permission'),
 
-    url(r'^(?P<uid>\d+)/manage_responsibility_groups/$',
+    path('<int:uid>/manage_responsibility_groups/',
         views.ManageResponsibilityGroups.as_view(),
         name='manage_responsibility_groups')
 ]
