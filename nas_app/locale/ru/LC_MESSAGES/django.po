@@ -36,14 +36,6 @@ msgstr "IP адрес"
 msgid "Port"
 msgstr "Порт"
 
-#: models.py:15
-msgid "Login"
-msgstr "Логин"
-
-#: models.py:16
-msgid "Password"
-msgstr "Пароль"
-
 #: models.py:17
 msgid "Type"
 msgstr "Тип"

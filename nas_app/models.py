@@ -12,8 +12,8 @@ class NASModel(models.Model):
     title = models.CharField(_('Title'), max_length=127, unique=True)
     ip_address = models.GenericIPAddressField(_('Ip address'), unique=True)
     ip_port = models.PositiveSmallIntegerField(_('Port'))
-    auth_login = models.CharField(_('Login'), max_length=64)
-    auth_passw = models.CharField(_('Password'), max_length=127)
+    auth_login = models.CharField(_('Auth login'), max_length=64)
+    auth_passw = models.CharField(_('Auth password'), max_length=127)
     nas_type = models.CharField(_('Type'), max_length=4, choices=MyChoicesAdapter(NAS_TYPES), default=NAS_TYPES[0][0])
     default = models.BooleanField(_('Is default'), default=False)
 
