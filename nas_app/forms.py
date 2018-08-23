@@ -12,7 +12,10 @@ class NasForm(forms.ModelForm):
         default = cd.get('default')
         if default:
             try:
-                NASModel.objects.get(default=True)
+                if self.instance:
+                    NASModel.objects.filter(default=True).exclude(pk=self.instance.pk).get()
+                else:
+                    NASModel.objects.get(default=True).exclude(pk=1).get()
                 raise ValidationError(message=_('Can be only one default gateway'), code='unique')
             except NASModel.DoesNotExist:
                 pass
