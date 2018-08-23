@@ -40,7 +40,7 @@ def secure_request(data: Dict) -> Optional[AnyStr]:
     sign = calc_hash('_'.join(vars_to_hash))
     data.update({'sign': sign})
     try:
-        with urlopen("%s/dialing/api/sms?%s" % (SERVER_DOMAIN, urlencode(data))) as r:
+        with urlopen("%s/dialing/api/sms/?%s" % (SERVER_DOMAIN, urlencode(data))) as r:
             return r.read()
     except ConnectionRefusedError:
         print('ERROR: connection refused')

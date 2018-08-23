@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import render, redirect, get_object_or_404, resolve_url, render_to_response
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
@@ -357,7 +357,7 @@ def delete_single_port(request, group_id, device_id, portid):
                 Port.objects.get(pk=portid).delete()
                 messages.success(request, _('Port successfully removed'))
         else:
-            return render_to_response('devapp/manage_ports/modal_del_port.html', {
+            return render(request, 'devapp/manage_ports/modal_del_port.html', {
                 'grp': group_id,
                 'did': device_id,
                 'port_id': portid
@@ -384,7 +384,7 @@ def edit_single_port(request, group_id, device_id, port_id):
             return redirect('devapp:manage_ports', group_id, device_id)
 
         frm = PortForm(instance=port)
-        return render_to_response('devapp/manage_ports/modal_add_edit_port.html', {
+        return render(request, 'devapp/manage_ports/modal_add_edit_port.html', {
             'port_id': port_id,
             'did': device_id,
             'gid': group_id,
@@ -415,7 +415,7 @@ def add_single_port(request, group_id, device_id):
                 'num': request.GET.get('n'),
                 'descr': request.GET.get('t')
             })
-        return render_to_response('devapp/manage_ports/modal_add_edit_port.html', {
+        return render(request, 'devapp/manage_ports/modal_add_edit_port.html', {
             'did': device_id,
             'gid': group_id,
             'form': frm

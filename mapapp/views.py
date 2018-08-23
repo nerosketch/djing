@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, HttpResponseBadRequest
-from django.shortcuts import render, redirect, get_object_or_404, resolve_url, render_to_response
+from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.utils.translation import gettext_lazy as _, gettext
 from django.utils.decorators import method_decorator
 from django.db.models import Count
@@ -137,7 +137,7 @@ def get_dots(request):
 @login_required
 def modal_add_dot(request):
     if not request.user.has_perm('mapapp.add_dot'):
-        return render_to_response('403_for_modal.html')
+        return render(request, '403_for_modal.html')
     if request.method == 'POST':
         frm = DotForm(request.POST, request.FILES)
         if frm.is_valid():
@@ -158,7 +158,7 @@ def modal_add_dot(request):
         coords = request.GET.get('coords')
         lat, lon = coords.split(',')
         frm = DotForm(initial={'latitude': lat, 'longitude': lon})
-    return render_to_response('maps/modal_add_dot.html', {
+    return render(request, 'maps/modal_add_dot.html', {
         'coords': coords,
         'form': frm
     })
@@ -175,17 +175,16 @@ def preload_devices(request):
     dot_devices_ids = tuple(dev.pk for dev in dot_devices.iterator())
     del dot_devices
 
-    ret = render_to_response('maps/preload_devices_tmpl.html', {
+    return render(request, 'maps/preload_devices_tmpl.html', {
         'all_devices': all_devices.iterator(),
         'dot_devices_ids': dot_devices_ids
-    })
-    return HttpResponse(ret, content_type='text/html')
+    }, content_type='text/html')
 
 
 @login_required
 def dot_tooltip(request):
     if not request.user.is_superuser:
-        return render_to_response('403_for_modal.html')
+        return render(request, '403_for_modal.html')
     d = request.GET.get('d')
     devs, dot = None, None
     try:
@@ -193,7 +192,7 @@ def dot_tooltip(request):
         devs = dot.devices.all()
     except Dot.DoesNotExist:
         pass
-    return render_to_response('maps/map_tooltip.html', {
+    return render(request, 'maps/map_tooltip.html', {
         'devs': devs.iterator(),
         'dot': dot
     })

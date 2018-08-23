@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404, render_to_response
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 
 from chatbot.models import MessageQueue
@@ -37,7 +37,7 @@ def new_conversation(request):
             else:
                 messages.error(request, _('fix form errors'))
         else:
-            return render_to_response('msg_app/modal_new_conversation.html', {
+            return render(request, 'msg_app/modal_new_conversation.html', {
                 'form': frm
             })
     except MessageError as e:

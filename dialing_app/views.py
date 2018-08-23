@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from django.db import ProgrammingError
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView
@@ -151,7 +151,7 @@ def send_sms(request):
             messages.error(request, _('fix form errors'))
     else:
         frm = SMSOutForm(initial={'dst': initial_dst})
-    return render_to_response('modal_send_sms.html', {
+    return render(request, 'modal_send_sms.html', {
         'form': frm,
         'path': path
     })
