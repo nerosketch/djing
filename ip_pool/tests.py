@@ -2,8 +2,7 @@ from abc import ABCMeta
 
 from django.conf import settings
 from django.shortcuts import resolve_url
-from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
+from django.test import TestCase, override_settings
 
 from accounts_app.models import UserProfile
 from group_app.models import Group
@@ -44,6 +43,7 @@ class NetworksTestCase(MyBaseTestCase, TestCase):
         netw.groups.add(self.group.pk)
         self.network = netw
 
+    @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_add_network(self):
         print('test_add_network')
         url = resolve_url('ip_pool:net_add')
@@ -57,32 +57,32 @@ class NetworksTestCase(MyBaseTestCase, TestCase):
             'ip_start': '192.168.23.2',
             'ip_end': '192.168.24.254'
         })
-        self.assertFormError(r, form='form', field='ip_end', errors=_('End ip must be in subnet of specified network'))
+        self.assertFormError(r, form='form', field='ip_end', errors='End ip must be in subnet of specified network')
 
         # Invalid ip
         r = self.client.post(url, data={
             'network': '192.168.23.0/24',
             'kind': 'inet',
             'description': 'SomeDescr',
-            'groups': ('1',),
+            'groups': (self.group.pk,),
             'ip_start': '192.168.23.2',
             'ip_end': '192.168.23.g'
         })
-        self.assertFormError(r, form='form', field='ip_end', errors=_('Enter a valid IPv4 or IPv6 address.'))
+        self.assertFormError(r, form='form', field='ip_end', errors='Enter a valid IPv4 or IPv6 address.')
 
         # Not existed group
         r = self.client.post(url, data={
             'network': '192.168.23.0/24',
             'kind': 'inet',
             'description': 'SomeDescr',
-            'groups': ('2',),
+            'groups': ('123',),  # Not existed group id
             'ip_start': '192.168.23.2',
             'ip_end': '192.168.23.6'
         })
         self.assertFormError(
             r, form='form', field='groups',
-            errors=_('Select a valid choice. %(value)s is not one of the available choices.') % {
-                'value': 2
+            errors='Select a valid choice. %(value)s is not one of the available choices.' % {
+                'value': 123  # Not existed group id
             }
         )
 
@@ -91,19 +91,20 @@ class NetworksTestCase(MyBaseTestCase, TestCase):
             'network': '192.168.12.0/24',
             'kind': 'inet',
             'description': 'SomeDescr',
-            'groups': ('1',),
+            'groups': (self.group.pk,),
             'ip_start': '192.168.12.2',
             'ip_end': '192.168.12.254'
         })
-        self.assertRedirects(r, resolve_url('ip_pool:net_edit', 2))
-        created_network = NetworkModel.objects.get(pk=2)
-        self.assertEqual('192.168.12.0/24', str(created_network.network))
-        self.assertEqual('inet', created_network.kind)
-        self.assertEqual('SomeDescr', created_network.description)
-        self.assertEqual(1, created_network.groups.all().first().pk)
-        self.assertEqual('192.168.12.2', str(created_network.ip_start))
-        self.assertEqual('192.168.12.254', str(created_network.ip_end))
+        added_net = NetworkModel.objects.get(description='SomeDescr', network='192.168.12.0/24', kind='inet')
+        self.assertRedirects(r, resolve_url('ip_pool:net_edit', added_net.pk))
+        self.assertEqual('192.168.12.0/24', str(added_net.network))
+        self.assertEqual('inet', added_net.kind)
+        self.assertEqual('SomeDescr', added_net.description)
+        self.assertEqual(self.group.pk, added_net.groups.all().first().pk)
+        self.assertEqual('192.168.12.2', str(added_net.ip_start))
+        self.assertEqual('192.168.12.254', str(added_net.ip_end))
 
+    @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_edit_network(self):
         print('test_edit_network')
         url = resolve_url('ip_pool:net_edit', net_id=self.network.pk)
@@ -112,16 +113,16 @@ class NetworksTestCase(MyBaseTestCase, TestCase):
             'network': '192.168.0.0/24',
             'kind': 'guest',
             'description': 'Описание',
-            'groups': ('1',),
+            'groups': (self.group.pk,),
             'ip_start': '192.168.0.2',
             'ip_end': '192.168.0.254'
         })
-        self.assertRedirects(r, resolve_url('ip_pool:net_edit', 1))
-        updated_network = NetworkModel.objects.get(pk=1)
+        self.assertRedirects(r, resolve_url('ip_pool:net_edit', self.network.pk))
+        updated_network = NetworkModel.objects.get(pk=self.network.pk)
         self.assertEqual('192.168.0.0/24', str(updated_network.network))
         self.assertEqual('guest', updated_network.kind)
         self.assertEqual('Описание', updated_network.description)
-        self.assertEqual(1, updated_network.groups.all().first().pk)
+        self.assertEqual(self.group.pk, updated_network.groups.all().first().pk)
         self.assertEqual('192.168.0.2', str(updated_network.ip_start))
         self.assertEqual('192.168.0.254', str(updated_network.ip_end))
 

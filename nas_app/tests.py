@@ -3,9 +3,8 @@ from abc import ABCMeta
 from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _, gettext
 from django.shortcuts import resolve_url
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from group_app.models import Group
 from nas_app.models import NASModel
 from nas_app.nas_managers import MikrotikTransmitter
@@ -54,6 +53,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         )
         self.nas = nas
 
+    @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_create(self):
         url = resolve_url('nas_app:add')
         self._client_get_check_login(url)
@@ -69,7 +69,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         })
         self.assertEqual(r.status_code, 302)
         msg = r.cookies.get('messages')
-        self.assertIn(gettext('New NAS has been created'), msg.output())
+        self.assertIn('New NAS has been created', msg.output())
         NASModel.objects.get(title='Test success nas', ip_address='192.168.8.10', ip_port=1254,
                              auth_login='_', auth_passw='_')
 
@@ -83,7 +83,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         })
         self.assertEqual(r.status_code, 200)
         self.assertFormError(response=r, form='form', field='ip_port',
-                             errors=_('Ensure this value is less than or equal to %(limit_value)s.') % {
+                             errors='Ensure this value is less than or equal to %(limit_value)s.' % {
                                  'limit_value': 65535
                              })
 
@@ -101,7 +101,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         })
         self.assertEqual(r.status_code, 200)
         self.assertFormError(response=r, form='form', field='title',
-                             errors=_('%(model_name)s with this %(field_label)s already exists.') % {
+                             errors='%(model_name)s with this %(field_label)s already exists.' % {
                                  'model_name': NASModel._meta.verbose_name,
                                  'field_label': NASModel._meta.get_field('title').verbose_name
                              })
@@ -116,7 +116,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
             'default': True
         })
         self.assertEqual(r.status_code, 200)
-        self.assertFormError(response=r, form='form', field='default', errors=_('Can be only one default gateway'))
+        self.assertFormError(response=r, form='form', field='default', errors='Can be only one default gateway')
 
         # test error duplicates ip_address
         r = self.client.post(url, data={
@@ -128,13 +128,14 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         })
         self.assertEqual(r.status_code, 200)
         self.assertFormError(response=r, form='form', field='ip_address',
-                             errors=_('%(model_name)s with this %(field_label)s already exists.') % {
+                             errors='%(model_name)s with this %(field_label)s already exists.' % {
                                  'model_name': NASModel._meta.verbose_name,
                                  'field_label': NASModel._meta.get_field('ip_address').verbose_name
                              })
 
+    @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_change(self):
-        url = resolve_url('nas_app:edit', 1)
+        url = resolve_url('nas_app:edit', self.nas.pk)
         self._client_get_check_login(url)
 
         # test get request
@@ -149,12 +150,13 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
             'auth_passw': '_v_c',
             'nas_type': 'mktk'
         })
-        self.assertRedirects(r, resolve_url('nas_app:edit', 1))
+        self.assertRedirects(r, resolve_url('nas_app:edit', self.nas.pk))
         msg = r.cookies.get('messages')
-        self.assertIn(gettext('Update successfully'), msg.output())
+        self.assertIn('Update successfully', msg.output())
         NASModel.objects.get(title='New again nas2 changed', ip_address='192.168.8.12',
                              ip_port=7865, auth_login='_w_c', auth_passw='_v_c')
 
+    @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_delete(self):
         url = resolve_url('nas_app:add')
         self._client_get_check_login(url)
@@ -179,7 +181,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         r = self.client.post(url)
         self.assertRedirects(r, resolve_url('nas_app:home'))
         msg = r.cookies.get('messages')
-        self.assertIn(gettext('Server successfully removed'), msg.output())
+        self.assertIn('Server successfully removed', msg.output())
         try:
             NASModel.objects.get(title='Test success nas_2')
             raise self.failureException("NAS not removed")
@@ -191,7 +193,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         r = self.client.post(resolve_url('nas_app:del', nas_id))
         self.assertRedirects(r, expected_url=resolve_url('nas_app:edit', nas_id))
         msg = r.cookies.get('messages')
-        self.assertIn(gettext('You cannot remove default server'), msg.output())
+        self.assertIn('You cannot remove default server', msg.output())
 
     def test_get_nas_manager(self):
         r = self.nas.get_nas_manager_klass()
