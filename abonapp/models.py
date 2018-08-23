@@ -225,7 +225,9 @@ class Abon(BaseAccount):
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         if len(abon_addresses) > 0:
             return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
-        raise LogicError(_('You have not any active leases'))
+        raise LogicError(_('Account "%(username)s" not have any active leases') % {
+            'username': self.username
+        })
 
     def nas_sync_self(self) -> Optional[Exception]:
         """
