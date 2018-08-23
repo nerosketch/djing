@@ -3,7 +3,7 @@
 интернет-провайдера.
 Сейчас идёт тестирвоание работы на Mikrotik, функционал пока минимальный, т.к. пишу в свободное время.
 Работа планируется в реальных условиях и на реальных абонентах.
-Использовано python 3, django 1.11, bootstrap 3, и другое в файле requirements.txt
+Использовано python 3, django 2, bootstrap 3, и другое в файле requirements.txt
 
 P.S. Возможно понадобится **Python 3.5** и выше из-за указания статических типов. [typing — Support for type hints](https://docs.python.org/3/library/typing.html).
 Вы можете использовать билиотеку [mypy](http://www.mypy-lang.org/) для старших версий python.
