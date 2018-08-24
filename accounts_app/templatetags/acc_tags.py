@@ -1,6 +1,9 @@
+from ipaddress import ip_address, AddressValueError
+
 from django import template
 from django.db.models import Model
 from django.apps import apps
+from ip_pool.models import IpLeaseModel
 from six import string_types, class_types
 
 register = template.Library()
@@ -16,3 +19,15 @@ def klass_name(klass):
     else:
         return 'Type not detected'
     return kl._meta.verbose_name
+
+
+@register.simple_tag
+def can_login_by_location(request):
+    try:
+        remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
+        if remote_ip.version == 4:
+            has_leases = IpLeaseModel.objects.filter(ip=str(remote_ip)).exists()
+            return has_leases
+    except AddressValueError:
+        pass
+    return False

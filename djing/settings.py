@@ -27,7 +27,8 @@ ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 AUTHENTICATION_BACKENDS = (
     'djing.lib.auth_backends.CustomAuthBackend',
     # 'django.contrib.auth.backends.ModelBackend', # default
-    'guardian.backends.ObjectPermissionBackend'
+    'guardian.backends.ObjectPermissionBackend',
+    'djing.lib.auth_backends.LocationAuthBackend'
 )
 
 # Application definition

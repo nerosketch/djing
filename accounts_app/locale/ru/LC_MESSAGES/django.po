@@ -296,3 +296,6 @@ msgstr "Ответственность за группы"
 
 msgid "Profile"
 msgstr "Учётная запись"
+
+msgid "Login by location"
+msgstr "Войти по местоположению"

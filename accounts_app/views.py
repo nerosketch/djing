@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
-from django.urls import NoReverseMatch, reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
+from django.urls import NoReverseMatch
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.views.generic import ListView, UpdateView, RedirectView
+from django.views.generic import ListView, UpdateView
 from django.conf import settings
 
 from group_app.models import Group
@@ -20,45 +21,36 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 
 
-class BaseAccListView(ListView):
-    http_method_names = ('get',)
-    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+class CustomLoginView(LoginView):
+    template_name = 'accounts/login.html'
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('Wrong login or password, please try again'))
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        if self.request.user.is_staff:
+            return resolve_url('acc_app:profile')
+        return resolve_url('client_side:home')
 
 
-def to_signin(request):
+def location_login(request):
     nextl = request.GET.get('next')
     nextl = '' if nextl == 'None' or nextl is None or nextl.isspace() else nextl
-
     try:
-        if request.POST:
-            auser = authenticate(username=request.POST.get('login'), password=request.POST.get('password'))
-            if auser:
-                login(request, auser)
-                if nextl == 'None' or nextl is None or nextl == '':
-                    if request.user.is_staff:
-                        return redirect('acc_app:profile')
-
-                    return redirect('client_side:home')
-
-                return redirect(nextl)
-
-            return render(request, 'accounts/login.html', {
-                'next': nextl,
-                'errmsg': _('Wrong login or password, please try again')
-            })
+        auser = authenticate(request=request, byip=None)
+        if auser:
+            login(request, auser)
+            if nextl == 'None' or nextl is None or nextl == '':
+                if request.user.is_staff:
+                    return redirect('acc_app:profile')
+                return redirect('client_side:home')
+            return redirect(nextl)
         return render(request, 'accounts/login.html', {
             'next': nextl
         })
     except NoReverseMatch:
-        return redirect('acc_app:profile')
-
-
-class SignOut(RedirectView):
-    url = reverse_lazy('acc_app:login')
-
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        return super(SignOut, self).get(request, *args, **kwargs)
+        return redirect('client_side:home')
 
 
 @login_required
@@ -181,7 +173,9 @@ def delete_profile(request, uid):
 
 
 @method_decorator((login_required, only_admins), name='dispatch')
-class AccountsListView(BaseAccListView):
+class AccountsListView(ListView):
+    http_method_names = 'get',
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'accounts/acc_list.html'
     context_object_name = 'users'
 
@@ -209,7 +203,9 @@ def perms(request, uid):
 
 
 @method_decorator(login_required, name='dispatch')
-class PermissionClassListView(BaseAccListView):
+class PermissionClassListView(ListView):
+    http_method_names = 'get',
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'accounts/perms/objects_of_type.html'
     context_object_name = 'objects'
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load i18n %}
+<!DOCTYPE html>{% load i18n %}{% load acc_tags %}{% load bootstrap3 %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
@@ -28,33 +28,26 @@
         </div>
         <div class="panel-body">
             <form role="form" action="{% url 'acc_app:login' %}{% if next %}?next={{ next }}{% endif %}" method="POST">{% csrf_token %}
-                {% if errmsg %}
-                    <div class="alert alert-danger alert-dismissable">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        {{ errmsg }}
-                    </div>
-                {% endif %}
+                {% include '_messages.html' %}
 
-                <div class="form-group">
-                    <label for="inp_uname">{% trans 'User name' %}</label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                        <input type="text" id="inp_uname" placeholder="username" name="login" autofocus required class="form-control">
-                    </div>
-                </div>
+                {# Username #}
+                {% bootstrap_icon 'user' as ic %}
+                {% bootstrap_field form.username addon_before=ic %}
 
-                <div class="form-group">
-                    <label for="inp_pass">{% trans 'Password' %}</label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                        <input type="password" id="inp_pass" name="password" class="form-control">
-                    </div>
-                </div>
+                {# Password #}
+                {% bootstrap_icon 'lock' as ic %}
+                {% bootstrap_field form.password addon_before=ic %}
 
                 <div class="btn-group btn-group-sm">
                     <button type="submit" class="btn btn-primary">
                         <span class="glyphicon glyphicon-log-in"></span> {% trans 'Login' %}
                     </button>
+                    {% can_login_by_location request as can_lbl %}
+                    {% if can_lbl %}
+                        <a href="{% url 'acc_app:llogin' %}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-map-marker"></span> {% trans 'Login by location' %}
+                        </a>
+                    {% endif %}
                 </div>
 
             </form>
