@@ -236,7 +236,7 @@ class DeviceUpdateExtra(UpdateView):
 
 @login_required
 @permission_required('devapp.change_device')
-def manage_ports(request, device_id):
+def manage_ports(request, group_id: int, device_id: int):
     device = ports = None
     try:
         device = Device.objects.get(pk=device_id)
@@ -281,7 +281,7 @@ class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView)
 
 @login_required
 @permission_required('devapp.add_port')
-def add_ports(request, device_id):
+def add_ports(request, group_id: int, device_id: int):
     class TempPort:
         def __init__(self, pid, text, status, from_db, pk=None):
             self.pid = pid
@@ -429,7 +429,7 @@ def add_single_port(request, group_id, device_id):
 
 @login_required
 @permission_required('devapp.can_view_device')
-def devview(request, device_id):
+def devview(request, group_id: int, device_id: int):
     ports, manager = None, None
     device = get_object_or_404(Device, id=device_id)
 
@@ -719,7 +719,7 @@ class DevicesGetListView(global_base_views.SecureApiView):
 
 @login_required
 @json_view
-def register_device(request, device_id: str):
+def register_device(request, group_id: int, device_id: int):
     def format_msg(msg: str, icon: str):
         return ' '.join((
             '<span class="glyphicon glyphicon-%s"></span>' % icon,
