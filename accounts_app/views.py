@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -50,7 +51,8 @@ def location_login(request):
                 return redirect('client_side:home')
             return redirect(nextl)
         return render(request, 'accounts/login.html', {
-            'next': nextl
+            'next': nextl,
+            'form': AuthenticationForm()
         })
     except NoReverseMatch:
         return redirect('client_side:home')

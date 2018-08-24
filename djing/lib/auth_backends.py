@@ -40,7 +40,7 @@ class LocationAuthBackend(ModelBackend):
     def authenticate(self, request, byip, **kwargs):
         try:
             remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
-            lease = IpLeaseModel.objects.filter(ip=str(remote_ip)).first()
+            lease = IpLeaseModel.objects.filter(ip=str(remote_ip), abon__is_active=True).first()
             if lease is None:
                 return
             user = Abon.objects.get(ip_addresses=lease)

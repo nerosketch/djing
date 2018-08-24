@@ -26,7 +26,7 @@ def can_login_by_location(request):
     try:
         remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
         if remote_ip.version == 4:
-            has_leases = IpLeaseModel.objects.filter(ip=str(remote_ip)).exists()
+            has_leases = IpLeaseModel.objects.filter(ip=str(remote_ip), abon__is_active=True).exists()
             return has_leases
     except AddressValueError:
         pass
