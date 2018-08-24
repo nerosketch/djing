@@ -6,6 +6,7 @@ from abonapp.models import Abon
 from devapp.models import Device
 from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 from django.contrib.auth.decorators import login_required
+from djing.lib.decorators import only_admins
 
 
 def replace_without_case(orig, old, new):
@@ -13,6 +14,7 @@ def replace_without_case(orig, old, new):
 
 
 @login_required
+@only_admins
 def home(request):
     s = request.GET.get('s')
     s = s.replace('+', '')

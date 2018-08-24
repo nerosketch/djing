@@ -11,14 +11,18 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from guardian.shortcuts import assign_perm
 from nas_app.forms import NasForm
 from nas_app.models import NASModel
+from djing.lib.decorators import only_admins
 
 
-@method_decorator(login_required, name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class NasListView(ListView):
     model = NASModel
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('nas_app.add_nasmodel'), name='dispatch')
 class NasCreateView(CreateView):
     model = NASModel
@@ -34,7 +38,7 @@ class NasCreateView(CreateView):
         return r
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('nas_app.delete_nasmodel'), name='dispatch')
 class NasDeleteView(DeleteView):
     model = NASModel
@@ -52,7 +56,7 @@ class NasDeleteView(DeleteView):
         return HttpResponseRedirect(failure_url)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('nas_app.change_nasmodel'), name='dispatch')
 class NasUpdateView(UpdateView):
     model = NASModel

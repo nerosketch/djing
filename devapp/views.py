@@ -30,7 +30,10 @@ from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class DevicesListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
@@ -57,14 +60,14 @@ class DevicesListView(global_base_views.OrderedFilteredList):
         return response
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class DevicesWithoutGroupsListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
     queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('devapp.delete_device'), name='dispatch')
 class DeviceDeleteView(DeleteView):
     model = Device
@@ -83,7 +86,7 @@ class DeviceDeleteView(DeleteView):
         return res
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
 class DeviceUpdate(UpdateView):
     template_name = 'devapp/dev.html'
@@ -149,7 +152,7 @@ class DeviceUpdate(UpdateView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
 class DeviceCreateView(CreateView):
     template_name = 'devapp/add_dev.html'
@@ -215,7 +218,7 @@ class DeviceCreateView(CreateView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('devapp.change_device'), name='dispatch')
 class DeviceUpdateExtra(UpdateView):
     template_name = 'devapp/modal_device_extra_edit.html'
@@ -235,6 +238,7 @@ class DeviceUpdateExtra(UpdateView):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.change_device')
 def manage_ports(request, group_id: int, device_id: int):
     device = ports = None
@@ -256,7 +260,7 @@ def manage_ports(request, group_id: int, device_id: int):
     })
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView):
     template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
     http_method_names = ('get',)
@@ -280,6 +284,7 @@ class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView)
 
 
 @login_required
+@only_admins
 @permission_required('devapp.add_port')
 def add_ports(request, group_id: int, device_id: int):
     class TempPort:
@@ -349,6 +354,7 @@ def add_ports(request, group_id: int, device_id: int):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.delete_port')
 def delete_single_port(request, group_id, device_id, portid):
     try:
@@ -370,6 +376,7 @@ def delete_single_port(request, group_id, device_id, portid):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.add_port')
 def edit_single_port(request, group_id, device_id, port_id):
     try:
@@ -398,6 +405,7 @@ def edit_single_port(request, group_id, device_id, port_id):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.add_port')
 def add_single_port(request, group_id, device_id):
     try:
@@ -428,6 +436,7 @@ def add_single_port(request, group_id, device_id):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.can_view_device')
 def devview(request, group_id: int, device_id: int):
     ports, manager = None, None
@@ -467,6 +476,7 @@ def devview(request, group_id: int, device_id: int):
 
 
 @login_required
+@only_admins
 def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
     fiber_id = safe_int(fiber_id)
     zte_olt_device = get_object_or_404(Device, id=device_id)
@@ -480,6 +490,7 @@ def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
 
 
 @login_required
+@only_admins
 @permission_required('devapp.can_toggle_ports')
 def toggle_port(request, device_id: int, portid: int, status=0):
     portid = int(portid)
@@ -505,7 +516,7 @@ def toggle_port(request, device_id: int, portid: int, status=0):
     return redirect('devapp:view', device.group.pk if device.group is not None else 0, device_id)
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class GroupsListView(global_base_views.OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'devapp/group_list.html'
@@ -519,6 +530,7 @@ class GroupsListView(global_base_views.OrderedFilteredList):
 
 
 @login_required
+@only_admins
 @json_view
 def search_dev(request):
     word = request.GET.get('s')
@@ -540,6 +552,7 @@ def search_dev(request):
 
 
 @login_required
+@only_admins
 def fix_device_group(request, device_id):
     device = get_object_or_404(Device, pk=device_id)
     try:
@@ -566,6 +579,7 @@ def fix_device_group(request, device_id):
 
 
 @login_required
+@only_admins
 @json_view
 def fix_onu(request):
     mac = request.GET.get('cmd_param')
@@ -599,6 +613,7 @@ def fix_onu(request):
 
 
 @login_required
+@only_admins
 def fix_port_conflict(request, group_id, device_id, port_id):
     dev_group = get_object_or_404(Group, pk=group_id)
     device = get_object_or_404(Device, pk=device_id)
@@ -718,6 +733,7 @@ class DevicesGetListView(global_base_views.SecureApiView):
 
 
 @login_required
+@only_admins
 @json_view
 def register_device(request, group_id: int, device_id: int):
     def format_msg(msg: str, icon: str):

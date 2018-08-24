@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.conf import settings
+from djing.lib.decorators import only_admins
 from guardian.decorators import permission_required_or_403 as permission_required
 
 from djing.global_base_views import OrderedFilteredList
@@ -14,7 +15,10 @@ from . import models
 from . import forms
 
 
-@method_decorator(login_required, name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class GroupListView(OrderedFilteredList):
     http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -23,7 +27,7 @@ class GroupListView(OrderedFilteredList):
     context_object_name = 'groups'
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class EditGroupView(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'group_app/edit_group.html'
@@ -41,7 +45,7 @@ class EditGroupView(UpdateView):
         return super(EditGroupView, self).form_invalid(form)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class AddGroupView(CreateView):
     http_method_names = ('get', 'post')
     template_name = 'group_app/add_group.html'
@@ -57,7 +61,7 @@ class AddGroupView(CreateView):
         return super(AddGroupView, self).form_invalid(form)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('group_app:delete_group'), name='dispatch')
 class DeleteGroupView(DeleteView):
     model = models.Group

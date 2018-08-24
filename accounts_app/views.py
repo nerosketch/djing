@@ -21,6 +21,9 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
 
 
+login_decs = login_required, only_admins
+
+
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
@@ -79,7 +82,7 @@ def profile_show(request, uid=0):
     })
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class AvatarUpdateView(UpdateView):
     form_class = AvatarChangeForm
     template_name = 'accounts/settings/ch_info.html'
@@ -124,6 +127,7 @@ def ch_info(request):
 
 
 @login_required
+@only_admins
 @permission_required('accounts_app.add_userprofile')
 def create_profile(request):
     if request.method == 'POST':
@@ -172,7 +176,7 @@ def delete_profile(request, uid):
     return redirect('acc_app:accounts_list')
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class AccountsListView(ListView):
     http_method_names = 'get',
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -202,7 +206,7 @@ def perms(request, uid):
     })
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class PermissionClassListView(ListView):
     http_method_names = 'get',
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -232,6 +236,7 @@ class PermissionClassListView(ListView):
 
 
 @login_required
+@only_admins
 def perms_edit(request, uid, klass_name, obj_id):
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -257,6 +262,7 @@ def perms_edit(request, uid, klass_name, obj_id):
 
 
 @login_required
+@only_admins
 def set_abon_groups_permission(request, uid):
     # Only superuser can change object permissions
     if not request.user.is_superuser:
@@ -284,7 +290,7 @@ def set_abon_groups_permission(request, uid):
     })
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class ManageResponsibilityGroups(ListView):
     http_method_names = ('get', 'post')
     template_name = 'accounts/manage_responsibility_groups.html'

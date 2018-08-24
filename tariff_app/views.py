@@ -12,10 +12,14 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from djing.global_base_views import OrderedFilteredList
 from .models import Tariff, PeriodicPay
 from djing import lib
+from djing.lib.decorators import only_admins
 from . import forms
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class TariffsListView(OrderedFilteredList):
     """
     Show Services(Tariffs) list
@@ -27,6 +31,7 @@ class TariffsListView(OrderedFilteredList):
 
 
 @login_required
+@only_admins
 def edit_tarif(request, tarif_id=0):
     tarif_id = lib.safe_int(tarif_id)
 
@@ -56,7 +61,7 @@ def edit_tarif(request, tarif_id=0):
     })
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('tariff_app.delete_tariff'), name='dispatch')
 class TariffDeleteView(DeleteView):
     model = Tariff
@@ -73,7 +78,7 @@ class TariffDeleteView(DeleteView):
         return super().get_context_data(**kwargs)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('tariff_app.delete_tariff'), name='dispatch')
 class PeriodicPaysListView(OrderedFilteredList):
     context_object_name = 'pays'
@@ -82,6 +87,7 @@ class PeriodicPaysListView(OrderedFilteredList):
 
 
 @login_required
+@only_admins
 def periodic_pay(request, pay_id=0):
     if pay_id != 0:
         pay_inst = get_object_or_404(PeriodicPay, pk=pay_id)

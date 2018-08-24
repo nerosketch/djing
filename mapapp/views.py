@@ -14,8 +14,12 @@ from group_app.models import Group
 from .models import Dot
 from .forms import DotForm
 from djing.lib import safe_int
+from djing.lib.decorators import only_admins
 from devapp.models import Device
 from guardian.decorators import permission_required
+
+
+login_decs = login_required, only_admins
 
 
 class BaseListView(ListView):
@@ -24,6 +28,7 @@ class BaseListView(ListView):
 
 
 @login_required
+@only_admins
 def home(request):
     if not request.user.is_superuser:
         return redirect('/')
@@ -35,7 +40,7 @@ def home(request):
     })
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class OptionsListView(BaseListView):
     template_name = 'maps/options.html'
     model = Dot
@@ -48,6 +53,7 @@ class OptionsListView(BaseListView):
 
 
 @login_required
+@only_admins
 def dot_edit(request, did=0):
     if not request.user.is_superuser:
         return redirect('/')
@@ -83,6 +89,7 @@ def dot_edit(request, did=0):
 
 
 @login_required
+@only_admins
 @permission_required('mapapp.delete_dot')
 def remove(request, did):
     try:
@@ -96,6 +103,7 @@ def remove(request, did):
 
 
 @login_required
+@only_admins
 @json_view
 def get_dots(request):
     if not request.user.is_superuser:
@@ -135,6 +143,7 @@ def get_dots(request):
 
 
 @login_required
+@only_admins
 def modal_add_dot(request):
     if not request.user.has_perm('mapapp.add_dot'):
         return render(request, '403_for_modal.html')
@@ -165,6 +174,7 @@ def modal_add_dot(request):
 
 
 @login_required
+@only_admins
 def preload_devices(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you have not super user')
@@ -182,6 +192,7 @@ def preload_devices(request):
 
 
 @login_required
+@only_admins
 def dot_tooltip(request):
     if not request.user.is_superuser:
         return render(request, '403_for_modal.html')
@@ -199,6 +210,7 @@ def dot_tooltip(request):
 
 
 @login_required
+@only_admins
 def add_dev(request, did):
     if not request.user.is_superuser:
         return redirect('/')
@@ -229,6 +241,7 @@ def add_dev(request, did):
 
 
 @login_required
+@only_admins
 @json_view
 def resolve_dots_by_group(request, grp_id):
     if not request.user.is_superuser:
@@ -240,6 +253,7 @@ def resolve_dots_by_group(request, grp_id):
 
 
 @login_required
+@only_admins
 def to_single_dev(request):
     dot_id = safe_int(request.GET.get('dot_id'))
     if dot_id <= 0:

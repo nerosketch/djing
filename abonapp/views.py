@@ -36,7 +36,10 @@ from djing import lib
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+login_decs = login_required, lib.decorators.only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class PeoplesListView(OrderedFilteredList):
     template_name = 'abonapp/peoples.html'
 
@@ -75,7 +78,7 @@ class PeoplesListView(OrderedFilteredList):
         return context
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class GroupListView(OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
@@ -88,7 +91,7 @@ class GroupListView(OrderedFilteredList):
         return queryset
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.add_abon'), name='dispatch')
 class AbonCreateView(CreateView):
     group = None
@@ -141,7 +144,7 @@ class AbonCreateView(CreateView):
         return super(AbonCreateView, self).form_invalid(form)
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.delete_abon'), name='dispatch')
 class DelAbonDeleteView(DeleteView):
     model = models.Abon
@@ -174,6 +177,7 @@ class DelAbonDeleteView(DeleteView):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.can_add_ballance')
 @transaction.atomic
 def abonamount(request, gid, uname):
@@ -207,7 +211,7 @@ def abonamount(request, gid, uname):
     })
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class DebtsListView(OrderedFilteredList):
     context_object_name = 'invoices'
@@ -225,7 +229,7 @@ class DebtsListView(OrderedFilteredList):
         return context
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class PayHistoryListView(OrderedFilteredList):
     context_object_name = 'pay_history'
@@ -270,7 +274,7 @@ def abon_services(request, gid, uname):
     })
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.change_abon'), name='post')
 class AbonHomeUpdateView(UpdateView):
     model = models.Abon
@@ -356,6 +360,7 @@ def terminal_pay(request):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid, uname):
     abon = get_object_or_404(models.Abon, username=uname)
@@ -439,6 +444,7 @@ def pick_tariff(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.delete_abontariff')
 def unsubscribe_service(request, gid, uname, abon_tariff_id):
     try:
@@ -455,7 +461,7 @@ def unsubscribe_service(request, gid, uname, abon_tariff_id):
     return redirect('abonapp:abon_services', gid=gid, uname=uname)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.can_view_abonlog'), name='dispatch')
 class LogListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -465,7 +471,7 @@ class LogListView(ListView):
     model = models.AbonLog
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.can_view_invoiceforpayment'), name='dispatch')
 class DebtorsListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -475,7 +481,7 @@ class DebtorsListView(ListView):
     queryset = models.InvoiceForPayment.objects.filter(status=True)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('group_app.can_view_group', (Group, 'pk', 'gid')), name='dispatch')
 class TaskLogListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -495,7 +501,7 @@ class TaskLogListView(ListView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('abonapp.can_view_passport'), name='dispatch')
 class PassportUpdateView(UpdateView):
     form_class = forms.PassportForm
@@ -557,6 +563,7 @@ def chgroup_tariff(request, gid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
 def dev(request, gid, uname):
     abon_dev = None
@@ -582,6 +589,7 @@ def dev(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def clear_dev(request, gid, uname):
@@ -599,6 +607,7 @@ def clear_dev(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def charts(request, gid, uname):
     high = 100
@@ -649,6 +658,7 @@ def charts(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.can_ping')
 @json_view
 def abon_ping(request, gid, uname):
@@ -701,6 +711,7 @@ def abon_ping(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 def vcards(r):
     users = models.Abon.objects.exclude(group=None).select_related('group', 'street').only(
         'username', 'fio', 'group__title', 'telephone',
@@ -742,7 +753,7 @@ def vcards(r):
     return response
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class DialsListView(OrderedFilteredList):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
@@ -785,6 +796,7 @@ class DialsListView(OrderedFilteredList):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
 def save_user_dev_port(request, gid, uname):
     if request.method != 'POST':
@@ -831,6 +843,7 @@ def save_user_dev_port(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.add_abonstreet')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_add(request, gid):
@@ -851,6 +864,7 @@ def street_add(request, gid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.change_abonstreet')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_edit(request, gid):
@@ -874,6 +888,7 @@ def street_edit(request, gid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.delete_abonstreet')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def street_del(request, gid, sid):
@@ -886,6 +901,7 @@ def street_del(request, gid, sid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def active_nets(request, gid):
     nets = NetworkModel.objects.filter(groups__id=gid)
@@ -895,6 +911,7 @@ def active_nets(request, gid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abonapp.can_view_additionaltelephones')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def tels(request, gid, uname):
@@ -908,6 +925,7 @@ def tels(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abnapp.add_additionaltelephone')
 def tel_add(request, gid, uname):
     if request.method == 'POST':
@@ -931,6 +949,7 @@ def tel_add(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('abnapp.delete_additionaltelephone')
 def tel_del(request, gid, uname):
     try:
@@ -944,6 +963,7 @@ def tel_del(request, gid, uname):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def phonebook(request, gid):
     res_format = request.GET.get('f')
@@ -966,6 +986,7 @@ def phonebook(request, gid):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def abon_export(request, gid):
     res_format = request.GET.get('f')
@@ -1019,6 +1040,7 @@ def fin_report(request):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
     if periodic_pay_id == 0:
@@ -1050,6 +1072,7 @@ def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
 
 
 @login_required
+@lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 @permission_required('abonapp.delete_periodicpayforid')
 def del_periodic_pay(request, gid, uname, periodic_pay_id):
@@ -1061,7 +1084,7 @@ def del_periodic_pay(request, gid, uname, periodic_pay_id):
     return redirect('abonapp:abon_services', gid, uname)
 
 
-@method_decorator((login_required, lib.decorators.only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class EditSibscriberMarkers(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'

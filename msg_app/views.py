@@ -10,12 +10,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 
 from chatbot.models import MessageQueue
+from djing.lib.decorators import only_admins
 
 from .models import Conversation, MessageError, Message
 from .forms import ConversationForm, MessageForm
 
 
-@method_decorator(login_required, name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class ConversationsListView(ListView):
     context_object_name = 'conversations'
     template_name = 'msg_app/conversations.html'
@@ -26,6 +30,7 @@ class ConversationsListView(ListView):
 
 
 @login_required
+@only_admins
 def new_conversation(request):
     try:
         frm = ConversationForm(request.POST or None)
@@ -46,6 +51,7 @@ def new_conversation(request):
 
 
 @login_required
+@only_admins
 def to_conversation(request, conv_id):
     conv = get_object_or_404(Conversation, pk=conv_id)
     try:
@@ -68,6 +74,7 @@ def to_conversation(request, conv_id):
 
 
 @login_required
+@only_admins
 def remove_msg(request, conv_id, msg_id):
     msg = get_object_or_404(Message, pk=msg_id)
     if msg.author != request.user:

@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
+from djing.lib.decorators import only_admins
 
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing.global_base_views import OrderedFilteredList
@@ -12,7 +13,10 @@ from ip_pool import models, forms
 from group_app.models import Group
 
 
-@method_decorator(login_required, name='dispatch')
+login_decs = login_required, only_admins
+
+
+@method_decorator(login_decs, name='dispatch')
 class NetworksListView(OrderedFilteredList):
     device_kind_code = None
     template_name = 'ip_pool/network_list.html'
@@ -26,7 +30,7 @@ class NetworksListView(OrderedFilteredList):
         return qs
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('ip_pool.change_networkmodel'), name='dispatch')
 class NetworkUpdateView(UpdateView):
     model = models.NetworkModel
@@ -40,7 +44,7 @@ class NetworkUpdateView(UpdateView):
         return r
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('ip_pool.delete_networkmodel'), name='dispatch')
 class NetworkDeleteView(DeleteView):
     model = models.NetworkModel
@@ -52,7 +56,7 @@ class NetworkDeleteView(DeleteView):
         return super(NetworkDeleteView, self).delete(request, *args, **kwargs)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class IpLeasesListView(OrderedFilteredList):
     template_name = 'ip_pool/ip_leases_list.html'
     model = models.IpLeaseModel
@@ -68,7 +72,7 @@ class IpLeasesListView(OrderedFilteredList):
         return self.model.objects.filter(network__id=net_id)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('ip_pool.add_networkmodel'), name='dispatch')
 class NetworkCreateView(CreateView):
     model = models.NetworkModel

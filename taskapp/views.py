@@ -24,12 +24,15 @@ from .models import Task, ExtraComment
 from .forms import TaskFrm, ExtraCommentForm
 
 
+login_decs = login_required, only_admins
+
+
 class BaseTaskListView(ListView):
     http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class NewTasksView(BaseTaskListView):
     """
     Show new tasks
@@ -43,6 +46,7 @@ class NewTasksView(BaseTaskListView):
             .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
+@method_decorator(login_decs, name='dispatch')
 class FailedTasksView(NewTasksView):
     """
     Show crashed tasks
@@ -55,6 +59,7 @@ class FailedTasksView(NewTasksView):
             .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
+@method_decorator(login_decs, name='dispatch')
 class FinishedTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_finish.html'
 
@@ -63,6 +68,7 @@ class FinishedTaskListView(NewTasksView):
             .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
+@method_decorator(login_decs, name='dispatch')
 class OwnTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_own.html'
 
@@ -73,6 +79,7 @@ class OwnTaskListView(NewTasksView):
             .select_related('abon', 'abon__street', 'abon__group')
 
 
+@method_decorator(login_decs, name='dispatch')
 class MyTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist.html'
 
@@ -82,7 +89,8 @@ class MyTaskListView(NewTasksView):
             .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
-@method_decorator((login_required, permission_required('taskapp.can_viewall')), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.can_viewall'), name='dispatch')
 class AllTasksListView(BaseTaskListView):
     template_name = 'taskapp/tasklist_all.html'
     context_object_name = 'tasks'
@@ -92,6 +100,7 @@ class AllTasksListView(BaseTaskListView):
             .select_related('abon', 'abon__street', 'abon__group', 'author')
 
 
+@method_decorator(login_decs, name='dispatch')
 class EmptyTasksListView(NewTasksView):
     template_name = 'taskapp/tasklist_empty.html'
 
@@ -100,6 +109,7 @@ class EmptyTasksListView(NewTasksView):
 
 
 @login_required
+@only_admins
 @permission_required('taskapp.delete_task')
 def task_delete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -111,7 +121,7 @@ def task_delete(request, task_id):
     return redirect('taskapp:home')
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 class TaskUpdateView(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'taskapp/add_edit_task.html'
@@ -235,6 +245,7 @@ def task_failed(request, task_id):
 
 
 @login_required
+@only_admins
 @permission_required('taskapp.can_remind')
 def remind(request, task_id):
     try:
@@ -267,7 +278,7 @@ def check_news(request):
     return r
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('taskapp.add_extracomment'), name='dispatch')
 class NewCommentView(CreateView):
     form_class = ExtraCommentForm
@@ -283,7 +294,7 @@ class NewCommentView(CreateView):
         return FormMixin.form_valid(self, form)
 
 
-@method_decorator((login_required, only_admins), name='dispatch')
+@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('taskapp.delete_extracomment'), name='dispatch')
 class DeleteCommentView(DeleteView):
     model = ExtraComment
