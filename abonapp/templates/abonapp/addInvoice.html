@@ -32,7 +32,7 @@
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input id="paystat" type="checkbox" name="status"{% if invcount == 0 %} checked{% endif %}>
+                        <input id="paystat" type="checkbox" name="status">
                         {% trans 'Pay status' %}
                     </label>
                 </div>
@@ -50,6 +50,14 @@
                     </button>
                 </div>
             </form>
+        </div>
+        <div class="panel-footer">
+            <p>
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                {% blocktrans trimmed %}
+                    This credit will be visible in user page, be careful with your text.
+                {% endblocktrans %}
+            </p>
         </div>
     </div>
 {% endblock %}

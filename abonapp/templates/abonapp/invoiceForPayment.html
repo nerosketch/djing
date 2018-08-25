@@ -32,23 +32,25 @@
             <tbody>
             {% for inv in invoices %}
                 <tr>
-                    <td>{% if inv.status %}
+                    <td class="col-xs-1 text-center">{% if inv.status %}
                         <span class="glyphicon glyphicon-ok"></span>
                     {% else %}
                         <span class="glyphicon glyphicon-time"></span>
                     {% endif %}</td>
-                    <td>{{ inv.date_create|date:"F" }}</td>
-                    <td>{{ inv.amount }}</td>
-                    <td>{{ inv.comment }}</td>
-                    <td>{{ inv.date_create|date:"D d E Y H:i:s" }}</td>
-                    <td>
+                    <td class="col-xs-1">{{ inv.date_create|date:"F" }}</td>
+                    <td class="col-xs-1">{{ inv.amount }}</td>
+                    <td class="col-xs-3">{{ inv.comment }}</td>
+                    <td class="col-xs-2">{{ inv.date_create|date:"D d E Y H:i:s" }}</td>
+                    <td class="col-xs-2">
                         {% if inv.date_pay %}
                             {{ inv.date_pay|date:"D d M Y H:i:s" }}
                         {% else %}
                             {{ inv.status|yesno:_('Created paid,Not yet paid') }}
                         {% endif %}
                     </td>
-                    <td><a href="{% url 'acc_app:other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a></td>
+                    <td class="col-xs-2">
+                        <a href="{% url 'acc_app:other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>
@@ -60,9 +62,14 @@
                 <tfoot>
                 <tr>
                     <th colspan="7">
-                        <a href="{% url 'abonapp:add_invoice' group.id abon.username %}" class="btn btn-success btn-sm">
-                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add debt' %}
-                        </a>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'abonapp:add_invoice' group.id abon.username %}" class="btn btn-success">
+                                <span class="glyphicon glyphicon-plus"></span> {% trans 'Add debt' %}
+                            </a>
+                            <a href="{% url 'abonapp:abon_home' group.id abon.username %}" class="btn btn-default">
+                                <span class="glyphicon glyphicon-backward"></span> {% trans 'Back to home' %}
+                            </a>
+                        </div>
                     </th>
                 </tr>
                 </tfoot>

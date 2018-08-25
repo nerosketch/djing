@@ -180,7 +180,7 @@ class DelAbonDeleteView(DeleteView):
 @lib.decorators.only_admins
 @permission_required('abonapp.can_add_ballance')
 @transaction.atomic
-def abonamount(request, gid, uname):
+def abonamount(request, gid: int, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     frm = None
     try:
@@ -250,7 +250,7 @@ class PayHistoryListView(OrderedFilteredList):
 
 @login_required
 @lib.decorators.only_admins
-def abon_services(request, gid, uname):
+def abon_services(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.can_view_group', grp):
         raise PermissionDenied
@@ -362,7 +362,7 @@ def terminal_pay(request):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abonapp.add_invoiceforpayment')
-def add_invoice(request, gid, uname):
+def add_invoice(request, gid: int, uname: str):
     abon = get_object_or_404(models.Abon, username=uname)
     grp = get_object_or_404(Group, pk=gid)
 
@@ -382,7 +382,7 @@ def add_invoice(request, gid, uname):
             newinv.author = request.user
             newinv.save()
             messages.success(request, _('Receipt has been created'))
-            return redirect('abonapp:abon_home', gid=gid, username=uname)
+            return redirect('abonapp:abon_debts', gid=gid, uname=uname)
 
     except (NasNetworkError, NasFailedResult) as e:
         messages.error(request, e)
@@ -400,7 +400,7 @@ def add_invoice(request, gid, uname):
 @lib.decorators.only_admins
 @permission_required('abonapp.can_buy_tariff')
 @transaction.atomic
-def pick_tariff(request, gid, uname):
+def pick_tariff(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
     abon = get_object_or_404(models.Abon, username=uname)
     tariffs = Tariff.objects.get_tariffs_by_group(grp.pk)
@@ -446,7 +446,7 @@ def pick_tariff(request, gid, uname):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abonapp.delete_abontariff')
-def unsubscribe_service(request, gid, uname, abon_tariff_id):
+def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     try:
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
         abon_tariff.delete()
@@ -565,7 +565,7 @@ def chgroup_tariff(request, gid):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
-def dev(request, gid, uname):
+def dev(request, gid: int, uname):
     abon_dev = None
     try:
         abon = models.Abon.objects.get(username=uname)
@@ -592,7 +592,7 @@ def dev(request, gid, uname):
 @lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def clear_dev(request, gid, uname):
+def clear_dev(request, gid: int, uname):
     try:
         abon = models.Abon.objects.get(username=uname)
         abon.device = None
@@ -609,7 +609,7 @@ def clear_dev(request, gid, uname):
 @login_required
 @lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def charts(request, gid, uname):
+def charts(request, gid: int, uname):
     high = 100
 
     wandate = request.GET.get('wantdate')
@@ -661,7 +661,7 @@ def charts(request, gid, uname):
 @lib.decorators.only_admins
 @permission_required('abonapp.can_ping')
 @json_view
-def abon_ping(request, gid, uname):
+def abon_ping(request, gid: int, uname):
     ip = request.GET.get('cmd_param')
     status = False
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
@@ -798,7 +798,7 @@ class DialsListView(OrderedFilteredList):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abonapp.change_abon')
-def save_user_dev_port(request, gid, uname):
+def save_user_dev_port(request, gid: int, uname):
     if request.method != 'POST':
         messages.error(request, _('Method is not POST'))
         return redirect('abonapp:abon_home', gid, uname)
@@ -891,7 +891,7 @@ def street_edit(request, gid):
 @lib.decorators.only_admins
 @permission_required('abonapp.delete_abonstreet')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def street_del(request, gid, sid):
+def street_del(request, gid: int, sid: int):
     try:
         models.AbonStreet.objects.get(pk=sid, group=gid).delete()
         messages.success(request, _('The street successfully deleted'))
@@ -914,7 +914,7 @@ def active_nets(request, gid):
 @lib.decorators.only_admins
 @permission_required('abonapp.can_view_additionaltelephones')
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def tels(request, gid, uname):
+def tels(request, gid: int, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     telephones = abon.additional_telephones.all()
     return render(request, 'abonapp/modal_additional_telephones.html', {
@@ -927,7 +927,7 @@ def tels(request, gid, uname):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abnapp.add_additionaltelephone')
-def tel_add(request, gid, uname):
+def tel_add(request, gid: int, uname):
     if request.method == 'POST':
         frm = forms.AdditionalTelephoneForm(request.POST)
         if frm.is_valid():
@@ -951,7 +951,7 @@ def tel_add(request, gid, uname):
 @login_required
 @lib.decorators.only_admins
 @permission_required('abnapp.delete_additionaltelephone')
-def tel_del(request, gid, uname):
+def tel_del(request, gid: int, uname):
     try:
         tid = lib.safe_int(request.GET.get('tid'))
         tel = models.AdditionalTelephone.objects.get(pk=tid)
@@ -1042,7 +1042,7 @@ def fin_report(request):
 @login_required
 @lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
-def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
+def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
     if periodic_pay_id == 0:
         if not request.user.has_perm('abonapp.add_periodicpayforid'):
             raise PermissionDenied
@@ -1075,7 +1075,7 @@ def add_edit_periodic_pay(request, gid, uname, periodic_pay_id=0):
 @lib.decorators.only_admins
 @permission_required('group_app.can_view_group', (Group, 'pk', 'gid'))
 @permission_required('abonapp.delete_periodicpayforid')
-def del_periodic_pay(request, gid, uname, periodic_pay_id):
+def del_periodic_pay(request, gid: int, uname, periodic_pay_id):
     periodic_pay_instance = get_object_or_404(models.PeriodicPayForId, pk=periodic_pay_id)
     if periodic_pay_instance.account.username != uname:
         uname = periodic_pay_instance.account.username
@@ -1118,7 +1118,7 @@ class EditSibscriberMarkers(UpdateView):
 
 @login_required
 @lib.decorators.only_admins
-def user_session_toggle(request, gid, uname, lease_id, action=None):
+def user_session_toggle(request, gid: int, uname, lease_id: int, action=None):
     abon = get_object_or_404(models.Abon, username=uname)
     if abon.nas is None:
         messages.error(request, _('NAS required'))
@@ -1149,7 +1149,7 @@ def user_session_toggle(request, gid, uname, lease_id, action=None):
 @login_required
 @lib.decorators.only_admins
 @permission_required('change_abon')
-def lease_add(request, gid, uname):
+def lease_add(request, gid: int, uname):
     group = get_object_or_404(Group, pk=gid)
     if request.method == 'POST':
         frm = LeaseForm(request.POST)
