@@ -47,9 +47,15 @@ def edit_tarif(request, tarif_id=0):
     if request.method == 'POST':
         frm = forms.TariffForm(request.POST, instance=tarif)
         if frm.is_valid():
-            new_service = frm.save()
+            service = frm.save()
+            if tarif is None:
+                request.user.log(request.META, 'csrv', '"%(title)s", "%(descr)s", %(amount).2f' % {
+                    'title': service.title or '-',
+                    'descr': service.descr or '-',
+                    'amount': service.amount or 0.0
+                })
             messages.success(request, _('Service has been saved'))
-            return redirect('tarifs:edit', tarif_id=new_service.pk)
+            return redirect('tarifs:edit', tarif_id=service.pk)
         else:
             messages.warning(request, _('Some fields were filled incorrect, please try again'))
     else:
@@ -70,6 +76,11 @@ class TariffDeleteView(DeleteView):
 
     def delete(self, request, *args, **kwargs):
         res = super().delete(request, *args, **kwargs)
+        request.user.log(request.META, 'dsrv', '"%(title)s", "%(descr)s", %(amount).2f' % {
+            'title': self.object.title or '-',
+            'descr': self.object.descr or '-',
+            'amount': self.object.amount or 0.0
+        })
         messages.success(request, _('Service has been deleted'))
         return res
 

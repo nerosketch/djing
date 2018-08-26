@@ -25,7 +25,7 @@
         </div>
         <div class="list-group scroll-area">
 
-        {% with can_view_profile=perms.accounts_app.can_view_userprofile %}
+        {% with can_view_profile=perms.accounts_app.view_userprofile %}
             {% for msg in msg_list %}
                 {% with author=msg.author %}
                 <div class="list-group-item">

@@ -14,7 +14,7 @@ from django.conf import settings
 
 from group_app.models import Group
 
-from .models import UserProfile
+from .models import UserProfile, UserProfileLog
 from .forms import AvatarChangeForm
 from djing import lib
 from djing.lib.decorators import only_admins
@@ -67,7 +67,7 @@ def profile_show(request, uid=0):
         return redirect('acc_app:other_profile', uid=request.user.id)
 
     usr = get_object_or_404(UserProfile, id=uid)
-    if request.user != usr and not request.user.has_perm('accounts_app.can_view_userprofile', usr):
+    if request.user != usr and not request.user.has_perm('accounts_app.view_userprofile', usr):
         raise PermissionDenied
     if request.method == 'POST':
         usr.username = request.POST.get('username')
@@ -168,7 +168,7 @@ def create_profile(request):
 
 @login_required
 @only_admins
-def delete_profile(request, uid):
+def delete_profile(request, uid: int):
     prf = get_object_or_404(UserProfile, id=uid)
     if uid != request.user.id:
         if not request.user.has_perm('acc_app.delete_userprofile', prf):
@@ -187,12 +187,12 @@ class AccountsListView(ListView):
 
     def get_queryset(self):
         users = UserProfile.objects.filter(is_admin=True).exclude(pk=self.request.user.pk)
-        users = get_objects_for_user(self.request.user, 'accounts_app.can_view_userprofile', users)
+        users = get_objects_for_user(self.request.user, 'accounts_app.view_userprofile', users)
         return users
 
 
 @login_required
-def perms(request, uid):
+def perms(request, uid: int):
     if not request.user.is_superuser:
         raise PermissionDenied
     userprofile = get_object_or_404(UserProfile, id=uid)
@@ -239,7 +239,7 @@ class PermissionClassListView(ListView):
 
 @login_required
 @only_admins
-def perms_edit(request, uid, klass_name, obj_id):
+def perms_edit(request, uid: int, klass_name, obj_id):
     if not request.user.is_superuser:
         raise PermissionDenied
     from django.apps import apps
@@ -265,7 +265,7 @@ def perms_edit(request, uid, klass_name, obj_id):
 
 @login_required
 @only_admins
-def set_abon_groups_permission(request, uid):
+def set_abon_groups_permission(request, uid: int):
     # Only superuser can change object permissions
     if not request.user.is_superuser:
         raise PermissionDenied
@@ -321,3 +321,21 @@ class ManageResponsibilityGroups(ListView):
         profile.responsibility_groups.add(*checked_groups)
         messages.success(request, _('Responsibilities has been updated'))
         return HttpResponseRedirect(self.get_success_url())
+
+
+@method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('accounts_app.view_userprofilelog'), name='dispatch')
+class ActionListView(ListView):
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
+    template_name = 'accounts/action_log.html'
+    model = UserProfileLog
+
+    def get_queryset(self):
+        uid = self.kwargs.get('uid')
+        return UserProfileLog.objects.filter(account__id=uid)
+
+    def get_context_data(self, **kwargs):
+        context = super(ActionListView, self).get_context_data(**kwargs)
+        context['uid'] = self.kwargs.get('uid')
+        context['userprofile'] = UserProfile.objects.get(pk=context['uid'])
+        return context

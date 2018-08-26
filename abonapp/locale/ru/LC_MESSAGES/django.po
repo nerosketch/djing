@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-25 14:55+0300\n"
+"POT-Creation-Date: 2018-08-26 19:21+0300\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -211,11 +211,12 @@ msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
 
 #: models.py:228
+#, python-format
 msgid "Account \"%(username)s\" not have any active leases"
-msgstr "Учётная запись %(username)s не имеет ни одной активной сессии"
+msgstr "Учётная запись \"%(username)s\" не имеет ни одной активной сессии"
 
-#: models.py:238 models.py:255 models.py:272 views.py:676 views.py:1124
-#: views.py:1167
+#: models.py:238 models.py:255 models.py:272 views.py:684 views.py:1132
+#: views.py:1175
 msgid "NAS required"
 msgstr "Необходимо выбрать NAS"
 
@@ -352,7 +353,9 @@ msgstr "Статус оплаты"
 
 #: templates/abonapp/addInvoice.html:57
 msgid "This credit will be visible in user page, be careful with your text."
-msgstr "Этот долг будет виден на странице абонента, будьте осторожны с высказываниями."
+msgstr ""
+"Этот долг будет виден на странице абонента, будьте осторожны с "
+"высказываниями."
 
 #: templates/abonapp/buy_tariff.html:10 templates/abonapp/buy_tariff.html:15
 #: templates/abonapp/buy_tariff.html:31 templates/abonapp/service.html:74
@@ -908,134 +911,134 @@ msgstr "Это не правильный IPv6 адрес"
 msgid "Address"
 msgstr "Адрес"
 
-#: views.py:132
+#: views.py:136
 msgid "create abon success msg"
 msgstr "Абонент успешно создан"
 
-#: views.py:143 views.py:317 views.py:436 views.py:532 views.py:857
-#: views.py:941 views.py:1014 views.py:1110
+#: views.py:147 views.py:325 views.py:444 views.py:540 views.py:865
+#: views.py:949 views.py:1022 views.py:1118
 msgid "fix form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#: views.py:167
+#: views.py:175
 msgid "delete abon success msg"
 msgstr "Абонент успешно удалён"
 
-#: views.py:172
+#: views.py:180
 #, python-format
 msgid "NAS says: '%s'"
 msgstr "NAS сказал: '%s'"
 
-#: views.py:193
+#: views.py:201
 msgid "fill account through admin side"
 msgstr "Пополнение счёта через админку"
 
-#: views.py:196
+#: views.py:204
 #, python-format
 msgid "Account filled successfully on %.2f"
 msgstr "Счёт пополнен на %.2f"
 
-#: views.py:199
+#: views.py:207
 msgid "I not know the account id"
 msgstr "Счёт успешно пополнен на %.2f"
 
-#: views.py:260
+#: views.py:268
 msgid "User group id is not matches with group in url"
 msgstr "Группа абонента не совпадает с группой указанной в url"
 
-#: views.py:313
+#: views.py:321
 msgid "edit abon success msg"
 msgstr "Абонент успешно изменён"
 
-#: views.py:324
+#: views.py:332
 msgid "User device was not found"
 msgstr "Пользовательское устройство не найдено"
 
-#: views.py:337
+#: views.py:345
 msgid "User has not have password, and cannot login"
 msgstr "Для абонента не задан пароль, он не сможет войти в учётку"
 
-#: views.py:384
+#: views.py:392
 msgid "Receipt has been created"
 msgstr "Квитанция на оплату была создана"
 
-#: views.py:411
+#: views.py:419
 #, python-format
 msgid "Service '%(service_name)s' has connected via admin"
 msgstr "Услуга '%(service_name)s' подключена администратором"
 
-#: views.py:421
+#: views.py:429
 msgid "Tariff has been picked"
 msgstr "Тариф успешно выбран"
 
-#: views.py:431
+#: views.py:439
 msgid "Tariff your picked does not exist"
 msgstr "Тариф, который вы выбрали, не существует"
 
-#: views.py:453
+#: views.py:461
 msgid "User has been detached from service"
 msgstr "Абонент отвязан от услуги"
 
-#: views.py:523
+#: views.py:531
 msgid "Passport information has been saved"
 msgstr "Информация о паспорте сохранена"
 
-#: views.py:554
+#: views.py:562
 msgid "Successfully saved"
 msgstr "Успешно сохранено"
 
-#: views.py:575
+#: views.py:583
 msgid "Device has successfully attached"
 msgstr "Устройство успешно прикреплено"
 
-#: views.py:580
+#: views.py:588
 msgid "Device your selected already does not exist"
 msgstr "Устройство, выбранное вами, уже не существует"
 
-#: views.py:582 views.py:604 views.py:642
+#: views.py:590 views.py:612 views.py:650
 msgid "Abon does not exist"
 msgstr "Абонент не найден"
 
-#: views.py:602
+#: views.py:610
 msgid "Device has successfully unattached"
 msgstr "Устройство успешно откреплено"
 
-#: views.py:645
+#: views.py:653
 msgid "Group what you want doesn't exist"
 msgstr "Указанная вами группа не найдена"
 
-#: views.py:667
+#: views.py:675
 msgid "no ping"
 msgstr "не пингуется"
 
-#: views.py:671
+#: views.py:679
 msgid "Ip not passed"
 msgstr "Ip адрес не передан"
 
-#: views.py:683 views.py:699
+#: views.py:691 views.py:707
 msgid "ping ok"
 msgstr "пингуется"
 
-#: views.py:690
+#: views.py:698
 #, python-format
 msgid "IP Conflict! %(all)d/%(return)d results"
 msgstr "IP Конфликт! ping %(all)d из %(return)d"
 
-#: views.py:693
+#: views.py:701
 #, python-format
 msgid "ok ping, %(all)d/%(return)d loses"
 msgstr "пингуется, %(all)d/%(return)d"
 
-#: views.py:697
+#: views.py:705
 #, python-format
 msgid "no ping, %(all)d/%(return)d loses"
 msgstr "не пингуется, %(all)d/%(return)d"
 
-#: views.py:803
+#: views.py:811
 msgid "Method is not POST"
 msgstr "Метод не POST"
 
-#: views.py:820
+#: views.py:828
 #, python-format
 msgid ""
 "<a href='%(user_url)s'>%(user_name)s</a> already pinned to this port on this "
@@ -1044,108 +1047,108 @@ msgstr ""
 "<a href='%(user_url)s'>%(user_name)s</a> уже привязан к этому порту на этом "
 "устройстве"
 
-#: views.py:828
+#: views.py:836
 msgid "Multiple users on the same device port"
 msgstr "Несколько абонентов на одном и том же порту устройства"
 
-#: views.py:837
+#: views.py:845
 msgid "User port has been saved"
 msgstr "Порт абонента успешно выбран"
 
-#: views.py:839
+#: views.py:847
 msgid "Selected port does not exist"
 msgstr "Выбранный порт не существует"
 
-#: views.py:841
+#: views.py:849
 msgid "User does not exist"
 msgstr "Абонент не найден"
 
-#: views.py:854
+#: views.py:862
 msgid "Street successfully saved"
 msgstr "Улица успешно сохранена"
 
-#: views.py:877
+#: views.py:885
 msgid "Streets has been saved"
 msgstr "Улицы сохранены"
 
-#: views.py:885
+#: views.py:893
 msgid "One of these streets has not been found"
 msgstr "Одна из этих улиц не была найдена"
 
-#: views.py:897
+#: views.py:905
 msgid "The street successfully deleted"
 msgstr "Улица успешно удалена"
 
-#: views.py:899
+#: views.py:907
 msgid "The street has not been found"
 msgstr "Улица не найдена"
 
-#: views.py:938
+#: views.py:946
 msgid "New telephone has been saved"
 msgstr "Новый телефон сохранен"
 
-#: views.py:959
+#: views.py:967
 msgid "Additional telephone successfully deleted"
 msgstr "Номер телефона успешно удалён"
 
-#: views.py:961
+#: views.py:969
 msgid "Telephone not found"
 msgstr "Телефон не найден"
 
-#: views.py:1011
+#: views.py:1019
 #, python-format
 msgid "Unexpected format %(export_format)s"
 msgstr "Нежиданный формат %(export_format)s"
 
-#: views.py:1061
+#: views.py:1069
 msgid "Periodic pays has been designated"
 msgstr "Периодический платёж назначен"
 
-#: views.py:1063
+#: views.py:1071
 msgid "Something wrong in form"
 msgstr "Что-то не так в форме"
 
-#: views.py:1083
+#: views.py:1091
 msgid "Periodic pay successfully deleted"
 msgstr "Периодический платёж успешно удалён"
 
-#: views.py:1115
+#: views.py:1123
 msgid "User flags has changed successfully"
 msgstr "Флаги абонента изменены успешно"
 
-#: views.py:1133
+#: views.py:1141
 msgid "Ip lease has been freed"
 msgstr "Аренда ip освобождена"
 
-#: views.py:1136
+#: views.py:1144
 msgid "You cannot disable last session"
 msgstr "Вы не можете отключить последний ip"
 
-#: views.py:1141
+#: views.py:1149
 msgid "Ip lease has been started"
 msgstr "Аренда ip включена"
 
-#: views.py:1143
+#: views.py:1151
 msgid "Unexpected action"
 msgstr "Непредвиденное действие"
 
-#: views.py:1174
+#: views.py:1182
 msgid "Ip lease has been created"
 msgstr "Аренда ip создана"
 
-#: views.py:1179
+#: views.py:1187
 msgid "Check form errors"
 msgstr "Некоторые поля заполнены не правильно, проверте ещё раз"
 
-#: views.py:1205
+#: views.py:1213
 msgid "Network access server for users in this group, has been updated"
 msgstr "Сервер доступа в интернет привязан к пользователям в этой группе"
 
-#: views.py:1208
+#: views.py:1216
 msgid "Users not found"
 msgstr "Пользователи не найдены"
 
-#: views.py:1210
+#: views.py:1218
 msgid "You must select gateway"
 msgstr "Вы должны выбрать шлюз"
 

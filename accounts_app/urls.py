@@ -37,5 +37,7 @@ urlpatterns = [
 
     path('<int:uid>/manage_responsibility_groups/',
         views.ManageResponsibilityGroups.as_view(),
-        name='manage_responsibility_groups')
+        name='manage_responsibility_groups'),
+
+    path('<int:uid>/actions/', views.ActionListView.as_view(), name='action_log')
 ]

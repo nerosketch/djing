@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-09 14:54+0300\n"
+"POT-Creation-Date: 2018-08-26 19:09+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,49 +18,105 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: models.py:19
+#: models.py:21
 msgid "Users must have an telephone number"
 msgstr "У пользователей должен быть номер телефона"
 
-#: models.py:47 templates/accounts/acc_list.html:21
+#: models.py:49 templates/accounts/acc_list.html:21
 msgid "profile username"
 msgstr "Логин"
 
-#: models.py:52
+#: models.py:54
 msgid "fio"
 msgstr "ФИО"
 
-#: models.py:53
+#: models.py:55
 msgid "birth day"
 msgstr "дата рождения"
 
-#: models.py:54
+#: models.py:56
 msgid "Is active"
 msgstr "Активен"
 
-#: models.py:58 templates/accounts/acc_list.html:23
+#: models.py:60 templates/accounts/acc_list.html:23
 #: templates/accounts/create_acc.html:62 templates/accounts/index.html:9
 #: templates/accounts/settings/ch_info.html:38
 msgid "Telephone"
 msgstr "Телефон"
 
+#: models.py:94
+msgid "Author"
+msgstr "Автор"
+
+#: models.py:95 templates/accounts/action_log.html:12
+msgid "Meta information"
+msgstr "Мета информация"
+
 #: models.py:97
+msgid "Create user"
+msgstr "Создание абонента"
+
+#: models.py:98
+msgid "Delete user"
+msgstr "Удаление абонента"
+
+#: models.py:99
+msgid "Create device"
+msgstr "Создание устройства"
+
+#: models.py:100
+msgid "Delete device"
+msgstr "Удаление устройства"
+
+#: models.py:101
+msgid "Create NAS"
+msgstr "Создание NAS"
+
+#: models.py:102
+msgid "Delete NAS"
+msgstr "Удаление NAS"
+
+#: models.py:103
+msgid "Create service"
+msgstr "Создание тарифа"
+
+#: models.py:104
+msgid "Delete service"
+msgstr "Удаление тарифа"
+
+#: models.py:106
+msgid "Action type"
+msgstr "Тип действия"
+
+#: models.py:107
+msgid "Additional info"
+msgstr "Дополнительная информация"
+
+#: models.py:108
+msgid "Action date"
+msgstr "Дата действия"
+
+#: models.py:115
+msgid "User profile log"
+msgstr "Лог действий учётной записи"
+
+#: models.py:116
+msgid "User profile logs"
+msgstr "Логи действий учётной записи"
+
+#: models.py:125
 msgid "Avatar"
 msgstr "Аватар"
 
-#: models.py:99
+#: models.py:127
 msgid "Responsibility groups"
 msgstr "Группы администратора"
 
-#: models.py:114
-msgid "Can view staff profile"
-msgstr "Может просматривать учётку сотрудника"
-
-#: models.py:116
+#: models.py:141
 msgid "Staff account profile"
 msgstr "Учётная запись работника"
 
-#: models.py:117
+#: models.py:142
 msgid "Staff account profiles"
 msgstr "Учётные записи работников"
 
@@ -104,6 +160,22 @@ msgstr "Пользователи не найдены"
 msgid "Add account"
 msgstr "Добавить учётную запись"
 
+#: templates/accounts/action_log.html:9
+msgid "Date"
+msgstr "Дата"
+
+#: templates/accounts/action_log.html:10
+msgid "Additional"
+msgstr "Дополнительное"
+
+#: templates/accounts/action_log.html:11
+msgid "Description"
+msgstr "Описание"
+
+#: templates/accounts/action_log.html:24
+msgid "That admin has no logs"
+msgstr "Эта учётная запись не имеет логов"
+
 #: templates/accounts/create_acc.html:9
 msgid "Add"
 msgstr "Добавить"
@@ -145,7 +217,7 @@ msgstr "Повторите пароль"
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/accounts/create_acc.html:92 templates/accounts/login.html:59
+#: templates/accounts/create_acc.html:92
 #: templates/accounts/manage_responsibility_groups.html:21
 #: templates/accounts/perms/perms_edit.html:68
 #: templates/accounts/set_abon_groups_permission.html:21
@@ -153,8 +225,7 @@ msgstr "Сохранить"
 msgid "Reset"
 msgstr "Сбросить"
 
-#: templates/accounts/index.html:13 templates/accounts/login.html:39
-#: templates/accounts/settings/ch_info.html:9
+#: templates/accounts/index.html:13 templates/accounts/settings/ch_info.html:9
 #: templates/accounts/settings/ch_info.html:13
 msgid "User name"
 msgstr "Логин"
@@ -179,13 +250,13 @@ msgstr "Административный доступ (все права)"
 msgid "Auth"
 msgstr "Аутентификация"
 
-#: templates/accounts/login.html:27 templates/accounts/login.html:56
+#: templates/accounts/login.html:27 templates/accounts/login.html:43
 msgid "Login"
 msgstr "Войти"
 
-#: templates/accounts/login.html:47
-msgid "Password"
-msgstr "Пароль"
+#: templates/accounts/login.html:48
+msgid "Login by location"
+msgstr "Войти по местоположению"
 
 #: templates/accounts/manage_responsibility_groups.html:5
 msgid "The responsibility of the administrator of the group of subscribers"
@@ -235,49 +306,52 @@ msgstr "Старый пароль"
 msgid "New password"
 msgstr "Новый пароль"
 
-#: views.py:47
+#: views.py:32
 msgid "Wrong login or password, please try again"
 msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
-#: views.py:123
+#: views.py:120
 msgid "New password is empty, fill it"
 msgstr "Новый пароль пустой, придумайте себе пароль"
 
-#: views.py:125
+#: views.py:122
 msgid "Wrong password"
 msgstr "Неправильный пароль"
 
-#: views.py:127
+#: views.py:124
 msgid "Empty password, fill it"
 msgstr "Пустой пароль, впишите что-то в пароль"
 
-#: views.py:150
+#: views.py:148
 msgid "You forget specify a password for the new account"
 msgstr "Забыли указать пароль для нового аккаунта"
 
-#: views.py:153
+#: views.py:151
 msgid "You forget to repeat a password for the new account"
 msgstr "Забыли повторить пароль для нового аккаунта"
 
-#: views.py:162
+#: views.py:160
 msgid "Subscriber with this name already exist"
 msgstr "Пользователь с таким именем уже есть"
 
-#: views.py:164
+#: views.py:162
 msgid "Passwords does not match, try again"
 msgstr "Пароли не совпадают, попробуйте ещё раз"
 
-#: views.py:179
+#: views.py:177
 msgid "Profile has been deleted"
 msgstr "Учётная запись удалена"
 
-#: views.py:252
+#: views.py:255
 msgid "Permissions has successfully updated"
 msgstr "Права успешно обновлены"
 
-#: views.py:318
+#: views.py:322
 msgid "Responsibilities has been updated"
 msgstr "Ответственность за группы обновлена"
+
+msgid "Password"
+msgstr "Пароль"
 
 msgid "Change self onfo"
 msgstr "Изменить инфу о себе"
@@ -297,5 +371,5 @@ msgstr "Ответственность за группы"
 msgid "Profile"
 msgstr "Учётная запись"
 
-msgid "Login by location"
-msgstr "Войти по местоположению"
+msgid "Action log"
+msgstr "Лог действий"

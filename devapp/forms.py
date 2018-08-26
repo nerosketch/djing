@@ -22,7 +22,8 @@ class DeviceForm(forms.ModelForm):
         else:
             comment = None
         super(DeviceForm, self).__init__(*args, **kwargs)
-        self.fields['comment'].widget.attrs['placeholder'] = comment
+        if comment:
+            self.fields['comment'].widget.attrs['placeholder'] = comment
 
     mac_addr = forms.CharField(widget=forms.TextInput(attrs={
         'pattern': MAC_ADDR_REGEX,

@@ -34,6 +34,11 @@ class NasCreateView(CreateView):
         r = super(NasCreateView, self).form_valid(form)
         assign_perm("nas_app.change_nasmodel", self.request.user, self.object)
         assign_perm("nas_app.can_view_nas", self.request.user, self.object)
+        self.request.user.log(self.request.META, 'cnas', '"%(title)s", %(ip)s, %(type)s' % {
+            'title': self.object.title,
+            'ip': self.object.ip_address,
+            'type': self.object.get_nas_type_display()
+        })
         messages.success(self.request, _('New NAS has been created'))
         return r
 
@@ -48,6 +53,11 @@ class NasDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         try:
             r = super(NasDeleteView, self).delete(request, *args, **kwargs)
+            request.user.log(request.META, 'dnas', '"%(title)s", %(ip)s, %(type)s' % {
+                'title': self.object.title,
+                'ip': self.object.ip_address,
+                'type': self.object.get_nas_type_display()
+            })
             messages.success(request, _('Server successfully removed'))
             return r
         except MessageFailure as e:

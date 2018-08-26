@@ -79,8 +79,13 @@ class DeviceDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         res = super().delete(request, *args, **kwargs)
         try:
+            request.user.log(request.META, 'ddev', 'ip %s, mac: %s, "%s"' % (
+                self.object.ip_address or '-',
+                self.object.mac_addr or '-',
+                self.object.comment or '-'
+            ))
             self.object.update_dhcp()
-        except DeviceDBException as e:
+        except (DeviceDBException, PermissionError) as e:
             messages.error(request, e)
         messages.success(request, _('Device successfully deleted'))
         return res
@@ -183,6 +188,11 @@ class DeviceCreateView(CreateView):
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
+            self.request.user.log(self.request.META, 'cdev', 'ip %s, mac: %s, "%s"' % (
+                self.object.ip_address,
+                self.object.mac_addr,
+                self.object.comment
+            ))
             self.object.update_dhcp()
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:

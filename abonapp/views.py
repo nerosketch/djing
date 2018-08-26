@@ -129,6 +129,10 @@ class AbonCreateView(CreateView):
             assign_perm("abonapp.can_buy_tariff", me, abon)
             assign_perm("abonapp.can_view_passport", me, abon)
             assign_perm('abonapp.can_add_ballance', me, abon)
+            me.log(self.request.META, 'cusr', '%s, "%s", %s' % (
+                abon.username, abon.fio,
+                abon.group.title if abon.group else ''
+            ))
             messages.success(self.request, _('create abon success msg'))
             self.abon = abon
             return super(AbonCreateView, self).form_valid(form)
@@ -164,6 +168,13 @@ class DelAbonDeleteView(DeleteView):
             abon = self.get_object()
             gid = abon.group.id
             abon.delete()
+            request.user.log(request.META, 'dusr', ('%(uname)s, "%(fio)s", %(group)s %(street)s %(house)s' % {
+                'uname': abon.username,
+                'fio': abon.fio or '-',
+                'group': abon.group.title if abon.group else '',
+                'street': abon.street.name if abon.street else '',
+                'house': abon.house or ''
+            }).strip())
             messages.success(request, _('delete abon success msg'))
             return redirect('abonapp:people_list', gid=gid)
         except NasNetworkError as e:

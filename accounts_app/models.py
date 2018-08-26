@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 import os
 from PIL import Image
+
+from jsonfield import JSONField
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
@@ -85,7 +87,33 @@ class BaseAccount(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'base_accounts'
-        ordering = ('username',)
+        ordering = 'username',
+
+
+class UserProfileLog(models.Model):
+    account = models.ForeignKey('UserProfile', on_delete=models.CASCADE, verbose_name=_('Author'))
+    meta_info = JSONField(verbose_name=_('Meta information'))
+    ACTION_TYPES = (
+        ('cusr', _('Create user')),
+        ('dusr', _('Delete user')),
+        ('cdev', _('Create device')),
+        ('ddev', _('Delete device')),
+        ('cnas', _('Create NAS')),
+        ('dnas', _('Delete NAS')),
+        ('csrv', _('Create service')),
+        ('dsrv', _('Delete service'))
+    )
+    do_type = models.CharField(_('Action type'), max_length=4, choices=ACTION_TYPES)
+    additional_text = models.CharField(_('Additional info'), blank=True, null=True, max_length=512)
+    action_date = models.DateTimeField(_('Action date'), auto_now_add=True)
+
+    def __str__(self):
+        return self.get_do_type_display()
+
+    class Meta:
+        ordering = '-action_date',
+        verbose_name = _('User profile log')
+        verbose_name_plural = _('User profile logs')
 
 
 class UserProfileManager(MyUserManager):
@@ -110,12 +138,9 @@ class UserProfile(BaseAccount):
         return self.get_big_ava()
 
     class Meta:
-        permissions = (
-            ('can_view_userprofile', _('Can view staff profile')),
-        )
         verbose_name = _('Staff account profile')
         verbose_name_plural = _('Staff account profiles')
-        ordering = ('fio',)
+        ordering = 'fio',
 
     def _thumbnail_avatar(self):
         if self.avatar and os.path.isfile(self.avatar.path):
@@ -127,3 +152,24 @@ class UserProfile(BaseAccount):
         r = super().save(*args, **kwargs)
         self._thumbnail_avatar()
         return r
+
+    def log(self, request_meta: dict, do_type: str, additional_text=None) -> None:
+        """
+        Make log about administrator actions.
+        :param request_meta: META from django request.
+        :param do_type: Choice from UserProfileLog.ACTION_TYPES
+        :param additional_text: Additional information for action
+        :return: None
+        """
+        inf = {
+            'src_ip': request_meta.get('REMOTE_ADDR'),
+            'username': request_meta.get('USER'),
+            'hostname': request_meta.get('HOSTNAME'),
+            'useragent': request_meta.get('HTTP_USER_AGENT')
+        }
+        UserProfileLog.objects.create(
+            account=self,
+            meta_info=inf,
+            do_type=do_type,
+            additional_text=additional_text
+        )
