@@ -2,7 +2,7 @@ from ipaddress import ip_address
 from typing import Dict, Optional
 from datetime import datetime, date
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError, ProgrammingError, transaction
+from django.db import IntegrityError, ProgrammingError, transaction, OperationalError
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
@@ -637,7 +637,7 @@ def charts(request, gid: int, uname):
             abon.save(update_fields=('group',))
 
         charts_data = StatElem.objects.chart(
-            abon.username,
+            abon,
             count_of_parts=30,
             want_date=wandate
         )
@@ -655,9 +655,9 @@ def charts(request, gid: int, uname):
     except Group.DoesNotExist:
         messages.error(request, _("Group what you want doesn't exist"))
         return redirect('abonapp:group_list')
-    except ProgrammingError as e:
+    except (ProgrammingError, OperationalError) as e:
         messages.error(request, e)
-        return redirect('abonapp:abon_home', gid=gid, uname=uname)
+        return redirect('abonapp:charts', gid=gid, uname=uname)
 
     return render(request, 'abonapp/charts.html', {
         'group': abon.group,
