@@ -56,7 +56,7 @@ if __name__ == '__main__':
     db.close()
 
     os.system(
-        'bash -c "export LD_LIBRARY_PATH=. && '
+        '/bin/bash -c "export LD_LIBRARY_PATH=. && '
         '%(CUR_DIR)s/djing_flow %(TMP_IPUSER_FILE)s < %(TMP_DUMP)s | '
         '/usr/bin/mysql -u%(DB_USER)s -h %(HOST)s -p %(DB_NAME)s --password=%(DB_PASSW)s"' % {
             'CUR_DIR': cur_dir,
