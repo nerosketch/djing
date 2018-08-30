@@ -517,7 +517,7 @@ class TaskLogListView(ListView):
 class PassportUpdateView(UpdateView):
     form_class = forms.PassportForm
     model = models.PassportInfo
-    template_name = 'abonapp/passport_view.html'
+    template_name = 'abonapp/modal_passport_view.html'
 
     def get_object(self, queryset=None):
         self.abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
@@ -535,7 +535,7 @@ class PassportUpdateView(UpdateView):
         return super(PassportUpdateView, self).form_valid(form)
 
     def get_success_url(self):
-        return resolve_url('abonapp:passport_view',
+        return resolve_url('abonapp:abon_home',
                            gid=self.kwargs.get('gid'),
                            uname=self.kwargs.get('uname'))
 

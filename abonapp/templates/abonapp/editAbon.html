@@ -97,6 +97,16 @@
                                         <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
                                     </a>
                                 {% endif %}
+
+                                {% if perms.abonapp.can_view_passport %}
+                                    <a href="{% url 'abonapp:passport_view' group.pk abon.username %}" class="btn btn-default btn-modal">
+                                        <span class="glyphicon glyphicon-paperclip"></span> {% trans 'Passport information' %}
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-default" disabled title="{% trans 'Permission denied' %}">
+                                        <span class="glyphicon glyphicon-paperclip"></span> {% trans 'Passport information' %}
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
 

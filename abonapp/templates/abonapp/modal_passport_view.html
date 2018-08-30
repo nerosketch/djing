@@ -1,0 +1,15 @@
+{% load i18n %}
+{% load bootstrap3 %}
+<form role="form" action="{% url 'abonapp:passport_view' group.pk abon.username %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-edit"></span>{% trans 'Passport information' %}</h4>
+    </div>
+    <div class="modal-body">
+
+        {% bootstrap_form form %}
+
+        {% trans 'Save' as tx %}
+        {% bootstrap_button tx button_type='submit' button_class='btn-primary' icon='floppy-disk' %}
+    </div>
+</form>

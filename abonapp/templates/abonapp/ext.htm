@@ -29,13 +29,6 @@
             <a href="{{ abserv }}">{% trans 'Services' %}</a>
         </li>
 
-        {% if perms.abonapp.can_view_passport %}
-            {% url 'abonapp:passport_view' group.pk abon.username as passport_view_url %}
-            <li{% if passport_view_url == request.path %} class="active"{% endif %}>
-                <a href="{{ passport_view_url }}">{% trans 'Passport information' %}</a>
-            </li>
-        {% endif %}
-
         {% url 'abonapp:abon_phistory' group.pk abon.username as abphist %}
         <li{% if abphist == request.path %} class="active"{% endif %}>
             <a href="{{ abphist }}">{% trans 'Payments' %}</a>
