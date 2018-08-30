@@ -433,7 +433,7 @@ def devview(request, group_id: int, device_id: int):
         messages.warning(request, _('Please attach group for device'))
         return redirect('devapp:fix_device_group', device.pk)
 
-    template_name = 'ports.html'
+    template_name = 'generic_switch.html'
     try:
         if device.ip_address:
             if not ping(device.ip_address):
