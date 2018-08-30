@@ -77,25 +77,64 @@
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'Device log' %}</h3>
+                    <h3 class="panel-title">{% trans 'Ports management' %}</h3>
                 </div>
-                <div class="panel-body">
-                    <table class="table table-responsive">
-                        <thead>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th class="col-sm-1">{% trans 'Number' %}</th>
+                        <th class="col-sm-5">{% trans 'Description' %}</th>
+                        <th class="col-sm-5">{% trans 'Count of subscribers' %}</th>
+                        <th class="col-sm-1">#</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% with gid=dev.group.pk did=dev.pk can_del_port=perms.devapp.delete_port can_edit_port=perms.devapp.change_port %}
+                    {% for port in ports_db %}
                         <tr>
-                            <td>ID</td>
-                            <td>{% trans 'Level' %}</td>
-                            <td>{% trans 'Description' %}</td>
-                            <td>{% trans 'Date' %}</td>
+                            <td>{{ port.num }}</td>
+                            <td>{{ port.descr|default:'-' }}</td>
+                            {% if port.num_abons > 1 %}
+                                {% url 'devapp:fix_port_conflict' gid did port.id as fixurl %}
+                                <td class="text-danger"><b>{{ port.num_abons }}</b>. {% blocktrans with furl=fixurl %}Port should not have more than one subscriber, <a href='{{ furl }}'>fix that</a>{% endblocktrans %}</td>
+                            {% else %}
+                                <td>{{ port.num_abons }}</td>
+                            {% endif %}
+                            <td class="btn-group btn-group-sm btn-group-justified">
+                                <a href="{% url 'devapp:show_subscriber_on_port' gid did port.id %}" class="btn btn-default btn-modal" title="{% trans 'Show subscriber on port' %}" data-toggle="tooltip">
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </a>
+                                {% if can_del_port %}
+                                    <a href="{% url 'devapp:del_port' gid did port.pk %}" class="btn btn-danger btn-modal" title="{% trans 'Delete' %}">
+                                        <span class="glyphicon glyphicon-remove-circle"></span>
+                                    </a>
+                                {% endif %}
+                                {% if can_edit_port %}
+                                    <a href="{% url 'devapp:edit_port' gid did port.pk %}" class="btn btn-primary btn-modal" title="{% trans 'Edit' %}">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </a>
+                                {% endif %}
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
+                    {% empty %}
                         <tr>
-                            <td colspan="4">Coming soon..</td>
+                            <td colspan="4">{% trans 'Ports not found' %}</td>
                         </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    {% endfor %}
+                    {% endwith %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="4" class="btn-group">
+                            {% if perms.devapp.add_port %}
+                                <a href="{% url 'devapp:add_ports' dev.group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
+                                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
         <div class="col-sm-6">
@@ -103,28 +142,26 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Ports comment' %}</h3>
                 </div>
-                <div class="panel-body">
-                    <table class="table table-responsive">
-                        <thead>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                        <th width="50">{% trans 'Port' %}</th>
+                        <th>{% trans 'Title' %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for port in ports %}
                         <tr>
-                            <th width="50">{% trans 'Port' %}</th>
-                            <th>{% trans 'Title' %}</th>
+                            <td>{{ port.num }}</td>
+                            <td>{{ port.nm|default:'-' }}</td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {% for port in ports %}
-                            <tr>
-                                <td>{{ port.num }}</td>
-                                <td>{{ port.nm|default:'-' }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                            <td colspan="2">{% trans 'We have not received info for ports' %}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                    {% empty %}
+                        <tr>
+                        <td colspan="2">{% trans 'We have not received info for ports' %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

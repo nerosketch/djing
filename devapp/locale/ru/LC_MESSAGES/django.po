@@ -378,8 +378,8 @@ msgid "Enable port"
 msgstr "Включить порт"
 
 #: templates/devapp/custom_dev_page/ports.html:80
-msgid "Device log"
-msgstr "Лог устройства"
+msgid "Ports management"
+msgstr "Управление портами"
 
 #: templates/devapp/custom_dev_page/ports.html:87
 msgid "Level"

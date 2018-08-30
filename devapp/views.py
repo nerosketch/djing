@@ -247,29 +247,6 @@ class DeviceUpdateExtra(UpdateView):
         return r
 
 
-@login_required
-@only_admins
-@permission_required('devapp.change_device')
-def manage_ports(request, group_id: int, device_id: int):
-    device = ports = None
-    try:
-        device = Device.objects.get(pk=device_id)
-        if device.group is None:
-            messages.error(request, _('Device does not have a group, please fix that'))
-            return redirect('devapp:fix_device_group', device.pk)
-        ports = Port.objects.filter(device=device).annotate(num_abons=Count('abon'))
-
-    except Device.DoesNotExist:
-        messages.error(request, _('Device does not exist'))
-        return redirect('devapp:group_list')
-    except DeviceDBException as e:
-        messages.error(request, e)
-    return render(request, 'devapp/manage_ports/list.html', {
-        'ports': ports,
-        'dev': device
-    })
-
-
 @method_decorator(login_decs, name='dispatch')
 class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView):
     template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
@@ -366,29 +343,29 @@ def add_ports(request, group_id: int, device_id: int):
 @login_required
 @only_admins
 @permission_required('devapp.delete_port')
-def delete_single_port(request, group_id, device_id, portid):
+def delete_single_port(request, group_id, device_id, port_id):
     try:
         if request.method == 'POST':
             if request.POST.get('confirm') == 'yes':
-                Port.objects.get(pk=portid).delete()
+                Port.objects.get(pk=port_id).delete()
                 messages.success(request, _('Port successfully removed'))
         else:
             return render(request, 'devapp/manage_ports/modal_del_port.html', {
                 'grp': group_id,
                 'did': device_id,
-                'port_id': portid
+                'port_id': port_id
             })
     except Port.DoesNotExist:
         messages.error(request, _('Port does not exist'))
     except DeviceDBException as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', group_id, device_id)
+    return redirect('devapp:view', group_id, device_id)
 
 
 @login_required
 @only_admins
 @permission_required('devapp.add_port')
-def edit_single_port(request, group_id, device_id, port_id):
+def edit_single_port(request, group_id: int, device_id: int, port_id: int):
     try:
         port = Port.objects.get(pk=port_id)
         if request.method == 'POST':
@@ -398,7 +375,7 @@ def edit_single_port(request, group_id, device_id, port_id):
                 messages.success(request, _('Port successfully saved'))
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
-            return redirect('devapp:manage_ports', group_id, device_id)
+            return redirect('devapp:view', group_id, device_id)
 
         frm = PortForm(instance=port)
         return render(request, 'devapp/manage_ports/modal_add_edit_port.html', {
@@ -411,7 +388,7 @@ def edit_single_port(request, group_id, device_id, port_id):
         messages.error(request, _('Port does not exist'))
     except (DeviceDBException, DuplicateEntry) as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', group_id, device_id)
+    return redirect('devapp:view', group_id, device_id)
 
 
 @login_required
@@ -425,7 +402,7 @@ def add_single_port(request, group_id, device_id):
             if frm.is_valid():
                 frm.save()
                 messages.success(request, _('Port successfully saved'))
-                return redirect('devapp:manage_ports', group_id, device_id)
+                return redirect('devapp:view', group_id, device_id)
             else:
                 messages.error(request, _('Form is invalid, check fields and try again'))
         else:
@@ -442,7 +419,7 @@ def add_single_port(request, group_id, device_id):
         messages.error(request, _('Device does not exist'))
     except (DeviceDBException, DuplicateEntry) as e:
         messages.error(request, e)
-    return redirect('devapp:manage_ports', group_id, device_id)
+    return redirect('devapp:view', group_id, device_id)
 
 
 @login_required
@@ -474,7 +451,8 @@ def devview(request, group_id: int, device_id: int):
             'dev': device,
             'ports': ports,
             'dev_accs': Abon.objects.filter(device=device),
-            'dev_manager': manager
+            'dev_manager': manager,
+            'ports_db': Port.objects.filter(device=device).annotate(num_abons=Count('abon')),
         })
     except EasySNMPError as e:
         messages.error(request, "%s: %s" % (gettext('SNMP error on device'), e))
@@ -502,8 +480,7 @@ def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
 @login_required
 @only_admins
 @permission_required('devapp.can_toggle_ports')
-def toggle_port(request, device_id: int, portid: int, status=0):
-    portid = int(portid)
+def toggle_port(request, device_id: int, port_id: int, status=0):
     status = int(status)
     device = get_object_or_404(Device, id=int(device_id))
     try:
@@ -512,9 +489,9 @@ def toggle_port(request, device_id: int, portid: int, status=0):
                 manager = device.get_manager_object()
                 ports = tuple(manager.get_ports())
                 if status:
-                    ports[portid - 1].enable()
+                    ports[port_id - 1].enable()
                 else:
-                    ports[portid - 1].disable()
+                    ports[port_id - 1].disable()
             else:
                 messages.warning(request, _('Not Set snmp device password'))
         else:

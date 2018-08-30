@@ -37,11 +37,6 @@
             <li{% if devapp_edit == request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_edit }}">{% trans 'Edit' %}</a>
             </li>
-
-            {% url 'devapp:manage_ports' dev.group.pk|default:0 dev.pk as devapp_mports %}
-            <li{% if devapp_mports == request.path %} class="active"{% endif %}>
-                <a href="{{ devapp_mports }}">{% trans 'Ports' %}</a>
-            </li>
         {% endif %}
     </ul>
 

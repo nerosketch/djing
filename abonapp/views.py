@@ -837,7 +837,7 @@ def save_user_dev_port(request, gid: int, uname):
                     pass
                 except models.Abon.MultipleObjectsReturned:
                     messages.error(request, _('Multiple users on the same device port'))
-                    return redirect('devapp:manage_ports', abon.device.group.pk, abon.device.pk)
+                    return redirect('devapp:view', abon.device.group.pk, abon.device.pk)
 
         abon.dev_port = port
         if abon.is_dynamic_ip != is_dynamic_ip:

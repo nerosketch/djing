@@ -102,7 +102,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         return tm
 
     def get_template_name(self):
-        return 'ports.html'
+        return 'generic_switch.html'
 
     @staticmethod
     def validate_extra_snmp_info(v: str) -> None:
