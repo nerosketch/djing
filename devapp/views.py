@@ -480,8 +480,9 @@ def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
 @login_required
 @only_admins
 @permission_required('devapp.can_toggle_ports')
-def toggle_port(request, device_id: int, port_id: int, status=0):
+def toggle_port(request, device_id: str, port_id: str, status=0):
     status = int(status)
+    port_id = int(port_id)
     device = get_object_or_404(Device, id=int(device_id))
     try:
         if ping(device.ip_address):
