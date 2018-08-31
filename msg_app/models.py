@@ -67,9 +67,6 @@ class Message(models.Model):
         ordering = ('-sent_at',)
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
-        permissions = (
-            ('can_view_messages', _('Can view messages')),
-        )
 
 
 class ConversationMembership(models.Model):
@@ -242,7 +239,4 @@ class Conversation(models.Model):
         db_table = 'conversations'
         verbose_name = _("Conversation")
         verbose_name_plural = _("Conversations")
-        permissions = (
-            ('can_view_conversation', _('Can view conversation')),
-        )
         ordering = ('title',)

@@ -99,9 +99,8 @@
                 {% endfor %}
             </table>
             <div class="panel-footer">
-                {% trans 'Add' as trns %}
                 {% url 'mapapp:add_dev' dot.pk as url %}
-                {% bootstrap_button trns button_type="link" icon='plus' size='sm' button_class='btn-success' href=url %}
+                {% bootstrap_button _('Add') button_type="link" icon='plus' size='sm' button_class='btn-success' href=url %}
             </div>
         </div>
     </div>

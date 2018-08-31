@@ -15,12 +15,8 @@
     </div>
 
     <div class="modal-body">
-
         {% bootstrap_form form %}
-
-        {% trans 'Save' as btntxt %}
-        {% bootstrap_button btntxt button_type="submit" button_class="btn-primary" icon="save" size='sm' %}
-
+        {% bootstrap_button _('Save') button_type="submit" button_class="btn-primary" icon="save" size='sm' %}
     </div>
 
 </form>

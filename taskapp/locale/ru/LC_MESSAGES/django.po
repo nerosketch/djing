@@ -241,10 +241,6 @@ msgstr "Автор"
 msgid "Time of create"
 msgstr "Дата создания"
 
-#: taskapp/models.py:131
-msgid "Can view comments"
-msgstr "Может видеть комментарии"
-
 #: taskapp/models.py:133
 msgid "Extra comment"
 msgstr "Комментарий"

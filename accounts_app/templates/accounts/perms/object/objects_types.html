@@ -1,0 +1,38 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/perms/ext.html' %}
+{% load i18n %}
+{% load acc_tags %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
+        <li><a href="{% url 'acc_app:setup_perms_object' userprofile.pk %}">{% trans 'Object permission options' %}</a></li>
+        <li class="active">{% trans 'Object permission options' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Pick the type of object' %}
+{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>{% trans 'Group' %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for klass in klasses %}
+                <tr>
+                    <td>
+                        <a href="{% url 'acc_app:perms_klasses' userprofile.pk klass %}">&lt;{{ klass }}&gt; {% klass_name klass %}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -27,16 +27,14 @@ from .forms import TaskFrm, ExtraCommentForm
 login_decs = login_required, only_admins
 
 
-class BaseTaskListView(ListView):
-    http_method_names = ('get',)
-    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-
-
 @method_decorator(login_decs, name='dispatch')
-class NewTasksView(BaseTaskListView):
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
+class NewTasksView(ListView):
     """
     Show new tasks
     """
+    http_method_names = ('get',)
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'taskapp/tasklist.html'
     context_object_name = 'tasks'
 
@@ -47,6 +45,7 @@ class NewTasksView(BaseTaskListView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class FailedTasksView(NewTasksView):
     """
     Show crashed tasks
@@ -60,6 +59,7 @@ class FailedTasksView(NewTasksView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class FinishedTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_finish.html'
 
@@ -69,6 +69,7 @@ class FinishedTaskListView(NewTasksView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class OwnTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_own.html'
 
@@ -80,6 +81,7 @@ class OwnTaskListView(NewTasksView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class MyTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist.html'
 
@@ -91,7 +93,9 @@ class MyTaskListView(NewTasksView):
 
 @method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('taskapp.can_viewall'), name='dispatch')
-class AllTasksListView(BaseTaskListView):
+class AllTasksListView(ListView):
+    http_method_names = ('get',)
+    paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'taskapp/tasklist_all.html'
     context_object_name = 'tasks'
 
@@ -101,6 +105,7 @@ class AllTasksListView(BaseTaskListView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class EmptyTasksListView(NewTasksView):
     template_name = 'taskapp/tasklist_empty.html'
 

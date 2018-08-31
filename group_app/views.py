@@ -19,6 +19,7 @@ login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('group_app.view_group'), name='dispatch')
 class GroupListView(OrderedFilteredList):
     http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
@@ -28,6 +29,7 @@ class GroupListView(OrderedFilteredList):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('group_app.change_group'), name='dispatch')
 class EditGroupView(UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'group_app/edit_group.html'
@@ -46,6 +48,7 @@ class EditGroupView(UpdateView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('group_app.add_group'), name='dispatch')
 class AddGroupView(CreateView):
     http_method_names = ('get', 'post')
     template_name = 'group_app/add_group.html'

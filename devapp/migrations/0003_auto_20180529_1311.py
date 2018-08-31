@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.RunPython(snmp_backup_info),
         migrations.AlterModelOptions(
             name='device',
-            options={'ordering': ('id',), 'permissions': (('can_view_device', 'Can view device'),), 'verbose_name': 'Device', 'verbose_name_plural': 'Devices'},
+            options={'ordering': ('id',), 'verbose_name': 'Device', 'verbose_name_plural': 'Devices'},
         ),
         migrations.AlterModelOptions(
             name='port',

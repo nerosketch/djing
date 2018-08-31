@@ -20,6 +20,7 @@ login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('tariff_app.view_tariff'), name='dispatch')
 class TariffsListView(OrderedFilteredList):
     """
     Show Services(Tariffs) list
@@ -32,6 +33,7 @@ class TariffsListView(OrderedFilteredList):
 
 @login_required
 @only_admins
+@permission_required('tariff_app.change_tariff')
 def edit_tarif(request, tarif_id=0):
     tarif_id = lib.safe_int(tarif_id)
 
@@ -90,7 +92,7 @@ class TariffDeleteView(DeleteView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('tariff_app.delete_tariff'), name='dispatch')
+@method_decorator(permission_required('tariff_app.view_periodicpay'), name='dispatch')
 class PeriodicPaysListView(OrderedFilteredList):
     context_object_name = 'pays'
     model = PeriodicPay

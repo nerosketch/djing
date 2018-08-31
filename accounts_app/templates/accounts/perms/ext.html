@@ -1,0 +1,36 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
+        <li class="active">{% trans 'Permission options' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Permission options' %}
+{% endblock %}
+
+{% block main %}
+    <ul class="nav nav-tabs nav-justified">
+
+        {% url 'acc_app:setup_perms' userprofile.pk as sperms %}
+        <li{% if sperms == request.path %} class="active"{% endif %}>
+            <a href="{{ sperms }}">{% trans 'Global permission options' %}</a>
+        </li>
+
+        {% url 'acc_app:setup_perms_object' userprofile.pk as sperms_obj %}
+        <li{% if sperms_obj == request.path %} class="active"{% endif %}>
+            <a href="{{ sperms_obj }}">{% trans 'Object permission options' %}</a>
+        </li>
+
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

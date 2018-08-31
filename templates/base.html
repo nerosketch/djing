@@ -36,20 +36,24 @@
                 </a>
             </li>
 
-            {% url 'taskapp:home' as task_home %}
-            <li{% if task_home in request.path %} class="active"{% endif %}>
-                <a href="{{ task_home }}">
-                    <span class="glyphicon glyphicon-tasks"></span> {% trans 'Tasks' %}
-                    {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
-                </a>
-            </li>
+            {% if perms.taskapp.view_task %}
+                {% url 'taskapp:home' as task_home %}
+                <li{% if task_home in request.path %} class="active"{% endif %}>
+                    <a href="{{ task_home }}">
+                        <span class="glyphicon glyphicon-tasks"></span> {% trans 'Tasks' %}
+                        {% if tasks_count > 0 %}<span class="badge">{{ tasks_count }}</span>{% endif %}
+                    </a>
+                </li>
+            {% endif %}
 
-            {% url 'group_app:group_list' as group_list_link %}
-            <li{% if group_list_link in request.path %} class="active"{% endif %}>
-                <a href="{{ group_list_link }}">
-                    <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Groups' %}
-                </a>
-            </li>
+            {% if perms.group_app.view_group %}
+                {% url 'group_app:group_list' as group_list_link %}
+                <li{% if group_list_link in request.path %} class="active"{% endif %}>
+                    <a href="{{ group_list_link }}">
+                        <span class="glyphicon glyphicon-list-alt"></span> {% trans 'Groups' %}
+                    </a>
+                </li>
+            {% endif %}
 
             {% url 'tarifs:home' as tarifs_home %}
             <li{% if tarifs_home in request.path %} class="active"{% endif %}>
@@ -85,12 +89,12 @@
             </li>
 
             {% if perms.dialing_app.change_asteriskcdr %}
-            {% url 'dialapp:home' as dialhome %}
-            <li{% if dialhome in request.path %} class="active"{% endif %}>
-                <a href="{{ dialhome }}">
-                    <span class="glyphicon glyphicon-phone-alt"></span> {% trans 'Dialing' %}
-                </a>
-            </li>
+                {% url 'dialapp:home' as dialhome %}
+                <li{% if dialhome in request.path %} class="active"{% endif %}>
+                    <a href="{{ dialhome }}">
+                        <span class="glyphicon glyphicon-phone-alt"></span> {% trans 'Dialing' %}
+                    </a>
+                </li>
             {% endif %}
 
             {% url 'devapp:group_list' as devapp_groups %}
@@ -101,12 +105,12 @@
             </li>
 
             {% if perms.nas_app.view_nasmodel %}
-            {% url 'nas_app:home' as nashome %}
-            <li{% if nashome in request.path %} class="active"{% endif %}>
-                <a href="{{ nashome }}">
-                    <span class="glyphicon glyphicon-globe"></span> {% trans 'NAS' %}
-                </a>
-            </li>
+                {% url 'nas_app:home' as nashome %}
+                <li{% if nashome in request.path %} class="active"{% endif %}>
+                    <a href="{{ nashome }}">
+                        <span class="glyphicon glyphicon-globe"></span> {% trans 'NAS' %}
+                    </a>
+                </li>
             {% endif %}
 
         </ul>

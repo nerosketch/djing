@@ -6,6 +6,12 @@ from .models import UserProfile
 
 
 class MyUserObjectPermissionsForm(UserObjectPermissionsForm):
+    def __init__(self, *args, **kwargs):
+        super(MyUserObjectPermissionsForm, self).__init__(*args, **kwargs)
+        self.fields['permissions'].widget.attrs.update({
+            'size': 15
+        })
+
     def save_obj_perms(self):
         """
         Saves selected object permissions by creating new ones and removing
@@ -29,3 +35,15 @@ class AvatarChangeForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('avatar',)
+
+
+class UserPermissionsForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(UserPermissionsForm, self).__init__(*args, **kwargs)
+        self.fields['user_permissions'].widget.attrs.update({
+            'size': 35
+        })
+
+    class Meta:
+        model = UserProfile
+        fields = 'user_permissions',

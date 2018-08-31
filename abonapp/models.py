@@ -134,7 +134,6 @@ class Abon(BaseAccount):
         db_table = 'abonent'
         permissions = (
             ('can_buy_tariff', _('Buy service perm')),
-            ('can_view_passport', _('Can view passport')),
             ('can_add_ballance', _('fill account')),
             ('can_ping', _('Can ping'))
         )
@@ -191,15 +190,15 @@ class Abon(BaseAccount):
         )
 
     # Destroy the service if the time has come
-    def bill_service(self, author):
-        abon_tariff = self.active_tariff()
-        if abon_tariff is None:
-            return
-        nw = timezone.now()
-        # if service is overdue
-        if nw > abon_tariff.deadline:
-            print("Service %s for user %s is overdued, end service" % (abon_tariff.tariff, self))
-            abon_tariff.delete()
+    # def bill_service(self, author):
+    #     abon_tariff = self.active_tariff()
+    #     if abon_tariff is None:
+    #         return
+    #     nw = timezone.now()
+    #     # if service is overdue
+    #     if nw > abon_tariff.deadline:
+    #         print("Service %s for user %s is overdued, end service" % (abon_tariff.tariff, self))
+    #         abon_tariff.delete()
 
     # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self) -> bool:

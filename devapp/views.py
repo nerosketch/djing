@@ -33,7 +33,6 @@ from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 login_decs = login_required, only_admins
 
 
-@method_decorator(login_decs, name='dispatch')
 class DevicesListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
@@ -51,6 +50,8 @@ class DevicesListView(global_base_views.OrderedFilteredList):
         context['group'] = get_object_or_404(Group, pk=group_id)
         return context
 
+    @method_decorator(login_decs)
+    @method_decorator(permission_required('devapp.view_device'))
     def dispatch(self, request, *args, **kwargs):
         try:
             response = super(DevicesListView, self).dispatch(request, *args, **kwargs)
@@ -61,6 +62,7 @@ class DevicesListView(global_base_views.OrderedFilteredList):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('devapp.view_device'), name='dispatch')
 class DevicesWithoutGroupsListView(global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
@@ -92,7 +94,7 @@ class DeviceDeleteView(DeleteView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
+@method_decorator(permission_required('devapp.view_device'), name='dispatch')
 class DeviceUpdate(UpdateView):
     template_name = 'devapp/dev.html'
     context_object_name = 'dev'
@@ -140,7 +142,7 @@ class DeviceUpdate(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         group_id = self.kwargs.get('group_id')
         device_group = get_object_or_404(Group, pk=group_id)
-        if not request.user.has_perm('group_app.can_view_group', device_group):
+        if not request.user.has_perm('group_app.view_group', device_group):
             raise PermissionDenied
         self.device_group = device_group
         return super().dispatch(request, *args, **kwargs)
@@ -158,7 +160,7 @@ class DeviceUpdate(UpdateView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.can_view_device'), name='dispatch')
+@method_decorator(permission_required('devapp.add_device'), name='dispatch')
 class DeviceCreateView(CreateView):
     template_name = 'devapp/add_dev.html'
     context_object_name = 'dev'
@@ -166,11 +168,6 @@ class DeviceCreateView(CreateView):
     form_class = DeviceForm
     device_group = None
     already_dev = None
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.has_perm('devapp.add_device'):
-            raise PermissionDenied
-        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         # check if that device is exist
@@ -202,7 +199,7 @@ class DeviceCreateView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         group_id = self.kwargs.get('group_id')
         device_group = get_object_or_404(Group, pk=group_id)
-        if not request.user.has_perm('group_app.can_view_group', device_group):
+        if not request.user.has_perm('group_app.view_group', device_group):
             raise PermissionDenied
         self.device_group = device_group
         return super().dispatch(request, *args, **kwargs)
@@ -364,7 +361,7 @@ def delete_single_port(request, group_id, device_id, port_id):
 
 @login_required
 @only_admins
-@permission_required('devapp.add_port')
+@permission_required('devapp.change_port')
 def edit_single_port(request, group_id: int, device_id: int, port_id: int):
     try:
         port = Port.objects.get(pk=port_id)
@@ -424,7 +421,7 @@ def add_single_port(request, group_id, device_id):
 
 @login_required
 @only_admins
-@permission_required('devapp.can_view_device')
+@permission_required('devapp.view_device')
 def devview(request, group_id: int, device_id: int):
     ports, manager = None, None
     device = get_object_or_404(Device, id=device_id)
@@ -512,7 +509,7 @@ class GroupsListView(global_base_views.OrderedFilteredList):
 
     def get_queryset(self):
         groups = super(GroupsListView, self).get_queryset()
-        groups = get_objects_for_user(self.request.user, 'group_app.can_view_group', klass=groups,
+        groups = get_objects_for_user(self.request.user, 'group_app.view_group', klass=groups,
                                       accept_global_perms=False)
         return groups
 
@@ -523,7 +520,7 @@ class GroupsListView(global_base_views.OrderedFilteredList):
 def search_dev(request):
     word = request.GET.get('s')
     if word is None or word == '':
-        results = [{'id': 0, 'text': ''}]
+        results = tuple({'id': 0, 'text': ''})
     else:
         qs = Q(comment__icontains=word)
         try:
@@ -532,10 +529,10 @@ def search_dev(request):
         except ValueError:
             pass
         results = Device.objects.filter(qs).only('pk', 'ip_address', 'comment')[:16]
-        results = [{
+        results = tuple({
             'id': device.pk,
             'text': "%s: %s" % (device.ip_address or '', device.comment)
-        } for device in results]
+        } for device in results)
     return results
 
 

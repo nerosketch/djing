@@ -8,6 +8,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.shortcuts import resolve_url
 from group_app.models import Group
 
 
@@ -173,3 +174,6 @@ class UserProfile(BaseAccount):
             do_type=do_type,
             additional_text=additional_text
         )
+
+    def get_absolute_url(self):
+        return resolve_url('acc_app:other_profile', self.pk)

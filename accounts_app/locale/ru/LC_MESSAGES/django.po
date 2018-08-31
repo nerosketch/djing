@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-26 19:09+0300\n"
+"POT-Creation-Date: 2018-08-31 16:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,112 +18,114 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: models.py:21
+#: models.py:22
 msgid "Users must have an telephone number"
 msgstr "У пользователей должен быть номер телефона"
 
-#: models.py:49 templates/accounts/acc_list.html:21
+#: models.py:50 templates/accounts/acc_list.html:21
 msgid "profile username"
 msgstr "Логин"
 
-#: models.py:54
+#: models.py:55
 msgid "fio"
 msgstr "ФИО"
 
-#: models.py:55
+#: models.py:56
 msgid "birth day"
 msgstr "дата рождения"
 
-#: models.py:56
+#: models.py:57
 msgid "Is active"
 msgstr "Активен"
 
-#: models.py:60 templates/accounts/acc_list.html:23
+#: models.py:61 templates/accounts/acc_list.html:23
 #: templates/accounts/create_acc.html:62 templates/accounts/index.html:9
 #: templates/accounts/settings/ch_info.html:38
 msgid "Telephone"
 msgstr "Телефон"
 
-#: models.py:94
+#: models.py:95
 msgid "Author"
 msgstr "Автор"
 
-#: models.py:95 templates/accounts/action_log.html:12
+#: models.py:96 templates/accounts/action_log.html:12
 msgid "Meta information"
 msgstr "Мета информация"
 
-#: models.py:97
+#: models.py:98
 msgid "Create user"
 msgstr "Создание абонента"
 
-#: models.py:98
+#: models.py:99
 msgid "Delete user"
 msgstr "Удаление абонента"
 
-#: models.py:99
+#: models.py:100
 msgid "Create device"
 msgstr "Создание устройства"
 
-#: models.py:100
+#: models.py:101
 msgid "Delete device"
 msgstr "Удаление устройства"
 
-#: models.py:101
+#: models.py:102
 msgid "Create NAS"
 msgstr "Создание NAS"
 
-#: models.py:102
+#: models.py:103
 msgid "Delete NAS"
 msgstr "Удаление NAS"
 
-#: models.py:103
+#: models.py:104
 msgid "Create service"
 msgstr "Создание тарифа"
 
-#: models.py:104
+#: models.py:105
 msgid "Delete service"
 msgstr "Удаление тарифа"
 
-#: models.py:106
+#: models.py:107
 msgid "Action type"
 msgstr "Тип действия"
 
-#: models.py:107
+#: models.py:108
 msgid "Additional info"
 msgstr "Дополнительная информация"
 
-#: models.py:108
+#: models.py:109
 msgid "Action date"
 msgstr "Дата действия"
 
-#: models.py:115
+#: models.py:116
 msgid "User profile log"
 msgstr "Лог действий учётной записи"
 
-#: models.py:116
+#: models.py:117
 msgid "User profile logs"
 msgstr "Логи действий учётной записи"
 
-#: models.py:125
+#: models.py:126
 msgid "Avatar"
 msgstr "Аватар"
 
-#: models.py:127
+#: models.py:128
 msgid "Responsibility groups"
 msgstr "Группы администратора"
 
-#: models.py:141
+#: models.py:142
 msgid "Staff account profile"
 msgstr "Учётная запись работника"
 
-#: models.py:142
+#: models.py:143
 msgid "Staff account profiles"
 msgstr "Учётные записи работников"
 
 #: templates/accounts/acc_list.html:7 templates/accounts/create_acc.html:8
-#: templates/accounts/perms/objects_of_type.html:7
-#: templates/accounts/perms/objects_types.html:8
-#: templates/accounts/perms/perms_edit.html:8
+#: templates/accounts/perms/change_global_perms.html:8
+#: templates/accounts/perms/ext.html:7
+#: templates/accounts/perms/object/objects_of_type.html:7
+#: templates/accounts/perms/object/objects_types.html:8
+#: templates/accounts/perms/object/perms_edit.html:8
 msgid "Administrators"
 msgstr "Сотрудники"
 
@@ -211,7 +213,8 @@ msgstr "Повторите пароль"
 
 #: templates/accounts/create_acc.html:89
 #: templates/accounts/manage_responsibility_groups.html:20
-#: templates/accounts/perms/perms_edit.html:65
+#: templates/accounts/perms/change_global_perms.html:22
+#: templates/accounts/perms/object/perms_edit.html:43
 #: templates/accounts/set_abon_groups_permission.html:20
 #: templates/accounts/settings/ch_info.html:67
 msgid "Save"
@@ -219,7 +222,7 @@ msgstr "Сохранить"
 
 #: templates/accounts/create_acc.html:92
 #: templates/accounts/manage_responsibility_groups.html:21
-#: templates/accounts/perms/perms_edit.html:68
+#: templates/accounts/perms/object/perms_edit.html:46
 #: templates/accounts/set_abon_groups_permission.html:21
 #: templates/accounts/settings/ch_info.html:70
 msgid "Reset"
@@ -262,37 +265,49 @@ msgstr "Войти по местоположению"
 msgid "The responsibility of the administrator of the group of subscribers"
 msgstr "Ответственность администратора за группы абонентов"
 
-#: templates/accounts/perms/objects_of_type.html:9
-#: templates/accounts/perms/objects_types.html:10
-#: templates/accounts/perms/perms_edit.html:10
+#: templates/accounts/perms/change_global_perms.html:10
+#: templates/accounts/perms/ext.html:9 templates/accounts/perms/ext.html:14
 msgid "Permission options"
 msgstr "Права"
 
-#: templates/accounts/perms/objects_of_type.html:16
-#: templates/accounts/perms/perms_edit.html:19
+#: templates/accounts/perms/change_global_perms.html:11
+#: templates/accounts/perms/ext.html:22
+msgid "Global permission options"
+msgstr "Глобальные права"
+
+#: templates/accounts/perms/change_global_perms.html:16
+msgid "Select permissions for picked account"
+msgstr "Отметьте права для выбранной учётной записи"
+
+#: templates/accounts/perms/ext.html:27
+#: templates/accounts/perms/object/objects_of_type.html:9
+#: templates/accounts/perms/object/objects_types.html:10
+#: templates/accounts/perms/object/objects_types.html:11
+#: templates/accounts/perms/object/perms_edit.html:10
+msgid "Object permission options"
+msgstr "Права для каждого объекта"
+
+#: templates/accounts/perms/object/objects_of_type.html:16
+#: templates/accounts/perms/object/perms_edit.html:18
 msgid "Pick object for edit permissions"
 msgstr "Выберите объект для редактирования прав доступа"
 
-#: templates/accounts/perms/objects_types.html:15
+#: templates/accounts/perms/object/objects_types.html:16
 msgid "Pick the type of object"
 msgstr "Выберите тип объекта"
 
-#: templates/accounts/perms/objects_types.html:23
+#: templates/accounts/perms/object/objects_types.html:24
 msgid "Group"
 msgstr "Группа"
 
-#: templates/accounts/perms/perms_edit.html:28
+#: templates/accounts/perms/object/perms_edit.html:27
 msgid "Profile is superuser, permissions to change it makes no sense"
 msgstr ""
-"Учётная запись является суперпользователем, разрешения менять нет смысла"
+"Учётная запись является суперпользователем. Разрешения менять нет смысла.,"
 
-#: templates/accounts/perms/perms_edit.html:34
+#: templates/accounts/perms/object/perms_edit.html:33
 msgid "Change permission for that object"
 msgstr "Изменение прав доступа для выбранного объекта"
-
-#: templates/accounts/perms/perms_edit.html:56
-msgid "Not set"
-msgstr "Не найдено"
 
 #: templates/accounts/set_abon_groups_permission.html:5
 msgid "The list of user groups to which the account has access"
@@ -306,52 +321,49 @@ msgstr "Старый пароль"
 msgid "New password"
 msgstr "Новый пароль"
 
-#: views.py:32
+#: views.py:33
 msgid "Wrong login or password, please try again"
 msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
-#: views.py:120
+#: views.py:121
 msgid "New password is empty, fill it"
 msgstr "Новый пароль пустой, придумайте себе пароль"
 
-#: views.py:122
+#: views.py:123
 msgid "Wrong password"
 msgstr "Неправильный пароль"
 
-#: views.py:124
+#: views.py:125
 msgid "Empty password, fill it"
 msgstr "Пустой пароль, впишите что-то в пароль"
 
-#: views.py:148
+#: views.py:149
 msgid "You forget specify a password for the new account"
 msgstr "Забыли указать пароль для нового аккаунта"
 
-#: views.py:151
+#: views.py:152
 msgid "You forget to repeat a password for the new account"
 msgstr "Забыли повторить пароль для нового аккаунта"
 
-#: views.py:160
+#: views.py:161
 msgid "Subscriber with this name already exist"
 msgstr "Пользователь с таким именем уже есть"
 
-#: views.py:162
+#: views.py:163
 msgid "Passwords does not match, try again"
 msgstr "Пароли не совпадают, попробуйте ещё раз"
 
-#: views.py:177
+#: views.py:178
 msgid "Profile has been deleted"
 msgstr "Учётная запись удалена"
 
-#: views.py:255
+#: views.py:240
 msgid "Permissions has successfully updated"
 msgstr "Права успешно обновлены"
 
-#: views.py:322
+#: views.py:352
 msgid "Responsibilities has been updated"
 msgstr "Ответственность за группы обновлена"
-
-msgid "Password"
-msgstr "Пароль"
 
 msgid "Change self onfo"
 msgstr "Изменить инфу о себе"
@@ -361,9 +373,6 @@ msgstr "Редактировать"
 
 msgid "Access to groups"
 msgstr "Доступ к группам"
-
-msgid "Administrator"
-msgstr "Сотрудник"
 
 msgid "Manage responsibility groups"
 msgstr "Ответственность за группы"

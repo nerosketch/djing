@@ -27,10 +27,6 @@ msgstr "Название"
 msgid "Tech code"
 msgstr "Технический код"
 
-#: models.py:17
-msgid "Can view group"
-msgstr "Может видеть группы"
-
 #: models.py:19
 msgid "Group"
 msgstr "Группа"

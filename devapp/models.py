@@ -58,9 +58,6 @@ class Device(models.Model):
 
     class Meta:
         db_table = 'dev'
-        permissions = (
-            ('can_view_device', _('Can view device')),
-        )
         verbose_name = _('Device')
         verbose_name_plural = _('Devices')
         ordering = ('id',)

@@ -17,6 +17,7 @@ login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('ip_pool.view_networkmodel'), name='dispatch')
 class NetworksListView(OrderedFilteredList):
     device_kind_code = None
     template_name = 'ip_pool/network_list.html'
@@ -57,6 +58,7 @@ class NetworkDeleteView(DeleteView):
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('ip_pool.view_ipleasemodel'), name='dispatch')
 class IpLeasesListView(OrderedFilteredList):
     template_name = 'ip_pool/ip_leases_list.html'
     model = models.IpLeaseModel
@@ -86,6 +88,7 @@ class NetworkCreateView(CreateView):
 
 
 @login_required
+@method_decorator(permission_required('ip_pool.view_networkmodel'), name='dispatch')
 def network_in_groups(request, net_id):
     network = get_object_or_404(models.NetworkModel, pk=net_id)
     if request.method == 'POST':

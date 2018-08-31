@@ -63,10 +63,6 @@ msgstr "Сообщение"
 msgid "Messages"
 msgstr "Сообщения"
 
-#: msg_app/models.py:71
-msgid "Can view messages"
-msgstr "может просматривать сообщения"
-
 #: msg_app/models.py:79
 msgid "Admin"
 msgstr "Админ"
@@ -102,10 +98,6 @@ msgstr "Без имени"
 #: msg_app/models.py:242 msg_app/templates/msg_app/conversations.html:14
 msgid "Conversations"
 msgstr "Беседы"
-
-#: msg_app/models.py:244
-msgid "Can view conversation"
-msgstr "Может просматривать беседы"
 
 #: msg_app/templates/msg_app/chat.html:7
 #: msg_app/templates/msg_app/conversations.html:7

@@ -12,9 +12,6 @@ class Group(models.Model):
 
     class Meta:
         db_table = 'groups'
-        permissions = (
-            ('can_view_group', _('Can view group')),
-        )
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
         ordering = ('title',)

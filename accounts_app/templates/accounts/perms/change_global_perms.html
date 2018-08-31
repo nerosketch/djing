@@ -1,0 +1,24 @@
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/perms/ext.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
+        <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
+        <li><a href="{% url 'acc_app:setup_perms' userprofile.pk %}">{% trans 'Permission options' %}</a></li>
+        <li class="active">{% trans 'Global permission options' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Select permissions for picked account' %}
+{% endblock %}
+
+{% block content %}
+    <form action="{% url 'acc_app:setup_perms' userprofile.pk %}" method="post">{% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button _('Save') button_type='submit' button_class='btn-primary' %}
+    </form>
+{% endblock %}

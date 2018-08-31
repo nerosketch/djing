@@ -168,10 +168,6 @@ msgstr "Маркер"
 msgid "Buy service perm"
 msgstr "Покупка тарифа абоненту"
 
-#: models.py:137
-msgid "Can view passport"
-msgstr "Может просматривать паспортные данные"
-
 #: models.py:138
 msgid "fill account"
 msgstr "Пополнение счёта"

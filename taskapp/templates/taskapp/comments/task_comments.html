@@ -26,13 +26,15 @@
                 </div>
             {% endfor %}
         </div>
-        <form action="{% url 'taskapp:comment_add' task_uid %}" method="post">{% csrf_token %}
-            {% bootstrap_form comment_form %}
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">
-                    {% bootstrap_icon "send" %} {% trans 'Send' %}
-                </button>
-            {% endbuttons %}
-        </form>
+        {% if perms.taskapp.add_extracomment %}
+            <form action="{% url 'taskapp:comment_add' task_uid %}" method="post">{% csrf_token %}
+                {% bootstrap_form comment_form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">
+                        {% bootstrap_icon "send" %} {% trans 'Send' %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        {% endif %}
     </div>
 </div>

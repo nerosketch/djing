@@ -19,13 +19,14 @@ urlpatterns = [
     path('settings/change_ava/', views.AvatarUpdateView.as_view(), name='setup_avatar'),
 
     path('<int:uid>/', views.profile_show, name='other_profile'),
-    path('<int:uid>/perms/', views.perms, name='setup_perms'),
+    path('<int:uid>/perms/', views.PermsUpdateView.as_view(), name='setup_perms'),
+    path('<int:uid>/perms/object/', views.perms_object, name='setup_perms_object'),
 
-    re_path('^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/',
+    re_path('^(?P<uid>\d+)/perms/object/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/$',
         views.PermissionClassListView.as_view(),
         name='perms_klasses'),
 
-    re_path('^(?P<uid>\d+)/perms/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)/',
+    re_path('^(?P<uid>\d+)/perms/object/(?P<klass_name>[a-z_]+\.[a-zA-Z_]+)/(?P<obj_id>\d+)/$',
         views.perms_edit,
         name='perms_edit'),
 

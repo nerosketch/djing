@@ -160,10 +160,6 @@ msgstr "Состояние"
 msgid "Send notify when monitoring state changed"
 msgstr "Отправлять уведомления при событиях мониторинга"
 
-#: models.py:62
-msgid "Can view device"
-msgstr "Может видеть устройство"
-
 #: models.py:64 models.py:112
 msgid "Device"
 msgstr "Устройство"

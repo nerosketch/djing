@@ -28,17 +28,11 @@
                         </a>
                     {% endif %}
                     {% if request.user.is_superuser %}
-                        {% if userprofile.is_superuser %}
-                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default" title="{% trans 'Profile is superuser, permissions to change it makes no sense' %}" data-toggle="tooltip">
-                                <span class="glyphicon glyphicon-lock"></span>
-                                <span class="hidden-sm hidden-md">{% trans 'Permission options' %}</span>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default">
-                                <span class="glyphicon glyphicon-lock"></span>
-                                <span class="hidden-sm hidden-md">{% trans 'Permission options' %}</span>
-                            </a>
-                        {% endif %}
+                        <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default"
+                           title="{{ userprofile.is_superuser|yesno:_("Profile is superuser. Permissions to change it makes no sense.,") }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-lock"></span>
+                            <span class="hidden-sm hidden-md">{% trans 'Permission options' %}</span>
+                        </a>
                     {% endif %}
                 </div>
             </div>

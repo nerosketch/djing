@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
@@ -15,7 +16,7 @@ from django.conf import settings
 from group_app.models import Group
 
 from .models import UserProfile, UserProfileLog
-from .forms import AvatarChangeForm
+from .forms import AvatarChangeForm, UserPermissionsForm, MyUserObjectPermissionsForm
 from djing import lib
 from djing.lib.decorators import only_admins
 from guardian.decorators import permission_required_or_403 as permission_required
@@ -192,7 +193,7 @@ class AccountsListView(ListView):
 
 
 @login_required
-def perms(request, uid: int):
+def perms_object(request, uid: int):
     if not request.user.is_superuser:
         raise PermissionDenied
     userprofile = get_object_or_404(UserProfile, id=uid)
@@ -202,17 +203,49 @@ def perms(request, uid: int):
         'abonapp.PassportInfo', 'abonapp.AdditionalTelephone', 'tariff_app.PeriodicPay',
         'group_app.Group'
     )
-    return render(request, 'accounts/perms/objects_types.html', {
+    return render(request, 'accounts/perms/object/objects_types.html', {
         'userprofile': userprofile,
         'klasses': klasses
     })
+
+
+@method_decorator(login_required, name='dispatch')
+class PermsUpdateView(UpdateView):
+    http_method_names = 'get', 'post'
+    template_name = 'accounts/perms/change_global_perms.html'
+    model = UserProfile
+    form_class = UserPermissionsForm
+    pk_url_kwarg = 'uid'
+
+    def get_success_url(self):
+        return resolve_url('acc_app:setup_perms', self.userprofile.pk)
+
+    def get_object(self, queryset=None):
+        self.userprofile = get_object_or_404(UserProfile, id=self.kwargs.get('uid'))
+        return super(PermsUpdateView, self).get_object(queryset=queryset)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return super(PermsUpdateView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'userprofile': self.userprofile
+        }
+        context.update(kwargs)
+        return super(PermsUpdateView, self).get_context_data(**context)
+
+    def form_valid(self, form):
+        messages.success(self.request, _('Permissions has successfully updated'))
+        return super(PermsUpdateView, self).form_valid(form)
 
 
 @method_decorator(login_decs, name='dispatch')
 class PermissionClassListView(ListView):
     http_method_names = 'get',
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
-    template_name = 'accounts/perms/objects_of_type.html'
+    template_name = 'accounts/perms/object/objects_of_type.html'
     context_object_name = 'objects'
 
     def get(self, request, *args, **kwargs):
@@ -228,7 +261,6 @@ class PermissionClassListView(ListView):
         return context
 
     def get_queryset(self):
-        from django.apps import apps
         klass_name = self.kwargs.get('klass_name')
         app_label, model_name = klass_name.split('.', 1)
         klass = apps.get_model(app_label, model_name)
@@ -242,8 +274,6 @@ class PermissionClassListView(ListView):
 def perms_edit(request, uid: int, klass_name, obj_id):
     if not request.user.is_superuser:
         raise PermissionDenied
-    from django.apps import apps
-    from .forms import MyUserObjectPermissionsForm
     userprofile = get_object_or_404(UserProfile, pk=uid)
     app_label, model_name = klass_name.split('.', 1)
     klass = apps.get_model(app_label, model_name)
@@ -254,7 +284,7 @@ def perms_edit(request, uid: int, klass_name, obj_id):
         frm.save_obj_perms()
         messages.success(request, _('Permissions has successfully updated'))
 
-    return render(request, 'accounts/perms/perms_edit.html', {
+    return render(request, 'accounts/perms/object/perms_edit.html', {
         'userprofile': userprofile,
         'obj': obj,
         'form': frm,
@@ -271,16 +301,16 @@ def set_abon_groups_permission(request, uid: int):
         raise PermissionDenied
     userprofile = get_object_or_404(UserProfile, pk=uid)
 
-    picked_groups = get_objects_for_user(userprofile, 'group_app.can_view_group', accept_global_perms=False)
+    picked_groups = get_objects_for_user(userprofile, 'group_app.view_group', accept_global_perms=False)
     picked_groups = picked_groups.values_list('pk', flat=True)
 
     if request.method == 'POST':
         checked_groups = tuple(int(ag) for ag in request.POST.getlist('grp', default=0))
         for grp in Group.objects.all():
             if grp.pk in checked_groups and grp.pk not in picked_groups:
-                assign_perm('groupapp.can_view_group', userprofile, obj=grp)
+                assign_perm('groupapp.view_group', userprofile, obj=grp)
             elif grp.pk not in checked_groups and grp.pk in picked_groups:
-                remove_perm('groupapp.can_view_group', userprofile, obj=grp)
+                remove_perm('groupapp.view_group', userprofile, obj=grp)
         return redirect('acc_app:set_abon_groups_permission', uid)
     groups = Group.objects.only('pk', 'title')
 

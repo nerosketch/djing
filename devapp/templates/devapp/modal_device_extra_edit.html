@@ -11,13 +11,11 @@
         {% bootstrap_form form %}
 
         <div class="btn-group btn-group-sm">
-            {% trans 'Save' as btntxt %}
-            {% bootstrap_button btntxt button_type="submit" button_class="btn-primary" icon="save" %}
+            {% bootstrap_button _('Save') button_type="submit" button_class="btn-primary" icon="save" %}
 
             {% if not request.is_ajax %}
-                {% trans 'Back' as btntxt %}
                 {% url 'devapp:edit' group_id object.pk as backurl %}
-                {% bootstrap_button btntxt button_type="link" href=backurl icon="fast-backward" %}
+                {% bootstrap_button _('Back') button_type="link" href=backurl icon="fast-backward" %}
             {% endif %}
         </div>
     </div>

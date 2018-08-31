@@ -18,6 +18,7 @@ login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
+@method_decorator(permission_required('nas_app.view_nasmodel'), name='dispatch')
 class NasListView(ListView):
     model = NASModel
 

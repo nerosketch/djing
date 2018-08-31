@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='device',
-            options={'ordering': ['id'], 'permissions': (('can_view_device', 'Can view device'),),
+            options={'ordering': ['id'],
                      'verbose_name': 'Device', 'verbose_name_plural': 'Devices'},
         ),
         migrations.AlterField(

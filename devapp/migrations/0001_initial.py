@@ -43,8 +43,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Device',
                 'verbose_name_plural': 'Devices',
                 'db_table': 'dev',
-                'ordering': ['comment'],
-                'permissions': (('can_view_device', 'Can view device'),),
+                'ordering': ['comment']
             },
         ),
         migrations.CreateModel(

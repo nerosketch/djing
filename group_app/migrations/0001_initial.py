@@ -22,8 +22,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Group',
                 'verbose_name_plural': 'Groups',
                 'db_table': 'groups',
-                'ordering': ['title'],
-                'permissions': (('can_view_group', 'Can view group'),),
+                'ordering': ('title',),
             },
         ),
     ]

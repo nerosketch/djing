@@ -131,9 +131,6 @@ class ExtraComment(models.Model):
 
     class Meta:
         db_table = 'extra_comments'
-        permissions = (
-            ('can_view_comments', _('Can view comments')),
-        )
         verbose_name = _('Extra comment')
         verbose_name_plural = _('Extra comments')
         ordering = ('-date_create',)

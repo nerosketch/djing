@@ -22,16 +22,13 @@
 
 
                         {# telephone field #}
-                        {% trans 'Call to' as tx %}
-                        {% bootstrap_button '' button_type='link' icon='earphone' button_class='btn-default' title=tx href='sip:'|add:form.telephone.value size='sm' as btn_call %}
+                        {% bootstrap_button '' button_type='link' icon='earphone' button_class='btn-default' title=_('Call to') href='sip:'|add:form.telephone.value size='sm' as btn_call %}
 
-                        {% trans 'Additional telephones' as tx %}
                         {% url 'abonapp:telephones' group.pk abon.username as url %}
-                        {% bootstrap_button '' button_type='link' icon='list' button_class='btn-default btn-modal' title=tx href=url size='sm' as btn_teleph_list %}
+                        {% bootstrap_button '' button_type='link' icon='list' button_class='btn-default btn-modal' title=_('Additional telephones') href=url size='sm' as btn_teleph_list %}
 
-                        {% trans 'Add telephone' as tx %}
                         {% url 'abonapp:telephone_new' group.pk abon.username as url %}
-                        {% bootstrap_button '' button_type='link' icon='plus' button_class='btn-default btn-modal' title=tx href=url size='sm' as btn_teleph_add %}
+                        {% bootstrap_button '' button_type='link' icon='plus' button_class='btn-default btn-modal' title=_('Add telephone') href=url size='sm' as btn_teleph_add %}
 
                         {% with ''|add:btn_call|add:btn_teleph_list|add:btn_teleph_add as bt %}
                             {% bootstrap_field form.telephone form_group_class='form-group-sm' addon_after_class='input-group-btn' addon_after=bt %}
@@ -69,11 +66,10 @@
                         <div class="form-group-sm">
                             <div class="btn-group btn-group-sm">
 
-                                {% trans 'Save' as tx %}
                                 {% if perms.abonapp.change_abon %}
-                                    {% bootstrap_button tx button_type='submit' icon='floppy-disk' button_class='btn-primary' %}
+                                    {% bootstrap_button _('Save') button_type='submit' icon='floppy-disk' button_class='btn-primary' %}
                                 {% else %}
-                                    {% bootstrap_button tx button_type='button' icon='floppy-disk' button_class='btn-primary disabled' %}
+                                    {% bootstrap_button _('Save') button_type='button' icon='floppy-disk' button_class='btn-primary disabled' %}
                                 {% endif %}
 
                                 {% if perms.taskapp.add_task %}
@@ -98,7 +94,7 @@
                                     </a>
                                 {% endif %}
 
-                                {% if perms.abonapp.can_view_passport %}
+                                {% if perms.abonapp.view_passportinfo %}
                                     <a href="{% url 'abonapp:passport_view' group.pk abon.username %}" class="btn btn-default btn-modal">
                                         <span class="glyphicon glyphicon-paperclip"></span> {% trans 'Passport information' %}
                                     </a>

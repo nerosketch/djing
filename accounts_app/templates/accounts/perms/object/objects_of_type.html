@@ -1,36 +1,34 @@
-{% extends 'base.html' %}
+{% extends request.is_ajax|yesno:'nullcont.htm,accounts/perms/ext.html' %}
 {% load i18n %}
-{% load acc_tags %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
         <li><a href="{% url 'acc_app:other_profile' userprofile.pk %}">{{ userprofile.username }}</a></li>
-        <li class="active">{% trans 'Permission options' %}</li>
+        <li><a href="{% url 'acc_app:setup_perms_object' userprofile.pk %}">{% trans 'Object permission options' %}</a></li>
+        <li class="active">&lt;{{ klass }}&gt; {{ klass_name }}</li>
     </ol>
 {% endblock %}
 
+
 {% block page-header %}
-    {% trans 'Pick the type of object' %}
+    {% trans 'Pick object for edit permissions' %}
 {% endblock %}
+
 
 {% block main %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>{% trans 'Group' %}</th>
+                <th>obj</th>
             </tr>
             </thead>
             <tbody>
-            {% for klass in klasses %}
-                <tr>
-                    <td>
-                        <a href="{% url 'acc_app:perms_klasses' userprofile.pk klass %}">&lt;{{ klass }}&gt; {% klass_name klass %}</a>
-                    </td>
-                </tr>
-            {% endfor %}
+            {% for obj in objects %}<tr><td>
+                <a href="{% url 'acc_app:perms_edit' userprofile.pk klass obj.pk %}">{{ obj }}</a>
+            </td></tr>{% endfor %}
             </tbody>
         </table>
     </div>

@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='group',
-            options={'ordering': ('title',), 'permissions': (('can_view_group', 'Can view group'),), 'verbose_name': 'Group', 'verbose_name_plural': 'Groups'},
+            options={'ordering': ('title',), 'verbose_name': 'Group', 'verbose_name_plural': 'Groups'},
         ),
     ]
