@@ -15,7 +15,7 @@
             </thead>
             <tbody>
             {% trans 'Edit' as edtext %}
-            {% with can_view=perms.tariff_app.can_view_periodic_pay %}
+            {% with can_view=perms.tariff_app.view_periodic_pay %}
             {% for pay in pays %}
             <tr>
                 <td>{{ pay.name }}</td>

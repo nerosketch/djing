@@ -55,9 +55,15 @@
                     {% endif %}
 
                     {% if abon_tariff %}
-                        <a href="{% url 'abonapp:unsubscribe_service' group.pk abon.username abon_tariff.pk %}" class="btn btn-sm btn-danger">
-                            <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
-                        </a>
+                        {% if perms.abonapp.can_complete_service %}
+                            <a href="{% url 'abonapp:unsubscribe_service' group.pk abon.username abon_tariff.pk %}" class="btn btn-sm btn-danger">
+                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
+                            </a>
+                        {% else %}
+                            <a href="#" class="btn btn-sm btn-danger disabled">
+                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -115,7 +121,7 @@
             </div>
         </div>
 
-        {% if perms.tariff_app.can_view_periodic_pay %}
+        {% if perms.tariff_app.view_periodic_pay %}
         <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">

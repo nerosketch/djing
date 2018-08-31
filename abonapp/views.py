@@ -456,7 +456,7 @@ def pick_tariff(request, gid: int, uname):
 
 @login_required
 @lib.decorators.only_admins
-@permission_required('abonapp.delete_abontariff')
+@permission_required('abonapp.can_complete_service')
 def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     try:
         abon_tariff = get_object_or_404(models.AbonTariff, pk=int(abon_tariff_id))
@@ -473,7 +473,7 @@ def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.can_view_abonlog'), name='dispatch')
+@method_decorator(permission_required('abonapp.view_abonlog'), name='dispatch')
 class LogListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
@@ -483,7 +483,7 @@ class LogListView(ListView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.can_view_invoiceforpayment'), name='dispatch')
+@method_decorator(permission_required('abonapp.view_invoiceforpayment'), name='dispatch')
 class DebtorsListView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
@@ -923,7 +923,7 @@ def active_nets(request, gid):
 
 @login_required
 @lib.decorators.only_admins
-@permission_required('abonapp.can_view_additionaltelephones')
+@permission_required('abonapp.view_additionaltelephones')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def tels(request, gid: int, uname):
     abon = get_object_or_404(models.Abon, username=uname)

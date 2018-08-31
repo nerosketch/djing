@@ -93,10 +93,6 @@ msgstr "Алгоритм расчёта"
 msgid "Total amount"
 msgstr "Стоимость"
 
-#: models.py:104
-msgid "Can view periodic pay"
-msgstr "Может смотреть периодические платежи"
-
 #: models.py:106
 msgid "Periodic pay"
 msgstr "Периодический платёж"

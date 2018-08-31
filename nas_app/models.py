@@ -48,9 +48,6 @@ class NASModel(models.Model):
         verbose_name = _('Network access server. Gateway')
         verbose_name_plural = _('Network access servers. Gateways')
         ordering = 'ip_address',
-        permissions = (
-            ('can_view_nas', _('Can view NAS')),
-        )
 
 
 @receiver(pre_delete, sender=NASModel)

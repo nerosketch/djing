@@ -95,13 +95,9 @@ msgstr "Поля"
 msgid "Amount of money"
 msgstr "Количество денег"
 
-#: models.py:34
-msgid "Can view subscriber logs"
-msgstr "Может видеть логи абонента"
-
 #: models.py:66
 msgid "finish service perm"
-msgstr "Снятие со счёта средств"
+msgstr "Завершение услуги"
 
 #: models.py:68
 msgid "Abon service"
@@ -232,10 +228,6 @@ msgstr "Кем выдан"
 msgid "Passport Info"
 msgstr "Паспортные данные"
 
-#: models.py:335
-msgid "Can view invoice for payment"
-msgstr "Может видеть назначенные платежи"
-
 #: models.py:337
 msgid "Debt"
 msgstr "Квитанция (долг)"
@@ -252,10 +244,6 @@ msgstr "Терминал"
 #: models.py:363
 msgid "Receipt number"
 msgstr "Номер пас."
-
-#: models.py:420
-msgid "Can view additional telephones"
-msgstr "Может видеть дополнительные телефоны"
 
 #: models.py:422
 msgid "Additional telephone"

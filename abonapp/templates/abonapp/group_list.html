@@ -55,12 +55,12 @@
             <tfoot>
             <tr>
                 <td colspan="4" class="btn-group btn-group-sm">
-                    {% if perms.abonapp.can_view_abonlog %}
+                    {% if perms.abonapp.view_abonlog %}
                         <a href="{% url 'abonapp:log' %}" class="btn btn-default">
                             <span class="glyphicon glyphicon-record"></span> <span class="hidden-xs">{% trans 'Subscribers actions' %}</span>
                         </a>
                     {% endif %}
-                    {% if perms.abonapp.can_view_invoiceforpayment %}
+                    {% if perms.abonapp.view_invoiceforpayment %}
                         <a href="{% url 'abonapp:debtors' %}" class="btn btn-default">
                             <span class="glyphicon glyphicon-exclamation-sign"></span> <span class="hidden-xs">{% trans 'List of debtors' %}</span>
                         </a>

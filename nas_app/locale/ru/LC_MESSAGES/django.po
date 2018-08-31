@@ -56,10 +56,6 @@ msgstr "Сервер доступа в интернет(NAS, Шлюз)"
 msgid "Network access servers. Gateways"
 msgstr "Серверы доступа в интернет"
 
-#: models.py:53
-msgid "Can view NAS"
-msgstr "Может видеть NAS"
-
 #: models.py:63 tests.py:194
 msgid "You cannot remove default server"
 msgstr "Вы не можете удалить шлюз по умолчанию"

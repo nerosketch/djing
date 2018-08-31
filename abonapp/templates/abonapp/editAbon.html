@@ -84,7 +84,7 @@
                                     </a>
                                 {% endif %}
 
-                                {% if perms.dialing_app.can_send_sms %}
+                                {% if perms.dialing_app.add_smsout %}
                                     <a href="{% url 'dialapp:send_sms' %}?path={{ request.path|urlencode }}&dst={{ form.telephone.value|urlencode }}" class="btn btn-default btn-modal">
                                         <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
                                     </a>

@@ -44,10 +44,6 @@ msgstr "Геоточка"
 msgid "Map points"
 msgstr "Геоточки"
 
-#: mapapp/models.py:18
-msgid "Can view"
-msgstr "Может просматривать"
-
 #: mapapp/templates/maps/add_device.html:8 mapapp/templates/maps/dot.html:9
 #: mapapp/templates/maps/options.html:7
 msgid "Map settings"

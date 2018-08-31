@@ -124,7 +124,7 @@ class DialsFilterListView(BaseListView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('dialing_app.can_view_sms'), name='dispatch')
+@method_decorator(permission_required('dialing_app.view_smsmodel'), name='dispatch')
 class InboxSMSListView(BaseListView):
     template_name = 'inbox_sms.html'
     context_object_name = 'sms_messages'
@@ -133,7 +133,7 @@ class InboxSMSListView(BaseListView):
 
 @login_required
 @only_admins
-@permission_required('dialing_app.can_send_sms')
+@permission_required('dialing_app.add_smsout')
 def send_sms(request):
     path = request.GET.get('path')
     initial_dst = request.GET.get('dst')

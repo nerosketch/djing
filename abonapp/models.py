@@ -30,9 +30,6 @@ class AbonLog(models.Model):
 
     class Meta:
         db_table = 'abonent_log'
-        permissions = (
-            ('can_view_abonlog', _('Can view subscriber logs')),
-        )
         ordering = '-date',
 
     def __str__(self):
@@ -330,9 +327,6 @@ class InvoiceForPayment(models.Model):
     class Meta:
         ordering = ('date_create',)
         db_table = 'abonent_inv_pay'
-        permissions = (
-            ('can_view_invoiceforpayment', _('Can view invoice for payment')),
-        )
         verbose_name = _('Debt')
         verbose_name_plural = _('Debts')
 
@@ -415,9 +409,6 @@ class AdditionalTelephone(models.Model):
     class Meta:
         db_table = 'additional_telephones'
         ordering = ('owner_name',)
-        permissions = (
-            ('can_view_additionaltelephones', _('Can view additional telephones')),
-        )
         verbose_name = _('Additional telephone')
         verbose_name_plural = _('Additional telephones')
 

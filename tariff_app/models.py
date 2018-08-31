@@ -100,9 +100,6 @@ class PeriodicPay(models.Model):
 
     class Meta:
         db_table = 'periodic_pay'
-        permissions = (
-            ('can_view_periodic_pay', _('Can view periodic pay')),
-        )
         verbose_name = _('Periodic pay')
         verbose_name_plural = _('Periodic pays')
         ordering = ('-id',)

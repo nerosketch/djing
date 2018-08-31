@@ -15,9 +15,6 @@ class Dot(models.Model):
         verbose_name = _('Map point')
         verbose_name_plural = _('Map points')
         ordering = ('title',)
-        permissions = (
-            ('can_view', _('Can view')),
-        )
 
     def __str__(self):
         return self.title

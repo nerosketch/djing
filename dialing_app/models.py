@@ -80,9 +80,6 @@ class SMSModel(models.Model):
 
     class Meta:
         db_table = 'sms'
-        permissions = (
-            ('can_view_sms', _('Can view sms')),
-        )
         verbose_name = _('SMS')
         verbose_name_plural = _('SMS')
         ordering = ('-when',)
@@ -104,10 +101,6 @@ class SMSOut(models.Model):
 
     class Meta:
         db_table = 'out_sms'
-        permissions = (
-            ('can_view_sms', _('Can view sms')),
-            ('can_send_sms', _('Can send sms'))
-        )
         verbose_name = _('Out SMS')
         verbose_name_plural = _('Out SMS')
         ordering = ('-when',)

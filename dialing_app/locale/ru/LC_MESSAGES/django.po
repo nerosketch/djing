@@ -39,10 +39,6 @@ msgstr "Отвечен"
 msgid "Unknown"
 msgstr "Не определён"
 
-#: models.py:84 models.py:108
-msgid "Can view sms"
-msgstr "Может просматривать смс"
-
 #: models.py:86 models.py:87
 msgid "SMS"
 msgstr "СМС"
@@ -70,10 +66,6 @@ msgstr "Отправленное"
 #: models.py:103
 msgid "Status"
 msgstr "Статус"
-
-#: models.py:109
-msgid "Can send sms"
-msgstr "Может отправлять смс"
 
 #: models.py:111 models.py:112
 msgid "Out SMS"
