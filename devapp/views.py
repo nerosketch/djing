@@ -591,7 +591,7 @@ def fix_onu(request):
                     text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
         else:
-            text = text + '\n%s' % _('Parent device not found')
+            text += '\n%s' % _('Parent device not found')
     except Device.DoesNotExist:
         pass
     return {
