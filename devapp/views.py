@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -516,11 +516,10 @@ class GroupsListView(global_base_views.OrderedFilteredList):
 
 @login_required
 @only_admins
-@json_view
 def search_dev(request):
     word = request.GET.get('s')
     if word is None or word == '':
-        results = tuple({'id': 0, 'text': ''})
+        results = {'id': 0, 'text': ''}
     else:
         qs = Q(comment__icontains=word)
         try:
@@ -533,7 +532,7 @@ def search_dev(request):
             'id': device.pk,
             'text': "%s: %s" % (device.ip_address or '', device.comment)
         } for device in results)
-    return results
+    return JsonResponse(results, safe=False)
 
 
 @login_required
