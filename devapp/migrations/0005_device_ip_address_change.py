@@ -34,10 +34,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(device_backup_info),
-        migrations.AlterField(
+        migrations.RemoveField(model_name='device', name='ip_address'),
+        migrations.AddField(
             model_name='device',
             name='ip_address',
-            field=models.GenericIPAddressField(blank=True, null=True, verbose_name='Ip address'),
+            field=models.GenericIPAddressField(blank=True, null=True, verbose_name='Ip address')
         ),
         migrations.RunPython(device_restore_info_to_new_scheme)
     ]
