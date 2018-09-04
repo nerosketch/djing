@@ -127,9 +127,9 @@ class BaseTransmitter(ABC):
             print('List for del:', len(list_for_del))
             for ld in list_for_del:
                 print('\t', ld)
-            #self.remove_user_range(list_for_del)
+            self.remove_user_range(list_for_del)
         if len(list_for_add) > 0:
             print('List for add:', len(list_for_add))
             for la in list_for_add:
                 print('\t', la)
-            #self.add_user_range(list_for_add)
+            self.add_user_range(list_for_add)
