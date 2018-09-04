@@ -8,13 +8,12 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 from django.views.generic import ListView
 from django.conf import settings
-from jsonview.decorators import json_view
 
 from group_app.models import Group
 from .models import Dot
 from .forms import DotForm
 from djing.lib import safe_int
-from djing.lib.decorators import only_admins
+from djing.lib.decorators import only_admins, json_view
 from devapp.models import Device
 from guardian.decorators import permission_required
 

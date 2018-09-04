@@ -97,7 +97,8 @@ class Abon(BaseAccount):
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(default=False)
-    nas = models.ForeignKey('nas_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('Network access server'), default=None)
+    nas = models.ForeignKey('nas_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL,
+                            verbose_name=_('Network access server'), default=None)
 
     MARKER_FLAGS = (
         ('icon_donkey', _('Donkey')),
@@ -337,12 +338,13 @@ class AllTimePayLogManager(models.Manager):
     def by_days():
         cur = connection.cursor()
         cur.execute(
-            'SELECT SUM(summ) as alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
+            'SELECT SUM(summ) AS alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
             'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")'
         )
         while True:
             r = cur.fetchone()
-            if r is None: break
+            if r is None:
+                break
             summ, dat = r
             yield {'summ': summ, 'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
 
@@ -420,7 +422,7 @@ class PeriodicPayForId(models.Model):
     next_pay = models.DateTimeField(_('Next time to pay'))
     account = models.ForeignKey(Abon, on_delete=models.CASCADE, verbose_name=_('Account'))
 
-    def payment_for_service(self, author: UserProfile=None, now=None):
+    def payment_for_service(self, author: UserProfile = None, now=None):
         """
         Charge for the service and leave a log about it
         :param now: Current date, if now is None than it calculates in here

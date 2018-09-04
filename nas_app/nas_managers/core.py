@@ -22,7 +22,7 @@ class BaseTransmitter(ABC):
         :return: Returnd a description of nas implementation
         """
 
-    def __init__(self, login: str, password: str, ip: str, port: int, *args, **kwargs):
+    def __init__(self, ip: str, *args, **kwargs):
         if not ping(ip):
             raise NasNetworkError('NAS %(ip_addr)s does not pinged' % {
                 'ip_addr': ip
@@ -34,34 +34,48 @@ class BaseTransmitter(ABC):
 
     @abstractmethod
     def add_user_range(self, user_list: VectorAbon):
-        """add subscribers list to NAS"""
+        """add subscribers list to NAS
+        :param user_list: Vector of instances of subscribers
+        """
 
     @abstractmethod
     def remove_user_range(self, users: VectorAbon):
-        """remove subscribers list"""
+        """remove subscribers list
+        :param users: Vector of instances of subscribers
+        """
 
     @abstractmethod
     def add_user(self, user: AbonStruct, *args):
-        """add subscriber"""
+        """add subscriber
+        :param user: Subscriber instance
+        """
 
     @abstractmethod
     def remove_user(self, user: AbonStruct):
-        """remove subscriber"""
+        """
+        remove subscriber
+        :param user: Subscriber instance
+        """
 
     @abstractmethod
     def update_user(self, user: AbonStruct, *args):
         """
         Update subscriber by uid, you can change everything except its uid.
         Subscriber will found by UID.
+        :param user: Subscriber instance
         """
 
     @abstractmethod
     def add_tariff_range(self, tariff_list: VectorTariff):
-        """Add services list to NAS."""
+        """Add services list to NAS.
+        :param tariff_list: Vector of TariffStruct
+        """
 
     @abstractmethod
     def remove_tariff_range(self, tariff_list: VectorTariff):
-        """Remove tariff list by unique id list."""
+        """Remove tariff list by unique id list.
+        :param tariff_list: Vector of TariffStruct
+        """
 
     @abstractmethod
     def add_tariff(self, tariff: TariffStruct):
@@ -72,6 +86,7 @@ class BaseTransmitter(ABC):
         """
         Update tariff by uid, you can change everything except its uid.
         Tariff will found by UID.
+        :param tariff: Service for update
         """
 
     @abstractmethod
@@ -97,6 +112,8 @@ class BaseTransmitter(ABC):
     def lease_free(self, user: AbonStruct, lease):
         """
         Remove ip lease from allowed to network
+        :param lease: ip_address for lease
+        :param user: Subscriber instance
         :return:
         """
 
@@ -104,6 +121,8 @@ class BaseTransmitter(ABC):
     def lease_start(self, user: AbonStruct, lease):
         """
         Starts ip lease to allowed to network
+        :param lease: ip_address for lease
+        :param user: Subscriber instance
         :return:
         """
 
@@ -112,7 +131,8 @@ class BaseTransmitter(ABC):
         :param users_from_db: QuerySet of all subscribers that can have service
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
-        users_struct_gen = (ab.build_agent_struct(raise_errs=False) for ab in users_from_db if ab is not None and ab.is_access())
+        users_struct_gen = (ab.build_agent_struct(raise_errs=False) for ab in users_from_db if
+                            ab is not None and ab.is_access())
         users_struct_set = set(ab for ab in users_struct_gen if ab is not None and ab.tariff is not None)
         users_from_nas = set(self.read_users())
         if len(users_from_nas) < 1:

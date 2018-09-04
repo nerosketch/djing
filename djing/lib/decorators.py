@@ -1,6 +1,6 @@
 from functools import wraps
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
 
 from djing.lib import check_sign
@@ -92,3 +92,14 @@ class LazyInitMetaclass(type):
         setattr(new_class, '_lazy_init', real_init)
 
         return new_class
+
+
+# Wraps return data to JSON
+def json_view(fn):
+    @wraps(fn)
+    def wrapped(request, *args, **kwargs):
+        r = fn(request, *args, **kwargs)
+        return JsonResponse(r, safe=False, json_dumps_params={
+            'ensure_ascii': False
+        })
+    return wrapped

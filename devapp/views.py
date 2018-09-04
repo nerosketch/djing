@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.utils.decorators import method_decorator
@@ -24,7 +24,7 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from guardian.shortcuts import get_objects_for_user
 from chatbot.send_func import send_notify
 from chatbot.models import ChatException
-from jsonview.decorators import json_view
+from djing.lib.decorators import json_view
 from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
@@ -516,6 +516,7 @@ class GroupsListView(global_base_views.OrderedFilteredList):
 
 @login_required
 @only_admins
+@json_view
 def search_dev(request):
     word = request.GET.get('s')
     if word is None or word == '':
@@ -532,7 +533,7 @@ def search_dev(request):
             'id': device.pk,
             'text': "%s: %s" % (device.ip_address or '', device.comment)
         } for device in results)
-    return JsonResponse(results, safe=False)
+    return results
 
 
 @login_required

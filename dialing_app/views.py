@@ -11,13 +11,12 @@ from django.views.generic import ListView
 from guardian.decorators import permission_required_or_403 as permission_required
 from django.db.models import Q
 from django.conf import settings
-from jsonview.decorators import json_view
 
 from abonapp.models import Abon
 from djing.global_base_views import SecureApiView
 from djing import JSONType
 from djing.lib import safe_int
-from djing.lib.decorators import only_admins
+from djing.lib.decorators import only_admins, json_view
 from .models import AsteriskCDR, SMSModel, SMSOut
 from .forms import SMSOutForm
 

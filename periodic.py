@@ -23,11 +23,11 @@ class NasSyncThread(Thread):
     def run(self):
         try:
             tm = self.nas.get_nas_manager()
-            users = Abon.objects\
-                .annotate(ips_count=Count('ip_addresses'))\
-                .filter(is_active=True, ips_count__gt=0, nas=self.nas)\
-                .exclude(current_tariff=None)\
-                .prefetch_related('ip_addresses')\
+            users = Abon.objects \
+                .annotate(ips_count=Count('ip_addresses')) \
+                .filter(is_active=True, ips_count__gt=0, nas=self.nas) \
+                .exclude(current_tariff=None) \
+                .prefetch_related('ip_addresses') \
                 .iterator()
             tm.sync_nas(users)
         except NasNetworkError as er:
@@ -70,7 +70,9 @@ def main():
     old_leases.delete()
 
     # sync subscribers on NAS
-    threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.annotate(usercount=Count('abon')).filter(usercount__gt=0))
+    threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.
+                    annotate(usercount=Count('abon')).
+                    filter(usercount__gt=0))
     for t in threads:
         t.start()
     for t in threads:

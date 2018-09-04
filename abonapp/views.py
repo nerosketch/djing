@@ -13,8 +13,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from django.conf import settings
-from djing.lib import DuplicateEntry
-from jsonview.decorators import json_view
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
 from nas_app.models import NASModel
@@ -33,10 +31,11 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
 from djing import ping
 from djing import lib
+from djing.lib.decorators import json_view, only_admins
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 
-login_decs = login_required, lib.decorators.only_admins
+login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -188,7 +187,7 @@ class DelAbonDeleteView(DeleteView):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.can_add_ballance')
 @transaction.atomic
 def abonamount(request, gid: int, uname):
@@ -260,7 +259,7 @@ class PayHistoryListView(OrderedFilteredList):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 def abon_services(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.view_group', grp):
@@ -371,7 +370,7 @@ def terminal_pay(request):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid: int, uname: str):
     abon = get_object_or_404(models.Abon, username=uname)
@@ -408,7 +407,7 @@ def add_invoice(request, gid: int, uname: str):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.can_buy_tariff')
 @transaction.atomic
 def pick_tariff(request, gid: int, uname):
@@ -455,7 +454,7 @@ def pick_tariff(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.can_complete_service')
 def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     try:
@@ -553,7 +552,7 @@ class PassportUpdateView(UpdateView):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 def chgroup_tariff(request, gid):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.change_group', grp):
@@ -574,7 +573,7 @@ def chgroup_tariff(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 def dev(request, gid: int, uname):
     abon_dev = None
@@ -600,7 +599,7 @@ def dev(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def clear_dev(request, gid: int, uname):
@@ -618,7 +617,7 @@ def clear_dev(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def charts(request, gid: int, uname):
     high = 100
@@ -669,7 +668,7 @@ def charts(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.can_ping')
 @json_view
 def abon_ping(request, gid: int, uname):
@@ -722,7 +721,7 @@ def abon_ping(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 def vcards(r):
     users = models.Abon.objects.exclude(group=None).select_related('group', 'street').only(
         'username', 'fio', 'group__title', 'telephone',
@@ -807,7 +806,7 @@ class DialsListView(OrderedFilteredList):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 def save_user_dev_port(request, gid: int, uname):
     if request.method != 'POST':
@@ -854,7 +853,7 @@ def save_user_dev_port(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.add_abonstreet')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def street_add(request, gid):
@@ -875,7 +874,7 @@ def street_add(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abonstreet')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def street_edit(request, gid):
@@ -899,7 +898,7 @@ def street_edit(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.delete_abonstreet')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def street_del(request, gid: int, sid: int):
@@ -912,7 +911,7 @@ def street_del(request, gid: int, sid: int):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def active_nets(request, gid):
     nets = NetworkModel.objects.filter(groups__id=gid)
@@ -922,7 +921,7 @@ def active_nets(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.view_additionaltelephones')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def tels(request, gid: int, uname):
@@ -936,7 +935,7 @@ def tels(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.add_additionaltelephone')
 def tel_add(request, gid: int, uname):
     if request.method == 'POST':
@@ -960,7 +959,7 @@ def tel_add(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.delete_additionaltelephone')
 def tel_del(request, gid: int, uname):
     try:
@@ -974,7 +973,7 @@ def tel_del(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def phonebook(request, gid):
     res_format = request.GET.get('f')
@@ -997,7 +996,7 @@ def phonebook(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def abon_export(request, gid):
     res_format = request.GET.get('f')
@@ -1033,7 +1032,7 @@ def abon_export(request, gid):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 def fin_report(request):
     q = models.AllTimePayLog.objects.by_days()
     res_format = request.GET.get('f')
@@ -1051,7 +1050,7 @@ def fin_report(request):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
     if periodic_pay_id == 0:
@@ -1083,7 +1082,7 @@ def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 @permission_required('abonapp.delete_periodicpayforid')
 def del_periodic_pay(request, gid: int, uname, periodic_pay_id):
@@ -1129,7 +1128,7 @@ class EditSibscriberMarkers(UpdateView):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 def user_session_toggle(request, gid: int, uname, lease_id: int, action=None):
     abon = get_object_or_404(models.Abon, username=uname)
@@ -1160,7 +1159,7 @@ def user_session_toggle(request, gid: int, uname, lease_id: int, action=None):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 def lease_add(request, gid: int, uname):
     group = get_object_or_404(Group, pk=gid)
@@ -1206,7 +1205,7 @@ def lease_add(request, gid: int, uname):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @permission_required('abonapp.change_abon')
 def attach_nas(request, gid):
     if request.method == 'POST':
@@ -1230,7 +1229,7 @@ def attach_nas(request, gid):
 
 # API's
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @json_view
 def abons(request):
     ablist = ({
@@ -1255,7 +1254,7 @@ def abons(request):
 
 
 @login_required
-@lib.decorators.only_admins
+@only_admins
 @json_view
 def search_abon(request):
     word = request.GET.get('s')
@@ -1310,7 +1309,7 @@ class DhcpLever(SecureApiView):
         except lib.LogicError as e:
             print('LogicError', e)
             return str(e)
-        except DuplicateEntry as e:
+        except lib.DuplicateEntry as e:
             print('Duplicate:', e)
             return str(e)
 
