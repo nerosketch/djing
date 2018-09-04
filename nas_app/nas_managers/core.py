@@ -112,7 +112,7 @@ class BaseTransmitter(ABC):
         :param users_from_db: QuerySet of all subscribers that can have service
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
-        users_struct_gen = (ab.build_agent_struct() for ab in users_from_db if ab.is_access())
+        users_struct_gen = (ab.build_agent_struct(raise_errs=False) for ab in users_from_db if ab is not None and ab.is_access())
         users_struct_set = set(ab for ab in users_struct_gen if ab is not None and ab.tariff is not None)
         users_from_nas = set(self.read_users())
         if len(users_from_nas) < 1:
@@ -127,9 +127,9 @@ class BaseTransmitter(ABC):
             print('List for del:', len(list_for_del))
             for ld in list_for_del:
                 print('\t', ld)
-            self.remove_user_range(list_for_del)
+            #self.remove_user_range(list_for_del)
         if len(list_for_add) > 0:
             print('List for add:', len(list_for_add))
             for la in list_for_add:
                 print('\t', la)
-            self.add_user_range(list_for_add)
+            #self.add_user_range(list_for_add)

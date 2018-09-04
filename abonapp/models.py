@@ -209,7 +209,7 @@ class Abon(BaseAccount):
         return ct.manage_access(self)
 
     # make subscriber from agent structure
-    def build_agent_struct(self):
+    def build_agent_struct(self, raise_errs=True):
         abon_addresses = tuple(ip_address(i.ip) for i in self.ip_addresses.filter(is_active=True))
         # if not abon_addresses:
         #     return
@@ -221,9 +221,10 @@ class Abon(BaseAccount):
             agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
         if len(abon_addresses) > 0:
             return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
-        raise LogicError(_('Account "%(username)s" not have any active leases') % {
-            'username': self.username
-        })
+        if raise_errs:
+            raise LogicError(_('Account "%(username)s" not have any active leases') % {
+                'username': self.username
+            })
 
     def nas_sync_self(self) -> Optional[Exception]:
         """
