@@ -1,4 +1,4 @@
-{% load i18n %}{% load bootstrap3 %}
+{% load i18n bootstrap3 %}
 <form action="{% url 'dialapp:send_sms' %}?path={{ path|default:'' }}" method="post"> {% csrf_token %}
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

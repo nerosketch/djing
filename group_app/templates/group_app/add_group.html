@@ -1,6 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,group_app/ext.html' %}
-{% load i18n %}
-{% load bootstrap3 %}
+{% load i18n bootstrap3%}
 {% block active_text %}{% trans 'Add group' %}{% endblock %}
 {% block content %}
 <form action="{% url 'group_app:add' %}" method="post">{% csrf_token %}

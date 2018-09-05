@@ -1,4 +1,4 @@
-{% load i18n %}{% load bootstrap3 %}{% load globaltags %}
+{% load i18n bootstrap3 globaltags %}
 <form action="{% url 'mapapp:modal_add_dot' %}" class="form-ajax" method="post" enctype="multipart/form-data">{% csrf_token %}
     <input type="hidden" name="MAX_FILE_SIZE" value="{% global_var 'FILE_UPLOAD_MAX_MEMORY_SIZE' %}"/>
     <div class="modal-header primary">
