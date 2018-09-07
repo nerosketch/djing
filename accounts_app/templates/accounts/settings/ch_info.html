@@ -1,6 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/settings/ext.htm' %}
-{% load globaltags %}
-{% load i18n %}
+{% load globaltags i18n %}
 {% block content %}
 
     <form role="form" action="{% url 'acc_app:setup_info' %}" method="post">{% csrf_token %}

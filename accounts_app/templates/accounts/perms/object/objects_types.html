@@ -1,6 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,accounts/perms/ext.html' %}
-{% load i18n %}
-{% load acc_tags %}
+{% load i18n acc_tags %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">

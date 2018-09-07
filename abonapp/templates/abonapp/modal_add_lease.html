@@ -1,6 +1,5 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,abonapp/ext.htm' %}
-{% load i18n %}
-{% load bootstrap3 %}
+{% load i18n bootstrap3 %}
 {% block content %}
 <form role="form" action="{% url 'abonapp:lease_add' group.id uname %}" method="post"> {% csrf_token %}
     <div class="modal-header primary">

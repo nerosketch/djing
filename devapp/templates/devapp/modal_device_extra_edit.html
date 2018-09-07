@@ -1,6 +1,5 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-{% load i18n %}
-{% load bootstrap3 %}
+{% load i18n bootstrap3 %}
 {% block main %}
 <form action="{% url 'devapp:extra_data_edit' group_id object.pk %}" method="post">{% csrf_token %}
     <div class="modal-header primary">
