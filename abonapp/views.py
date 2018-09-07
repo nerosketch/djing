@@ -126,7 +126,6 @@ class AbonCreateView(CreateView):
             assign_perm("abonapp.change_abon", me, abon)
             assign_perm("abonapp.delete_abon", me, abon)
             assign_perm("abonapp.can_buy_tariff", me, abon)
-            assign_perm("abonapp.view_passportinfo", me, abon)
             assign_perm('abonapp.can_add_ballance', me, abon)
             me.log(self.request.META, 'cusr', '%s, "%s", %s' % (
                 abon.username, abon.fio,
