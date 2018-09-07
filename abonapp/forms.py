@@ -43,7 +43,7 @@ class AbonForm(forms.ModelForm):
             abon_group_queryset = None
         if abon_group_queryset is not None:
             self.fields['street'].queryset = abon_group_queryset
-        if not instance:
+        if instance.pk is None:
             self.initial['nas'] = NASModel.objects.filter(default=True).first()
 
     username = forms.CharField(max_length=127, required=False, initial=_generate_random_username,
