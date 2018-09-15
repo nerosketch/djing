@@ -636,6 +636,9 @@ msgstr "Не правильный логин или пароль для дост
 msgid "Process locked by another process"
 msgstr "Процесс занят другой задачей, подождите чуть и попробуйте ещё"
 
+msgid "You have not info in extra_data field, please fill it in JSON"
+msgstr "Не заполнено поле 'Техническая информация', обратитесь к администратору"
+
 #~ msgid "Device %(device_name)s is up"
 #~ msgstr "%(device_name)s в сети"
 

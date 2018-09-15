@@ -478,8 +478,8 @@ class ZteOnuDevice(OnuDevice):
         return '\n'.join(i for i in r if i)
 
     def register_device(self, extra_data: Dict):
-        if extra_data is None:
-            raise DeviceConfigurationError('You have not info in extra_data field, please fill it in JSON')
+        if not extra_data:
+            raise DeviceConfigurationError(_('You have not info in extra_data field, please fill it in JSON'))
         device = self.db_instance
         ip = None
         if device.ip_address:
