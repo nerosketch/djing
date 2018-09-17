@@ -33,8 +33,9 @@
             <tbody>
             {% for gr in groups %}
                 <tr>
-                    <td>{{ gr.pk }}</td>
-                    <td><a href="{% url 'abonapp:people_list' gr.pk %}">{{ gr.title }}</a></td>
+                    {% url 'abonapp:people_list' gr.pk as aburl %}
+                    <td><a href="{{ aburl }}">{{ gr.pk }}</a></td>
+                    <td><a href="{{ aburl }}">{{ gr.title }}</a></td>
                     <td class="hidden-xs">{{ gr.usercount }}</td>
                     <td class="btn-group btn-group-sm">
                         <a href="{% url 'abonapp:ch_group_tariff' gr.pk %}" class="btn btn-default" title="{% trans 'User groups' %}">
