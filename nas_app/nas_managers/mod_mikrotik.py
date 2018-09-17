@@ -387,11 +387,17 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             return
         if not isinstance(user.tariff, TariffStruct):
             raise TypeError
-        self.add_queue(user)
+        try:
+            self.add_queue(user)
+        except NasFailedResult as e:
+            print('Error:', e)
         for ip in user.ips:
             if not issubclass(ip.__class__, _BaseAddress):
                 raise TypeError
-            self.add_ip(LIST_USERS_ALLOWED, ip)
+            try:
+                self.add_ip(LIST_USERS_ALLOWED, ip)
+            except NasFailedResult as e:
+                print('Error:', e)
 
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
@@ -478,6 +484,8 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
 
     def lease_free(self, user: AbonStruct, lease):
         queue = self.find_queue('uid%d' % user.uid)
+        if queue is None:
+            return
         if len(queue.ips) > 1:
             if queue is not None:
                 user.ips = tuple(i for i in user.ips if i != lease)
