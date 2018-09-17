@@ -1150,3 +1150,6 @@ msgstr "Графики"
 
 msgid "Cancel"
 msgstr "Отмена"
+
+msgid "View"
+msgstr "Открыть"
