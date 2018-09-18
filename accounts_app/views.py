@@ -34,6 +34,9 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
     def get_success_url(self):
+        next_url = self.request.GET.get('next')
+        if next_url:
+            return next_url
         if self.request.user.is_staff:
             return resolve_url('acc_app:profile')
         return resolve_url('client_side:home')
