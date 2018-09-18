@@ -38,17 +38,26 @@
             <ul class="nav navbar-nav">
 
                 <li{% if client_side_home == request.path %} class="active"{% endif %}>
-                <a href="{{ client_side_home }}">{% trans 'Personal account' %}</a>
+                    <a href="{{ client_side_home }}">
+                        <span class="glyphicon glyphicon-user"></span>
+                        {% trans 'Personal account' %}
+                    </a>
                 </li>
 
                 {% url 'client_side:pays' as client_side_pays %}
                 <li{% if client_side_pays == request.path %} class="active"{% endif %}>
-                <a href="{{ client_side_pays }}">{% trans 'Pays' %}</a>
+                    <a href="{{ client_side_pays }}">
+                        <span class="glyphicon glyphicon-ruble"></span>
+                        {% trans 'Pays' %}
+                    </a>
                 </li>
 
                 {% url 'client_side:services' as client_side_services %}
                 <li{% if client_side_services == request.path %} class="active"{% endif %}>
-                <a href="{{ client_side_services }}">{% trans 'Services' %}</a>
+                    <a href="{{ client_side_services }}">
+                        <span class="glyphicon glyphicon-book"></span>
+                        {% trans 'Services' %}
+                    </a>
                 </li>
 
 {#                <li class="dropdown">#}
@@ -67,9 +76,25 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Other' %} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{% url 'client_side:debts' %}">{% trans 'Show debts and pay it' %}</a></li>
-                        <li><a href="{% url 'client_side:task_history' %}">{% trans 'Show task history' %}</a></li>
-                        <li><a href="{% url 'acc_app:logout' %}">{% trans 'Quit' %}</a></li>
+                        <li>
+                            <a href="{% url 'client_side:debts' %}">
+                                <span class="glyphicon glyphicon-ruble"></span>
+                                {% trans 'Show debts and pay it' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'client_side:task_history' %}">
+                                <span class="glyphicon glyphicon-tasks"></span>
+                                {% trans 'Show task history' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'acc_app:logout' %}">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                {% trans 'Quit' %}
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
             </ul>
@@ -91,6 +116,10 @@
         {% endblocktrans %}
     </div>
     {% endif %}
+
+    <div class="alert alert-info">
+        {% blocktrans %}You may add link to this personal page to bookmarks by pressing Ctrl+D{% endblocktrans %}
+    </div>
 
     {% include '_messages.html' %}
 

@@ -1,14 +1,14 @@
 function show_ModalMyContent(content){
-    $('#modContent').html(content);
+	$('#modContent').html(content);
 	$('#modFrm').modal();
 }
 function show_Modal(title, content, type_class){
 var cnt='<div class="modal-header '+type_class+'">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-            '<h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>'+title+'</h4>' +
-        '</div>' +
-        '<div class="modal-body">'+content+'</div>' +
-        '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button></div>';
+			'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+			'<h4 class="modal-title"><span class="glyphicon glyphicon-warning-sign"></span>'+title+'</h4>' +
+		'</div>' +
+		'<div class="modal-body">'+content+'</div>' +
+		'<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button></div>';
 	show_ModalMyContent(cnt);
 }
 
@@ -46,11 +46,11 @@ $(document).ready(function () {
 		$.getJSON(data_url, {checked: this.checked});
 	});
 
-    $('.btn-modal').on('click', function(){
-        $.get(this.href, function(r){
-            show_ModalMyContent(r);
-        });
-        return false;
-    });
+	$('.btn-modal').on('click', function(){
+		$.get(this.href, function(r){
+			show_ModalMyContent(r);
+		});
+		return false;
+	});
 
 });
