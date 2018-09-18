@@ -408,7 +408,6 @@ def add_invoice(request, gid: int, uname: str):
 @login_required
 @only_admins
 @permission_required('abonapp.can_buy_tariff')
-@transaction.atomic
 def pick_tariff(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
     abon = get_object_or_404(models.Abon, username=uname)
@@ -716,6 +715,20 @@ def abon_ping(request, gid: int, uname):
     return {
         'status': 0 if status else 1,
         'dat': text
+    }
+
+
+@login_required
+@only_admins
+@json_view
+def set_auto_continue_service(request, gid: int, uname):
+    checked = request.GET.get('checked')
+    checked = True if checked == 'true' else False
+    abon = get_object_or_404(models.Abon, username=uname)
+    abon.autoconnect_service = checked
+    abon.save(update_fields=('autoconnect_service',))
+    return {
+        'status': 0
     }
 
 

@@ -41,7 +41,8 @@ def main():
     AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
     fields = ('id', 'tariff__title', 'abon__id')
-    expired_services = AbonTariff.objects.filter(deadline__lt=now).exclude(abon=None)
+    expired_services = AbonTariff.objects.exclude(abon=None).filter(deadline__lt=now,
+                                                                    abon__autoconnect_service=False)
 
     # finishing expires services
     with transaction.atomic():
@@ -57,6 +58,42 @@ def main():
             )
             print(log)
         expired_services.delete()
+
+    # Automatically connect new service
+    for ex in AbonTariff.objects.filter(deadline__lt=now, abon__autoconnect_service=True).exclude(
+            abon=None).iterator():
+        abon = ex.abon
+        trf = ex.tariff
+        amount = round(trf.amount, 2)
+        if abon.ballance >= amount:
+            # can continue service
+            with transaction.atomic():
+                abon.ballance -= amount
+                ex.time_start = now
+                ex.deadline = None  # Deadline sets automatically in signal pre_save
+                ex.save(update_fields=('time_start', 'deadline'))
+                abon.save(update_fields=('ballance',))
+                # make log about it
+                l = AbonLog.objects.create(
+                    abon=abon, amount=-amount,
+                    comment="Автоматическое продление услуги '%s'" % trf.title
+                )
+                print(l.comment)
+        else:
+            # finish service
+            with transaction.atomic():
+                ex.delete()
+                l = AbonLog.objects.create(
+                    abon_id=ex.abon.id,
+                    amount=0,
+                    author=None,
+                    date=now,
+                    comment="Срок действия услуги '%(service_name)s' истёк" % {
+                        'service_name': ex.tariff.title
+                    }
+                )
+                print(l.comment)
+
     signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
 
     # manage periodic pays

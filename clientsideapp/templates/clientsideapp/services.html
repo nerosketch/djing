@@ -24,8 +24,19 @@
 
                                 <dt>{% trans 'Cost' %}</dt>
                                 <dd>{{ current_service.tariff.amount }} {% trans 'currency' %}</dd>
+
+                                <dt>{% trans 'Auto continue service.' %}</dt>
+                                <dd><input type="checkbox" data-url="{% url 'clientsideapp:set_auto_continue_service' %}" class="autosave" {{ request.user.autoconnect_service|yesno:'checked,' }}></dd>
+
                             </dl>
                             <p>{{ current_service.tariff.descr }}</p>
+                            {% blocktrans trimmed %}
+                                The check box <b>Auto continue service</b> for auto-renewal service
+                                is designed so that the following <u>automatically</u> connected to the service
+                                that you had last month. Connection will occur if the account has enough funds.</p>
+                                <p>If you do not have time to make a Deposit before the service ended,
+                                replenish your account and log back into your personal account to connect it.</p>
+                            {% endblocktrans %}
                         </div>
                     </div>
 

@@ -1153,3 +1153,6 @@ msgstr "Отмена"
 
 msgid "View"
 msgstr "Открыть"
+
+msgid "Auto continue service."
+msgstr "Автопродление услуги."

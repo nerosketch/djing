@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-09 14:57+0300\n"
+"POT-Creation-Date: 2018-09-18 15:18+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -59,7 +59,7 @@ msgid "Your debt"
 msgstr "Ваши долги"
 
 #: templates/clientsideapp/debts.html:11
-#: templates/clientsideapp/tasklist.html:14
+#: templates/clientsideapp/tasklist.html:13
 msgid "State"
 msgstr "Состояние"
 
@@ -72,7 +72,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: templates/clientsideapp/debts.html:14
-#: templates/clientsideapp/tasklist.html:15
+#: templates/clientsideapp/tasklist.html:14
 msgid "Date of create"
 msgstr "Дата создания"
 
@@ -87,7 +87,7 @@ msgstr "Оплатить"
 #: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:77
 #: templates/clientsideapp/modal_service_buy.html:19
 #: templates/clientsideapp/services.html:26
-#: templates/clientsideapp/services.html:55
+#: templates/clientsideapp/services.html:66
 msgid "currency"
 msgstr "руб."
 
@@ -195,6 +195,8 @@ msgid ""
 "Inbound speed: %(speedIn)s MBit/s<br> Outgoing speed: %(speedOut)s MBit/"
 "s<br> Cost: %(amount)s rubles."
 msgstr ""
+"Входящая скорость: %(speedIn)s MBit/s<br> Исходяшая скорость: %(speedOut)s "
+"MBit/s<br> Стоимость: %(amount)s руб."
 
 #: templates/clientsideapp/modal_service_buy.html:19
 #, python-format
@@ -202,7 +204,7 @@ msgid "The cost is %(amount)s"
 msgstr "Стоимость %(amount)s"
 
 #: templates/clientsideapp/modal_service_buy.html:23
-#: templates/clientsideapp/services.html:63
+#: templates/clientsideapp/services.html:74
 msgid "Pick"
 msgstr "Заказать"
 
@@ -246,7 +248,26 @@ msgstr "Дата завершения услуги"
 msgid "Cost"
 msgstr "Стоимость"
 
-#: templates/clientsideapp/services.html:35
+#: templates/clientsideapp/services.html:28
+msgid "Auto continue service."
+msgstr "Автопродление услуги."
+
+#: templates/clientsideapp/services.html:33
+msgid ""
+"The check box <b>Auto continue service</b> for auto-renewal service is "
+"designed so that the following <u>automatically</u> connected to the service "
+"that you had last month. Connection will occur if the account has enough "
+"funds.</p> <p>If you do not have time to make a Deposit before the service "
+"ended, replenish your account and log back into your personal account to "
+"connect it.</p>"
+msgstr ""
+"<p>Флажок <b>Автопрдление услуги</b> предназначен для того чтоб в следующем "
+"месяце <u>автоматически</u> подключилась услуга которая была у вас в прошлом "
+"месяце. Подключение произойдёт если на счету достаточно средств.</p> <p>Если "
+"вы не успели внести средства до того как закочилась услуга, пополните счёт и "
+"снова войдите в личный кабинет чтоб подключить её.</p>"
+
+#: templates/clientsideapp/services.html:46
 msgid ""
 "<strong>Attantion!</strong> You have not yet a service, for use the services "
 "please purchase service you want."
@@ -254,27 +275,27 @@ msgstr ""
 "<strong>Внимание!</strong> У вас нет услуги, для использования ресурсов "
 "приобретите нужную услугу из представленных тут."
 
-#: templates/clientsideapp/services.html:46
+#: templates/clientsideapp/services.html:57
 msgid "Services available for ordering"
 msgstr "Доступные для заказа услуги"
 
-#: templates/clientsideapp/services.html:68
+#: templates/clientsideapp/services.html:79
 msgid "No services available for ordering"
 msgstr "Нет доступных для заказа услуг"
 
-#: templates/clientsideapp/tasklist.html:7
+#: templates/clientsideapp/tasklist.html:6
 msgid "Task history"
 msgstr "История заявок"
 
-#: templates/clientsideapp/tasklist.html:16
+#: templates/clientsideapp/tasklist.html:15
 msgid "The nature of the damage"
 msgstr "Характер заявки"
 
-#: templates/clientsideapp/tasklist.html:17
+#: templates/clientsideapp/tasklist.html:16
 msgid "Expected or real completion date"
 msgstr "Ожидаемый или реальный срок выполнения"
 
-#: templates/clientsideapp/tasklist.html:43
+#: templates/clientsideapp/tasklist.html:42
 msgid "You didn't leave any requests for breakdowns."
 msgstr "Заявки по вашей учётной записи не найдены"
 

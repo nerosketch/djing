@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core import validators
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import post_delete, pre_delete, post_init
+from django.db.models.signals import post_delete, pre_delete, post_init, pre_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone
@@ -87,7 +87,7 @@ class AbonManager(MyUserManager):
 
 
 class Abon(BaseAccount):
-    current_tariff = models.ForeignKey(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
+    current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
@@ -96,9 +96,10 @@ class Abon(BaseAccount):
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
-    is_dynamic_ip = models.BooleanField(default=False)
+    is_dynamic_ip = models.BooleanField(_('Is dynamic ip'), default=False)
     nas = models.ForeignKey('nas_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL,
                             verbose_name=_('Network access server'), default=None)
+    autoconnect_service = models.BooleanField(_('Automatically connect next service'), default=False)
 
     MARKER_FLAGS = (
         ('icon_donkey', _('Donkey')),
@@ -148,7 +149,16 @@ class Abon(BaseAccount):
         )
         self.ballance += amount
 
-    def pick_tariff(self, tariff, author, comment=None, deadline=None):
+    def pick_tariff(self, tariff, author, comment=None, deadline=None) -> None:
+        """
+        Trying to buy a service if enough money.
+        :param tariff: instance of tariff_app.models.Tariff.
+        :param author: Instance of accounts_app.models.UserProfile. Who connected this
+        service. May be None if author is a system.
+        :param comment: Optional text for logging this pay.
+        :param deadline: Instance of datetime.datetime. Date when service is expired.
+        :return: Nothing
+        """
         if not isinstance(tariff, Tariff):
             raise TypeError
 
@@ -170,22 +180,23 @@ class Abon(BaseAccount):
         if self.ballance < amount:
             raise LogicError(_('not enough money'))
 
-        new_abtar = AbonTariff.objects.create(
-            deadline=deadline, tariff=tariff
-        )
-        self.current_tariff = new_abtar
+        with transaction.atomic():
+            new_abtar = AbonTariff.objects.create(
+                deadline=deadline, tariff=tariff
+            )
+            self.current_tariff = new_abtar
 
-        # charge for the service
-        self.ballance -= amount
+            # charge for the service
+            self.ballance -= amount
 
-        self.save()
+            self.save(update_fields=('ballance', 'current_tariff'))
 
-        # make log about it
-        AbonLog.objects.create(
-            abon=self, amount=-tariff.amount,
-            author=author,
-            comment=comment or _('Buy service default log')
-        )
+            # make log about it
+            AbonLog.objects.create(
+                abon=self, amount=-tariff.amount,
+                author=author,
+                comment=comment or _('Buy service default log')
+            )
 
     # Destroy the service if the time has come
     # def bill_service(self, author):
@@ -468,8 +479,16 @@ def abon_tariff_post_init(sender, **kwargs):
     abon_tariff = kwargs["instance"]
     if getattr(abon_tariff, 'time_start') is None:
         abon_tariff.time_start = timezone.now()
-    calc_obj = abon_tariff.tariff.get_calc_type()(abon_tariff)
     if getattr(abon_tariff, 'deadline') is None:
+        calc_obj = abon_tariff.tariff.get_calc_type()(abon_tariff)
+        abon_tariff.deadline = calc_obj.calc_deadline()
+
+
+@receiver(pre_save, sender=AbonTariff)
+def abon_tariff_pre_save(sender, **kwargs):
+    abon_tariff = kwargs["instance"]
+    if getattr(abon_tariff, 'deadline') is None:
+        calc_obj = abon_tariff.tariff.get_calc_type()(abon_tariff)
         abon_tariff.deadline = calc_obj.calc_deadline()
 
 

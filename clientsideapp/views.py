@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _, gettext
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
+from djing.lib.decorators import json_view
 from tariff_app.models import Tariff
 from taskapp.models import Task
 from djing.lib import LogicError
@@ -43,7 +44,6 @@ def services(request):
 
 
 @login_required
-@transaction.atomic
 def buy_service(request, srv_id):
     abon = request.user
     service = get_object_or_404(Tariff, pk=srv_id)
@@ -115,3 +115,16 @@ def task_history(request):
     return render(request, 'clientsideapp/tasklist.html', {
         'tasks': tasks
     })
+
+
+@login_required
+@json_view
+def set_auto_continue_service(request):
+    checked = request.GET.get('checked')
+    checked = True if checked == 'true' else False
+    abon = request.user
+    abon.autoconnect_service = checked
+    abon.save(update_fields=('autoconnect_service',))
+    return {
+        'status': 0
+    }

@@ -10,5 +10,6 @@ urlpatterns = [
     path('services/<int:srv_id>/buy/', views.buy_service, name='buy_service'),
     path('debts/', views.debts_list, name='debts'),
     path('debts/<int:d_id>/', views.debt_buy, name='debt_buy'),
-    path('tasks/', views.task_history, name='task_history')
+    path('tasks/', views.task_history, name='task_history'),
+    path('set_auto_continue_service/', views.set_auto_continue_service, name='set_auto_continue_service')
 ]

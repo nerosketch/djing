@@ -297,6 +297,12 @@ $(document).ready(function () {
 		return false;
 	});
 
+	// autosave checkbox
+	$('input[type=checkbox].autosave').on('click', function(){
+		var data_url = $(this).attr('data-url');
+		$.getJSON(data_url, {checked: this.checked});
+	});
+
 	$('button.player-btn').aplayer();
 
 	$('[data-toggle="tooltip"]').tooltip({container:'body'});

@@ -4,71 +4,6 @@
 
     <div class="row">
         <div class="col-sm-6">
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{% trans "Subscriber's service" %}</h3>
-                </div>
-                <div class="panel-body">
-                    {% if abon_tariff %}
-
-                        <dl class="dl-horizontal">
-                            <dt>{% trans 'Service' %}</dt>
-                            <dd>
-                                {% if abon_tariff.tariff %}
-                                    {% if perms.tariff_app.change_tariff %}
-                                        <a href="{% url 'tarifs:edit' abon_tariff.tariff.pk %}" title="{{ abon_tariff.time_start|default:'' }}">
-                                            {{ abon_tariff.tariff.title }}
-                                        </a>
-                                    {% else %}
-                                        {{ abon_tariff.tariff.title }}
-                                    {% endif %}
-                                {% else %}
-                                    <b class="text-danger">{% trans 'We have a problem in DB: AbonTariff instance has no related to service' %}</b>
-                                {% endif %}
-                            </dd>
-                            <dt>{% trans 'Sum' %}</dt>
-                            <dd>{{ abon_tariff.tariff.amount }} {% trans 'currency' %}.</dd>
-
-                            <dt>{% trans 'Input speed' %}</dt>
-                            <dd>{{ abon_tariff.tariff.speedIn }}</dd>
-
-                            <dt>{% trans 'Output speed' %}</dt>
-                            <dd>{{ abon_tariff.tariff.speedOut }}</dd>
-
-                            <dt>{% trans 'Date of start' %}</dt>
-                            <dd>{{ abon_tariff.time_start|date:"d E Y, l H:i" }}</dd>
-
-                            <dt>{% trans 'Works until' %}</dt>
-                            <dd>{{ abon_tariff.deadline|date:"d E Y, l H:i" }}</dd>
-                        </dl>
-
-                        <blockquote>
-                            <p>{{ abon_tariff.tariff.descr }}</p>
-                        </blockquote>
-
-                    {% else %}
-                        {% trans 'Subscriber has no service' %}.
-                        <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}">
-                            {% trans 'Buy service' %}
-                        </a>
-                    {% endif %}
-
-                    {% if abon_tariff %}
-                        {% if perms.abonapp.can_complete_service %}
-                            <a href="{% url 'abonapp:unsubscribe_service' group.pk abon.username abon_tariff.pk %}" class="btn btn-sm btn-danger">
-                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
-                            </a>
-                        {% else %}
-                            <a href="#" class="btn btn-sm btn-danger disabled">
-                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
-                            </a>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">{% trans 'Services for buy' %}</h3>
@@ -120,6 +55,75 @@
                 </div>
             </div>
         </div>
+        <div class="col-sm-6">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans "Subscriber's service" %}</h3>
+                </div>
+                <div class="panel-body">
+                    {% if abon_tariff %}
+
+                        <dl class="dl-horizontal">
+                            <dt>{% trans 'Service' %}</dt>
+                            <dd>
+                                {% if abon_tariff.tariff %}
+                                    {% if perms.tariff_app.change_tariff %}
+                                        <a href="{% url 'tarifs:edit' abon_tariff.tariff.pk %}" title="{{ abon_tariff.time_start|default:'' }}">
+                                            {{ abon_tariff.tariff.title }}
+                                        </a>
+                                    {% else %}
+                                        {{ abon_tariff.tariff.title }}
+                                    {% endif %}
+                                {% else %}
+                                    <b class="text-danger">{% trans 'We have a problem in DB: AbonTariff instance has no related to service' %}</b>
+                                {% endif %}
+                            </dd>
+                            <dt>{% trans 'Sum' %}</dt>
+                            <dd>{{ abon_tariff.tariff.amount }} {% trans 'currency' %}.</dd>
+
+                            <dt>{% trans 'Input speed' %}</dt>
+                            <dd>{{ abon_tariff.tariff.speedIn }}</dd>
+
+                            <dt>{% trans 'Output speed' %}</dt>
+                            <dd>{{ abon_tariff.tariff.speedOut }}</dd>
+
+                            <dt>{% trans 'Date of start' %}</dt>
+                            <dd>{{ abon_tariff.time_start|date:"d E Y, l H:i" }}</dd>
+
+                            <dt>{% trans 'Works until' %}</dt>
+                            <dd>{{ abon_tariff.deadline|date:"d E Y, l H:i" }}</dd>
+                        </dl>
+
+                        <blockquote>
+                            <p>
+                                {% trans 'Auto continue service.' %}
+                                <input type="checkbox" data-url="{% url 'abonapp:set_auto_continue_service' group.pk abon.username %}" class="autosave" {{ abon.autoconnect_service|yesno:'checked,' }}>
+                            </p>
+                            <p>{{ abon_tariff.tariff.descr }}</p>
+                        </blockquote>
+
+                    {% else %}
+                        {% trans 'Subscriber has no service' %}.
+                        <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}">
+                            {% trans 'Buy service' %}
+                        </a>
+                    {% endif %}
+
+                    {% if abon_tariff %}
+                        {% if perms.abonapp.can_complete_service %}
+                            <a href="{% url 'abonapp:unsubscribe_service' group.pk abon.username abon_tariff.pk %}" class="btn btn-sm btn-danger">
+                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
+                            </a>
+                        {% else %}
+                            <a href="#" class="btn btn-sm btn-danger disabled">
+                                <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Finish service' %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
         {% if perms.tariff_app.view_periodic_pay %}
         <div class="col-sm-6">
@@ -149,6 +153,7 @@
             </div>
         </div>
         {% endif %}
+
     </div>
 
 {% endblock %}

@@ -40,6 +40,12 @@ $(document).ready(function () {
 		}
 	});
 
+	// autosave checkbox
+	$('input[type=checkbox].autosave').on('click', function(){
+		var data_url = $(this).attr('data-url');
+		$.getJSON(data_url, {checked: this.checked});
+	});
+
     $('.btn-modal').on('click', function(){
         $.get(this.href, function(r){
             show_ModalMyContent(r);
