@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-09 14:57+0300\n"
+"POT-Creation-Date: 2018-09-18 20:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -59,7 +59,7 @@ msgid "Your debt"
 msgstr "Ваши долги"
 
 #: templates/clientsideapp/debts.html:11
-#: templates/clientsideapp/tasklist.html:14
+#: templates/clientsideapp/tasklist.html:13
 msgid "State"
 msgstr "Состояние"
 
@@ -72,7 +72,7 @@ msgid "Description"
 msgstr "Описание"
 
 #: templates/clientsideapp/debts.html:14
-#: templates/clientsideapp/tasklist.html:15
+#: templates/clientsideapp/tasklist.html:14
 msgid "Date of create"
 msgstr "Дата создания"
 
@@ -84,7 +84,7 @@ msgstr "Дата платежа"
 msgid "Pay"
 msgstr "Оплатить"
 
-#: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:77
+#: templates/clientsideapp/debts.html:23 templates/clientsideapp/ext.html:102
 #: templates/clientsideapp/modal_service_buy.html:19
 #: templates/clientsideapp/services.html:26
 #: templates/clientsideapp/services.html:55
@@ -103,40 +103,40 @@ msgstr "Ещё не оплачен"
 msgid "You have no debt"
 msgstr "У вас нет долгов"
 
-#: templates/clientsideapp/ext.html:7 templates/clientsideapp/ext.html:41
+#: templates/clientsideapp/ext.html:7 templates/clientsideapp/ext.html:43
 msgid "Personal account"
 msgstr "Личный кабинет"
 
-#: templates/clientsideapp/ext.html:46
+#: templates/clientsideapp/ext.html:51
 msgid "Pays"
 msgstr "Платежи"
 
-#: templates/clientsideapp/ext.html:51
+#: templates/clientsideapp/ext.html:59
 msgid "Services"
 msgstr "Услуги"
 
-#: templates/clientsideapp/ext.html:68
+#: templates/clientsideapp/ext.html:77
 msgid "Other"
 msgstr "Другое"
 
-#: templates/clientsideapp/ext.html:70
+#: templates/clientsideapp/ext.html:82
 msgid "Show debts and pay it"
 msgstr "Посмотреть долги и оплатить"
 
-#: templates/clientsideapp/ext.html:71
+#: templates/clientsideapp/ext.html:88
 msgid "Show task history"
 msgstr "Посмотреть заявки"
 
-#: templates/clientsideapp/ext.html:72
+#: templates/clientsideapp/ext.html:94
 msgid "Quit"
 msgstr "Выйти"
 
-#: templates/clientsideapp/ext.html:77
+#: templates/clientsideapp/ext.html:102
 #, python-format
 msgid "Your balance is <b>%(ballance)s</b>"
 msgstr "Ваш балланс <b>%(ballance)s</b>"
 
-#: templates/clientsideapp/ext.html:88
+#: templates/clientsideapp/ext.html:113
 msgid ""
 "<strong>Attantion!</strong> You are is admin, and do not be active here, "
 "please back to admin side. Client side to you for reference only."
@@ -144,6 +144,10 @@ msgstr ""
 "<strong>Кстати.</strong> Вы администратор, и не должны производить действия "
 "из кабинета пользователя, производите их из админки. Кабинет клиента для вас "
 "только для ознакомления."
+
+#: templates/clientsideapp/ext.html:121
+msgid "You may add link to this personal page to bookmarks by pressing Ctrl+D"
+msgstr "Вы можете добавить закладку на личный кабинет нажав <b>Ctrl+D</b>."
 
 #: templates/clientsideapp/index.html:7
 msgid "Account info"
@@ -262,41 +266,41 @@ msgstr "Доступные для заказа услуги"
 msgid "No services available for ordering"
 msgstr "Нет доступных для заказа услуг"
 
-#: templates/clientsideapp/tasklist.html:7
+#: templates/clientsideapp/tasklist.html:6
 msgid "Task history"
 msgstr "История заявок"
 
-#: templates/clientsideapp/tasklist.html:16
+#: templates/clientsideapp/tasklist.html:15
 msgid "The nature of the damage"
 msgstr "Характер заявки"
 
-#: templates/clientsideapp/tasklist.html:17
+#: templates/clientsideapp/tasklist.html:16
 msgid "Expected or real completion date"
 msgstr "Ожидаемый или реальный срок выполнения"
 
-#: templates/clientsideapp/tasklist.html:43
+#: templates/clientsideapp/tasklist.html:42
 msgid "You didn't leave any requests for breakdowns."
 msgstr "Заявки по вашей учётной записи не найдены"
 
-#: views.py:54
+#: views.py:53
 #, python-format
 msgid "Buy the service via user side, service '%s'"
 msgstr "Покупка тарифного плана через личный кабинет, тариф '%s'"
 
-#: views.py:57
+#: views.py:56
 #, python-format
 msgid "The service '%s' wan successfully activated"
 msgstr "Услуга '%s' успешно подключена"
 
-#: views.py:87
+#: views.py:86
 msgid "Are you not sure that you want buy the service?"
 msgstr "Вы не уверены что хотите оплатить долг?"
 
-#: views.py:89
+#: views.py:88
 msgid "Your account have not enough money"
 msgstr "Недостаточно средств на счету"
 
-#: views.py:92
+#: views.py:91
 #, python-format
 msgid "%(username)s paid the debt %(amount).2f"
 msgstr "%(username)s заплатил долг в размере %(amount).2f"
