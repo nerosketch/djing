@@ -1156,3 +1156,6 @@ msgstr "Открыть"
 
 msgid "Auto continue service."
 msgstr "Автопродление услуги."
+
+msgid "No author attached"
+msgstr "Автор не назначен"
