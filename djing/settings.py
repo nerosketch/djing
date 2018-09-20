@@ -31,6 +31,8 @@ AUTHENTICATION_BACKENDS = (
     'djing.lib.auth_backends.LocationAuthBackend'
 )
 
+ADMINS = getattr(local_settings, 'ADMINS', ())
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -224,7 +226,7 @@ EMAIL_PORT = local_settings.EMAIL_PORT
 EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
 EMAIL_USE_TLS = getattr(local_settings, 'EMAIL_USE_TLS', True)
 
-SERVER_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = getattr(local_settings, 'SERVER_EMAIL', EMAIL_HOST_USER)
 
 # Inactive ip lease time in seconds.
 # If lease time more than time of create, and lease is inactive
