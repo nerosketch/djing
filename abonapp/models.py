@@ -87,7 +87,7 @@ class AbonManager(MyUserManager):
 
 
 class Abon(BaseAccount):
-    current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL)
+    current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL, default=None)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
     ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
