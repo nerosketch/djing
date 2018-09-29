@@ -62,5 +62,6 @@ urlpatterns = [
     # Api's
     path('api/abons/', views.abons),
     path('api/abon_filter/', views.search_abon),
-    path('api/dhcp_lever/', views.DhcpLever.as_view())
+    path('api/dhcp_lever/', views.DhcpLever.as_view()),
+    path('api/duplicate_pay/', views.DublicatePay.as_view())
 ]

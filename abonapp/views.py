@@ -2,13 +2,14 @@ from ipaddress import ip_address
 from typing import Dict, Optional
 from datetime import datetime, date
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError, ProgrammingError, transaction, OperationalError
+from django.db import IntegrityError, ProgrammingError, transaction, OperationalError, DatabaseError
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView
@@ -33,6 +34,7 @@ from djing import ping
 from djing import lib
 from djing.lib.decorators import json_view, only_admins
 from djing.global_base_views import OrderedFilteredList, SecureApiView
+from xmlview.decorators import xml_view
 
 
 login_decs = login_required, only_admins
@@ -1325,3 +1327,103 @@ class DhcpLever(SecureApiView):
             print('Duplicate:', e)
             return str(e)
 
+
+class DublicatePay(SecureApiView):
+    http_method_names = 'get',
+
+    @staticmethod
+    def _bad_ret(err_id, err_description=None):
+        now = timezone.now()
+        r = {
+            'status_code': lib.safe_int(err_id),
+            'time_stamp': now.strftime("%d.%m.%Y %H:%M")
+        }
+        if err_description:
+            r.update({'description': err_description})
+        return r
+
+    @method_decorator(xml_view(root_node='pay-response'))
+    def get(self, request, *args, **kwargs):
+        act = lib.safe_int(request.GET.get('ACT'))
+        self.current_date = timezone.now().strftime("%d.%m.%Y %H:%M")
+
+        if act <= 0:
+            return self._bad_ret(-101, 'ACT less than zero')
+
+        try:
+            if act == 1:
+                return self._fetch_user_info(request.GET)
+            elif act == 4:
+                return self._make_pay(request.GET)
+            elif act == 7:
+                return self._check_pay(request.GET)
+            else:
+                return self._bad_ret(-101, 'ACT is not passed')
+        except models.Abon.DoesNotExist:
+            return self._bad_ret(-40)
+        except DatabaseError:
+            return self._bad_ret(-90)
+        except models.AllTimePayLog.DoesNotExist:
+            return self._bad_ret(-10)
+        except AttributeError:
+            return self._bad_ret(-101)
+
+    def _fetch_user_info(self, data: dict):
+        pay_account = data.get('PAY_ACCOUNT')
+        abon = models.Abon.objects.get(pk=pay_account)
+        fio = abon.fio
+        ballance = float(abon.ballance)
+        return {
+            'balance': ballance,
+            'name': fio,
+            'account': pay_account,
+            'service_id': getattr(settings, 'PAY_SERV_ID'),
+            'min_amount': 10.0,
+            'max_amount': 5000,
+            'status_code': 21,
+            'time_stamp': self.current_date
+        }
+
+    def _make_pay(self, data: dict):
+        trade_point = lib.safe_int(data.get('TRADE_POINT'))
+        receipt_num = lib.safe_int(data.get('RECEIPT_NUM'))
+        pay_account = data.get('PAY_ACCOUNT')
+        pay_id = data.get('PAY_ID')
+        pay_amount = lib.safe_float(data.get('PAY_AMOUNT'))
+        abon = models.Abon.objects.get(pk=pay_account)
+        pays = models.AllTimePayLog.objects.filter(pay_id=pay_id)
+        if pays.count() > 0:
+            return self._bad_ret(-100)
+
+        abon.add_ballance(None, pay_amount, comment='KonikaForward %.2f' % pay_amount)
+        abon.save(update_fields=('ballance',))
+
+        models.AllTimePayLog.objects.create(
+            pay_id=pay_id,
+            summ=pay_amount,
+            abon=abon,
+            trade_point=trade_point,
+            receipt_num=receipt_num
+        )
+        return {
+            'pay_id': pay_id,
+            'service_id': data.get('SERVICE_ID'),
+            'amount': pay_amount,
+            'status_code': 22,
+            'time_stamp': self.current_date
+        }
+
+    def _check_pay(self, data: dict):
+        pay_id = data.get('PAY_ID')
+        pay = models.AllTimePayLog.objects.get(pay_id=pay_id)
+        return {
+            'status_code': 11,
+            'time_stamp': self.current_date,
+            'transaction': {
+                'pay_id': pay_id,
+                'service_id': data.get('SERVICE_ID'),
+                'amount': pay.summ,
+                'status': 111,
+                'time_stamp': pay.date_add.strftime("%d.%m.%Y %H:%M")
+            }
+        }
