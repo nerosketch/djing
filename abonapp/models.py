@@ -198,17 +198,6 @@ class Abon(BaseAccount):
                 comment=comment or _('Buy service default log')
             )
 
-    # Destroy the service if the time has come
-    # def bill_service(self, author):
-    #     abon_tariff = self.active_tariff()
-    #     if abon_tariff is None:
-    #         return
-    #     nw = timezone.now()
-    #     # if service is overdue
-    #     if nw > abon_tariff.deadline:
-    #         print("Service %s for user %s is overdued, end service" % (abon_tariff.tariff, self))
-    #         abon_tariff.delete()
-
     # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self) -> bool:
         if not self.is_active:
@@ -299,6 +288,25 @@ class Abon(BaseAccount):
             if lease is None:
                 return 'Error while creating a ip lease'
             self.ip_addresses.add(lease)
+
+    def enable_service(self, tariff: Tariff, deadline=None, time_start=None):
+        """
+        Makes a services for current user
+        :param tariff: Instance of service
+        :param deadline: Time when service is expired
+        :param time_start: Time when service has started
+        :return: None
+        """
+        if deadline is None:
+            deadline = tariff.calc_deadline()
+        if time_start is None:
+            time_start = datetime.now()
+        new_abtar = AbonTariff.objects.create(
+            deadline=deadline, tariff=tariff,
+            time_start=time_start
+        )
+        self.current_tariff = new_abtar
+        self.save(update_fields=('current_tariff',))
 
 
 class PassportInfo(models.Model):
