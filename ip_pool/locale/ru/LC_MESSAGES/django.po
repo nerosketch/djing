@@ -167,10 +167,6 @@ msgstr "Подсеть"
 msgid "Networks"
 msgstr "Подсети"
 
-#: models.py:153
-msgid "Ip has already taken"
-msgstr "IP уже занят"
-
 #: models.py:166
 msgid "Parent network"
 msgstr "Родительская подсеть"
