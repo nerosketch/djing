@@ -103,8 +103,7 @@ def main():
         pay.payment_for_service(now=now)
 
     # Remove old inactive ip leases
-    old_leases = IpLeaseModel.objects.expired()
-    old_leases.delete()
+    IpLeaseModel.objects.expired().delete()
 
     # sync subscribers on NAS
     threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.
