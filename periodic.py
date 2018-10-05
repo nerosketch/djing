@@ -94,7 +94,7 @@ def main():
                 )
                 print(l.comment)
 
-    signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
+    # signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
 
     # manage periodic pays
     ppays = PeriodicPayForId.objects.filter(next_pay__lt=now) \
@@ -103,7 +103,7 @@ def main():
         pay.payment_for_service(now=now)
 
     # Remove old inactive ip leases
-    IpLeaseModel.objects.expired().delete()
+    IpLeaseModel.objects.expired().filter(is_active=False).delete()
 
     # sync subscribers on NAS
     threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.

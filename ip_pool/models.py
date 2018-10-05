@@ -156,14 +156,14 @@ class IpLeaseManager(models.Manager):
         if lease_live_time is None:
             raise ImproperlyConfigured('You must specify LEASE_LIVE_TIME in settings')
         senility = now() - timedelta(seconds=lease_live_time)
-        return self.filter(lease_time__lt=senility, is_active=False)
+        return self.filter(lease_time__lt=senility)
 
 
 class IpLeaseModel(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True)
     network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE,
                                 verbose_name=_('Parent network'), null=True, blank=True)
-    mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True, unique=True)
+    mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True)
     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
     is_dynamic = models.BooleanField(_('Is dynamic'), default=False)
     is_active = models.BooleanField(_('Is active'), default=True)
@@ -198,7 +198,7 @@ class IpLeaseModel(models.Model):
         verbose_name = _('Employed ip')
         verbose_name_plural = _('Employed ip addresses')
         ordering = ('-id',)
-        unique_together = ('ip', 'network')
+        unique_together = ('ip', 'network', 'mac_addr')
 
 
 # class LeasesHistory(models.Model):
