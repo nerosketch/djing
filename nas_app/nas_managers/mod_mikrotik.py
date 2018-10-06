@@ -266,7 +266,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             # FIXME: тут в разных микротиках или =target-addresses или =target
             '=target=%s' % ips,
             '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
-            '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
+            '=queue=Djing_SFQ/Djing_SFQ',
             '=burst-time=1/1'
         ))
 
@@ -303,7 +303,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
                 '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                 # FIXME: тут в разных версиях прошивки микротика или =target-addresses или =target
                 '=target=%s' % ','.join(str(i) for i in user.ips),
-                '=queue=MikroBILL_SFQ/MikroBILL_SFQ',
+                '=queue=Djing_SFQ/Djing_SFQ',
                 '=burst-time=1/1'
             ]
             if mk_id is not None:
