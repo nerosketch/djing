@@ -47,3 +47,9 @@ class UserPermissionsForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = 'user_permissions',
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        exclude = ('avatar',)
