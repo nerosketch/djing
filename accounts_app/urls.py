@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('add/', views.create_profile, name='create_profile'),
 
-    path('settings/', views.ch_info, name='setup_info'),
+    path('settings/', views.UpdateSelfAccount.as_view(), name='setup_info'),
     path('settings/change_ava/', views.AvatarUpdateView.as_view(), name='setup_avatar'),
 
     path('<int:uid>/', views.profile_show, name='other_profile'),
