@@ -557,6 +557,13 @@ class IpUpdateView(AbonappPermissionMixin, UpdateView):
     slug_field = 'username'
     template_name = 'abonapp/modal_ip_form.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(IpUpdateView, self).dispatch(request, *args, **kwargs)
+        except lib.LogicError as e:
+            messages.error(request, e)
+        return self.render_to_response(self.get_context_data(**kwargs))
+
     def get_context_data(self, **kwargs):
         context = super(IpUpdateView, self).get_context_data(**kwargs)
         context['group'] = self.object.group

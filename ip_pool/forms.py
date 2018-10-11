@@ -20,3 +20,8 @@ class NetworkForm(forms.ModelForm):
     class Meta:
         model = models.NetworkModel
         fields = '__all__'
+        widgets = {
+            'groups': forms.SelectMultiple(attrs={
+                'size': 12
+            })
+        }

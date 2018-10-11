@@ -1,6 +1,6 @@
 from datetime import timedelta
 from ipaddress import ip_network, ip_address
-from typing import Optional
+from typing import Optional, Generator
 
 from django.conf import settings
 from django.db.utils import IntegrityError
@@ -104,6 +104,32 @@ class NetworkModel(models.Model):
         elif net.is_unspecified:
             return _('Unspecified')
         return "I don't know"
+
+    def get_free_ip(self, employed_ips: Optional[Generator]):
+        """
+        Find free ip in network.
+        :param employed_ips: Sorted from less to more ip addresses from current network.
+        :return: single finded ip
+        """
+        network = self.get_network()
+        work_range_start_ip = ip_address(self.ip_start)
+        work_range_end_ip = ip_address(self.ip_end)
+        if employed_ips is None:
+            for ip in network.hosts():
+                if work_range_start_ip <= ip <= work_range_end_ip:
+                    return ip
+            return
+        for ip in network.hosts():
+            if ip < work_range_start_ip:
+                continue
+            elif ip > work_range_end_ip:
+                break  # Not found
+            used_ip = next(employed_ips)
+            if used_ip is None:
+                return ip
+            used_ip = ip_address(used_ip)
+            if ip < used_ip:
+                return ip
 
     class Meta:
         db_table = 'ip_pool_network'

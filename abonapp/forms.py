@@ -4,6 +4,8 @@ from django.contrib.auth.hashers import make_password
 from random import choice
 from string import digits, ascii_lowercase
 
+from djing.lib import LogicError
+from ip_pool.models import NetworkModel
 from nas_app.models import NASModel
 from . import models
 from django.conf import settings
@@ -166,11 +168,31 @@ class MarkersForm(forms.ModelForm):
 
 
 class AmountMoneyForm(forms.Form):
-    amount = forms.FloatField(max_value=50000, label=_('Amount of money'))
+    amount = forms.FloatField(max_value=5000, label=_('Amount of money'))
     comment = forms.CharField(max_length=128, label=_('Comment'), required=False)
 
 
 class AddIpForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = getattr(self, 'instance')
+        if instance:
+            if instance.group:
+                self.fields['networks'].queryset = NetworkModel.objects.filter(groups=instance.group)
+        if not self.initial['ip_address']:
+            if instance:
+                net = NetworkModel.objects.filter(groups=instance.group).first()
+                if net is not None:
+                    ips = (ip.ip_address for ip in
+                           models.Abon.objects.filter(group=instance.group).order_by('ip_address').only(
+                               'ip_address').iterator())
+                    free_ip = net.get_free_ip(ips)
+                    self.initial['ip_address'] = free_ip
+            else:
+                raise LogicError(_('Subnet has not attached to current group'))
+
+    networks = forms.ModelChoiceField(label=_('Networks'), queryset=NetworkModel.objects.none(), empty_label=None)
+
     class Meta:
         model = models.Abon
         fields = 'ip_address',
