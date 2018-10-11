@@ -9,7 +9,6 @@ from django.utils import timezone
 from django.db import transaction
 from django.db.models import signals, Count
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
-from ip_pool.models import IpLeaseModel
 from nas_app.nas_managers import NasNetworkError, NasFailedResult
 from nas_app.models import NASModel
 from djing.lib import LogicError
@@ -24,10 +23,8 @@ class NasSyncThread(Thread):
         try:
             tm = self.nas.get_nas_manager()
             users = Abon.objects \
-                .annotate(ips_count=Count('ip_addresses')) \
-                .filter(is_active=True, ips_count__gt=0, nas=self.nas) \
-                .exclude(current_tariff=None) \
-                .prefetch_related('ip_addresses') \
+                .filter(is_active=True, nas=self.nas) \
+                .exclude(current_tariff=None, ip_address=None) \
                 .iterator()
             tm.sync_nas(users)
         except NasNetworkError as er:
@@ -101,9 +98,6 @@ def main():
         .prefetch_related('account', 'periodic_pay')
     for pay in ppays:
         pay.payment_for_service(now=now)
-
-    # Remove old inactive ip leases
-    IpLeaseModel.objects.expired().filter(is_active=False).delete()
 
     # sync subscribers on NAS
     threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.

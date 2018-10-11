@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 from hashlib import sha256
 
-API_AUTH_SECRET = 'your api key'
+API_AUTH_SECRET = 'yourapikey'
 SERVER_DOMAIN = 'http://localhost:8000'
 
 

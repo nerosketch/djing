@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from ipaddress import ip_address
+from ipaddress import ip_address, _BaseAddress
 from typing import Iterable
 
 
@@ -36,38 +36,38 @@ class TariffStruct(BaseStruct):
 
 # Abon from database
 class AbonStruct(BaseStruct):
-    __slots__ = ('uid', '_ips', 'tariff', 'is_access', 'queue_id')
+    __slots__ = ('uid', '_ip', 'tariff', 'is_access', 'queue_id')
 
-    def __init__(self, uid=0, ips=None, tariff=None, is_access=True):
+    def __init__(self, uid=0, ip=None, tariff=None, is_access=True):
         self.uid = int(uid or 0)
-        if ips is None:
-            self._ips = ()
-        else:
-            self._ips = tuple(ip_address(ip) for ip in ips)
+        self._ip = ip
         self.tariff = tariff
         self.is_access = is_access
         self.queue_id = 0
 
-    def get_ips(self):
-        return self._ips
+    def get_ip(self):
+        return self._ip
 
-    def set_ips(self, v):
-        self._ips = set(v)
+    def set_ip(self, v):
+        if issubclass(v.__class__, _BaseAddress):
+            self._ip = v
+        else:
+            self._ip = ip_address(v)
 
-    ips = property(get_ips, set_ips, doc='Ip addresses')
+    ip = property(get_ip, set_ip, doc='Ip address')
 
     def __eq__(self, other):
         if not isinstance(other, AbonStruct):
             raise TypeError
-        r = self.uid == other.uid and self._ips == other._ips
+        r = self.uid == other.uid and self._ip == other._ip
         r = r and self.tariff == other.tariff
         return r
 
     def __str__(self):
-        return "uid=%d, ips=[%s], tariff=%s" % (self.uid, ';'.join(str(i) for i in self._ips), self.tariff or '<No Service>')
+        return "uid=%d, ip=[%s], tariff=%s" % (self.uid, self._ip, self.tariff or '<No Service>')
 
     def __hash__(self):
-        return hash(hash(self._ips) + hash(self.tariff) if self.tariff is not None else 0)
+        return hash(hash(self._ip) + hash(self.tariff) if self.tariff is not None else 0)
 
 
 VectorAbon = Iterable[AbonStruct]

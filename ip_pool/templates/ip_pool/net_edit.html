@@ -38,10 +38,6 @@
                 <a href="{% back_url request %}" class="btn btn-default">
                     <span class="glyphicon glyphicon-backward"></span> {% trans 'Back' %}
                 </a>
-                <a href="{% url 'ip_pool:ip_leases_list' object.pk %}" class="btn btn-default">
-                    <span class="glyphicon glyphicon-eye-open"></span>
-                    <span class="hidden-xs hidden-sm">{% trans 'View employed' %}</span>
-                </a>
                 <a href="{% url 'ip_pool:net_groups' object.pk %}" class="btn btn-default">
                     <span class="glyphicon glyphicon-user"></span>
                     <span class="hidden-xs hidden-sm">{% trans 'Groups available' %}</span>

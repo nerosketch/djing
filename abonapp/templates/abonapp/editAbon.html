@@ -46,9 +46,6 @@
 
                         <script type="text/javascript">
                             $(function () {
-                                $("#iprefreshbtn").on('click', function(){
-                                    $("#{{ form.ip_address.id_for_label }}").val('');
-                                });
                                 $('#passwdtoggler').on('mousedown', function(){
                                     document.getElementById("{{ form.password.id_for_label }}").type='text';
                                 }).on('mouseup', function(){
@@ -182,61 +179,45 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{% trans 'Ip addresses' %}</h3>
+                    <h3 class="panel-title">{% trans 'Ip address' %}</h3>
                 </div>
-                <ul class="list-group">
-                    {% with can_ping=perms.abonapp.can_ping %}
-                    {% for lease in abon.ip_addresses.all %}
-                        <li class="list-group-item">
-                            <div class="btn-group btn-group-xs">
-                                {% if lease.is_active %}
-                                    <a href="{% url 'abonapp:user_session_free' group.pk abon.username lease.pk %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                    </a>
-                                {% else %}
-                                    <a href="{% url 'abonapp:user_session_start' group.pk abon.username lease.pk %}" class="btn btn-success" title="{% trans 'Start session' %}" data-toggle="tooltip">
-                                        <span class="glyphicon glyphicon-flash"></span>
-                                    </a>
-                                {% endif %}
-
-                                {% if can_ping %}
-                                    <a href="{% url 'abonapp:ping' group.pk abon.username %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ lease.ip }}">
-                                        <span class="glyphicon glyphicon-flash"></span> Ping
-                                    </a>
-                                {% else %}
-                                    <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
-                                        <span class="glyphicon glyphicon-flash"></span> Ping
-                                    </a>
-                                {% endif %}
-                            </div>
-
-                            <span{{ lease.is_active|yesno:', class="text-muted"'|safe }}>
-                                <b>{{ lease }}</b>
-                                <small>{% trans 'Leased by:' %} {{ lease.lease_time|date:'d-m H:i:s' }}.
-                                    {% if lease.mac_addr %}
-                                        {% trans 'From' %}: {{ lease.mac_addr }}.
-                                    {% endif %}
-                                </small>
-                            </span>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item">{% trans 'Leases does not found' %}</li>
-                    {% endfor %}
-                    {% endwith %}
-                </ul>
+                <div class="panel-body">
+                    {% if abon.ip_address %}
+                        <div class="btn-group btn-group-xs">
+                            <a href="{% url 'abonapp:user_session_free' group.pk abon.username %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                            <b>{{ abon.ip_address }}</b>
+                            {% if perms.abonapp.can_ping %}
+                                <a href="{% url 'abonapp:ping' group.pk abon.username %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ abon.ip_address }}">
+                                    <span class="glyphicon glyphicon-flash"></span> Ping
+                                </a>
+                            {% else %}
+                                <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
+                                    <span class="glyphicon glyphicon-flash"></span> Ping
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span class="text-info">{% trans 'No ip address' %}</span>
+                    {% endif %}
+                </div>
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm">
-                        {% if abon.is_dynamic_ip %}
-                            <a href="#" class="btn btn-success" disabled>
+                        {% if abon.ip_address %}
+                            <a href="#" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-edit"></span>
+                                <span class="hidden-xs">{% trans 'Change' %}</span>
+                            </a>
                         {% else %}
-                            <a href="{% url 'abonapp:lease_add' group.pk abon.username %}" class="btn btn-success btn-modal">
+                            <a href="#" class="btn btn-success btn-modal">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <span class="hidden-xs">{% trans 'Add' %}</span>
+                            </a>
                         {% endif %}
-                            <span class="glyphicon glyphicon-plus"></span>
-                            <span class="hidden-xs">{% trans 'Add' %}</span>
-                        </a>
                         <a href="{% url 'abonapp:active_nets' group.pk %}" class="btn btn-default btn-modal">
                             <span class="glyphicon glyphicon-globe"></span>
-                            <span class="hidden-sm hidden-xs">{% trans 'Active networks' %}</span>
+                            <span class="hidden-sm hidden-xs">{% trans 'Networks' %}</span>
                         </a>
                    </div>
                 </div>

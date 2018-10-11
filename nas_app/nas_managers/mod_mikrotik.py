@@ -228,17 +228,20 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             disabled = info.get('=disabled', False)
             if disabled is not None:
                 disabled = True if disabled == 'true' else False
-            if target is not None and name is not None:
+            if target and name:
                 # target may be '192.168.0.3/32,192.168.0.2/32'
-                ips = (ip.split('/')[0] for ip in target.split(','))
+                ip = target.split(',')[0]
+                if not ip:
+                    return
+                ip, mask_bits = ip.split('/')
+                if not ip:
+                    return
                 a = AbonStruct(
                     uid=int(name[3:]),
-                    ips=ips,
+                    ip=ip,
                     tariff=t,
                     is_access=not disabled
                 )
-                if len(a.ips) < 1:
-                    return
                 a.queue_id = info.get('=.id')
                 return a
         except ValueError as e:
@@ -259,12 +262,11 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             raise TypeError
         if user.tariff is None or not isinstance(user.tariff, TariffStruct):
             return
-        ips = ','.join(str(i) for i in user.ips)
         self._exec_cmd((
             '/queue/simple/add',
             '=name=uid%d' % user.uid,
             # FIXME: тут в разных микротиках или =target-addresses или =target
-            '=target=%s' % ips,
+            '=target=%s' % user.ip,
             '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
             '=queue=Djing_SFQ/Djing_SFQ',
             '=burst-time=1/1'
@@ -302,7 +304,7 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
                 '=name=uid%d' % user.uid,
                 '=max-limit=%.3fM/%.3fM' % (user.tariff.speedOut, user.tariff.speedIn),
                 # FIXME: тут в разных версиях прошивки микротика или =target-addresses или =target
-                '=target=%s' % ','.join(str(i) for i in user.ips),
+                '=target=%s' % user.ip,
                 '=queue=Djing_SFQ/Djing_SFQ',
                 '=burst-time=1/1'
             ]
@@ -377,10 +379,9 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         self.remove_queue_range(queue_ids)
         for user in users:
             if isinstance(user, AbonStruct):
-                for ip in user.ips:
-                    ip_list_entity = self.find_ip(ip, LIST_USERS_ALLOWED)
-                    if ip_list_entity:
-                        self.remove_ip(ip_list_entity.get('=.id'))
+                ip_list_entity = self.find_ip(user.ip, LIST_USERS_ALLOWED)
+                if ip_list_entity:
+                    self.remove_ip(ip_list_entity.get('=.id'))
 
     def add_user(self, user: AbonStruct, *args):
         if user.tariff is None:
@@ -391,44 +392,40 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
             self.add_queue(user)
         except NasFailedResult as e:
             print('Error:', e)
-        for ip in user.ips:
-            if not issubclass(ip.__class__, _BaseAddress):
-                raise TypeError
-            try:
-                self.add_ip(LIST_USERS_ALLOWED, ip)
-            except NasFailedResult as e:
-                print('Error:', e)
+        ip = user.ip
+        if not issubclass(ip.__class__, _BaseAddress):
+            raise TypeError
+        try:
+            self.add_ip(LIST_USERS_ALLOWED, ip)
+        except NasFailedResult as e:
+            print('Error:', e)
 
     def remove_user(self, user: AbonStruct):
         self.remove_queue(user)
-
-        def _finder(ips):
-            for ip in ips:
-                r = self.find_ip(ip, LIST_USERS_ALLOWED)
-                if r: yield r.get('=.id')
-
-        firewall_ip_list_ids = _finder(user.ips)
-        self.remove_ip_range(firewall_ip_list_ids)
+        r = self.find_ip(user.ip, LIST_USERS_ALLOWED)
+        ip_id = r.get('=.id')
+        self.remove_ip(ip_id)
 
     def update_user(self, user: AbonStruct, *args):
         # queue is instance of AbonStruct
         queue = self.find_queue('uid%d' % user.uid)
-        for ip in user.ips:
-            if not issubclass(ip.__class__, _BaseAddress):
-                raise TypeError
-            nas_ip = self.find_ip(ip, LIST_USERS_ALLOWED)
-            if user.is_access:
-                if nas_ip is None:
-                    self.add_ip(LIST_USERS_ALLOWED, ip)
-            else:
-                # если не активен - то и обновлять не надо
-                # но и выключить на всяк случай надо, а то вдруг был включён
-                if nas_ip:
-                    # и если найден был - то удалим ip из разрешённых
-                    self.remove_ip(nas_ip.get('=.id'))
-                if queue is not None:
-                    self.remove_queue(user, queue)
-                queue = None
+        ip = user.ip
+
+        if not issubclass(ip.__class__, _BaseAddress):
+            raise TypeError
+        nas_ip = self.find_ip(ip, LIST_USERS_ALLOWED)
+        if user.is_access:
+            if nas_ip is None:
+                self.add_ip(LIST_USERS_ALLOWED, ip)
+        else:
+            # если не активен - то и обновлять не надо
+            # но и выключить на всяк случай надо, а то вдруг был включён
+            if nas_ip:
+                # и если найден был - то удалим ip из разрешённых
+                self.remove_ip(nas_ip.get('=.id'))
+            if queue is not None:
+                self.remove_queue(user, queue)
+            queue = None
 
         # если нет услуги то её не должно быть и в nas
         if user.tariff is None:
@@ -481,32 +478,3 @@ class MikrotikTransmitter(BaseTransmitter, ApiRos, metaclass=type('_ABC_Lazy_mcs
         all_ips = set(ip for ip, mkid in self.read_ips_iter(LIST_USERS_ALLOWED))
         queues = (q for q in self.read_queue_iter() if all_ips.issuperset(q.ips))
         return queues
-
-    def lease_free(self, user: AbonStruct, lease):
-        queue = self.find_queue('uid%d' % user.uid)
-        if queue is None:
-            return
-        if len(queue.ips) > 1:
-            if queue is not None:
-                user.ips = tuple(i for i in user.ips if i != lease)
-                self.update_queue(user, queue)
-            ip = self.find_ip(lease, LIST_USERS_ALLOWED)
-            if ip is not None:
-                self.remove_ip(ip.get('=.id'))
-        else:
-            raise NasFailedResult(_('You cannot disable last session'))
-
-    def lease_start(self, user: AbonStruct, lease):
-        if not issubclass(lease.__class__, _BaseAddress):
-            lease = ip_address(lease)
-        if not isinstance(user, AbonStruct):
-            raise TypeError
-        ip = self.find_ip(lease, LIST_USERS_ALLOWED)
-        if ip is None:
-            self.add_ip(LIST_USERS_ALLOWED, lease)
-        queue = self.find_queue('uid%d' % user.uid)
-        user.ips += lease,
-        if queue is None:
-            self.add_queue(user)
-        else:
-            self.update_queue(user, queue)

@@ -108,30 +108,30 @@ class BaseTransmitter(ABC):
     def read_users(self) -> VectorAbon:
         pass
 
-    @abstractmethod
-    def lease_free(self, user: AbonStruct, lease):
-        """
-        Remove ip lease from allowed to network
-        :param lease: ip_address for lease
-        :param user: Subscriber instance
-        :return:
-        """
-
-    @abstractmethod
-    def lease_start(self, user: AbonStruct, lease):
-        """
-        Starts ip lease to allowed to network
-        :param lease: ip_address for lease
-        :param user: Subscriber instance
-        :return:
-        """
+    # @abstractmethod
+    # def lease_free(self, user: AbonStruct, lease):
+    #     """
+    #     Remove ip lease from allowed to network
+    #     :param lease: ip_address for lease
+    #     :param user: Subscriber instance
+    #     :return:
+    #     """
+    #
+    # @abstractmethod
+    # def lease_start(self, user: AbonStruct, lease):
+    #     """
+    #     Starts ip lease to allowed to network
+    #     :param lease: ip_address for lease
+    #     :param user: Subscriber instance
+    #     :return:
+    #     """
 
     def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:
         """
         :param users_from_db: QuerySet of all subscribers that can have service
         :return: Tuple of 2 lists that contain list to add users and list to remove users
         """
-        users_struct_gen = (ab.build_agent_struct(raise_errs=False) for ab in users_from_db if
+        users_struct_gen = (ab.build_agent_struct() for ab in users_from_db if
                             ab is not None and ab.is_access())
         users_struct_set = set(ab for ab in users_struct_gen if ab is not None and ab.tariff is not None)
         users_from_nas = set(self.read_users())

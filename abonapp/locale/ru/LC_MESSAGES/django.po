@@ -116,8 +116,8 @@ msgid "User group"
 msgstr "Группа"
 
 #: models.py:96 templates/abonapp/editAbon.html:180
-msgid "Ip addresses"
-msgstr "IP Адреса"
+msgid "Ip address"
+msgstr "IP Адрес"
 
 #: models.py:103
 msgid "Network access server"
@@ -201,11 +201,6 @@ msgstr "Не хватает денег на счету"
 #: models.py:190
 msgid "Buy service default log"
 msgstr "Покупка тарифного плана через админку"
-
-#: models.py:228
-#, python-format
-msgid "Account \"%(username)s\" not have any active leases"
-msgstr "Учётная запись \"%(username)s\" не имеет ни одной активной сессии"
 
 #: models.py:238 models.py:255 models.py:272 views.py:684 views.py:1132
 #: views.py:1175
@@ -515,10 +510,6 @@ msgstr "Выделен из:"
 msgid "From"
 msgstr "От"
 
-#: templates/abonapp/editAbon.html:218
-msgid "Leases does not found"
-msgstr "Аренды ip не найдены"
-
 #: templates/abonapp/editAbon.html:230
 #: templates/abonapp/modal_add_lease.html:16
 #: templates/abonapp/modal_add_phone.html:27
@@ -529,8 +520,8 @@ msgid "Add"
 msgstr "Добавить"
 
 #: templates/abonapp/editAbon.html:234
-msgid "Active networks"
-msgstr "Активные подсети"
+msgid "Networks"
+msgstr "Подсети"
 
 #: templates/abonapp/editAbon.html:242
 msgid "User flags"
@@ -1159,3 +1150,6 @@ msgstr "Автопродление услуги."
 
 msgid "No author attached"
 msgstr "Автор не назначен"
+
+msgid "User not have ip"
+msgstr "У пользователя нет ip"

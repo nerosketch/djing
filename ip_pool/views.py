@@ -58,23 +58,6 @@ class NetworkDeleteView(DeleteView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('ip_pool.view_ipleasemodel'), name='dispatch')
-class IpLeasesListView(OrderedFilteredList):
-    template_name = 'ip_pool/ip_leases_list.html'
-    model = models.IpLeaseModel
-
-    def get_context_data(self, **kwargs):
-        net_id = self.kwargs.get('net_id')
-        context = super().get_context_data(**kwargs)
-        context['net'] = get_object_or_404(models.NetworkModel, pk=net_id)
-        return context
-
-    def get_queryset(self):
-        net_id = self.kwargs.get('net_id')
-        return self.model.objects.filter(network__id=net_id)
-
-
-@method_decorator(login_decs, name='dispatch')
 @method_decorator(permission_required('ip_pool.add_networkmodel'), name='dispatch')
 class NetworkCreateView(CreateView):
     model = models.NetworkModel
