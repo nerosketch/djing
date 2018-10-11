@@ -205,12 +205,12 @@
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm">
                         {% if abon.ip_address %}
-                            <a href="#" class="btn btn-primary">
+                            <a href="{% url 'abonapp:update_ip' group.pk abon.username %}" class="btn btn-primary btn-modal">
                                 <span class="glyphicon glyphicon-edit"></span>
                                 <span class="hidden-xs">{% trans 'Change' %}</span>
                             </a>
                         {% else %}
-                            <a href="#" class="btn btn-success btn-modal">
+                            <a href="{% url 'abonapp:update_ip' group.pk abon.username %}" class="btn btn-success btn-modal">
                                 <span class="glyphicon glyphicon-plus"></span>
                                 <span class="hidden-xs">{% trans 'Add' %}</span>
                             </a>

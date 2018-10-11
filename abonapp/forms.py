@@ -168,3 +168,9 @@ class MarkersForm(forms.ModelForm):
 class AmountMoneyForm(forms.Form):
     amount = forms.FloatField(max_value=50000, label=_('Amount of money'))
     comment = forms.CharField(max_length=128, label=_('Comment'), required=False)
+
+
+class AddIpForm(forms.ModelForm):
+    class Meta:
+        model = models.Abon
+        fields = 'ip_address',

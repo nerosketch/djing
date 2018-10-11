@@ -549,6 +549,21 @@ class PassportUpdateView(AbonappPermissionMixin, UpdateView):
         return super(PassportUpdateView, self).get_context_data(**context)
 
 
+class IpUpdateView(AbonappPermissionMixin, UpdateView):
+    permission_required = 'abonapp.change_abon'
+    form_class = forms.AddIpForm
+    model = models.Abon
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
+    template_name = 'abonapp/modal_ip_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IpUpdateView, self).get_context_data(**kwargs)
+        context['group'] = self.object.group
+        context['abon'] = self.object
+        return context
+
+
 @login_required
 @only_admins
 def chgroup_tariff(request, gid):

@@ -31,7 +31,8 @@ subscriber_patterns = [
     path('periodic_pay/<int:periodic_pay_id>/', views.add_edit_periodic_pay, name='add_periodic_pay'),
     path('periodic_pay/<int:periodic_pay_id>/del/', views.del_periodic_pay, name='del_periodic_pay'),
     path('ping/', views.abon_ping, name='ping'),
-    path('set_auto_continue_service/', views.set_auto_continue_service, name='set_auto_continue_service')
+    path('set_auto_continue_service/', views.set_auto_continue_service, name='set_auto_continue_service'),
+    path('update_ip/', views.IpUpdateView.as_view(), name='update_ip')
 ]
 
 group_patterns = [
