@@ -2,6 +2,7 @@ from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -16,7 +17,7 @@ from django.conf import settings
 from group_app.models import Group
 
 from .models import UserProfile, UserProfileLog
-from .forms import AvatarChangeForm, UserPermissionsForm, MyUserObjectPermissionsForm
+from .forms import AvatarChangeForm, UserPermissionsForm, MyUserObjectPermissionsForm, UserProfileForm
 from djing import lib
 from djing.lib.decorators import only_admins
 from guardian.decorators import permission_required_or_403 as permission_required
@@ -100,36 +101,18 @@ class AvatarUpdateView(UpdateView):
         return resolve_url('acc_app:other_profile', uid=self.request.user.id)
 
 
-@login_required
-@only_admins
-def ch_info(request):
-    if request.method == 'POST':
-        user = request.user
-        user.username = request.POST.get('username')
-        user.fio = request.POST.get('fio')
-        user.email = request.POST.get('email')
-        user.telephone = request.POST.get('telephone')
+class UpdateSelfAccount(LoginRequiredMixin, UpdateView):
+    form_class = UserProfileForm
+    model = UserProfile
+    template_name = 'accounts/userprofile_form.html'
 
-        psw = request.POST.get('oldpasswd')
-        if psw != '' and psw is not None:
-            if user.check_password(psw):
-                newpasswd = request.POST.get('newpasswd')
-                if newpasswd != '' and newpasswd is not None:
-                    user.set_password(newpasswd)
-                    user.save()
-                    request.user = user
-                    logout(request)
-                    return redirect('acc_app:other_profile', uid=user.pk)
-                else:
-                    messages.error(request, _('New password is empty, fill it'))
-            else:
-                messages.error(request, _('Wrong password'))
-        else:
-            messages.warning(request, _('Empty password, fill it'))
+    def get_object(self, queryset=None):
+        return self.request.user
 
-    return render(request, 'accounts/settings/ch_info.html', {
-        'user': request.user
-    })
+    def form_valid(self, form):
+        r = super(UpdateSelfAccount, self).form_valid(form)
+        messages.success(self.request, _('Saved successfully'))
+        return r
 
 
 @login_required
