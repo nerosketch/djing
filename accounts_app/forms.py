@@ -46,7 +46,7 @@ class UserPermissionsForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = 'user_permissions',
+        fields = ('avatar', 'password', 'groups', 'user_permissions', 'responsibility_groups', 'is_superuser')
 
 
 class UserProfileForm(forms.ModelForm):
