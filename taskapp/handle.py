@@ -22,7 +22,10 @@ def handle(task, author, recipients, abon_group):
             elif task.state == 'F' or task.state == 'C':
                 text = _('Task completed')
             if task.abon is not None:
-                fulltext = "%s:\n%s\n" % (text, task.abon.get_full_name())
+                fulltext = "%s:\n%s\n" % (
+                    text,
+                    '<a href="%s">%s</a>' % (task.abon.get_absolute_url(), task.abon.get_full_name())
+                )
             else:
                 fulltext = "%s\n" % text
             fulltext += _('locality %s.\n') % abon_group.title
