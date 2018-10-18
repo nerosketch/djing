@@ -26,14 +26,13 @@ subscriber_patterns = [
     path('tel/add/', views.tel_add, name='telephone_new'),
     path('tel/del/', views.tel_del, name='telephone_del'),
     path('markers/', views.EditSibscriberMarkers.as_view(), name='markers_edit'),
-    path('session/<int:lease_id>/free/', views.user_session_toggle, {'action': 'free'}, name='user_session_free'),
-    path('session/<int:lease_id>/start/', views.user_session_toggle, {'action': 'start'}, name='user_session_start'),
+    path('session/free/', views.user_session_free, name='user_session_free'),
     path('periodic_pay/', views.add_edit_periodic_pay, name='add_periodic_pay'),
     path('periodic_pay/<int:periodic_pay_id>/', views.add_edit_periodic_pay, name='add_periodic_pay'),
     path('periodic_pay/<int:periodic_pay_id>/del/', views.del_periodic_pay, name='del_periodic_pay'),
-    path('lease/add/', views.lease_add, name='lease_add'),
     path('ping/', views.abon_ping, name='ping'),
-    path('set_auto_continue_service/', views.set_auto_continue_service, name='set_auto_continue_service')
+    path('set_auto_continue_service/', views.set_auto_continue_service, name='set_auto_continue_service'),
+    path('update_ip/', views.IpUpdateView.as_view(), name='update_ip')
 ]
 
 group_patterns = [

@@ -1,6 +1,6 @@
 from datetime import timedelta
 from ipaddress import ip_network, ip_address
-from typing import Optional
+from typing import Optional, Generator
 
 from django.conf import settings
 from django.db.utils import IntegrityError
@@ -38,6 +38,8 @@ class NetworkModel(models.Model):
     # Usable ip range
     ip_start = models.GenericIPAddressField(_('Start work ip range'))
     ip_end = models.GenericIPAddressField(_('End work ip range'))
+
+    speed = models.FloatField(_('Speed for subnet'))
 
     def __str__(self):
         netw = self.get_network()
@@ -105,6 +107,32 @@ class NetworkModel(models.Model):
             return _('Unspecified')
         return "I don't know"
 
+    def get_free_ip(self, employed_ips: Optional[Generator]):
+        """
+        Find free ip in network.
+        :param employed_ips: Sorted from less to more ip addresses from current network.
+        :return: single finded ip
+        """
+        network = self.get_network()
+        work_range_start_ip = ip_address(self.ip_start)
+        work_range_end_ip = ip_address(self.ip_end)
+        if employed_ips is None:
+            for ip in network.hosts():
+                if work_range_start_ip <= ip <= work_range_end_ip:
+                    return ip
+            return
+        for ip in network.hosts():
+            if ip < work_range_start_ip:
+                continue
+            elif ip > work_range_end_ip:
+                break  # Not found
+            used_ip = next(employed_ips)
+            if used_ip is None:
+                return ip
+            used_ip = ip_address(used_ip)
+            if ip < used_ip:
+                return ip
+
     class Meta:
         db_table = 'ip_pool_network'
         verbose_name = _('Network')
@@ -145,7 +173,6 @@ class IpLeaseManager(models.Manager):
                 ip=ip,
                 network=net,
                 is_dynamic=is_dynamic,
-                is_active=True,
                 mac_addr=mac
             )
         except IntegrityError as e:
@@ -159,30 +186,19 @@ class IpLeaseManager(models.Manager):
         return self.filter(lease_time__lt=senility)
 
 
+# Deprecated. Remove after migrations squashed
 class IpLeaseModel(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True)
     network = models.ForeignKey(NetworkModel, on_delete=models.CASCADE,
                                 verbose_name=_('Parent network'), null=True, blank=True)
     mac_addr = MACAddressField(verbose_name=_('Mac address'), null=True, blank=True)
     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
-    is_dynamic = models.BooleanField(_('Is dynamic'), default=False)
-    is_active = models.BooleanField(_('Is active'), default=True)
     device_info = models.CharField(null=True, blank=True, default=None, max_length=128)
 
     objects = IpLeaseManager()
 
     def __str__(self):
         return self.ip
-
-    def free(self):
-        if self.is_active:
-            self.is_active = False
-            self.save(update_fields=('is_active',))
-
-    def start(self):
-        if not self.is_active:
-            self.is_active = True
-            self.save(update_fields=('is_active',))
 
     def clean(self):
         ip = ip_address(self.ip)
@@ -201,7 +217,16 @@ class IpLeaseModel(models.Model):
         unique_together = ('ip', 'network', 'mac_addr')
 
 
-# class LeasesHistory(models.Model):
-#     ip = models.GenericIPAddressField(verbose_name=_('Ip address'))
-#     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
-#     mac_addr = MACAddressField(_('Mac address'), null=True, blank=True)
+class LeasesHistory(models.Model):
+    ip = models.GenericIPAddressField(verbose_name=_('Ip address'))
+    lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)
+    mac_addr = MACAddressField(_('Mac address'), null=True, blank=True)
+
+    def __str__(self):
+        return self.ip
+
+    class Meta:
+        db_table = 'ip_pool_leases_history'
+        verbose_name = _('History lease')
+        verbose_name_plural = _('Leases history')
+        ordering = '-lease_time',

@@ -2,7 +2,6 @@ from typing import Optional
 from django.core.exceptions import MultipleObjectsReturned
 from abonapp.models import Abon
 from devapp.models import Device, Port
-from ip_pool.models import IpLeaseModel
 
 
 def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: int) -> Optional[str]:
@@ -13,22 +12,17 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
         if mngr_class.get_is_use_device_port():
             abon = Abon.objects.get(dev_port__device=dev,
                                     dev_port__num=switch_port,
-                                    device=dev)
+                                    device=dev, is_active=True)
         else:
-            abon = Abon.objects.get(device=dev)
+            abon = Abon.objects.get(device=dev, is_active=True)
         if not abon.is_dynamic_ip:
             return 'User settings is not dynamic'
-        client_ips = tuple(str(ip) for ip in abon.ip_addresses.all())
-        if client_ip in client_ips:
-            return 'Ip address already existed'
-        add_lease_result = abon.add_lease(client_ip, mac_addr=client_mac, network=None)
-        if add_lease_result is None:
-            if abon.is_access():
-                abon.nas_sync_self()
-            else:
-                return 'User %s is not access to service' % abon.username
+        abon.attach_ip_addr(client_ip, strict=False)
+        if abon.is_access():
+            r = abon.nas_sync_self()
+            return r if r else None
         else:
-            return add_lease_result
+            return 'User %s is not access to service' % abon.username
     except Abon.DoesNotExist:
         return "User with device with mac '%s' does not exist" % switch_mac
     except Device.DoesNotExist:
@@ -43,16 +37,13 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
 
 
 def dhcp_expiry(client_ip: str) -> Optional[str]:
-    try:
-        lease = IpLeaseModel.objects.get(ip=client_ip)
-        lease.is_active = False
-        lease.save(update_fields=('is_active',))
-        abon = Abon.objects.filter(ip_addresses=lease).first()
-        if abon is None:
-            return "Subscriber with ip %s does not exist" % client_ip
-        abon.nas_sync_self()
-    except IpLeaseModel.DoesNotExist:
-        pass
+    abon = Abon.objects.filter(ip_address=client_ip, is_active=True).exclude(current_tariff=None).first()
+    if abon is None:
+        return "Subscriber with ip %s does not exist" % client_ip
+    else:
+        is_freed = abon.free_ip_addr()
+        if is_freed:
+            abon.nas_sync_self()
 
 
 def dhcp_release(client_ip: str) -> Optional[str]:

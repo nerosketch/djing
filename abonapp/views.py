@@ -1,4 +1,3 @@
-from ipaddress import ip_address
 from typing import Dict, Optional
 from datetime import datetime, date
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -6,6 +5,7 @@ from django.db import IntegrityError, ProgrammingError, transaction, Operational
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin as PermissionRequiredMixin_django
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -25,21 +25,22 @@ from taskapp.models import Task
 from dialing_app.models import AsteriskCDR
 from statistics.models import getModel
 from group_app.models import Group
-from ip_pool.models import IpLeaseModel, NetworkModel
-from ip_pool.forms import LeaseForm
+from ip_pool.models import NetworkModel
 from guardian.shortcuts import get_objects_for_user, assign_perm
 from guardian.decorators import permission_required_or_403 as permission_required
+from guardian.mixins import PermissionRequiredMixin
 from djing import ping
 from djing import lib
 from djing.lib.decorators import json_view, only_admins
+from djing.lib.mixins import OnlyAdminsMixin
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 
 
-login_decs = login_required, only_admins
+class AbonappPermissionMixin(LoginRequiredMixin, OnlyAdminsMixin, PermissionRequiredMixin):
+    return_403 = True
 
 
-@method_decorator(login_decs, name='dispatch')
-class PeoplesListView(OrderedFilteredList):
+class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     template_name = 'abonapp/peoples.html'
 
     def get_queryset(self):
@@ -77,8 +78,7 @@ class PeoplesListView(OrderedFilteredList):
         return context
 
 
-@method_decorator(login_decs, name='dispatch')
-class GroupListView(OrderedFilteredList):
+class GroupListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
     queryset = Group.objects.annotate(usercount=Count('abon'))
@@ -90,9 +90,8 @@ class GroupListView(OrderedFilteredList):
         return queryset
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.add_abon'), name='dispatch')
-class AbonCreateView(CreateView):
+class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin, PermissionRequiredMixin_django, CreateView):
+    permission_required = 'abonapp.add_abon'
     group = None
     abon = None
     form_class = forms.AbonForm
@@ -146,9 +145,8 @@ class AbonCreateView(CreateView):
         return super(AbonCreateView, self).form_invalid(form)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.delete_abon'), name='dispatch')
-class DelAbonDeleteView(DeleteView):
+class DelAbonDeleteView(AbonappPermissionMixin, DeleteView):
+    permission_required = 'abonapp.delete_abon'
     model = models.Abon
     slug_url_kwarg = 'uname'
     slug_field = 'username'
@@ -220,11 +218,13 @@ def abonamount(request, gid: int, uname):
     })
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('group_app.view_group', (Group, 'pk', 'gid')), name='dispatch')
-class DebtsListView(OrderedFilteredList):
+class DebtsListView(AbonappPermissionMixin, OrderedFilteredList):
+    permission_required = 'group_app.view_group'
     context_object_name = 'invoices'
     template_name = 'abonapp/invoiceForPayment.html'
+
+    def get_permission_object(self):
+        return self.abon.group
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
@@ -238,11 +238,15 @@ class DebtsListView(OrderedFilteredList):
         return context
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('group_app.view_group', (Group, 'pk', 'gid')), name='dispatch')
-class PayHistoryListView(OrderedFilteredList):
+class PayHistoryListView(AbonappPermissionMixin, OrderedFilteredList):
+    permission_required = 'group_app.view_group'
     context_object_name = 'pay_history'
     template_name = 'abonapp/payHistory.html'
+
+    def get_permission_object(self):
+        if hasattr(self, 'abon'):
+            return self.abon.group
+        return models.Group.objects.filter(pk=self.kwargs.get('gid')).first()
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
@@ -283,9 +287,8 @@ def abon_services(request, gid: int, uname):
     })
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.view_abon'), name='post')
-class AbonHomeUpdateView(UpdateView):
+class AbonHomeUpdateView(AbonappPermissionMixin, UpdateView):
+    permission_required = 'abonapp.view_abon'
     model = models.Abon
     form_class = forms.AbonForm
     slug_field = 'username'
@@ -469,9 +472,8 @@ def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     return redirect('abonapp:abon_services', gid=gid, uname=uname)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.view_abonlog'), name='dispatch')
-class LogListView(ListView):
+class LogListView(AbonappPermissionMixin, ListView):
+    permission_required = 'abonapp.view_abonlog'
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'logs'
@@ -479,9 +481,8 @@ class LogListView(ListView):
     model = models.AbonLog
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.view_invoiceforpayment'), name='dispatch')
-class DebtorsListView(ListView):
+class DebtorsListView(AbonappPermissionMixin, ListView):
+    permission_required = 'abonapp.view_invoiceforpayment'
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'invoices'
@@ -489,13 +490,15 @@ class DebtorsListView(ListView):
     queryset = models.InvoiceForPayment.objects.filter(status=True)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('group_app.view_group', (Group, 'pk', 'gid')), name='dispatch')
-class TaskLogListView(ListView):
+class TaskLogListView(AbonappPermissionMixin, ListView):
+    permission_required = 'group_app.view_group'
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     http_method_names = ('get',)
     context_object_name = 'tasks'
     template_name = 'abonapp/task_log.html'
+
+    def get_permission_object(self):
+        return self.abon.group
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
@@ -509,9 +512,8 @@ class TaskLogListView(ListView):
         return context
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.view_passportinfo'), name='dispatch')
-class PassportUpdateView(UpdateView):
+class PassportUpdateView(AbonappPermissionMixin, UpdateView):
+    permission_required = 'abonapp.view_passportinfo'
     form_class = forms.PassportForm
     model = models.PassportInfo
     template_name = 'abonapp/modal_passport_view.html'
@@ -547,6 +549,28 @@ class PassportUpdateView(UpdateView):
         }
         context.update(kwargs)
         return super(PassportUpdateView, self).get_context_data(**context)
+
+
+class IpUpdateView(AbonappPermissionMixin, UpdateView):
+    permission_required = 'abonapp.change_abon'
+    form_class = forms.AddIpForm
+    model = models.Abon
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
+    template_name = 'abonapp/modal_ip_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(IpUpdateView, self).dispatch(request, *args, **kwargs)
+        except lib.LogicError as e:
+            messages.error(request, e)
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        context = super(IpUpdateView, self).get_context_data(**kwargs)
+        context['group'] = self.object.group
+        context['abon'] = self.object
+        return context
 
 
 @login_required
@@ -775,8 +799,7 @@ def vcards(r):
     return response
 
 
-@method_decorator(login_decs, name='dispatch')
-class DialsListView(OrderedFilteredList):
+class DialsListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     context_object_name = 'logs'
     template_name = 'abonapp/dial_log.html'
 
@@ -1106,9 +1129,8 @@ def del_periodic_pay(request, gid: int, uname, periodic_pay_id):
     return redirect('abonapp:abon_services', gid, uname)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('abonapp.change_abon'), name='dispatch')
-class EditSibscriberMarkers(UpdateView):
+class EditSibscriberMarkers(AbonappPermissionMixin, UpdateView):
+    permission_required = 'abonapp.change_abon'
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
     form_class = forms.MarkersForm
@@ -1142,78 +1164,17 @@ class EditSibscriberMarkers(UpdateView):
 @login_required
 @only_admins
 @permission_required('abonapp.change_abon')
-def user_session_toggle(request, gid: int, uname, lease_id: int, action=None):
+def user_session_free(request, gid: int, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     if abon.nas is None:
         messages.error(request, _('NAS required'))
         return redirect('abonapp:abon_home', gid, uname)
-    lease = abon.ip_addresses.get(pk=lease_id)
-    tm = abon.nas.get_nas_manager()
-    try:
-        if action == 'free':
-            try:
-                abon_nas_obj = abon.build_agent_struct()
-                tm.lease_free(abon_nas_obj, ip_address(lease.ip))
-                messages.success(request, _('Ip lease has been freed'))
-                lease.free()
-            except lib.LogicError:
-                messages.error(request, _('You cannot disable last session'))
-        elif action == 'start':
-            lease.start()
-            abon_nas_obj = abon.build_agent_struct()
-            tm.lease_start(abon_nas_obj, ip_address(lease.ip))
-            messages.success(request, _('Ip lease has been started'))
-        else:
-            messages.error(request, _('Unexpected action'))
-    except (NasFailedResult, lib.LogicError) as e:
-        messages.error(request, e)
-    return redirect('abonapp:abon_home', gid, uname)
-
-
-@login_required
-@only_admins
-@permission_required('abonapp.change_abon')
-def lease_add(request, gid: int, uname):
-    group = get_object_or_404(Group, pk=gid)
-    if request.method == 'POST':
-        frm = LeaseForm(request.POST)
-        if frm.is_valid():
-            try:
-                abon = get_object_or_404(models.Abon, username=uname)
-                cleaned = frm.clean()
-                ip = cleaned.get('ip_addr')
-                is_dynamic = cleaned.get('is_dynamic')
-                network_id = cleaned.get('possible_networks')  # str(int)
-                network = get_object_or_404(NetworkModel, pk=network_id)
-                lease = IpLeaseModel.objects.create_from_ip(ip, net=network, is_dynamic=is_dynamic)
-                abon.ip_addresses.add(lease)
-                if abon.nas is None:
-                    messages.error(request, _('NAS required'))
-                else:
-                    tm = abon.nas.get_nas_manager()
-                    tm.lease_start(
-                        user=abon.build_agent_struct(),
-                        lease=lease.ip
-                    )
-                    messages.success(request, _('Ip lease has been created'))
-                return redirect('abonapp:abon_home', gid, uname)
-            except lib.DuplicateEntry as e:
-                messages.error(request, e)
-        else:
-            messages.error(request, _('Check form errors'))
+    if abon.ip_address:
+        abon.free_ip_addr()
+        messages.success(request, _('Ip lease has been freed'))
     else:
-        first_network = NetworkModel.objects.filter(groups=group).first()
-        if first_network is not None:
-            free_ip = IpLeaseModel.objects.get_free_ip(first_network)
-            initial = {'ip_addr': free_ip}
-        else:
-            initial = None
-        frm = LeaseForm(initial=initial)
-    return render(request, 'abonapp/modal_add_lease.html', {
-        'form': frm,
-        'group': group,
-        'uname': uname
-    })
+        messages.error(request, _('User not have ip'))
+    return redirect('abonapp:abon_home', gid, uname)
 
 
 @login_required
@@ -1247,9 +1208,8 @@ def abons(request):
     ablist = ({
         'id': abn.pk,
         'tarif_id': abn.active_tariff().tariff.pk if abn.active_tariff() is not None else 0,
-        'ips': ','.join(str(i.ip) for i in abn.ip_addresses.filter(is_active=True)),
-        'is_active': abn.is_active
-    } for abn in models.Abon.objects.all())
+        'ip': abn.ip_address
+    } for abn in models.Abon.objects.iterator())
 
     tarlist = ({
         'id': trf.pk,
@@ -1285,10 +1245,13 @@ class DhcpLever(SecureApiView):
     @method_decorator(json_view)
     def get(self, request, *args, **kwargs):
         data = request.GET.copy()
-        r = self.on_dhcp_event(data)
-        if r is not None:
-            return {'text': r}
-        return {'status': 'ok'}
+        try:
+            r = self.on_dhcp_event(data)
+            if r is not None:
+                return {'text': r}
+            return {'status': 'ok'}
+        except IntegrityError as e:
+            return {'status': str(e).replace('\n', ' ')}
 
     @staticmethod
     def on_dhcp_event(data: Dict) -> Optional[str]:

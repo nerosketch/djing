@@ -1,0 +1,12 @@
+[Unit]
+Description=Backup for djing
+
+[Service]
+Type=simple
+ExecStart=/var/backups/do_backup.sh
+WorkingDirectory=/var/backups
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

@@ -28,7 +28,7 @@
         {% with can_ch_net=perms.ip_pool.change_networkmodel can_del_net=perms.ip_poo.delete_networkmodel %}
         {% for netw in networks_list %}
             <tr>
-                <td><a href="{% url 'ip_pool:ip_leases_list' netw.id %}">{{ netw.get_network }}</a></td>
+                <td>{{ netw.get_network }}</td>
                 <td>{{ netw.get_kind_display }}</td>
                 <td>{{ netw.description }}</td>
                 <td>{{ netw.get_scope }}</td>
@@ -55,10 +55,6 @@
                             <span class="hidden-xs hidden-sm">{% trans 'Permission denied' %}</span>
                         </a>
                     {% endif %}
-                    <a href="{% url 'ip_pool:ip_leases_list' netw.pk %}" class="btn btn-default">
-                        <span class="glyphicon glyphicon-eye-open"></span>
-                        <span class="hidden-xs hidden-sm">{% trans 'View employed' %}</span>
-                    </a>
                 </td>
             </tr>
         {% empty %}

@@ -1,5 +1,4 @@
 from datetime import datetime
-from ipaddress import ip_address
 from typing import Optional
 
 from django.conf import settings
@@ -13,10 +12,10 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
-from nas_app.nas_managers import AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
+from nas_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import LogicError
-from ip_pool.models import IpLeaseModel, NetworkModel
+from ip_pool.models import NetworkModel
 from tariff_app.models import Tariff, PeriodicPay
 from bitfield import BitField
 
@@ -90,7 +89,7 @@ class Abon(BaseAccount):
     current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL, default=None)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
-    ip_addresses = models.ManyToManyField(IpLeaseModel, verbose_name=_('Ip addresses'))
+    ip_address = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True, null=True, blank=True)
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
@@ -198,6 +197,25 @@ class Abon(BaseAccount):
                 comment=comment or _('Buy service default log')
             )
 
+    def attach_ip_addr(self, ip, strict=False):
+        """
+        Attach ip address to account
+        :param ip: Instance of str or ip_address
+        :param strict: If strict is True then ip not replaced quietly
+        :return: None
+        """
+        if strict and self.ip_address:
+            raise LogicError('Ip address already exists')
+        self.ip_address = ip
+        self.save(update_fields=('ip_address',))
+
+    def free_ip_addr(self) -> bool:
+        if self.ip_address:
+            self.ip_address = None
+            self.save(update_fields=('ip_address',))
+            return True
+        return False
+
     # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self) -> bool:
         if not self.is_active:
@@ -210,22 +228,19 @@ class Abon(BaseAccount):
         return ct.manage_access(self)
 
     # make subscriber from agent structure
-    def build_agent_struct(self, raise_errs=True):
-        abon_addresses = tuple(ip_address(i.ip) for i in self.ip_addresses.filter(is_active=True))
-        # if not abon_addresses:
-        #     return
+    def build_agent_struct(self):
+        if not self.ip_address:
+            return
         abon_tariff = self.active_tariff()
-        if abon_tariff is None:
-            agent_trf = None
-        else:
-            trf = abon_tariff.tariff
-            agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
-        if len(abon_addresses) > 0:
-            return AbonStruct(self.pk, abon_addresses, agent_trf, self.is_access())
-        if raise_errs:
-            raise LogicError(_('Account "%(username)s" not have any active leases') % {
-                'username': self.username
-            })
+        if abon_tariff:
+            abon_tariff = abon_tariff.tariff
+            return SubnetQueue(
+                name="uid%d" % self.pk,
+                network=self.ip_address,
+                max_limit=(abon_tariff.speedIn, abon_tariff.speedOut),
+                queue_type=SubnetQueue.QUEUE_LEAF,
+                is_access=self.is_access()
+            )
 
     def nas_sync_self(self) -> Optional[Exception]:
         """
@@ -280,14 +295,6 @@ class Abon(BaseAccount):
 
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
-
-    def add_lease(self, ip: str, network: Optional[NetworkModel], mac_addr=None):
-        existed_client_ips = tuple(l.ip for l in self.ip_addresses.all())
-        if ip not in existed_client_ips:
-            lease = IpLeaseModel.objects.create_from_ip(ip=ip, net=network, mac=mac_addr)
-            if lease is None:
-                return 'Error while creating a ip lease'
-            self.ip_addresses.add(lease)
 
     def enable_service(self, tariff: Tariff, deadline=None, time_start=None):
         """

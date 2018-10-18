@@ -3,7 +3,7 @@ from ipaddress import ip_address, AddressValueError
 from django import template
 from django.db.models import Model
 from django.apps import apps
-from ip_pool.models import IpLeaseModel
+from abonapp.models import Abon
 from six import string_types, class_types
 
 register = template.Library()
@@ -26,8 +26,8 @@ def can_login_by_location(request):
     try:
         remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
         if remote_ip.version == 4:
-            has_leases = IpLeaseModel.objects.filter(ip=str(remote_ip), abon__is_active=True).exists()
-            return has_leases
+            has_exist = Abon.objects.filter(ip_address=str(remote_ip), is_active=True).exists()
+            return has_exist
     except AddressValueError:
         pass
     return False

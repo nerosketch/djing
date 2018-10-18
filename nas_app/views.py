@@ -34,8 +34,8 @@ class NasCreateView(CreateView):
     def form_valid(self, form):
         r = super(NasCreateView, self).form_valid(form)
         assign_perm("nas_app.change_nasmodel", self.request.user, self.object)
-        assign_perm("nas_app.view_nas", self.request.user, self.object)
-        assign_perm("nas_app.delete_nas", self.request.user, self.object)
+        assign_perm("nas_app.view_nasmodel", self.request.user, self.object)
+        assign_perm("nas_app.delete_nasmodel", self.request.user, self.object)
         self.request.user.log(self.request.META, 'cnas', '"%(title)s", %(ip)s, %(type)s' % {
             'title': self.object.title,
             'ip': self.object.ip_address,

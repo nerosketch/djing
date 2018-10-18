@@ -1,0 +1,27 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'abonapp:group_list' %}">{% trans 'User groups' %}</a></li>
+        <li><a href="{% url 'abonapp:people_list' group.id %}">{{ group.title }}</a></li>
+        <li><a href="{% url 'abonapp:abon_home' group.id abon.username %}">{{ abon.fio }}</a></li>
+        <li class="active">{% trans 'Update ip address' %}</li>
+    </ol>
+{% endblock %}
+
+{% block main %}
+<form role="form" action="{% url 'abonapp:update_ip' group.id object.username %}" method="post"> {% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span>{% trans 'Update ip address' %}</h4>
+    </div>
+    <div class="modal-body">
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-sm btn-primary">
+            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+        </button>
+    </div>
+</form>
+{% endblock %}

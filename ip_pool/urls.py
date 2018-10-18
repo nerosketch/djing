@@ -7,7 +7,6 @@ app_name = 'ip_pool'
 urlpatterns = [
     path('', views.NetworksListView.as_view(), name='networks'),
     path('network_add/', views.NetworkCreateView.as_view(), name='net_add'),
-    path('<int:net_id>/', views.IpLeasesListView.as_view(), name='ip_leases_list'),
     path('<int:net_id>/edit/', views.NetworkUpdateView.as_view(), name='net_edit'),
     path('<int:net_id>/del/', views.NetworkDeleteView.as_view(), name='net_delete'),
     path('<int:net_id>/group_attach/', views.network_in_groups, name='net_groups')
