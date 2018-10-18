@@ -5,7 +5,7 @@ from django.db import IntegrityError, ProgrammingError, transaction, Operational
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin as PermissionRequiredMixin_django
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -90,7 +90,7 @@ class GroupListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
         return queryset
 
 
-class AbonCreateView(AbonappPermissionMixin, CreateView):
+class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin, PermissionRequiredMixin_django, CreateView):
     permission_required = 'abonapp.add_abon'
     group = None
     abon = None
@@ -244,7 +244,9 @@ class PayHistoryListView(AbonappPermissionMixin, OrderedFilteredList):
     template_name = 'abonapp/payHistory.html'
 
     def get_permission_object(self):
-        return self.abon.group
+        if hasattr(self, 'abon'):
+            return self.abon.group
+        return models.Group.objects.filter(pk=self.kwargs.get('gid')).first()
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))

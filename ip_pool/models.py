@@ -39,6 +39,8 @@ class NetworkModel(models.Model):
     ip_start = models.GenericIPAddressField(_('Start work ip range'))
     ip_end = models.GenericIPAddressField(_('End work ip range'))
 
+    speed = models.FloatField(_('Speed for subnet'))
+
     def __str__(self):
         netw = self.get_network()
         return "%s: %s" % (self.description, netw.with_prefixlen)

@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from ipaddress import ip_address, _BaseAddress
+from ipaddress import ip_network, _BaseNetwork
 from typing import Iterable
 
 
@@ -7,68 +7,76 @@ class BaseStruct(object, metaclass=ABCMeta):
     __slots__ = ()
 
 
-# Как обслуживается абонент
-class TariffStruct(BaseStruct):
-    __slots__ = ('tid', 'speedIn', 'speedOut')
+class SubnetQueue(BaseStruct):
+    __slots__ = ('name', '_net', '_max_limit', '_queue_type',
+                 'is_access', 'queue_id')
 
-    def __init__(self, tariff_id=0, speed_in=None, speed_out=None):
-        self.tid = int(tariff_id)
-        self.speedIn = speed_in or 0
-        self.speedOut = speed_out or 0
+    # Queue types
+    QUEUE_UNKNOWN = 0
+    QUEUE_ROOT = 1
+    QUEUE_SUBNET = 2
+    QUEUE_LEAF = 3
 
-    # Yes, if all variables is zeroed
-    def is_empty(self):
-        return self.tid == 0 and self.speedIn == 0 and self.speedOut == 0
-
-    def __eq__(self, other):
-        # не сравниваем id, т.к. тарифы с одинаковыми скоростями для NAS одинаковы
-        # Да и иногда не удобно доставать из nas id тарифы из базы
-        return self.speedIn == other.speedIn and self.speedOut == other.speedOut
-
-    def __str__(self):
-        return "Id=%d, speedIn=%.2f, speedOut=%.2f" % (self.tid, self.speedIn, self.speedOut)
-
-    # нужно чтоб хеши тарифов In10,Out20 и In20,Out10 были разными
-    # поэтому сначала float->str и потом хеш
-    def __hash__(self):
-        return hash(str(self.speedIn) + str(self.speedOut))
-
-
-# Abon from database
-class AbonStruct(BaseStruct):
-    __slots__ = ('uid', '_ip', 'tariff', 'is_access', 'queue_id')
-
-    def __init__(self, uid=0, ip=None, tariff=None, is_access=True):
-        self.uid = int(uid or 0)
-        self._ip = ip
-        self.tariff = tariff
+    def __init__(self, name: str, network, max_limit=0.0,
+                 queue_type=QUEUE_UNKNOWN, is_access=True, queue_id=None):
+        super().__init__()
+        self.name = name
+        self.network = network
+        self.max_limit = max_limit
+        self.queue_type = queue_type
         self.is_access = is_access
-        self.queue_id = 0
+        self.queue_id = queue_id
 
-    def get_ip(self):
-        return self._ip
+    def get_max_limit(self):
+        return self._max_limit
 
-    def set_ip(self, v):
-        if issubclass(v.__class__, _BaseAddress):
-            self._ip = v
+    def set_max_limit(self, v):
+        if isinstance(v, tuple):
+            self._max_limit = v
+        elif isinstance(v, str):
+            s_in, s_out = v.split('/')
+            self._max_limit = float(s_in), float(s_out)
+        elif isinstance(v, (int, float)):
+            sp = float(v)
+            self._max_limit = sp, sp
         else:
-            self._ip = ip_address(v)
+            raise ValueError('Unexpected format for max_limit')
 
-    ip = property(get_ip, set_ip, doc='Ip address')
+    max_limit = property(get_max_limit, set_max_limit)
+
+    def get_network(self):
+        return self._net
+
+    def set_network(self, v):
+        if isinstance(v, (str, int)):
+            self._net = ip_network(v, strict=False)
+        elif issubclass(v.__class__, _BaseNetwork):
+            self._net = v
+        else:
+            raise ValueError('Unexpected format for network')
+
+    network = property(get_network, set_network)
+
+    def get_queue_type(self):
+        return self._queue_type
+
+    def set_queue_type(self, v):
+        if not isinstance(v, int):
+            raise ValueError('queue_type must be int')
+        if v < self.QUEUE_UNKNOWN or v > self.QUEUE_LEAF:
+            raise IndexError('queue_type out of range')
+        self._queue_type = v
+
+    queue_type = property(get_queue_type, set_queue_type)
 
     def __eq__(self, other):
-        if not isinstance(other, AbonStruct):
-            raise TypeError
-        r = self.uid == other.uid and self._ip == other._ip
-        r = r and self.tariff == other.tariff
-        return r
-
-    def __str__(self):
-        return "uid=%d, ip=[%s], tariff=%s" % (self.uid, self._ip, self.tariff or '<No Service>')
+        return self.network == other.network and self.max_limit == other.max_limit
 
     def __hash__(self):
-        return hash(hash(self._ip) + hash(self.tariff) if self.tariff is not None else 0)
+        return hash(str(self.max_limit) + str(self.network))
+
+    def __repr__(self):
+        return "net %s" % self.network
 
 
-VectorAbon = Iterable[AbonStruct]
-VectorTariff = Iterable[TariffStruct]
+VectorQueue = Iterable[SubnetQueue]

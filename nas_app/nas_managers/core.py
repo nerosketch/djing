@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
 from typing import Iterator, Any, Tuple, Optional
 from djing import ping
-from nas_app.nas_managers.structs import AbonStruct, TariffStruct, VectorAbon, VectorTariff
+from nas_app.nas_managers.structs import SubnetQueue, VectorQueue
 
 
 # Raised if NAS has returned failed result
@@ -33,66 +33,36 @@ class BaseTransmitter(ABC):
         return cls.description
 
     @abstractmethod
-    def add_user_range(self, user_list: VectorAbon):
+    def add_user_range(self, queue_list: VectorQueue):
         """add subscribers list to NAS
-        :param user_list: Vector of instances of subscribers
+        :param queue_list: Vector of instances of subscribers
         """
 
     @abstractmethod
-    def remove_user_range(self, users: VectorAbon):
+    def remove_user_range(self, queues):
         """remove subscribers list
-        :param users: Vector of instances of subscribers
+        :param queues: Vector of instances of subscribers
         """
 
     @abstractmethod
-    def add_user(self, user: AbonStruct, *args):
+    def add_user(self, queue: SubnetQueue, *args):
         """add subscriber
-        :param user: Subscriber instance
+        :param queue: Subscriber instance
         """
 
     @abstractmethod
-    def remove_user(self, user: AbonStruct):
+    def remove_user(self, queue: SubnetQueue):
         """
         remove subscriber
-        :param user: Subscriber instance
+        :param queue: Subscriber instance
         """
 
     @abstractmethod
-    def update_user(self, user: AbonStruct, *args):
+    def update_user(self, queue: SubnetQueue, *args):
         """
         Update subscriber by uid, you can change everything except its uid.
         Subscriber will found by UID.
-        :param user: Subscriber instance
-        """
-
-    @abstractmethod
-    def add_tariff_range(self, tariff_list: VectorTariff):
-        """Add services list to NAS.
-        :param tariff_list: Vector of TariffStruct
-        """
-
-    @abstractmethod
-    def remove_tariff_range(self, tariff_list: VectorTariff):
-        """Remove tariff list by unique id list.
-        :param tariff_list: Vector of TariffStruct
-        """
-
-    @abstractmethod
-    def add_tariff(self, tariff: TariffStruct):
-        pass
-
-    @abstractmethod
-    def update_tariff(self, tariff: TariffStruct):
-        """
-        Update tariff by uid, you can change everything except its uid.
-        Tariff will found by UID.
-        :param tariff: Service for update
-        """
-
-    @abstractmethod
-    def remove_tariff(self, tid: int):
-        """
-        :param tid: unique id of tariff.
+        :param queue: Subscriber instance
         """
 
     @abstractmethod
@@ -105,26 +75,8 @@ class BaseTransmitter(ABC):
         """
 
     @abstractmethod
-    def read_users(self) -> VectorAbon:
+    def read_users(self) -> VectorQueue:
         pass
-
-    # @abstractmethod
-    # def lease_free(self, user: AbonStruct, lease):
-    #     """
-    #     Remove ip lease from allowed to network
-    #     :param lease: ip_address for lease
-    #     :param user: Subscriber instance
-    #     :return:
-    #     """
-    #
-    # @abstractmethod
-    # def lease_start(self, user: AbonStruct, lease):
-    #     """
-    #     Starts ip lease to allowed to network
-    #     :param lease: ip_address for lease
-    #     :param user: Subscriber instance
-    #     :return:
-    #     """
 
     def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:
         """
@@ -153,3 +105,9 @@ class BaseTransmitter(ABC):
             for la in list_for_add:
                 print('\t', la)
             self.add_user_range(list_for_add)
+
+
+def diff_set(one: set, two: set) -> Tuple[set, set]:
+    list_for_del = (one ^ two) - one
+    list_for_add = one - two
+    return list_for_add, list_for_del

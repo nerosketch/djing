@@ -1,5 +1,4 @@
 from datetime import datetime
-from ipaddress import ip_address
 from typing import Optional
 
 from django.conf import settings
@@ -13,7 +12,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
-from nas_app.nas_managers import AbonStruct, TariffStruct, NasFailedResult, NasNetworkError
+from nas_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import LogicError
 from ip_pool.models import NetworkModel
@@ -232,14 +231,16 @@ class Abon(BaseAccount):
     def build_agent_struct(self):
         if not self.ip_address:
             return
-        abon_address = ip_address(self.ip_address)
         abon_tariff = self.active_tariff()
-        if abon_tariff is None:
-            agent_trf = None
-        else:
-            trf = abon_tariff.tariff
-            agent_trf = TariffStruct(trf.id, trf.speedIn, trf.speedOut)
-        return AbonStruct(self.pk, abon_address, agent_trf, self.is_access())
+        if abon_tariff:
+            abon_tariff = abon_tariff.tariff
+            return SubnetQueue(
+                name="uid%d" % self.pk,
+                network=self.ip_address,
+                max_limit=(abon_tariff.speedIn, abon_tariff.speedOut),
+                queue_type=SubnetQueue.QUEUE_LEAF,
+                is_access=self.is_access()
+            )
 
     def nas_sync_self(self) -> Optional[Exception]:
         """
