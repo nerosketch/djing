@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, abstractproperty
-from typing import Iterator, Any, Tuple, Optional
+from typing import Iterator, Tuple, Optional
 from djing import ping
 from nas_app.nas_managers.structs import SubnetQueue, VectorQueue
 
@@ -78,33 +78,13 @@ class BaseTransmitter(ABC):
     def read_users(self) -> VectorQueue:
         pass
 
-    def _diff_users(self, users_from_db: Iterator[Any]) -> Tuple[set, set]:
-        """
-        :param users_from_db: QuerySet of all subscribers that can have service
-        :return: Tuple of 2 lists that contain list to add users and list to remove users
-        """
-        users_struct_gen = (ab.build_agent_struct() for ab in users_from_db if
-                            ab is not None and ab.is_access())
-        users_struct_set = set(ab for ab in users_struct_gen if ab is not None and ab.tariff is not None)
-        users_from_nas = set(self.read_users())
-        if len(users_from_nas) < 1:
-            print('WARNING: Not have users from NAS')
-        list_for_del = (users_struct_set ^ users_from_nas) - users_struct_set
-        list_for_add = users_struct_set - users_from_nas
-        return list_for_add, list_for_del
-
+    @abstractmethod
     def sync_nas(self, users_from_db: Iterator):
-        list_for_add, list_for_del = self._diff_users(users_from_db)
-        if len(list_for_del) > 0:
-            print('List for del:', len(list_for_del))
-            for ld in list_for_del:
-                print('\t', ld)
-            self.remove_user_range(list_for_del)
-        if len(list_for_add) > 0:
-            print('List for add:', len(list_for_add))
-            for la in list_for_add:
-                print('\t', la)
-            self.add_user_range(list_for_add)
+        """
+        Synchronize db with gateway
+        :param users_from_db: Queryset of allowed users
+        :return: nothing
+        """
 
 
 def diff_set(one: set, two: set) -> Tuple[set, set]:
