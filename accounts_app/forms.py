@@ -52,4 +52,4 @@ class UserPermissionsForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        exclude = ('avatar', 'password', 'groups', 'user_permissions', 'responsibility_groups')
+        exclude = ('avatar', 'password', 'groups', 'user_permissions', 'responsibility_groups', 'is_superuser')
