@@ -238,7 +238,6 @@ class Abon(BaseAccount):
                 name="uid%d" % self.pk,
                 network=self.ip_address,
                 max_limit=(abon_tariff.speedIn, abon_tariff.speedOut),
-                queue_type=SubnetQueue.QUEUE_LEAF,
                 is_access=self.is_access()
             )
 

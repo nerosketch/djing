@@ -32,6 +32,7 @@
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="hidden-xs">{% trans 'Last traffic' %}</th>
+                        <th>{% trans 'Network' %}</th>
                         <th class="col-xs-3">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_order_by request order_by='fio' %}">
                                 {% trans 'fio' %}
@@ -88,9 +89,10 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td class="col-xs-2">{{ human.fio }}</td>
-                        <td class="col-xs-2">{{ human.street|default:_('Not assigned') }}</td>
-                        <td class="col-xs-1">{{ human.house|default:'-' }}</td>
+                        <td class="col-xs-1">{{ human.ip_address|default_if_none:'&mdash;' }}</td>
+                        <td class="col-xs-2">{{ human.fio|default:'&mdash;' }}</td>
+                        <td class="col-xs-1">{{ human.street|default:_('Not assigned') }}</td>
+                        <td class="col-xs-1">{{ human.house|default:'&mdash;' }}</td>
                         <td class="col-xs-1"><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
                         <td class="col-xs-2">
                             {% if human.current_tariff %}
@@ -117,7 +119,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11">
+                            <td colspan="12">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' group.pk %}">{% trans 'Add abon' %}</a>

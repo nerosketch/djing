@@ -4,14 +4,13 @@ import socket
 from abc import ABCMeta
 from hashlib import md5
 from ipaddress import ip_network, _BaseNetwork
-from typing import Iterable, Optional, Tuple, Generator, Dict, Iterator, Any
+from typing import Iterable, Optional, Tuple, Generator, Dict, Iterator
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from djing.lib.decorators import LazyInitMetaclass
 from nas_app.nas_managers import core
 from nas_app.nas_managers import structs as i_structs
-from ip_pool.models import NetworkModel
 
 DEBUG = getattr(settings, 'DEBUG', False)
 
@@ -21,14 +20,14 @@ LIST_DEVICES_ALLOWED = 'DjingDevicesAllowed'
 
 class ApiRos(object):
     """Routeros api"""
-    sk = None
+    __sk = None
     is_login = False
 
     def __init__(self, ip: str, port: int):
-        if self.sk is None:
+        if self.__sk is None:
             sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sk.connect((ip, port or 8728))
-            self.sk = sk
+            self.__sk = sk
 
     def login(self, username, pwd):
         if self.is_login:
@@ -147,7 +146,7 @@ class ApiRos(object):
     def write_bytes(self, s):
         n = 0
         while n < len(s):
-            r = self.sk.send(s[n:])
+            r = self.__sk.send(s[n:])
             if r == 0:
                 raise core.NasFailedResult("connection closed by remote end")
             n += r
@@ -155,16 +154,15 @@ class ApiRos(object):
     def read_bytes(self, length):
         ret = b''
         while len(ret) < length:
-            s = self.sk.recv(length - len(ret))
+            s = self.__sk.recv(length - len(ret))
             if len(s) == 0:
                 raise core.NasFailedResult("connection closed by remote end")
             ret += s
         return ret
 
     def __del__(self):
-        sk = getattr(self, 'sk')
-        if sk is not None:
-            self.sk.close()
+        if self.__sk is not None:
+            self.__sk.close()
 
 
 class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
@@ -247,14 +245,6 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                     is_access=not disabled,
                     queue_id=info.get('=.id')
                 )
-                if name.startswith('uid'):
-                    a.queue_type = i_structs.SubnetQueue.QUEUE_LEAF
-                elif name.startswith('net_'):
-                    a.queue_type = i_structs.SubnetQueue.QUEUE_SUBNET
-                elif name == 'queue-root':
-                    a.queue_type = i_structs.SubnetQueue.QUEUE_ROOT
-                else:
-                    a.queue_type = i_structs.SubnetQueue.QUEUE_UNKNOWN
                 return a
         except ValueError as e:
             print('ValueError:', e)
@@ -269,8 +259,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
         if r:
             return self._build_shape_obj(r.get('!re'))
 
-    def add_queue(self, queue: i_structs.SubnetQueue,
-                  parent_name: str) -> None:
+    def add_queue(self, queue: i_structs.SubnetQueue) -> None:
         if not isinstance(queue, i_structs.SubnetQueue):
             raise TypeError('queue must be instance of SubnetQueue')
         self._exec_cmd((
@@ -279,10 +268,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             # FIXME: тут в разных микротиках или =target-addresses или =target
             '=target=%s' % queue.network,
             '=max-limit=%.3fM/%.3fM' % queue.max_limit,
-            '=queue=Djing_SFQ/Djing_SFQ',
+            '=queue=Djing_pcq/Djing_pcq',
             '=burst-time=1/1',
-            '=parent=%s' % parent_name,
-            '=total-queue=Djing_SFQ'
+            '=total-queue=Djing_pcq'
         ))
 
     def remove_queue(self, queue: i_structs.SubnetQueue) -> None:
@@ -302,13 +290,13 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
         if len(ids) > 1:
             self._exec_cmd(('/queue/simple/remove', '=numbers=%s' % ids))
 
-    def update_queue(self, queue: i_structs.SubnetQueue, parent_name: str):
+    def update_queue(self, queue: i_structs.SubnetQueue):
         if not isinstance(queue, i_structs.SubnetQueue):
             raise TypeError
         if not queue.queue_id:
             queue = self.find_queue(queue.name)
         if queue is None:
-            return self.add_queue(queue, parent_name)
+            return self.add_queue(queue)
         else:
             cmd = [
                 '/queue/simple/set',
@@ -317,8 +305,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 # FIXME: тут в разных версиях прошивки микротика
                 # или =target-addresses или =target
                 '=target=%s' % queue.network,
-                '=queue=Djing_SFQ/Djing_SFQ',
-                '=parent=%s' % parent_name,
+                '=queue=Djing_pcq/Djing_pcq',
                 '=burst-time=1/1'
             ]
             if queue.queue_id:
@@ -375,8 +362,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             '?dynamic=no'
         ))
         for dat in nets:
-            yield ip_network(dat.get('=address'), strict=False), dat.get(
-                '=.id')
+            n = ip_network(dat.get('=address'))
+            n.queue_id = dat.get('=.id')
+            yield n
 
     #################################################
     #         BaseTransmitter implementation
@@ -397,9 +385,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 if ip_list_entity:
                     self.remove_ip(ip_list_entity.get('=.id'))
 
-    def add_user(self, queue: i_structs.SubnetQueue, parent_name=None, *args):
+    def add_user(self, queue: i_structs.SubnetQueue, *args):
         try:
-            self.add_queue(queue, parent_name=parent_name)
+            self.add_queue(queue)
         except core.NasFailedResult as e:
             print('Error:', e)
         net = queue.network
@@ -416,9 +404,8 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
         ip_id = r.get('=.id')
         self.remove_ip(ip_id)
 
-    def update_user(self, queue: i_structs.SubnetQueue, parent_name=None,
-                    *args):
-        self.update_queue(queue, parent_name)
+    def update_user(self, queue: i_structs.SubnetQueue, *args):
+        self.update_queue(queue)
 
     def ping(self, host, count=10) -> Optional[Tuple[int, int]]:
         r = self._exec_cmd((
@@ -441,80 +428,30 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
     def read_users(self) -> i_structs.VectorQueue:
         return self.read_queue_iter()
 
-    @staticmethod
-    def _build_db_queues(users_from_db: Iterator[Any]) -> Generator:
-        # Корневая очередь
-        # FIXME: Корневую очередь надо брать откуда-то
-        root_queue = i_structs.SubnetQueue(
-            name='queue-root',
-            network='10.0.0.0/8',
-            max_limit=2048,
-            queue_type=i_structs.SubnetQueue.QUEUE_ROOT
-        )
-
-        # выберем структуры подсетей
-        db_subnet_queues = (i_structs.SubnetQueue(
-            name="net_%s" % db_net.network,
-            network=db_net.get_network(),
-            max_limit=float(db_net.speed),
-            queue_type=i_structs.SubnetQueue.QUEUE_SUBNET
-        ) for db_net in NetworkModel.objects.all().iterator())
-
-        queues_struct_gen = (
+    def sync_nas(self, users_from_db: Iterator):
+        queues_from_db = (
             ab.build_agent_struct() for ab in users_from_db
             if ab is not None and ab.is_access()
         )
+        queues_from_db = set(filter(lambda x: x is not None, queues_from_db))
+        queues_from_gw = self.read_queue_iter()
 
-        r = [q for q in queues_struct_gen if q is not None]
-        r.insert(0, root_queue)
-        r.extend(db_subnet_queues)
-        return r, root_queue
-
-    def _queues_diff(self, users_from_db: Iterator):
-        queues_from_db, root_queue = self._build_db_queues(users_from_db)
-        queues_from_gw = tuple(self.read_queue_iter())
-
-        # TODO: надо чтоб корневая очередь тоже создавалась
-
-        db_queues_subnets = (
-            q for q in queues_from_db
-            if q.queue_type == i_structs.SubnetQueue.QUEUE_SUBNET
-        )
-        gw_queues_subnets = tuple(
-            q for q in queues_from_gw
-            if q.queue_type == i_structs.SubnetQueue.QUEUE_SUBNET
-        )
-        subnets_for_add, subnets_for_del = core.diff_set(
-            set(db_queues_subnets), set(gw_queues_subnets))
-
-        self.remove_queue_range(
-            (q.queue_id for q in subnets_for_del)
-        )
-        for q in subnets_for_add:
-            self.add_queue(q, parent_name=root_queue.name)
-        del subnets_for_add, subnets_for_del
-
-        db_queue_users = (
-            q for q in queues_from_db
-            if q.queue_type == i_structs.SubnetQueue.QUEUE_LEAF
-        )
-        gw_queue_users = (
-            q for q in queues_from_gw
-            if q.queue_type == i_structs.SubnetQueue.QUEUE_LEAF
-        )
-        user_q_for_add, user_q_for_del = core.diff_set(set(db_queue_users),
-                                                       set(gw_queue_users))
+        user_q_for_add, user_q_for_del = core.diff_set(queues_from_db,
+                                                       set(queues_from_gw))
 
         self.remove_queue_range(
             (q.queue_id for q in user_q_for_del)
         )
         for q in user_q_for_add:
-            find_filter = filter(
-                lambda qe: qe.network.overlaps(q.network),
-                gw_queues_subnets
-            )
-            parent_subnet = next(find_filter, root_queue)
-            self.add_queue(q, parent_name=parent_subnet.name)
+            self.add_queue(q)
+        del user_q_for_add, user_q_for_del
 
-    def sync_nas(self, users_from_db: Iterator):
-        self._queues_diff(users_from_db)
+        # sync ip addrs list
+        db_nets = set(net.network for net in queues_from_db)
+        gw_nets = set(self.read_nets_iter(LIST_USERS_ALLOWED))
+        nets_add, nets_del = core.diff_set(db_nets, gw_nets)
+        self.remove_ip_range(
+            (q.queue_id for q in nets_del)
+        )
+        for q in nets_add:
+            self.add_ip(LIST_USERS_ALLOWED, q)
