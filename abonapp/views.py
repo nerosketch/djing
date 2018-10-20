@@ -566,6 +566,15 @@ class IpUpdateView(AbonappPermissionMixin, UpdateView):
             messages.error(request, e)
         return self.render_to_response(self.get_context_data(**kwargs))
 
+    def form_valid(self, form):
+        r = super(IpUpdateView, self).form_valid(form)
+        abon = self.object
+        res = abon.nas_sync_self()
+        if isinstance(res, Exception):
+            messages.warning(self.request, res)
+        messages.success(self.request, _('Ip successfully updated'))
+        return r
+
     def get_context_data(self, **kwargs):
         context = super(IpUpdateView, self).get_context_data(**kwargs)
         context['group'] = self.object.group

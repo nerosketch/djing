@@ -1153,3 +1153,6 @@ msgstr "Автор не назначен"
 
 msgid "User not have ip"
 msgstr "У пользователя нет ip"
+
+msgid "Ip successfully updated"
+msgstr "IP успешно обновлён"

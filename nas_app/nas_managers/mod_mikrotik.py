@@ -262,7 +262,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
     def add_queue(self, queue: i_structs.SubnetQueue) -> None:
         if not isinstance(queue, i_structs.SubnetQueue):
             raise TypeError('queue must be instance of SubnetQueue')
-        self._exec_cmd((
+        return self._exec_cmd((
             '/queue/simple/add',
             '=name=%s' % queue.name,
             # FIXME: тут в разных микротиках или =target-addresses или =target
@@ -293,9 +293,8 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
     def update_queue(self, queue: i_structs.SubnetQueue):
         if not isinstance(queue, i_structs.SubnetQueue):
             raise TypeError
-        if not queue.queue_id:
-            queue = self.find_queue(queue.name)
-        if queue is None:
+        queue_gw = self.find_queue(queue.name)
+        if queue_gw is None:
             return self.add_queue(queue)
         else:
             cmd = [
@@ -348,10 +347,14 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
     def find_ip(self, net, list_name: str):
         if not issubclass(net.__class__, _BaseNetwork):
             raise TypeError
+        if net.prefixlen == net.max_prefixlen:
+            ip = net.network_address
+        else:
+            ip = net.with_prefixlen
         r = self._exec_cmd((
             '/ip/firewall/address-list/print', 'where',
             '?list=%s' % list_name,
-            '?address=%s' % net
+            '?address=%s' % ip
         ))
         return r.get('!re')
 
@@ -365,6 +368,13 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             n = ip_network(dat.get('=address'))
             n.queue_id = dat.get('=.id')
             yield n
+
+    def update_ip(self, net):
+        if not issubclass(net.__class__, _BaseNetwork):
+            raise TypeError
+        res_net_gw = self.find_ip(net, LIST_USERS_ALLOWED)
+        if not res_net_gw:
+            self.add_ip(LIST_USERS_ALLOWED, net)
 
     #################################################
     #         BaseTransmitter implementation
@@ -406,6 +416,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
 
     def update_user(self, queue: i_structs.SubnetQueue, *args):
         self.update_queue(queue)
+        self.update_ip(queue.network)
 
     def ping(self, host, count=10) -> Optional[Tuple[int, int]]:
         r = self._exec_cmd((
