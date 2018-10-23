@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils.html import escape
 from abonapp.models import Abon
 from devapp.models import Device
-from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
+from djing import MAC_ADDR_REGEX
 from django.contrib.auth.decorators import login_required
 from djing.lib.decorators import only_admins
 
@@ -20,19 +20,15 @@ def home(request):
     s = s.replace('+', '')
 
     if s:
-        if re.match(IP_ADDR_REGEX, s):
-            abons = Abon.objects.filter(ip_address=s)
-            devices = Device.objects.filter(ip_address=s)
-        else:
-            abons = Abon.objects.filter(
-                Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s) |
-                Q(additional_telephones__telephone__icontains=s)
-            )
+        abons = Abon.objects.filter(
+            Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s) |
+            Q(additional_telephones__telephone__icontains=s) | Q(ip_address__icontains=s)
+        )
 
-            if re.match(MAC_ADDR_REGEX, s):
-                devices = Device.objects.filter(mac_addr=s)
-            else:
-                devices = Device.objects.filter(comment__icontains=s)
+        if re.match(MAC_ADDR_REGEX, s):
+            devices = Device.objects.filter(mac_addr=s)
+        else:
+            devices = Device.objects.filter(Q(comment__icontains=s) | Q(ip_address__icontains=s))
 
     else:
         abons = ()
