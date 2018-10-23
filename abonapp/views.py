@@ -500,7 +500,10 @@ class TaskLogListView(AbonappPermissionMixin, ListView):
     template_name = 'abonapp/task_log.html'
 
     def get_permission_object(self):
-        return self.abon.group
+        if hasattr(self, 'abon'):
+            return self.abon.group
+        else:
+            return get_object_or_404(models.Group, pk=self.kwargs.get('gid'))
 
     def get_queryset(self):
         abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))

@@ -10,8 +10,8 @@ netaddr
 xmltodict
 dicttoxml
 
-# Django recommended mysql client
-mysqlclient
+# db client for Postgres
+psycopg2-binary
 
 easysnmp
 pid
