@@ -250,8 +250,9 @@ class Abon(BaseAccount):
             raise LogicError(_('NAS required'))
         try:
             agent_abon = self.build_agent_struct()
-            mngr = self.nas.get_nas_manager()
-            mngr.update_user(agent_abon)
+            if agent_abon is not None:
+                mngr = self.nas.get_nas_manager()
+                mngr.update_user(agent_abon)
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
@@ -267,8 +268,9 @@ class Abon(BaseAccount):
             raise LogicError(_('NAS required'))
         try:
             agent_abon = self.build_agent_struct()
-            mngr = self.nas.get_nas_manager()
-            mngr.add_user(agent_abon)
+            if agent_abon is not None:
+                mngr = self.nas.get_nas_manager()
+                mngr.add_user(agent_abon)
         except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
             print('ERROR:', e)
             return e
