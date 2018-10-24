@@ -101,13 +101,9 @@ class Task(models.Model):
         self.save(update_fields=('state',))
 
     def send_notification(self):
-        if self.abon:
-           group = self.abon.group
-        else:
-           group = ''
         task_handle(
            self, self.author,
-           self.recipients.all(), group
+           self.recipients.all()
         )
 
     def get_attachment_fname(self):

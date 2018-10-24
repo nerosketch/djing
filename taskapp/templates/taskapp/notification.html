@@ -1,0 +1,13 @@
+{% load i18n %}
+{% blocktrans with abon_url=abon.get_absolute_url group=abon.group street=abon.street house=abon.house telephone=abon.telephone task_type=task.get_mode_display task_detail=task.descr %}
+    <pre>
+        {{ task_status }}
+        <a href="{{ abon_url }}">{{ abon }}</a>
+        In group: {{ group }}
+        Street: {{ street }}
+        House: {{ house }}
+        Tel: {{ telephone }}
+        Task type: {{ task_type }}
+    </pre>
+    <p>{{ task_detail }}</p>
+{% endblocktrans %}
