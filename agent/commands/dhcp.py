@@ -17,6 +17,8 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             abon = Abon.objects.get(device=dev, is_active=True)
         if not abon.is_dynamic_ip:
             return 'User settings is not dynamic'
+        if client_ip == abon.ip_address:
+            return 'Ip has already attached'
         abon.attach_ip_addr(client_ip, strict=False)
         if abon.is_access():
             r = abon.nas_sync_self()
