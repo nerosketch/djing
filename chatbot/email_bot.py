@@ -3,12 +3,12 @@ from smtplib import SMTPException
 from django.core.mail import send_mail
 from django.conf import settings
 
-from chatbot.models import ChatException, MessageQueue
+from chatbot.models import ChatException
 
 
 def send_notify(msg_text, account, tag='none'):
     try:
-        MessageQueue.objects.push(msg=msg_text, user=account, tag=tag)
+        # MessageQueue.objects.push(msg=msg_text, user=account, tag=tag)
         target_email = account.email
         send_mail(
             subject=getattr(settings, 'COMPANY_NAME', 'Djing notify'),
