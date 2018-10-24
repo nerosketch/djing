@@ -485,23 +485,23 @@ msgstr "Время ожидания истекло -%(time_left)s"
 msgid "fix form errors"
 msgstr "исправте ошибки формы"
 
-#~ msgid "locality %s.\n"
-#~ msgstr "с. %s\n"
+msgid "Failed tasks"
+msgstr "Проваленные задачи"
 
-#~ msgid "Failed tasks"
-#~ msgstr "Проваленные задачи"
+msgid "All my tasks"
+msgstr "Все мои задачи"
 
-#~ msgid "All my tasks"
-#~ msgstr "Все мои задачи"
+msgid "Completed tasks"
+msgstr "Выполненные задачи"
 
-#~ msgid "Completed tasks"
-#~ msgstr "Выполненные задачи"
+msgid "New tasks"
+msgstr "Новые задачи"
 
-#~ msgid "New tasks"
-#~ msgstr "Новые задачи"
+msgid "Scheduled tasks me"
+msgstr "Назначенные мной задачи"
 
-#~ msgid "Scheduled tasks me"
-#~ msgstr "Назначенные мной задачи"
+msgid "Tasks to be performed"
+msgstr "Задачи, которые необходимо выполнить"
 
-#~ msgid "Tasks to be performed"
-#~ msgstr "Задачи, которые необходимо выполнить"
+msgid "Task has been reminded"
+msgstr "Напоминание о задаче отправлено"

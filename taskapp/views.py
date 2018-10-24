@@ -256,6 +256,7 @@ def remind(request, task_id):
         task = get_object_or_404(Task, id=task_id)
         task.save(update_fields=('state',))
         task.send_notification()
+        messages.success(request, _('Task has been reminded'))
     except MultipleException as errs:
         for err in errs.err_list:
             messages.add_message(request, messages.constants.ERROR, err)
