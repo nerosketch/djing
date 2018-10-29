@@ -1,8 +1,8 @@
 from django.urls import path
-from nas_app import views
+from gw_app import views
 
 
-app_name = 'nas_app'
+app_name = 'gw_app'
 
 
 urlpatterns = [

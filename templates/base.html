@@ -104,11 +104,11 @@
                 </a>
             </li>
 
-            {% if perms.nas_app.view_nasmodel %}
-                {% url 'nas_app:home' as nashome %}
+            {% if perms.gw_app.view_nasmodel %}
+                {% url 'gw_app:home' as nashome %}
                 <li{% if nashome in request.path %} class="active"{% endif %}>
                     <a href="{{ nashome }}">
-                        <span class="glyphicon glyphicon-globe"></span> {% trans 'NAS' %}
+                        <span class="glyphicon glyphicon-globe"></span> {% trans 'Gateways' %}
                     </a>
                 </li>
             {% endif %}

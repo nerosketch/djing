@@ -4,7 +4,7 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'nas_app:home' %}">{% trans 'Network access servers' %}</a></li>
+        <li><a href="{% url 'gw_app:home' %}">{% trans 'Network access servers' %}</a></li>
         <li class="active">{% trans 'Edit gateway' %}</li>
     </ol>
 {% endblock %}
@@ -19,14 +19,14 @@
         <h3 class="panel-title">{% trans 'Change gateway' %}</h3>
     </div>
     <div class="panel-body">
-        <form action="{% url 'nas_app:edit' object.pk %}" method="post">{% csrf_token %}
+        <form action="{% url 'gw_app:edit' object.pk %}" method="post">{% csrf_token %}
             {% bootstrap_form form %}
             <div class="btn-group">
                 <button type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
                 </button>
-                {% if perms.nas_app.delete_nasmodel %}
-                    <a href="{% url 'nas_app:del' object.pk %}" class="btn btn-danger btn-modal">
+                {% if perms.gw_app.delete_nasmodel %}
+                    <a href="{% url 'gw_app:del' object.pk %}" class="btn btn-danger btn-modal">
                         <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
                     </a>
                 {% else %}

@@ -6,7 +6,7 @@ from string import digits, ascii_lowercase
 
 from djing.lib import LogicError
 from ip_pool.models import NetworkModel
-from nas_app.models import NASModel
+from gw_app.models import NASModel
 from . import models
 from django.conf import settings
 

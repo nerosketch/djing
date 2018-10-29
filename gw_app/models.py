@@ -5,7 +5,7 @@ from django.shortcuts import resolve_url
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from djing.lib import MyChoicesAdapter
-from nas_app.nas_managers import NAS_TYPES
+from gw_app.nas_managers import NAS_TYPES
 
 
 class NASModel(models.Model):
@@ -38,7 +38,7 @@ class NASModel(models.Model):
         return o
 
     def get_absolute_url(self):
-        return resolve_url('nas_app:edit', self.pk)
+        return resolve_url('gw_app:edit', self.pk)
 
     def __str__(self):
         return self.title

@@ -9,7 +9,7 @@ from djing.lib.decorators import json_view
 from tariff_app.models import Tariff
 from taskapp.models import Task
 from djing.lib import LogicError
-from nas_app.nas_managers import NasFailedResult, NasNetworkError
+from gw_app.nas_managers import NasFailedResult, NasNetworkError
 
 
 @login_required

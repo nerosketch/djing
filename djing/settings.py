@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ip_pool',
     'accounts_app',
-    'nas_app',
+    'gw_app',
     'abonapp',
     'tariff_app',
     'searchapp',

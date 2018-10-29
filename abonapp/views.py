@@ -16,9 +16,9 @@ from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from django.conf import settings
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
-from nas_app.models import NASModel
+from gw_app.models import NASModel
 from tariff_app.models import Tariff
-from nas_app.nas_managers import NasFailedResult, NasNetworkError
+from gw_app.nas_managers import NasFailedResult, NasNetworkError
 from . import forms
 from . import models
 from devapp.models import Device, Port as DevPort
@@ -719,7 +719,7 @@ def abon_ping(request, gid: int, uname):
         if abon.nas is None:
             return {
                 'status': 1,
-                'dat': '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('NAS required')
+                'dat': '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('gateway required')
             }
         mngr = abon.nas.get_nas_manager()
         ping_result = mngr.ping(ip)
@@ -1181,7 +1181,7 @@ class EditSibscriberMarkers(AbonappPermissionMixin, UpdateView):
 def user_session_free(request, gid: int, uname):
     abon = get_object_or_404(models.Abon, username=uname)
     if abon.nas is None:
-        messages.error(request, _('NAS required'))
+        messages.error(request, _('gateway required'))
         return redirect('abonapp:abon_home', gid, uname)
     if abon.ip_address:
         abon.free_ip_addr()

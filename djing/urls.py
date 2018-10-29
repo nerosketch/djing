@@ -18,7 +18,7 @@ urlpatterns = [
     path('dialing/', include('dialing_app.urls', namespace='dialapp')),
     path('groups/', include('group_app.urls', namespace='group_app')),
     path('ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
-    path('nas/', include('nas_app.urls', namespace='nas_app'))
+    path('gw/', include('gw_app.urls', namespace='gw_app'))
 
     # Switch language
     #path(r'i18n/', include('django.conf.urls.i18n')),

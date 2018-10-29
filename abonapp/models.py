@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
 
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
-from nas_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
+from gw_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
 from group_app.models import Group
 from djing.lib import LogicError
 from ip_pool.models import NetworkModel
@@ -96,7 +96,7 @@ class Abon(BaseAccount):
     device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
     dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
     is_dynamic_ip = models.BooleanField(_('Is dynamic ip'), default=False)
-    nas = models.ForeignKey('nas_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL,
+    nas = models.ForeignKey('gw_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL,
                             verbose_name=_('Network access server'), default=None)
     autoconnect_service = models.BooleanField(_('Automatically connect next service'), default=False)
 
@@ -243,11 +243,11 @@ class Abon(BaseAccount):
 
     def nas_sync_self(self) -> Optional[Exception]:
         """
-        Synchronize user with gateway(NAS)
+        Synchronize user with gateway
         :return:
         """
         if self.nas is None:
-            raise LogicError(_('NAS required'))
+            raise LogicError(_('gateway required'))
         try:
             agent_abon = self.build_agent_struct()
             if agent_abon is not None:
@@ -265,7 +265,7 @@ class Abon(BaseAccount):
         :return:
         """
         if self.nas is None:
-            raise LogicError(_('NAS required'))
+            raise LogicError(_('gateway required'))
         try:
             agent_abon = self.build_agent_struct()
             if agent_abon is not None:
@@ -283,7 +283,7 @@ class Abon(BaseAccount):
         :return:
         """
         if self.nas is None:
-            raise LogicError(_('NAS required'))
+            raise LogicError(_('gateway required'))
         try:
             agent_abon = self.build_agent_struct()
             if agent_abon is not None:

@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod, abstractproperty
 from typing import Iterator, Tuple, Optional
 from djing import ping
-from nas_app.nas_managers.structs import SubnetQueue, VectorQueue
+from gw_app.nas_managers.structs import SubnetQueue, VectorQueue
 
 
-# Raised if NAS has returned failed result
+# Raised if gw has returned failed result
 class NasFailedResult(Exception):
     pass
 
 
-# Raised when is no connection to the NAS
+# Raised when is no connection to the gw
 class NasNetworkError(Exception):
     pass
 
 
-# Communicate with NAS
+# Communicate with gw
 class BaseTransmitter(ABC):
     @abstractproperty
     def description(self):
@@ -34,7 +34,7 @@ class BaseTransmitter(ABC):
 
     @abstractmethod
     def add_user_range(self, queue_list: VectorQueue):
-        """add subscribers list to NAS
+        """add subscribers list to gateway
         :param queue_list: Vector of instances of subscribers
         """
 

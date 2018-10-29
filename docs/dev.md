@@ -150,7 +150,7 @@ def terminal_pay(request):
 Сейчас биллинг работает с Mikrotik в роли устройства для доступа абонентов в интернет.
 Как можно реализовать такой-же для вашего роутера, например на GNU/Linux.
 
-Создадим файл *nas_app/nas_managers/mod_linux.py* и реализуем потомка для интерфейса *BaseTransmitter*.
+Создадим файл *gw_app/nas_managers/mod_linux.py* и реализуем потомка для интерфейса *BaseTransmitter*.
 Методы вашего класса будут вызываться биллингом для взаимодействия с сервером доступа абонентов в интернет(NAS).
 
 ```python
@@ -229,7 +229,7 @@ class LinuxTransmitter(BaseTransmitter):
         """
 ```
 
-Для того чтоб биллинг знал о вашем классе надо указать его в *nas_app/nas_managers/\_\_init\_\_.py*.
+Для того чтоб биллинг знал о вашем классе надо указать его в *gw_app/nas_managers/\_\_init\_\_.py*.
 Замените
 >from .mod_mikrotik import MikrotikTransmitter
 
@@ -249,7 +249,7 @@ from .structs import TariffStruct, AbonStruct
 Transmitter = LinuxTransmitter
 ```
 
-Для примера, как вы наверное уже догадались, можно посмотреть реализацию для Mikrotik в файле *nas_app/nas_managers/mod_mikrotik.py*
+Для примера, как вы наверное уже догадались, можно посмотреть реализацию для Mikrotik в файле *gw_app/nas_managers/mod_mikrotik.py*
 
 Чтобы выводить в биллинге различные сообщения об ошибках есть 2 типа исключений: *NasFailedResult* и *NasNetworkError*.
 NasNetworkError, как понятно из названия, вызывается при проблемах в сети. А NasFailedResult при ошибочных кодах возврата из модуля на сервере NAS.

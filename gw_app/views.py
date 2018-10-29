@@ -9,8 +9,8 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import assign_perm
-from nas_app.forms import NasForm
-from nas_app.models import NASModel
+from gw_app.forms import NasForm
+from gw_app.models import NASModel
 from djing.lib.decorators import only_admins
 
 
@@ -18,24 +18,24 @@ login_decs = login_required, only_admins
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('nas_app.view_nasmodel'), name='dispatch')
+@method_decorator(permission_required('gw_app.view_nasmodel'), name='dispatch')
 class NasListView(ListView):
     model = NASModel
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('nas_app.add_nasmodel'), name='dispatch')
+@method_decorator(permission_required('gw_app.add_nasmodel'), name='dispatch')
 class NasCreateView(CreateView):
     model = NASModel
     form_class = NasForm
-    template_name = 'nas_app/nasmodel_add.html'
-    success_url = reverse_lazy('nas_app:home')
+    template_name = 'gw_app/nasmodel_add.html'
+    success_url = reverse_lazy('gw_app:home')
 
     def form_valid(self, form):
         r = super(NasCreateView, self).form_valid(form)
-        assign_perm("nas_app.change_nasmodel", self.request.user, self.object)
-        assign_perm("nas_app.view_nasmodel", self.request.user, self.object)
-        assign_perm("nas_app.delete_nasmodel", self.request.user, self.object)
+        assign_perm("gw_app.change_nasmodel", self.request.user, self.object)
+        assign_perm("gw_app.view_nasmodel", self.request.user, self.object)
+        assign_perm("gw_app.delete_nasmodel", self.request.user, self.object)
         self.request.user.log(self.request.META, 'cnas', '"%(title)s", %(ip)s, %(type)s' % {
             'title': self.object.title,
             'ip': self.object.ip_address,
@@ -46,10 +46,10 @@ class NasCreateView(CreateView):
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('nas_app.delete_nasmodel'), name='dispatch')
+@method_decorator(permission_required('gw_app.delete_nasmodel'), name='dispatch')
 class NasDeleteView(DeleteView):
     model = NASModel
-    success_url = reverse_lazy('nas_app:home')
+    success_url = reverse_lazy('gw_app:home')
     pk_url_kwarg = 'nas_id'
 
     def delete(self, request, *args, **kwargs):
@@ -64,17 +64,17 @@ class NasDeleteView(DeleteView):
             return r
         except MessageFailure as e:
             messages.error(request, e)
-        failure_url = resolve_url('nas_app:edit', self.object.pk)
+        failure_url = resolve_url('gw_app:edit', self.object.pk)
         return HttpResponseRedirect(failure_url)
 
 
 @method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('nas_app.change_nasmodel'), name='dispatch')
+@method_decorator(permission_required('gw_app.change_nasmodel'), name='dispatch')
 class NasUpdateView(UpdateView):
     model = NASModel
     form_class = NasForm
     pk_url_kwarg = 'nas_id'
-    template_name = 'nas_app/nasmodel_update.html'
+    template_name = 'gw_app/nasmodel_update.html'
 
     def form_valid(self, form):
         r = super(NasUpdateView, self).form_valid(form)

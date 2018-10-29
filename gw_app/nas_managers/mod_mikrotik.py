@@ -9,8 +9,8 @@ from typing import Iterable, Optional, Tuple, Generator, Dict, Iterator
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from djing.lib.decorators import LazyInitMetaclass
-from nas_app.nas_managers import core
-from nas_app.nas_managers import structs as i_structs
+from gw_app.nas_managers import core
+from gw_app.nas_managers import structs as i_structs
 
 DEBUG = getattr(settings, 'DEBUG', False)
 

@@ -54,7 +54,7 @@
                             });
                         </script>
 
-                        {% if perms.nas_app.change_nasmodel %}
+                        {% if perms.gw_app.change_nasmodel %}
                             {% bootstrap_field form.nas form_group_class='form-group-sm' %}
                         {% endif %}
                         {% bootstrap_field form.description form_group_class='form-group-sm' %}

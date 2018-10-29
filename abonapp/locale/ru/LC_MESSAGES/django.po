@@ -204,8 +204,8 @@ msgstr "Покупка тарифного плана через админку"
 
 #: models.py:238 models.py:255 models.py:272 views.py:684 views.py:1132
 #: views.py:1175
-msgid "NAS required"
-msgstr "Необходимо выбрать NAS"
+msgid "gateway required"
+msgstr "Необходимо выбрать шлюз"
 
 #: models.py:296
 msgid "Pasport serial"

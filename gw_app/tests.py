@@ -6,8 +6,8 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.test import TestCase, override_settings
 from group_app.models import Group
-from nas_app.models import NASModel
-from nas_app.nas_managers import MikrotikTransmitter
+from gw_app.models import NASModel
+from gw_app.nas_managers import MikrotikTransmitter
 
 
 class MyBaseTestCase(metaclass=ABCMeta):
@@ -55,7 +55,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
 
     @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_create(self):
-        url = resolve_url('nas_app:add')
+        url = resolve_url('gw_app:add')
         self._client_get_check_login(url)
 
         # test success create nas
@@ -135,7 +135,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
 
     @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_change(self):
-        url = resolve_url('nas_app:edit', self.nas.pk)
+        url = resolve_url('gw_app:edit', self.nas.pk)
         self._client_get_check_login(url)
 
         # test get request
@@ -150,7 +150,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
             'auth_passw': '_v_c',
             'nas_type': 'mktk'
         })
-        self.assertRedirects(r, resolve_url('nas_app:edit', self.nas.pk))
+        self.assertRedirects(r, resolve_url('gw_app:edit', self.nas.pk))
         msg = r.cookies.get('messages')
         self.assertIn('Update successfully', msg.output())
         NASModel.objects.get(title='New again nas2 changed', ip_address='192.168.8.12',
@@ -158,7 +158,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
 
     @override_settings(LANGUAGE_CODE='en', LANGUAGES=(('en', 'English'),))
     def test_delete(self):
-        url = resolve_url('nas_app:add')
+        url = resolve_url('gw_app:add')
         self._client_get_check_login(url)
         r = self.client.post(url, data={
             'title': 'Test success nas_2',
@@ -171,7 +171,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
         self.assertEqual(r.status_code, 302)
         o = NASModel.objects.get(title='Test success nas_2', ip_address='192.168.8.11', ip_port=1254,
                                  auth_login='_', auth_passw='_')
-        url = resolve_url('nas_app:del', o.pk)
+        url = resolve_url('gw_app:del', o.pk)
 
         # test get request
         r = self.client.get(url)
@@ -179,7 +179,7 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
 
         # test deleting
         r = self.client.post(url)
-        self.assertRedirects(r, resolve_url('nas_app:home'))
+        self.assertRedirects(r, resolve_url('gw_app:home'))
         msg = r.cookies.get('messages')
         self.assertIn('Server successfully removed', msg.output())
         try:
@@ -190,8 +190,8 @@ class NASModelTestCase(MyBaseTestCase, TestCase):
 
         # try to remove default nas
         nas_id = self.nas.pk
-        r = self.client.post(resolve_url('nas_app:del', nas_id))
-        self.assertRedirects(r, expected_url=resolve_url('nas_app:edit', nas_id))
+        r = self.client.post(resolve_url('gw_app:del', nas_id))
+        self.assertRedirects(r, expected_url=resolve_url('gw_app:edit', nas_id))
         msg = r.cookies.get('messages')
         self.assertIn('You cannot remove default server', msg.output())
 

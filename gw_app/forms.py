@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from nas_app.models import NASModel
+from gw_app.models import NASModel
 from djing import IP_ADDR_REGEX
 
 

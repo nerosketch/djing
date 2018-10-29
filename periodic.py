@@ -9,8 +9,8 @@ from django.utils import timezone
 from django.db import transaction
 from django.db.models import signals, Count
 from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
-from nas_app.nas_managers import NasNetworkError, NasFailedResult
-from nas_app.models import NASModel
+from gw_app.nas_managers import NasNetworkError, NasFailedResult
+from gw_app.models import NASModel
 from djing.lib import LogicError
 
 
@@ -99,7 +99,7 @@ def main():
     for pay in ppays:
         pay.payment_for_service(now=now)
 
-    # sync subscribers on NAS
+    # sync subscribers on GW
     threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.
                     annotate(usercount=Count('abon')).
                     filter(usercount__gt=0))

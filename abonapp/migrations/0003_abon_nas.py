@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nas_app', '0001_initial'),
+        ('gw_app', '0001_initial'),
         ('abonapp', '0002_auto_20180808_1448'),
     ]
 
@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='abon',
             name='nas',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='nas_app.NASModel', verbose_name='Network access server'),
+            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='gw_app.NASModel', verbose_name='Network access server'),
         ),
     ]
