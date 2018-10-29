@@ -415,8 +415,14 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
         self.remove_ip(ip_id)
 
     def update_user(self, queue: i_structs.SubnetQueue, *args):
-        self.update_queue(queue)
-        self.update_ip(queue.network)
+        if queue.is_access:
+            self.update_queue(queue)
+            self.update_ip(queue.network)
+        else:
+            self.remove_queue(queue)
+            res_ips = self.find_ip(queue.network, LIST_USERS_ALLOWED)
+            if res_ips:
+                self.remove_ip(res_ips.get('=.id'))
 
     def ping(self, host, count=10) -> Optional[Tuple[int, int]]:
         r = self._exec_cmd((
