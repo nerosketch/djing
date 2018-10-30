@@ -28,7 +28,7 @@ def home(request):
         if re.match(MAC_ADDR_REGEX, s):
             devices = Device.objects.filter(mac_addr=s)
         else:
-            devices = Device.objects.filter(Q(comment__icontains=s) | Q(ip_address__icontains=s))
+            devices = Device.objects.filter(Q(comment__icontains=s) | Q(ip_address__icontains=s) | Q(mac_addr__icontains=s))
 
     else:
         abons = ()
