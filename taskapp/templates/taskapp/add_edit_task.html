@@ -93,9 +93,11 @@
                                 <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
                             </a>
                         {% endif %}
-                        <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success">
-                            <span class="glyphicon glyphicon-ok"></span> {% trans 'Complete' %}
-                        </a>
+                        {% if task.id %}
+                            <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success">
+                                <span class="glyphicon glyphicon-ok"></span> {% trans 'Complete' %}
+                            </a>
+                        {% endif %}
                     </div>
                     </form>
                 </div>
