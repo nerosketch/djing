@@ -103,13 +103,9 @@ def check_sign(get_list, sign):
     my_sign = calc_hash(hashed)
     return sign == my_sign
 
-#
-# only one process for function
-#
-
 
 class ProcessLocked(OSError):
-    pass
+    """only one process for function"""
 
 
 def process_lock(fn):

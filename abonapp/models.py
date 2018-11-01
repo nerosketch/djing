@@ -89,7 +89,7 @@ class Abon(BaseAccount):
     current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL, default=None)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
     ballance = models.FloatField(default=0.0)
-    ip_address = models.GenericIPAddressField(verbose_name=_('Ip address'), unique=True, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
     description = models.TextField(_('Comment'), null=True, blank=True)
     street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
     house = models.CharField(_('House'), max_length=12, null=True, blank=True)
@@ -138,6 +138,7 @@ class Abon(BaseAccount):
         verbose_name = _('Abon')
         verbose_name_plural = _('Abons')
         ordering = ('fio',)
+        unique_together = ('ip_address', 'nas')
 
     def add_ballance(self, current_user, amount, comment):
         AbonLog.objects.create(
