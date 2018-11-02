@@ -125,11 +125,17 @@
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="4" class="btn-group">
+                        <td colspan="4">
                             {% if perms.devapp.add_port %}
-                                <a href="{% url 'devapp:add_ports' dev.group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
-                                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
-                                </a>
+                                {% if ports %}
+                                    <a href="{% url 'devapp:add_ports' dev.group.pk dev.pk %}" class="btn btn-sm btn-default" title="{% trans 'Add' %}">
+                                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'devapp:add_port' dev.group.pk dev.pk %}" class="btn btn-sm btn-default btn-modal">
+                                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add ports' %}
+                                    </a>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>

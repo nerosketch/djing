@@ -1,47 +1,50 @@
 import re
 from ipaddress import ip_address
+
+from abonapp.models import Abon
+from accounts_app.models import UserProfile
+from chatbot.models import ChatException
+from chatbot.send_func import send_notify
+from devapp.base_intr import DeviceImplementationError
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
-from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
-from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from django.views.generic import DetailView, DeleteView, UpdateView, CreateView
-
-from devapp.base_intr import DeviceImplementationError
-from djing.lib.decorators import only_admins, hash_auth_view
-from djing.lib import safe_int, ProcessLocked, DuplicateEntry
-from abonapp.models import Abon
-from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, ZteOltLoginFailed
-from group_app.models import Group
-from accounts_app.models import UserProfile
-from django.conf import settings
-from guardian.decorators import permission_required_or_403 as permission_required
-from guardian.shortcuts import get_objects_for_user
-from chatbot.send_func import send_notify
-from chatbot.models import ChatException
-from djing.lib.decorators import json_view
 from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
-from .models import Device, Port, DeviceDBException, DeviceMonitoringException
+from djing.lib import safe_int, ProcessLocked, DuplicateEntry
+from djing.lib.decorators import json_view
+from djing.lib.decorators import only_admins, hash_auth_view
+from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
+from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, \
+    ZteOltLoginFailed
+from easysnmp import EasySNMPTimeoutError, EasySNMPError
+from group_app.models import Group
+from guardian.decorators import \
+    permission_required_or_403 as permission_required
+from guardian.shortcuts import get_objects_for_user
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
+from .models import Device, Port, DeviceDBException, DeviceMonitoringException
 
 
-login_decs = login_required, only_admins
-
-
-class DevicesListView(global_base_views.OrderedFilteredList):
+class DevicesListView(LoginAdminPermissionMixin,
+                      global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices.html'
+    permission_required = 'devapp.view_device'
 
     def get_queryset(self):
         group_id = safe_int(self.kwargs.get('group_id'))
         queryset = Device.objects.filter(group__pk=group_id) \
             .select_related('group') \
-            .only('comment', 'mac_addr', 'devtype', 'group', 'pk', 'ip_address')
+            .only('comment', 'mac_addr', 'devtype', 'group', 'pk',
+                  'ip_address')
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -50,33 +53,34 @@ class DevicesListView(global_base_views.OrderedFilteredList):
         context['group'] = get_object_or_404(Group, pk=group_id)
         return context
 
-    @method_decorator(login_decs)
-    @method_decorator(permission_required('devapp.view_device'))
     def dispatch(self, request, *args, **kwargs):
         try:
-            response = super(DevicesListView, self).dispatch(request, *args, **kwargs)
+            response = super(DevicesListView, self).dispatch(request, *args,
+                                                             **kwargs)
         except (DeviceDBException, DeviceMonitoringException) as e:
             messages.error(request, e)
             response = HttpResponse('Error')
         return response
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.view_device'), name='dispatch')
-class DevicesWithoutGroupsListView(global_base_views.OrderedFilteredList):
+class DevicesWithoutGroupsListView(LoginAdminPermissionMixin,
+                                   global_base_views.OrderedFilteredList):
     context_object_name = 'devices'
     template_name = 'devapp/devices_null_group.html'
-    queryset = Device.objects.filter(group=None).only('comment', 'devtype', 'pk', 'ip_address')
+    queryset = Device.objects.filter(group=None).only('comment', 'devtype',
+                                                      'pk', 'ip_address')
+    permission_required = 'devapp.view_device'
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.delete_device'), name='dispatch')
-class DeviceDeleteView(DeleteView):
+class DeviceDeleteView(LoginAdminPermissionMixin, DeleteView):
     model = Device
     pk_url_kwarg = 'device_id'
+    permission_required = 'devapp.delete_device'
 
     def get_success_url(self):
-        return resolve_url('devapp:devs', group_id=self.object.group.pk if self.object.group else 0)
+        return resolve_url('devapp:devs',
+                           group_id=self.object.group.pk
+                           if self.object.group else 0)
 
     def delete(self, request, *args, **kwargs):
         res = super().delete(request, *args, **kwargs)
@@ -93,9 +97,7 @@ class DeviceDeleteView(DeleteView):
         return res
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.view_device'), name='dispatch')
-class DeviceUpdate(UpdateView):
+class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
     template_name = 'devapp/dev.html'
     context_object_name = 'dev'
     model = Device
@@ -103,6 +105,7 @@ class DeviceUpdate(UpdateView):
     pk_url_kwarg = 'device_id'
     device_group = None
     already_dev = None
+    permission_required = 'devapp.view_device'
 
     def post(self, request, *args, **kwargs):
         if not request.user.has_perm('devapp.change_device'):
@@ -120,13 +123,17 @@ class DeviceUpdate(UpdateView):
         # check if that device is exist
         device_id = self.kwargs.get(self.pk_url_kwarg)
         try:
-            already_dev = self.model.objects.exclude(pk=device_id).get(mac_addr=self.request.POST.get('mac_addr'))
+            already_dev = self.model.objects.exclude(pk=device_id).get(
+                mac_addr=self.request.POST.get('mac_addr'))
             self.already_dev = already_dev
             if already_dev.group:
-                messages.warning(self.request, _('You have redirected to existing device'))
-                return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
+                messages.warning(self.request,
+                                 _('You have redirected to existing device'))
+                return redirect('devapp:view', already_dev.group.pk,
+                                already_dev.pk)
             else:
-                messages.warning(self.request, _('Please attach group for device'))
+                messages.warning(self.request,
+                                 _('Please attach group for device'))
                 return redirect('devapp:fix_device_group', already_dev.pk)
         except Device.DoesNotExist:
             pass
@@ -148,7 +155,8 @@ class DeviceUpdate(UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        messages.error(self.request, _('Form is invalid, check fields and try again'))
+        messages.error(self.request,
+                       _('Form is invalid, check fields and try again'))
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -159,37 +167,41 @@ class DeviceUpdate(UpdateView):
         return context
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.add_device'), name='dispatch')
-class DeviceCreateView(CreateView):
+class DeviceCreateView(LoginAdminPermissionMixin, CreateView):
     template_name = 'devapp/add_dev.html'
     context_object_name = 'dev'
     model = Device
     form_class = DeviceForm
+    permission_required = 'devapp.add_device'
     device_group = None
     already_dev = None
 
     def form_valid(self, form):
         # check if that device is exist
         try:
-            already_dev = self.model.objects.get(mac_addr=self.request.POST.get('mac_addr'))
+            already_dev = self.model.objects.get(
+                mac_addr=self.request.POST.get('mac_addr'))
             self.already_dev = already_dev
             if already_dev.group:
-                messages.warning(self.request, _('You have redirected to existing device'))
-                return redirect('devapp:view', already_dev.group.pk, already_dev.pk)
+                messages.warning(self.request,
+                                 _('You have redirected to existing device'))
+                return redirect('devapp:view', already_dev.group.pk,
+                                already_dev.pk)
             else:
-                messages.warning(self.request, _('Please attach group for device'))
+                messages.warning(self.request,
+                                 _('Please attach group for device'))
                 return redirect('devapp:fix_device_group', already_dev.pk)
         except Device.DoesNotExist:
             pass
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
-            self.request.user.log(self.request.META, 'cdev', 'ip %s, mac: %s, "%s"' % (
-                self.object.ip_address,
-                self.object.mac_addr,
-                self.object.comment
-            ))
+            self.request.user.log(self.request.META, 'cdev',
+                                  'ip %s, mac: %s, "%s"' % (
+                                      self.object.ip_address,
+                                      self.object.mac_addr,
+                                      self.object.comment
+                                  ))
             self.object.update_dhcp()
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:
@@ -221,17 +233,17 @@ class DeviceCreateView(CreateView):
         context['group'] = self.device_group
         context['already_dev'] = self.already_dev
         parent_device_id = self.request.GET.get('pdev')
-        context['selected_parent_dev'] = get_object_or_None(Device, pk=parent_device_id)
+        context['selected_parent_dev'] = get_object_or_None(
+            Device, pk=parent_device_id)
         return context
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('devapp.change_device'), name='dispatch')
-class DeviceUpdateExtra(UpdateView):
+class DeviceUpdateExtra(LoginAdminPermissionMixin, UpdateView):
     template_name = 'devapp/modal_device_extra_edit.html'
     model = Device
     form_class = DeviceExtraDataForm
     pk_url_kwarg = 'device_id'
+    permission_required = 'devapp.change_device'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -240,12 +252,14 @@ class DeviceUpdateExtra(UpdateView):
 
     def form_valid(self, form):
         r = super().form_valid(form)
-        messages.success(self.request, _('Device extra data has successfully updated'))
+        messages.success(self.request, _('Device extra data has '
+                                         'successfully updated'))
         return r
 
 
-@method_decorator(login_decs, name='dispatch')
-class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView):
+class ShowSubscriberOnPort(LoginAdminMixin,
+                           global_base_views.RedirectWhenErrorMixin,
+                           DetailView):
     template_name = 'devapp/manage_ports/modal_show_subscriber_on_port.html'
     http_method_names = ('get',)
 
@@ -260,7 +274,9 @@ class ShowSubscriberOnPort(global_base_views.RedirectWhenErrorMixin, DetailView)
             errmsg = gettext('More than one subscriber on device port')
             # messages.error(self.request, errmsg)
             raise global_base_views.RedirectWhenError(
-                resolve_url('devapp:fix_port_conflict', group_id=self.kwargs.get('group_id'), device_id=dev_id,
+                resolve_url('devapp:fix_port_conflict',
+                            group_id=self.kwargs.get('group_id'),
+                            device_id=dev_id,
                             port_id=port_id),
                 errmsg
             )
@@ -292,7 +308,8 @@ def add_ports(request, group_id: int, device_id: int):
     res_ports = list()
     try:
         if device.group is None:
-            messages.error(request, _('Device does not have a group, please fix that'))
+            messages.error(request,
+                           _('Device does not have a group, please fix that'))
             return redirect('devapp:fix_device_group', device.pk)
         if request.method == 'POST':
             ports = zip(
@@ -314,7 +331,8 @@ def add_ports(request, group_id: int, device_id: int):
                     )
 
         db_ports = Port.objects.filter(device=device)
-        db_ports = tuple(TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
+        db_ports = tuple(
+            TempPort(p.num, p.descr, None, True, p.pk) for p in db_ports)
 
         manager = device.get_manager_object()
         ports = manager.get_ports()
@@ -371,16 +389,18 @@ def edit_single_port(request, group_id: int, device_id: int, port_id: int):
                 frm.save()
                 messages.success(request, _('Port successfully saved'))
             else:
-                messages.error(request, _('Form is invalid, check fields and try again'))
+                messages.error(request, _(
+                    'Form is invalid, check fields and try again'))
             return redirect('devapp:view', group_id, device_id)
 
         frm = PortForm(instance=port)
-        return render(request, 'devapp/manage_ports/modal_add_edit_port.html', {
-            'port_id': port_id,
-            'did': device_id,
-            'gid': group_id,
-            'form': frm
-        })
+        return render(request, 'devapp/manage_ports/modal_add_edit_port.html',
+                      {
+                          'port_id': port_id,
+                          'did': device_id,
+                          'gid': group_id,
+                          'form': frm
+                      })
     except Port.DoesNotExist:
         messages.error(request, _('Port does not exist'))
     except (DeviceDBException, DuplicateEntry) as e:
@@ -401,17 +421,19 @@ def add_single_port(request, group_id, device_id):
                 messages.success(request, _('Port successfully saved'))
                 return redirect('devapp:view', group_id, device_id)
             else:
-                messages.error(request, _('Form is invalid, check fields and try again'))
+                messages.error(request, _(
+                    'Form is invalid, check fields and try again'))
         else:
             frm = PortForm(initial={
                 'num': request.GET.get('n'),
                 'descr': request.GET.get('t')
             })
-        return render(request, 'devapp/manage_ports/modal_add_edit_port.html', {
-            'did': device_id,
-            'gid': group_id,
-            'form': frm
-        })
+        return render(request, 'devapp/manage_ports/modal_add_edit_port.html',
+                      {
+                          'did': device_id,
+                          'gid': group_id,
+                          'form': frm
+                      })
     except Device.DoesNotExist:
         messages.error(request, _('Device does not exist'))
     except (DeviceDBException, DuplicateEntry) as e:
@@ -433,12 +455,13 @@ def devview(request, group_id: int, device_id: int):
     template_name = 'generic_switch.html'
     try:
         if device.ip_address:
-            if not ping(device.ip_address):
+            if not ping(str(device.ip_address)):
                 messages.error(request, _('Dot was not pinged'))
         if device.man_passw:
             manager = device.get_manager_object()
             ports = tuple(manager.get_ports())
-            if ports is not None and len(ports) > 0 and isinstance(ports[0], Exception):
+            if ports is not None and len(ports) > 0 and isinstance(ports[0],
+                                                                   Exception):
                 messages.error(request, ports[0])
                 ports = ports[1]
             template_name = manager.get_template_name()
@@ -449,10 +472,12 @@ def devview(request, group_id: int, device_id: int):
             'ports': ports,
             'dev_accs': Abon.objects.filter(device=device),
             'dev_manager': manager,
-            'ports_db': Port.objects.filter(device=device).annotate(num_abons=Count('abon')),
+            'ports_db': Port.objects.filter(device=device).annotate(
+                num_abons=Count('abon')),
         })
     except EasySNMPError as e:
-        messages.error(request, "%s: %s" % (gettext('SNMP error on device'), e))
+        messages.error(request,
+                       "%s: %s" % (gettext('SNMP error on device'), e))
     except (DeviceDBException, DeviceImplementationError) as e:
         messages.error(request, e)
     return render(request, 'devapp/custom_dev_page/' + template_name, {
@@ -467,11 +492,12 @@ def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
     zte_olt_device = get_object_or_404(Device, id=device_id)
     manager = zte_olt_device.get_manager_object()
     onu_list = manager.get_units_unregistered(fiber_id)
-    return render(request, 'devapp/custom_dev_page/olt_ztec320_units_uncfg.html', {
-        'onu_list': onu_list,
-        'dev': zte_olt_device,
-        'grp': group_id
-    })
+    return render(request,
+                  'devapp/custom_dev_page/olt_ztec320_units_uncfg.html', {
+                      'onu_list': onu_list,
+                      'dev': zte_olt_device,
+                      'grp': group_id
+                  })
 
 
 @login_required
@@ -498,18 +524,20 @@ def toggle_port(request, device_id: str, port_id: str, status=0):
         messages.error(request, _('wait for a reply from the SNMP Timeout'))
     except EasySNMPError as e:
         messages.error(request, 'EasySNMPError: %s' % e)
-    return redirect('devapp:view', device.group.pk if device.group is not None else 0, device_id)
+    return redirect('devapp:view',
+                    device.group.pk if device.group is not None else 0,
+                    device_id)
 
 
-@method_decorator(login_decs, name='dispatch')
-class GroupsListView(global_base_views.OrderedFilteredList):
+class GroupsListView(LoginAdminMixin, global_base_views.OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'devapp/group_list.html'
     model = Group
 
     def get_queryset(self):
         groups = super(GroupsListView, self).get_queryset()
-        groups = get_objects_for_user(self.request.user, 'group_app.view_group', klass=groups,
+        groups = get_objects_for_user(self.request.user,
+                                      'group_app.view_group', klass=groups,
                                       accept_global_perms=False)
         return groups
 
@@ -528,11 +556,13 @@ def search_dev(request):
             qs |= Q(ip_address=str(ip))
         except ValueError:
             pass
-        results = Device.objects.filter(qs).only('pk', 'ip_address', 'comment')[:16]
+        results = Device.objects.filter(qs).only('pk', 'ip_address',
+                                                 'comment')[:16]
         results = tuple({
-            'id': device.pk,
-            'text': "%s: %s" % (device.ip_address or '', device.comment)
-        } for device in results)
+                            'id': device.pk,
+                            'text': "%s: %s" % (
+                            device.ip_address or '', device.comment)
+                        } for device in results)
     return results
 
 
@@ -549,9 +579,11 @@ def fix_device_group(request, device_id):
                     messages.success(request, _('Device fixed'))
                     return redirect('devapp:devs', ch_dev.group.pk)
                 else:
-                    messages.error(request, _('Please attach group for device'))
+                    messages.error(request,
+                                   _('Please attach group for device'))
             else:
-                messages.error(request, _('Form is invalid, check fields and try again'))
+                messages.error(request, _(
+                    'Form is invalid, check fields and try again'))
         else:
             frm = DeviceForm(instance=device)
     except ValueError:
@@ -577,7 +609,8 @@ def fix_onu(request):
             manobj = parent.get_manager_object()
             ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
             text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % \
-                   (_('Device with mac address %(mac)s does not exist') % {'mac': mac})
+                   (_('Device with mac address %(mac)s does not exist') % {
+                       'mac': mac})
             for srcmac, snmpnum in ports:
                 # convert bytes mac address to str presentation mac address
                 real_mac = ':'.join('%x' % ord(i) for i in srcmac)
@@ -585,7 +618,8 @@ def fix_onu(request):
                     onu.snmp_extra = str(snmpnum)
                     onu.save(update_fields=('snmp_extra',))
                     status = 0
-                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
+                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _(
+                        'Fixed')
                     break
         else:
             text += '\n%s' % _('Parent device not found')
@@ -630,7 +664,8 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             if not re.match(MAC_ADDR_REGEX, dev_mac):
                 return {'text': 'mac address %s is not valid' % dev_mac}
 
-            device_down = Device.objects.filter(mac_addr=dev_mac).defer('extra_data').first()
+            device_down = Device.objects.filter(mac_addr=dev_mac).defer(
+                'extra_data').first()
             if device_down is None:
                 return {'text': 'Devices with mac %s does not exist' % dev_mac}
 
@@ -650,9 +685,13 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             device_down.save(update_fields=('status',))
 
             if not device_down.is_noticeable:
-                return {'text': 'Notification for %s is unnecessary' % device_down.ip_address or device_down.comment}
+                return {
+                    'text': 'Notification for %s is unnecessary' %
+                            device_down.ip_address or device_down.comment
+                }
 
-            recipients = UserProfile.objects.get_profiles_by_group(device_down.group.pk)
+            recipients = UserProfile.objects.get_profiles_by_group(
+                device_down.group.pk)
             names = list()
 
             for recipient in recipients.iterator():
@@ -688,7 +727,8 @@ def nagios_objects_conf(request):
         except DeviceImplementationError:
             pass
 
-    devices_queryset = Device.objects.exclude(Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
+    devices_queryset = Device.objects.exclude(
+        Q(mac_addr=None) | Q(ip_address='127.0.0.1')) \
         .select_related('parent_dev') \
         .only('ip_address', 'comment', 'parent_dev')
     confs = map(getconf, devices_queryset)
@@ -710,7 +750,8 @@ class DevicesGetListView(global_base_views.SecureApiView):
             devs = Device.objects.all()
         else:
             devs = Device.objects.filter(devtype=device_type)
-        res = devs.defer('man_passw', 'group', 'parent_dev', 'extra_data').values()
+        res = devs.defer('man_passw', 'group', 'parent_dev',
+                         'extra_data').values()
         for r in res:
             if isinstance(r['mac_addr'], EUI):
                 r['mac_addr'] = int(r['mac_addr'])
@@ -726,6 +767,7 @@ def register_device(request, group_id: int, device_id: int):
             '<span class="glyphicon glyphicon-%s"></span>' % icon,
             '<span class="hidden-xs">%s</span>' % msg
         ))
+
     device = get_object_or_404(Device, pk=device_id)
     status = 1
     try:
@@ -734,7 +776,8 @@ def register_device(request, group_id: int, device_id: int):
     except OnuZteRegisterError:
         text = format_msg(gettext('Unregistered onu not found'), 'eye-close')
     except ZteOltLoginFailed:
-        text = format_msg(gettext('Wrong login or password for telnet access'), 'lock')
+        text = format_msg(gettext('Wrong login or password for telnet access'),
+                          'lock')
     except (ConnectionRefusedError, ZteOltConsoleError) as e:
         text = format_msg(e, 'exclamation-sign')
     except DeviceImplementationError as e:
