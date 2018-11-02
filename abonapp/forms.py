@@ -184,7 +184,10 @@ class AddIpForm(forms.ModelForm):
                 net = NetworkModel.objects.filter(groups=instance.group).first()
                 if net is not None:
                     ips = (ip.ip_address for ip in
-                           models.Abon.objects.filter(group__in=net.groups.all()).order_by('ip_address').only(
+                           models.Abon.objects.filter(
+                               group__in=net.groups.all(),
+                               nas=instance.nas
+                           ).order_by('ip_address').only(
                                'ip_address').iterator())
                     free_ip = net.get_free_ip(ips)
                     self.initial['ip_address'] = free_ip
