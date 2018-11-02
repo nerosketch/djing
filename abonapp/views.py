@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, \
-    PermissionRequiredMixin as PermissionRequiredMixin_django
+    PermissionRequiredMixin as PermissionRequiredMixin_django, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction, \
     OperationalError, DatabaseError
@@ -25,7 +25,7 @@ from djing import lib
 from djing import ping
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 from djing.lib.decorators import json_view, only_admins
-from djing.lib.mixins import OnlyAdminsMixin, LoginAdminPermissionMixin
+from djing.lib.mixins import OnlyAdminsMixin, LoginAdminPermissionMixin, LoginAdminMixin
 from group_app.models import Group
 from guardian.decorators import \
     permission_required_or_403 as permission_required
@@ -155,7 +155,7 @@ class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,
         return super(AbonCreateView, self).form_invalid(form)
 
 
-class DelAbonDeleteView(LoginAdminPermissionMixin, DeleteView):
+class DelAbonDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
     permission_required = 'abonapp.delete_abon'
     model = models.Abon
     slug_url_kwarg = 'uname'
@@ -304,7 +304,7 @@ def abon_services(request, gid: int, uname):
     })
 
 
-class AbonHomeUpdateView(LoginAdminPermissionMixin, UpdateView):
+class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'abonapp.view_abon'
     model = models.Abon
     form_class = forms.AbonForm
