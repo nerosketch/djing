@@ -1,9 +1,11 @@
 {% load i18n bootstrap3 %}
 
-{% if port_id %}
-    {% url 'devapp:edit_port' gid did port_id as frm_url %}
+{% if object %}
+    {% url 'devapp:edit_port' gid did object.pk as frm_url %}
+    {% trans 'Edit' as modal_title %}
 {% else %}
     {% url 'devapp:add_port' gid did as frm_url %}
+    {% trans 'Add' as modal_title %}
 {% endif %}
 
 <form role="form" action="{{ frm_url }}" method="post">{% csrf_token %}
@@ -11,7 +13,7 @@
 
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{% trans 'Edit' %}</h4>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-exclamation-sign"></span>{{ modal_title }}</h4>
     </div>
 
     <div class="modal-body">

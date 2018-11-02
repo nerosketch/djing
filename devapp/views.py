@@ -9,6 +9,7 @@ from devapp.base_intr import DeviceImplementationError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Q, Count
@@ -167,7 +168,7 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
         return context
 
 
-class DeviceCreateView(LoginAdminPermissionMixin, CreateView):
+class DeviceCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
     template_name = 'devapp/add_dev.html'
     context_object_name = 'dev'
     model = Device
@@ -377,35 +378,39 @@ def delete_single_port(request, group_id, device_id, port_id):
     return redirect('devapp:view', group_id, device_id)
 
 
-@login_required
-@only_admins
-@permission_required('devapp.change_port')
-def edit_single_port(request, group_id: int, device_id: int, port_id: int):
-    try:
-        port = Port.objects.get(pk=port_id)
-        if request.method == 'POST':
-            frm = PortForm(request.POST, instance=port)
-            if frm.is_valid():
-                frm.save()
-                messages.success(request, _('Port successfully saved'))
-            else:
-                messages.error(request, _(
-                    'Form is invalid, check fields and try again'))
-            return redirect('devapp:view', group_id, device_id)
+class EditSinglePort(LoginAdminPermissionMixin, UpdateView):
+    pk_url_kwarg = 'port_id'
+    permission_required = 'devapp.change_port'
+    template_name = 'devapp/manage_ports/modal_add_edit_port.html'
 
-        frm = PortForm(instance=port)
-        return render(request, 'devapp/manage_ports/modal_add_edit_port.html',
-                      {
-                          'port_id': port_id,
-                          'did': device_id,
-                          'gid': group_id,
-                          'form': frm
-                      })
-    except Port.DoesNotExist:
-        messages.error(request, _('Port does not exist'))
-    except (DeviceDBException, DuplicateEntry) as e:
-        messages.error(request, e)
-    return redirect('devapp:view', group_id, device_id)
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            return super(EditSinglePort, self).dispatch(request, *args, **kwargs)
+        except (DeviceDBException, DuplicateEntry) as e:
+            messages.error(request, e)
+        group_id = self.kwargs.get('group_id')
+        device_id = self.kwargs.get('device_id')
+        return redirect('devapp:view', group_id, device_id)
+
+    def form_valid(self, form):
+        messages.success(self.request, _('Port successfully saved'))
+        return super(EditSinglePort, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _(
+                    'Form is invalid, check fields and try again'))
+        return super(EditSinglePort, self).form_invalid(form)
+
+    def get_success_url(self):
+        group_id = self.kwargs.get('group_id')
+        return resolve_url('devapp:view', group_id, self.pk)
+
+    def get_context_data(self, **kwargs):
+        group_id = self.kwargs.get('group_id')
+        context = super(EditSinglePort, self).get_context_data(**kwargs)
+        context['did'] = self.object.device.pk
+        context['gid'] = group_id
+        return super(EditSinglePort, self).get_context_data(**context)
 
 
 @login_required

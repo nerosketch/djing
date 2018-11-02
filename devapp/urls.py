@@ -36,7 +36,7 @@ urlpatterns = [
     path('<int:group_id>/<int:device_id>/<int:port_id>/del/',
          views.delete_single_port, name='del_port'),
     path('<int:group_id>/<int:device_id>/<int:port_id>/edit/',
-         views.edit_single_port, name='edit_port'),
+         views.EditSinglePort.as_view(), name='edit_port'),
     path('fix_device_group/<int:device_id>/', views.fix_device_group,
          name='fix_device_group'),
     path('search_dev/', views.search_dev),
