@@ -594,6 +594,12 @@ class IpUpdateView(LoginAdminPermissionMixin, UpdateView):
             return super(IpUpdateView, self).dispatch(request, *args, **kwargs)
         except lib.LogicError as e:
             messages.error(request, e)
+        except IntegrityError as e:
+            str_text = str(e)
+            if 'abonent_ip_address_nas_id' in str_text and 'duplicate key value' in str_text:
+                messages.error(request, _('IP address conflict'))
+            else:
+                messages.error(request, e)
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def form_valid(self, form):

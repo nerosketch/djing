@@ -1156,3 +1156,6 @@ msgstr "У пользователя нет ip"
 
 msgid "Ip successfully updated"
 msgstr "IP успешно обновлён"
+
+msgid "IP address conflict"
+msgstr "IP адрес уже есть"
