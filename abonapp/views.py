@@ -473,7 +473,7 @@ def pick_tariff(request, gid: int, uname):
         'tariffs': tariffs,
         'abon': abon,
         'group': grp,
-        'selected_tariff': lib.safe_int(request.GET.get('selected_tariff'))
+        'selected_tariff': get_object_or_404(Tariff, pk=request.GET.get('selected_tariff'))
     })
 
 
