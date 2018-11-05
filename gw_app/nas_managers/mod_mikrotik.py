@@ -411,8 +411,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
     def remove_user(self, queue: i_structs.SubnetQueue):
         self.remove_queue(queue)
         r = self.find_ip(queue.network, LIST_USERS_ALLOWED)
-        ip_id = r.get('=.id')
-        self.remove_ip(ip_id)
+        if r:
+            ip_id = r.get('=.id')
+            self.remove_ip(ip_id)
 
     def update_user(self, queue: i_structs.SubnetQueue, *args):
         if queue.is_access:
