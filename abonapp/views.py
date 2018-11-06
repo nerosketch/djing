@@ -469,11 +469,15 @@ def pick_tariff(request, gid: int, uname):
     except ValueError as e:
         messages.error(request, "%s: %s" % (_('fix form errors'), e))
 
+    selected_tariff = request.GET.get('selected_tariff')
+    if selected_tariff:
+        selected_tariff = get_object_or_404(Tariff, pk=selected_tariff)
+
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
         'abon': abon,
         'group': grp,
-        'selected_tariff': get_object_or_404(Tariff, pk=request.GET.get('selected_tariff'))
+        'selected_tariff': selected_tariff
     })
 
 
