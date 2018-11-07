@@ -269,7 +269,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             '=target=%s' % queue.network,
             '=max-limit=%.3fM/%.3fM' % queue.max_limit,
             '=queue=Djing_pcq/Djing_pcq',
-            '=burst-time=1/1',
+            '=burst-time=1/5',
             '=total-queue=Djing_pcq'
         ))
 
