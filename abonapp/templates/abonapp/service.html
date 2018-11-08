@@ -95,19 +95,20 @@
                             <dd>{{ abon_tariff.deadline|date:"d E Y, l H:i" }}</dd>
                         </dl>
 
-                        <blockquote>
-                            <p>
-                                {% trans 'Auto continue service.' %}
-                                <input type="checkbox" data-url="{% url 'abonapp:set_auto_continue_service' group.pk abon.username %}" class="autosave" {{ abon.autoconnect_service|yesno:'checked,' }}>
-                            </p>
-                            <p>{{ abon_tariff.tariff.descr }}</p>
-                        </blockquote>
-
                     {% else %}
                         {% trans 'Subscriber has no service' %}.
                         <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}">
                             {% trans 'Buy service' %}
                         </a>
+                    {% endif %}
+
+                    <p>
+                        {% trans 'Auto continue service.' %}
+                        <input type="checkbox" data-url="{% url 'abonapp:set_auto_continue_service' group.pk abon.username %}" class="autosave" {{ abon.autoconnect_service|yesno:'checked,' }}>
+                        <a href="https://github.com/nerosketch/djing/blob/master/docs/tarifs.md" title="{% trans 'Help' %}" target="_blank" data-toggle="tooltip">?</a>
+                    </p>
+                    {% if abon_tariff.tariff.descr %}
+                        <p>{{ abon_tariff.tariff.descr }}</p>
                     {% endif %}
 
                     {% if abon_tariff %}
