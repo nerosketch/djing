@@ -99,6 +99,13 @@
                                         <span class="glyphicon glyphicon-paperclip"></span> {% trans 'Passport information' %}
                                     </a>
                                 {% endif %}
+
+                                {% if perms.abonapp.delete_abon %}
+                                    <a href="{% url 'abonapp:del_abon' group.pk abon.username %}" class="btn btn-danger btn-modal" title="{% trans 'Remove subscriber' %}" data-toggle="tooltip">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        <span>{% trans 'Remove subscriber' %}</span>
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
 

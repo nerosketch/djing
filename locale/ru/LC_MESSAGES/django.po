@@ -122,3 +122,6 @@ msgstr "500 - Ошибка сервера"
 
 msgid "A server has error occurred. Please contact the administrator."
 msgstr "На сервере произошла ошибка. Пожалуйста свяжитесь с системным администратором."
+
+msgid "Are you sure about them?"
+msgstr "Вы уверены в этом?"
