@@ -382,6 +382,8 @@ class EditSinglePort(LoginAdminPermissionMixin, UpdateView):
     pk_url_kwarg = 'port_id'
     permission_required = 'devapp.change_port'
     template_name = 'devapp/manage_ports/modal_add_edit_port.html'
+    model = Port
+    form_class = PortForm
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -403,7 +405,8 @@ class EditSinglePort(LoginAdminPermissionMixin, UpdateView):
 
     def get_success_url(self):
         group_id = self.kwargs.get('group_id')
-        return resolve_url('devapp:view', group_id, self.pk)
+        device_id = self.kwargs.get('device_id')
+        return resolve_url('devapp:view', group_id, device_id)
 
     def get_context_data(self, **kwargs):
         group_id = self.kwargs.get('group_id')
