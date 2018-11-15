@@ -271,9 +271,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             # FIXME: тут в разных микротиках или =target-addresses или =target
             '=target=%s' % queue.network,
             '=max-limit=%.3fM/%.3fM' % queue.max_limit,
-            '=queue=Djing_pcq/Djing_pcq',
+            '=queue=Djing_pcq_up/Djing_pcq_down',
             '=burst-time=1/5',
-            '=total-queue=Djing_pcq'
+            #'=total-queue=Djing_pcq_down'
         ))
 
     def remove_queue(self, queue: i_structs.SubnetQueue) -> None:
@@ -307,7 +307,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 # FIXME: тут в разных версиях прошивки микротика
                 # или =target-addresses или =target
                 '=target=%s' % queue.network,
-                '=queue=Djing_pcq/Djing_pcq',
+                '=queue=Djing_pcq_up/Djing_pcq_down',
                 '=burst-time=1/1'
             ]
             if queue.queue_id:
