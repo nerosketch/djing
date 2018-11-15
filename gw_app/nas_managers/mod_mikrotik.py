@@ -170,14 +170,17 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                                          (ABCMeta, LazyInitMetaclass), {})):
     description = _('Mikrotik NAS')
 
-    def __init__(self, login: str, password: str, ip: str, port: int, *args,
-                 **kwargs):
+    def __init__(self, login: str, password: str, ip: str, port: int,
+                 enabled: bool, *args, **kwargs):
+        if not enabled:
+            raise core.NasFailedResult(_('Gateway disabled'))
         try:
-            core.BaseTransmitter.__init__(self,
-                                          login=login, password=password,
-                                          ip=ip,
-                                          port=port, *args, **kwargs
-                                          )
+            core.BaseTransmitter.__init__(
+                self, login=login,
+                password=password,
+                ip=ip, port=port,
+                *args, **kwargs
+            )
             ApiRos.__init__(self, ip, port)
             self.login(username=login, pwd=password)
         except ConnectionRefusedError:
