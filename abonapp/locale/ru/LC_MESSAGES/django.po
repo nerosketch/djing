@@ -1159,3 +1159,6 @@ msgstr "IP успешно обновлён"
 
 msgid "IP address conflict"
 msgstr "IP адрес уже есть"
+
+msgid "Last connected service"
+msgstr "Последняя подключённая услуга"

@@ -23,7 +23,7 @@ from tariff_app.models import Tariff, PeriodicPay
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon', on_delete=models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE,
+    author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL,
                                related_name='+', blank=True, null=True)
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
@@ -50,10 +50,6 @@ class AbonTariff(models.Model):
     def calc_amount_service(self):
         amount = self.tariff.amount
         return round(amount, 2)
-
-    # is used service now, if time start is present than it activated
-    def is_started(self):
-        return False if self.time_start is None else True
 
     def __str__(self):
         return "%s: %s" % (
@@ -156,10 +152,10 @@ class Abon(BaseAccount):
         _('Automatically connect next service'),
         default=False
     )
-    # last_connected_tariff = models.ForeignKey(
-    #     Tariff, verbose_name=_('Last connected service'),
-    #     on_delete=models.CASCADE, null=True, blank=True, default=None
-    # )
+    last_connected_tariff = models.ForeignKey(
+        Tariff, verbose_name=_('Last connected service'),
+        on_delete=models.SET_NULL, null=True, blank=True, default=None
+    )
 
     MARKER_FLAGS = (
         ('icon_donkey', _('Donkey')),
@@ -230,7 +226,8 @@ class Abon(BaseAccount):
         if tariff.is_admin and author is not None:
             if not author.is_staff:
                 raise LogicError(
-                    _('User that is no staff can not buy admin services'))
+                    _('User that is no staff can not buy admin services')
+                )
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
@@ -249,11 +246,17 @@ class Abon(BaseAccount):
                 deadline=deadline, tariff=tariff
             )
             self.current_tariff = new_abtar
+            if self.last_connected_tariff != tariff:
+                self.last_connected_tariff = tariff
 
             # charge for the service
             self.ballance -= amount
 
-            self.save(update_fields=('ballance', 'current_tariff'))
+            self.save(update_fields=(
+                'ballance',
+                'current_tariff',
+                'last_connected_tariff'
+            ))
 
             # make log about it
             AbonLog.objects.create(
@@ -366,7 +369,7 @@ class Abon(BaseAccount):
 
     def enable_service(self, tariff: Tariff, deadline=None, time_start=None):
         """
-        Makes a services for current user
+        Makes a services for current user, without money
         :param tariff: Instance of service
         :param deadline: Time when service is expired
         :param time_start: Time when service has started
@@ -381,7 +384,8 @@ class Abon(BaseAccount):
             time_start=time_start
         )
         self.current_tariff = new_abtar
-        self.save(update_fields=('current_tariff',))
+        self.last_connected_tariff = tariff
+        self.save(update_fields=('current_tariff', 'last_connected_tariff'))
 
 
 class PassportInfo(models.Model):
@@ -464,8 +468,10 @@ class AllTimePayLogManager(models.Manager):
             if r is None:
                 break
             summ, dat = r
-            yield {'summ': summ,
-                   'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
+            yield {
+                'summ': summ,
+                'pay_date': datetime.strptime(dat, '%Y-%m-%d')
+            }
 
 
 # Log for pay system "AllTime"

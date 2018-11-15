@@ -38,8 +38,10 @@ def main():
     AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
     fields = ('id', 'tariff__title', 'abon__id')
-    expired_services = AbonTariff.objects.exclude(abon=None).filter(deadline__lt=now,
-                                                                    abon__autoconnect_service=False)
+    expired_services = AbonTariff.objects.exclude(abon=None).filter(
+        deadline__lt=now,
+        abon__autoconnect_service=False
+    )
 
     # finishing expires services
     with transaction.atomic():
@@ -57,8 +59,10 @@ def main():
         expired_services.delete()
 
     # Automatically connect new service
-    for ex in AbonTariff.objects.filter(deadline__lt=now, abon__autoconnect_service=True).exclude(
-            abon=None).iterator():
+    for ex in AbonTariff.objects.filter(
+        deadline__lt=now,
+        abon__autoconnect_service=True
+    ).exclude(abon=None).iterator():
         abon = ex.abon
         trf = ex.tariff
         amount = round(trf.amount, 2)
@@ -68,7 +72,8 @@ def main():
                 abon.ballance -= amount
                 ex.time_start = now
                 ex.deadline = None  # Deadline sets automatically in signal pre_save
-                ex.save(update_fields=('time_start', 'deadline'))
+                ex.is_active = True
+                ex.save(update_fields=('time_start', 'deadline', 'is_active'))
                 abon.save(update_fields=('ballance',))
                 # make log about it
                 l = AbonLog.objects.create(
@@ -91,7 +96,19 @@ def main():
                 )
                 print(l.comment)
 
-    # signals.pre_delete.connect(abontariff_pre_delete, sender=AbonTariff)
+    # Post connect service
+    # connect service when autoconnect is True, and user have enough money
+    for ab in Abon.objects.filter(
+        is_active=True,
+        current_tariff=None
+    ).exclude(last_connected_tariff=None).iterator():
+        tariff = ab.last_connected_tariff
+        if tariff is None:
+            continue
+        ab.pick_tariff(
+            tariff, None,
+            "Автоматическое продление услуги '%s'" % tariff.title
+        )
 
     # manage periodic pays
     ppays = PeriodicPayForId.objects.filter(next_pay__lt=now) \
@@ -102,7 +119,7 @@ def main():
     # sync subscribers on GW
     threads = tuple(NasSyncThread(nas) for nas in NASModel.objects.
                     annotate(usercount=Count('abon')).
-                    filter(usercount__gt=0))
+                    filter(usercount__gt=0, enabled=True))
     for t in threads:
         t.start()
     for t in threads:
