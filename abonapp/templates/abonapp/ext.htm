@@ -39,11 +39,6 @@
             <a href="{{ abtasklog }}">{% trans 'History of tasks' %}</a>
         </li>
 
-        {% url 'abonapp:charts' group.pk abon.username as abtasklog %}
-        <li{% if abtasklog == request.path %} class="active"{% endif %}>
-            <a href="{{ abtasklog }}">{% trans 'Charts' %}</a>
-        </li>
-
         {% url 'abonapp:dials' group.pk abon.username as abdials %}
         <li{% if abdials == request.path %} class="active"{% endif %}>
             <a href="{{ abdials }}">{% trans 'Dialing' %}</a>

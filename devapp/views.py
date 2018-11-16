@@ -4,7 +4,6 @@ from ipaddress import ip_address
 from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from chatbot.models import ChatException
-from chatbot.send_func import send_notify
 from devapp.base_intr import DeviceImplementationError
 from django.conf import settings
 from django.contrib import messages
@@ -25,6 +24,7 @@ from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
 from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, \
     ZteOltLoginFailed
+from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
 from guardian.decorators import \
@@ -700,24 +700,18 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
 
             recipients = UserProfile.objects.get_profiles_by_group(
                 device_down.group.pk)
-            names = list()
 
-            for recipient in recipients.iterator():
-                send_notify(
-                    msg_text=gettext(notify_text) % {
-                        'device_name': "%s(%s) %s" % (
-                            device_down.ip_address,
-                            device_down.mac_addr,
-                            device_down.comment
-                        )
-                    },
-                    account=recipient,
-                    tag='devmon'
+            multicast_email_notify.delay(msg_text=gettext(notify_text) % {
+                'device_name': "%s(%s) %s" % (
+                    device_down.ip_address,
+                    device_down.mac_addr,
+                    device_down.comment
                 )
-                names.append(recipient.username)
+            }, account_ids=(
+                recipient.pk for recipient in recipients.only('pk').iterator()
+            ))
             return {
-                'text': 'notification successfully sent',
-                'recipients': names
+                'text': 'notification successfully sent'
             }
         except ChatException as e:
             return {

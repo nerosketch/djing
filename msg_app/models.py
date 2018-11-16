@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from accounts_app.models import UserProfile
-from chatbot.send_func import send_notify
+from djing.tasks import send_email_notify
 from chatbot.models import ChatException
 
 
@@ -10,17 +10,29 @@ class MessageError(Exception):
 
 
 class MessageStatus(models.Model):
-    msg = models.ForeignKey('Message', on_delete=models.CASCADE, related_name='msg_statuses')
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='usr_msg_status')
+    msg = models.ForeignKey(
+        'Message', on_delete=models.CASCADE,
+        related_name='msg_statuses'
+    )
+    user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE,
+        related_name='usr_msg_status'
+    )
     MESSAGE_STATES = (
         ('new', _('New')),
         ('old', _('Seen')),
         ('del', _('Deleted'))
     )
-    state = models.CharField(max_length=3, choices=MESSAGE_STATES, default='new')
+    state = models.CharField(
+        max_length=3, choices=MESSAGE_STATES,
+        default='new'
+    )
 
     def __str__(self):
-        return "%s for %s (%s)" % (self.get_state_display(), self.user, self.msg)
+        return "%s for %s (%s)" % (
+            self.get_state_display(),
+            self.user, self.msg
+        )
 
     class Meta:
         db_table = 'message_status'
@@ -34,10 +46,22 @@ class MessageStatus(models.Model):
 class Message(models.Model):
     text = models.TextField(_("Body"))
     sent_at = models.DateTimeField(_("sent at"), auto_now_add=True)
-    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='messages')
-    conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE, verbose_name=_('Conversation'))
-    attachment = models.FileField(upload_to='messages_attachments/%Y_%m_%d', blank=True, null=True)
-    account_status = models.ManyToManyField(UserProfile, through=MessageStatus, through_fields=('msg', 'user'))
+    author = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE,
+        related_name='messages'
+    )
+    conversation = models.ForeignKey(
+        'Conversation', on_delete=models.CASCADE,
+        verbose_name=_('Conversation')
+    )
+    attachment = models.FileField(
+        upload_to='messages_attachments/%Y_%m_%d',
+        blank=True, null=True
+    )
+    account_status = models.ManyToManyField(
+        UserProfile, through=MessageStatus,
+        through_fields=('msg', 'user')
+    )
 
     def __str__(self):
         return self.text[:9]
@@ -70,7 +94,10 @@ class Message(models.Model):
 
 
 class ConversationMembership(models.Model):
-    account = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='memberships')
+    account = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE,
+        related_name='memberships'
+    )
     conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE)
     PARTICIPANT_STATUS = (
         ('adm', _('Admin')),
@@ -78,9 +105,14 @@ class ConversationMembership(models.Model):
         ('ban', _('Banned user')),
         ('inv', _('Inviter'))
     )
-    status = models.CharField(max_length=3, choices=PARTICIPANT_STATUS, default='gst')
-    who_invite_that_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True,
-                                             related_name='self_conversations')
+    status = models.CharField(
+        max_length=3, choices=PARTICIPANT_STATUS, default='gst'
+    )
+    who_invite_that_user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE,
+        null=True, blank=True,
+        related_name='self_conversations'
+    )
 
     def __str__(self):
         return "%s < %s" % (self.conversation, self.account)
@@ -102,7 +134,9 @@ def id_to_userprofile(acc):
 
 class ConversationManager(models.Manager):
     def create_conversation(self, author, other_participants, title=None):
-        other_participants = tuple(id_to_userprofile(acc) for acc in other_participants)
+        other_participants = tuple(
+            id_to_userprofile(acc) for acc in other_participants
+        )
         if not title:
             usernames = tuple(acc.username for acc in other_participants)
             if not usernames:
@@ -112,7 +146,8 @@ class ConversationManager(models.Manager):
         conversation = self.create(title=title, author=author)
         for acc in other_participants:
             ConversationMembership.objects.create(
-                account=acc, conversation=conversation, status='adm', who_invite_that_user=author
+                account=acc, conversation=conversation,
+                status='adm', who_invite_that_user=author
             )
 
         ConversationMembership.objects.create(
@@ -123,12 +158,16 @@ class ConversationManager(models.Manager):
     @staticmethod
     def get_new_messages_count(account):
         if isinstance(account, UserProfile):
-            return MessageStatus.objects.filter(user=account, state='new').count()
+            return MessageStatus.objects.filter(
+                user=account, state='new'
+            ).count()
         else:
             return 0
 
     def fetch(self, account):
-        conversations = self.filter(models.Q(author=account) | models.Q(participants__in=(account,))).annotate(
+        conversations = self.filter(
+            models.Q(author=account) | models.Q(participants__in=(account,))
+        ).annotate(
             msg_count=models.Count('message', distinct=True)
         )
         return conversations
@@ -136,9 +175,11 @@ class ConversationManager(models.Manager):
 
 class Conversation(models.Model):
     title = models.CharField(max_length=32)
-    participants = models.ManyToManyField(UserProfile, related_name='conversations',
-                                          through='ConversationMembership',
-                                          through_fields=('conversation', 'account'))
+    participants = models.ManyToManyField(
+        UserProfile, related_name='conversations',
+        through='ConversationMembership',
+        through_fields=('conversation', 'account')
+    )
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_create = models.DateTimeField(auto_now_add=True)
 
@@ -152,7 +193,9 @@ class Conversation(models.Model):
 
     def get_messages_new_count(self, account):
         msgs = Message.objects.filter(conversation=self)
-        return MessageStatus.objects.filter(user=account, msg__in=msgs, state='new').count()
+        return MessageStatus.objects.filter(
+            user=account, msg__in=msgs, state='new'
+        ).count()
 
     def last_message(self):
         messages = Message.objects.filter(conversation=self)
@@ -162,14 +205,18 @@ class Conversation(models.Model):
     def new_message(self, text, attachment, author, with_status=True):
         try:
             msg = Message.objects.create(
-                text=text, conversation=self, attachment=attachment, author=author
+                text=text, conversation=self,
+                attachment=attachment, author=author
             )
             if with_status:
                 for participant in self.participants.all():
                     if participant == author:
                         continue
                     MessageStatus.objects.create(msg=msg, user=participant)
-                    send_notify(msg_text=text, account=participant, tag='msgapp')
+                    send_email_notify.delay(
+                        msg_text=text,
+                        account_id=participant.pk
+                    )
             return msg
         except ChatException as e:
             raise MessageError(e)
@@ -188,10 +235,13 @@ class Conversation(models.Model):
 
     def _make_participant_status(self, user, status, cm=None):
         if cm is None:
-            cm = ConversationMembership.objects.get(account=user, conversation=self)
+            cm = ConversationMembership.objects.get(
+                account=user, conversation=self
+            )
         else:
             if not isinstance(cm, ConversationMembership):
-                raise TypeError('cm must be instance of msg_app.ConversationMembership')
+                raise TypeError('cm must be instance of '
+                                'msg_app.ConversationMembership')
         cm.status = status
         cm.save(update_fields=('status',))
         return cm
@@ -210,21 +260,28 @@ class Conversation(models.Model):
 
     def remove_participant(self, user):
         try:
-            cm = ConversationMembership.objects.get(account=user, conversation=self)
+            cm = ConversationMembership.objects.get(
+                account=user, conversation=self
+            )
             cm.delete()
         except ConversationMembership.DoesNotExist:
             pass
 
     def add_participant(self, author, user):
         return ConversationMembership.objects.create(
-            account=user, conversation=self, status='gst', who_invite_that_user=author
+            account=user, conversation=self,
+            status='gst', who_invite_that_user=author
         )
 
     def find_messages_by_text(self, text):
-        return Message.objects.filter(text__icontains=text, conversation=self)
+        return Message.objects.filter(
+            text__icontains=text, conversation=self
+        )
 
     def _make_messages_status(self, account, status):
-        qs = MessageStatus.objects.filter(msg__conversation=self, user=account).exclude(state='del')
+        qs = MessageStatus.objects.filter(
+            msg__conversation=self, user=account
+        ).exclude(state='del')
         if status != 'del':
             qs = qs.exclude(state=status)
         return qs.update(state=status)

@@ -1,14 +1,14 @@
+import importlib
 import os
 import re
-import importlib
 import typing as t
 from urllib.parse import unquote
 
 from django.http import HttpResponseRedirect, HttpResponse
-from netaddr import mac_unix, mac_eui48
-
 from django.shortcuts import _get_queryset
 from django.utils.http import is_safe_url
+from netaddr import mac_unix, mac_eui48
+from djing.celery import app
 
 MAC_ADDR_REGEX = '^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 

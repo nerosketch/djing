@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from typing import Dict, Optional
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, \
     PermissionRequiredMixin as PermissionRequiredMixin_django, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction, \
-    OperationalError, DatabaseError
+    DatabaseError
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseBadRequest, \
     HttpResponseRedirect
@@ -33,7 +33,6 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from gw_app.models import NASModel
 from gw_app.nas_managers import NasFailedResult, NasNetworkError
 from ip_pool.models import NetworkModel
-from statistics.models import getModel
 from tariff_app.models import Tariff
 from taskapp.models import Task
 from xmlview.decorators import xml_view
@@ -440,15 +439,17 @@ def pick_tariff(request, gid: int, uname):
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
             deadline = request.POST.get('deadline')
             log_comment = _(
-                "Service '%(service_name)s' has connected via admin") % {
-                              'service_name': trf.title
-                          }
-            if deadline == '' or deadline is None:
-                abon.pick_tariff(trf, request.user, comment=log_comment)
-            else:
+                "Service '%(service_name)s' "
+                "has connected via admin until %(deadline)s") % {
+                    'service_name': trf.title,
+                    'deadline': deadline
+                    }
+            if deadline:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline,
                                  comment=log_comment)
+            else:
+                abon.pick_tariff(trf, request.user, comment=log_comment)
             r = abon.nas_sync_self()
             if r is None:
                 messages.success(request, _('Tariff has been picked'))
@@ -689,56 +690,56 @@ def clear_dev(request, gid: int, uname):
     return redirect('abonapp:abon_home', gid=gid, uname=uname)
 
 
-@login_required
-@only_admins
-@permission_required('group_app.view_group', (Group, 'pk', 'gid'))
-def charts(request, gid: int, uname):
-    high = 100
-
-    wandate = request.GET.get('wantdate')
-    if wandate:
-        wandate = datetime.strptime(wandate, '%d%m%Y').date()
-    else:
-        wandate = date.today()
-
-    try:
-        StatElem = getModel(wandate)
-        abon = models.Abon.objects.get(username=uname)
-        if abon.group is None:
-            abon.group = Group.objects.get(pk=gid)
-            abon.save(update_fields=('group',))
-
-        charts_data = StatElem.objects.chart(
-            abon,
-            count_of_parts=30,
-            want_date=wandate
-        )
-
-        abontariff = abon.active_tariff()
-        if abontariff is not None:
-            trf = abontariff.tariff
-            high = trf.speedIn + trf.speedOut
-            if high > 100:
-                high = 100
-
-    except models.Abon.DoesNotExist:
-        messages.error(request, _('Abon does not exist'))
-        return redirect('abonapp:people_list', gid)
-    except Group.DoesNotExist:
-        messages.error(request, _("Group what you want doesn't exist"))
-        return redirect('abonapp:group_list')
-    except (ProgrammingError, OperationalError) as e:
-        messages.error(request, e)
-        return redirect('abonapp:charts', gid=gid, uname=uname)
-
-    return render(request, 'abonapp/charts.html', {
-        'group': abon.group,
-        'abon': abon,
-        'charts_data': ',\n'.join(
-            charts_data) if charts_data is not None else None,
-        'high': high,
-        'wantdate': wandate
-    })
+# @login_required
+# @only_admins
+# @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
+# def charts(request, gid: int, uname):
+#     high = 100
+#
+#     wandate = request.GET.get('wantdate')
+#     if wandate:
+#         wandate = datetime.strptime(wandate, '%d%m%Y').date()
+#     else:
+#         wandate = date.today()
+#
+#     try:
+#         StatElem = getModel(wandate)
+#         abon = models.Abon.objects.get(username=uname)
+#         if abon.group is None:
+#             abon.group = Group.objects.get(pk=gid)
+#             abon.save(update_fields=('group',))
+#
+#         charts_data = StatElem.objects.chart(
+#             abon,
+#             count_of_parts=30,
+#             want_date=wandate
+#         )
+#
+#         abontariff = abon.active_tariff()
+#         if abontariff is not None:
+#             trf = abontariff.tariff
+#             high = trf.speedIn + trf.speedOut
+#             if high > 100:
+#                 high = 100
+#
+#     except models.Abon.DoesNotExist:
+#         messages.error(request, _('Abon does not exist'))
+#         return redirect('abonapp:people_list', gid)
+#     except Group.DoesNotExist:
+#         messages.error(request, _("Group what you want doesn't exist"))
+#         return redirect('abonapp:group_list')
+#     except (ProgrammingError, OperationalError) as e:
+#         messages.error(request, e)
+#         return redirect('abonapp:charts', gid=gid, uname=uname)
+#
+#     return render(request, 'abonapp/charts.html', {
+#         'group': abon.group,
+#         'abon': abon,
+#         'charts_data': ',\n'.join(
+#             charts_data) if charts_data is not None else None,
+#         'high': high,
+#         'wantdate': wandate
+#     })
 
 
 @login_required
