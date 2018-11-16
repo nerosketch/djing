@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from abonapp.tasks import user_remove_from_gw, user_add_to_gw, user_nas_sync
 from accounts_app.models import UserProfile, MyUserManager, BaseAccount
 from bitfield import BitField
 from django.conf import settings
@@ -318,7 +317,16 @@ class Abon(BaseAccount):
         """
         if self.nas is None:
             raise LogicError(_('gateway required'))
-        user_nas_sync.delay(self.pk)
+        try:
+            agent_abon = self.build_agent_struct()
+            if agent_abon is not None:
+                mngr = self.nas.get_nas_manager()
+                mngr.update_user(agent_abon)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return e
+        except LogicError:
+            pass
 
     def nas_add_self(self):
         """
@@ -327,7 +335,16 @@ class Abon(BaseAccount):
         """
         if self.nas is None:
             raise LogicError(_('gateway required'))
-        user_add_to_gw.delay(self.pk)
+        try:
+            agent_abon = self.build_agent_struct()
+            if agent_abon is not None:
+                mngr = self.nas.get_nas_manager()
+                mngr.add_user(agent_abon)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return e
+        except LogicError:
+            pass
 
     def nas_remove_self(self):
         """
@@ -336,7 +353,16 @@ class Abon(BaseAccount):
         """
         if self.nas is None:
             raise LogicError(_('gateway required'))
-        user_remove_from_gw.delay(self.pk)
+        try:
+            agent_abon = self.build_agent_struct()
+            if agent_abon is not None:
+                mngr = self.nas.get_nas_manager()
+                mngr.remove_user(agent_abon)
+        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
+            print('ERROR:', e)
+            return e
+        except LogicError:
+            pass
 
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
