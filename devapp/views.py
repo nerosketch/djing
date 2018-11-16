@@ -32,6 +32,7 @@ from guardian.decorators import \
 from guardian.shortcuts import get_objects_for_user
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
+from .tasks import onu_register
 
 
 class DevicesListView(LoginAdminPermissionMixin,
@@ -91,7 +92,9 @@ class DeviceDeleteView(LoginAdminPermissionMixin, DeleteView):
                 self.object.mac_addr or '-',
                 self.object.comment or '-'
             ))
-            self.object.update_dhcp()
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
         except (DeviceDBException, PermissionError) as e:
             messages.error(request, e)
         messages.success(request, _('Device successfully deleted'))
@@ -141,7 +144,9 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
-            self.object.update_dhcp()
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:
             messages.error(self.request, e)
@@ -197,13 +202,16 @@ class DeviceCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
-            self.request.user.log(self.request.META, 'cdev',
-                                  'ip %s, mac: %s, "%s"' % (
-                                      self.object.ip_address,
-                                      self.object.mac_addr,
-                                      self.object.comment
-                                  ))
-            self.object.update_dhcp()
+            self.request.user.log(
+                self.request.META, 'cdev',
+                'ip %s, mac: %s, "%s"' % (
+                    self.object.ip_address,
+                    self.object.mac_addr,
+                    self.object.comment
+                ))
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:
             messages.error(self.request, e)

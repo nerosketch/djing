@@ -1,11 +1,14 @@
-#!/usr/bin/env python3
 from typing import Iterable
 from subprocess import run
+from celery import shared_task
+from devapp.models import Device
 
 
-def onu_register(devices: Iterable):
+@shared_task
+def onu_register(device_ids: Iterable[int]):
     with open('/etc/dhcp/macs.conf', 'w') as f:
-        for dev in devices:
+        for dev_id in device_ids:
+            dev = Device.objects.get(pk=dev_id)
             if not dev.has_attachable_to_subscriber() or dev.mac_addr is None:
                 continue
             group_code = dev.group.code
