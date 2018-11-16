@@ -1,12 +1,11 @@
 [Unit]
-Description=Djing telegram bot
+Description=Celery worker for djing
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 ./telebot.py
-PIDFile=/run/djing_telebot.pid
+ExecStart=/var/www/djing/venv/bin/celery worker -A djing --loglevel=info --concurrency=4
 WorkingDirectory=/var/www/djing
-TimeoutSec=9
+TimeoutSec=7
 Restart=always
 User=www-data
 Group=www-data

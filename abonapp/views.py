@@ -51,9 +51,9 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
         if street_id > 0:
             peoples_list = peoples_list.filter(street=street_id)
         peoples_list = peoples_list.select_related(
-            'group', 'street', 'statcache', 'current_tariff'
+            'group', 'street', 'current_tariff'
         ).only(
-            'group', 'street', 'statcache', 'fio',
+            'group', 'street', 'fio',
             'street', 'house', 'telephone', 'ballance', 'markers',
             'username', 'is_active', 'current_tariff'
         )

@@ -75,23 +75,25 @@
                         {% else %}
                             <tr class="danger">
                         {% endif %}
-                        <td>{% if human.statcache.is_online %}
-                                <span class="glyphicon glyphicon-ok text-success"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>
-                            {% endif %}
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign text-muted"></span>
+{#                            {% if human.statcache.is_online %}#}
+{#                                <span class="glyphicon glyphicon-ok text-success"></span>#}
+{#                            {% else %}#}
+{#                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>#}
+{#                            {% endif %}#}
                         </td>
                         <td class="col-xs-1">
                             <a href="{% url 'abonapp:abon_home' human.group_id human.username %}">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
-                            {% if human.statcache %}
-                                {% if human.statcache.is_today %}
-                                    {{ human.statcache.last_time|date:"H:i" }}
-                                {% else %}
-                                    {{ human.statcache.last_time|date:"D H:i" }}
-                                {% endif %}
-                            {% endif %}
+{#                            {% if human.statcache %}#}
+{#                                {% if human.statcache.is_today %}#}
+{#                                    {{ human.statcache.last_time|date:"H:i" }}#}
+{#                                {% else %}#}
+{#                                    {{ human.statcache.last_time|date:"D H:i" }}#}
+{#                                {% endif %}#}
+{#                            {% endif %}#}
                         </td>
                         <td class="col-xs-1">{{ human.ip_address|default_if_none:'&mdash;' }}</td>
                         <td class="col-xs-2">{{ human.fio|default:'&mdash;' }}</td>
