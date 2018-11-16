@@ -28,3 +28,7 @@ asterisk
 
 # django-xmlview for pay system allpay
 -e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview
+
+Celery
+redis==2.10.6
+celery[redis]

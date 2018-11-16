@@ -176,13 +176,6 @@ class IpLeaseManager(models.Manager):
         except IntegrityError as e:
             raise DuplicateEntry(e)
 
-    def expired(self):
-        lease_live_time = getattr(settings, 'LEASE_LIVE_TIME')
-        if lease_live_time is None:
-            raise ImproperlyConfigured('You must specify LEASE_LIVE_TIME in settings')
-        senility = now() - timedelta(seconds=lease_live_time)
-        return self.filter(lease_time__lt=senility)
-
 
 # Deprecated. Remove after migrations squashed
 class IpLeaseModel(models.Model):

@@ -228,7 +228,9 @@ EMAIL_USE_TLS = getattr(local_settings, 'EMAIL_USE_TLS', True)
 
 SERVER_EMAIL = getattr(local_settings, 'SERVER_EMAIL', EMAIL_HOST_USER)
 
-# Inactive ip lease time in seconds.
-# If lease time more than time of create, and lease is inactive
-# then delete it. Used in ip_pool app.
-LEASE_LIVE_TIME = 86400
+# REDIS related settings
+REDIS_HOST = 'localhost'
+REDIS_PORT = '6379'
+BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'

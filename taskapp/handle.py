@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
-from chatbot.send_func import send_notify
+from djing.tasks import send_email_notify
 from chatbot.models import ChatException
 from djing.lib import MultipleException
 
@@ -30,12 +30,9 @@ def handle(task, author, recipients):
 
             if task.state == 'F' or task.state == 'C':
                 # If task completed or failed than send one message to author
-                try:
-                    send_notify(fulltext, author, tag='taskap')
-                except ChatException as e:
-                    raise TaskException(e)
+                send_email_notify.delay(fulltext, author.pk)
             else:
-                send_notify(fulltext, recipient, tag='taskap')
+                send_email_notify.delay(fulltext, recipient.pk)
         except ChatException as e:
             errors.append(e)
     if len(errors) > 0:
