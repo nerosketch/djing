@@ -72,8 +72,7 @@ def main():
                 abon.ballance -= amount
                 ex.time_start = now
                 ex.deadline = None  # Deadline sets automatically in signal pre_save
-                ex.is_active = True
-                ex.save(update_fields=('time_start', 'deadline', 'is_active'))
+                ex.save(update_fields=('time_start', 'deadline'))
                 abon.save(update_fields=('ballance',))
                 # make log about it
                 l = AbonLog.objects.create(
