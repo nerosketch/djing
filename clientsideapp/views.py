@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _, gettext
 
-from abonapp.models import AbonLog, InvoiceForPayment, Abon
+from abonapp.models.generic import AbonLog, InvoiceForPayment, Abon
 from djing.lib.decorators import json_view
 from tariff_app.models import Tariff
 from taskapp.models import Task
@@ -14,7 +14,9 @@ from gw_app.nas_managers import NasFailedResult, NasNetworkError
 
 @login_required
 def home(request):
-    num_active_tasks = Task.objects.filter(abon=request.user, state='S').count()
+    num_active_tasks = Task.objects.filter(
+        abon=request.user, state='S'
+    ).count()
     return render(request, 'clientsideapp/index.html', {
         'num_active_tasks': num_active_tasks
     })
@@ -32,7 +34,9 @@ def pays(request):
 def services(request):
     try:
         abon = request.user
-        all_tarifs = Tariff.objects.get_tariffs_by_group(abon.group.pk).filter(is_admin=False)
+        all_tarifs = Tariff.objects.get_tariffs_by_group(
+            abon.group.pk
+        ).filter(is_admin=False)
         current_service = abon.active_tariff()
     except Abon.DoesNotExist:
         all_tarifs = None
@@ -50,14 +54,20 @@ def buy_service(request, srv_id):
     try:
         current_service = abon.active_tariff()
         if request.method == 'POST':
-            abon.pick_tariff(service, None, _("Buy the service via user side, service '%s'")
-                             % service)
+            abon.pick_tariff(
+                service, None,
+                _("Buy the service via user side, service '%s'") % service
+            )
             abon.nas_sync_self()
-            messages.success(request, _("The service '%s' wan successfully activated") % service.title)
+            messages.success(
+                request,
+                _("The service '%s' wan successfully activated") % service.title
+            )
         else:
             return render(request, 'clientsideapp/modal_service_buy.html', {
                 'service': service,
-                'current_service': current_service.tariff if current_service is not None else None
+                'current_service': current_service.tariff
+                if current_service is not None else None
             })
     except LogicError as e:
         messages.error(request, e)
@@ -83,15 +93,20 @@ def debt_buy(request, d_id):
         try:
             sure = request.POST.get('sure')
             if sure != 'on':
-                raise LogicError(_("Are you not sure that you want buy the service?"))
+                raise LogicError(
+                    _("Are you not sure that you want buy the service?")
+                )
             if abon.ballance < debt.amount:
                 raise LogicError(_('Your account have not enough money'))
 
             amount = -debt.amount
-            abon.add_ballance(None, amount, comment=gettext('%(username)s paid the debt %(amount).2f') % {
-                'username': abon.get_full_name(),
-                'amount': amount
-            })
+            abon.add_ballance(
+                None, amount,
+                comment=gettext('%(username)s paid the debt %(amount).2f') % {
+                    'username': abon.get_full_name(),
+                    'amount': amount
+                }
+            )
             abon.save(update_fields=('ballance',))
             debt.set_ok()
             debt.save(update_fields=('status', 'date_pay'))

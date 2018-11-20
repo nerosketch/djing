@@ -2,7 +2,7 @@ from ipaddress import ip_address, AddressValueError
 
 from django.contrib.auth.backends import ModelBackend
 from accounts_app.models import BaseAccount, UserProfile
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 
 
 class CustomAuthBackend(ModelBackend):
@@ -39,7 +39,10 @@ class LocationAuthBackend(ModelBackend):
     def authenticate(self, request, byip, **kwargs):
         try:
             remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
-            user = Abon.objects.filter(ip_address=str(remote_ip), is_active=True).first()
+            user = Abon.objects.filter(
+                ip_address=str(remote_ip),
+                is_active=True
+            ).first()
             if user is None:
                 return
             if self.user_can_authenticate(user):

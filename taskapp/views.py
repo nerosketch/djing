@@ -14,7 +14,7 @@ from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 from guardian.decorators import permission_required_or_403 as permission_required
 
 from chatbot.models import MessageQueue
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from djing import httpresponse_to_referrer
 from djing.lib import safe_int, MultipleException, RuTimedelta
 from djing.lib.decorators import only_admins, json_view
@@ -38,9 +38,13 @@ class NewTasksView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(recipients=self.request.user, state='S') \
-            .annotate(comment_count=Count('extracomment')) \
-            .select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.filter(
+            recipients=self.request.user, state='S'
+        ).annotate(
+            comment_count=Count('extracomment')
+        ).select_related(
+            'abon', 'abon__street', 'abon__group', 'author'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -53,8 +57,11 @@ class FailedTasksView(NewTasksView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.filter(recipients=self.request.user, state='C') \
-            .select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.filter(
+            recipients=self.request.user, state='C'
+        ).select_related(
+            'abon', 'abon__street', 'abon__group', 'author'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -63,8 +70,11 @@ class FinishedTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_finish.html'
 
     def get_queryset(self):
-        return Task.objects.filter(recipients=self.request.user, state='F') \
-            .select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.filter(
+            recipients=self.request.user, state='F'
+        ).select_related(
+            'abon', 'abon__street', 'abon__group', 'author'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -74,9 +84,11 @@ class OwnTaskListView(NewTasksView):
 
     def get_queryset(self):
         # Attached and not finished tasks
-        return Task.objects.filter(author=self.request.user) \
-            .exclude(state='F') \
-            .select_related('abon', 'abon__street', 'abon__group')
+        return Task.objects.filter(
+            author=self.request.user
+        ).exclude(state='F').select_related(
+            'abon', 'abon__street', 'abon__group'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -86,8 +98,11 @@ class MyTaskListView(NewTasksView):
 
     def get_queryset(self):
         # Tasks in which I participated
-        return Task.objects.filter(recipients=self.request.user) \
-            .select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.filter(
+            recipients=self.request.user
+        ).select_related(
+            'abon', 'abon__street', 'abon__group', 'author'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -99,8 +114,11 @@ class AllTasksListView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Task.objects.annotate(comment_count=Count('extracomment')) \
-            .select_related('abon', 'abon__street', 'abon__group', 'author')
+        return Task.objects.annotate(
+            comment_count=Count('extracomment')
+        ).select_related(
+            'abon', 'abon__street', 'abon__group', 'author'
+        )
 
 
 @method_decorator(login_decs, name='dispatch')
@@ -109,7 +127,9 @@ class EmptyTasksListView(NewTasksView):
     template_name = 'taskapp/tasklist_empty.html'
 
     def get_queryset(self):
-        return Task.objects.annotate(reccount=Count('recipients')).filter(reccount__lt=1)
+        return Task.objects.annotate(
+            reccount=Count('recipients')
+        ).filter(reccount__lt=1)
 
 
 @login_required
@@ -121,7 +141,9 @@ def task_delete(request, task_id):
     if request.user.is_superuser or request.user not in task.recipients.all():
         task.delete()
     else:
-        messages.warning(request, _('You cannot delete task that assigned to you'))
+        messages.warning(
+            request, _('You cannot delete task that assigned to you')
+        )
     return redirect('taskapp:home')
 
 
@@ -196,7 +218,9 @@ class TaskUpdateView(UpdateView):
             if task.out_date > now_date:
                 time_diff = "%s: %s" % (_('time left'), RuTimedelta(task.out_date - now_date))
             else:
-                time_diff = _("Expired timeout -%(time_left)s") % {'time_left': RuTimedelta(now_date - task.out_date)}
+                time_diff = _("Expired timeout -%(time_left)s") % {
+                    'time_left': RuTimedelta(now_date - task.out_date)
+                }
         else:
             time_diff = None
 
@@ -217,7 +241,10 @@ class TaskUpdateView(UpdateView):
             return resolve_url('taskapp:edit', task_id)
 
     def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR, _('fix form errors'))
+        messages.add_message(
+            self.request, messages.ERROR,
+            _('fix form errors')
+        )
         return super(TaskUpdateView, self).form_invalid(form)
 
 

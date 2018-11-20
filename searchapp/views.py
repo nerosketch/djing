@@ -2,7 +2,7 @@ import re
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils.html import escape
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from devapp.models import Device
 from djing import MAC_ADDR_REGEX
 from django.contrib.auth.decorators import login_required
@@ -21,14 +21,18 @@ def home(request):
 
     if s:
         abons = Abon.objects.filter(
-            Q(fio__icontains=s) | Q(username__icontains=s) | Q(telephone__icontains=s) |
-            Q(additional_telephones__telephone__icontains=s) | Q(ip_address__icontains=s)
+            Q(fio__icontains=s) | Q(username__icontains=s) |
+            Q(telephone__icontains=s) |
+            Q(additional_telephones__telephone__icontains=s) |
+            Q(ip_address__icontains=s)
         )
 
         if re.match(MAC_ADDR_REGEX, s):
             devices = Device.objects.filter(mac_addr=s)
         else:
-            devices = Device.objects.filter(Q(comment__icontains=s) | Q(ip_address__icontains=s))
+            devices = Device.objects.filter(
+                Q(comment__icontains=s) | Q(ip_address__icontains=s)
+            )
 
     else:
         abons = ()

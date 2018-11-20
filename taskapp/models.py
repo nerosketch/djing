@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from .handle import handle as task_handle
 
 TASK_PRIORITIES = (
@@ -49,7 +49,10 @@ class ChangeLog(models.Model):
     )
     act_type = models.CharField(max_length=1, choices=ACT_CHOICES)
     when = models.DateTimeField(auto_now_add=True)
-    who = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    who = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE, related_name='+'
+    )
 
     def __str__(self):
         return self.get_act_type_display()
@@ -60,18 +63,46 @@ def delta_add_days():
 
 
 class Task(models.Model):
-    descr = models.CharField(_('Description'), max_length=128, null=True, blank=True)
-    recipients = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('Recipients'),
-                                        related_name='them_task')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+', on_delete=models.SET_NULL, null=True,
-                               blank=True, verbose_name=_('Task author'))
-    priority = models.CharField(_('A priority'), max_length=1, choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0])
-    out_date = models.DateField(_('Reality'), null=True, blank=True, default=delta_add_days)
-    time_of_create = models.DateTimeField(_('Date of create'), auto_now_add=True)
-    state = models.CharField(_('Condition'), max_length=1, choices=TASK_STATES, default=TASK_STATES[0][0])
-    attachment = models.ImageField(_('Attached image'), upload_to='task_attachments/%Y.%m.%d', blank=True, null=True)
-    mode = models.CharField(_('The nature of the damage'), max_length=2, choices=TASK_TYPES, default=TASK_TYPES[0][0])
-    abon = models.ForeignKey(Abon, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('Subscriber'))
+    descr = models.CharField(
+        _('Description'), max_length=128,
+        null=True, blank=True
+    )
+    recipients = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, verbose_name=_('Recipients'),
+        related_name='them_task'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='+',
+        on_delete=models.SET_NULL, null=True,
+        blank=True, verbose_name=_('Task author')
+    )
+    priority = models.CharField(
+        _('A priority'), max_length=1,
+        choices=TASK_PRIORITIES, default=TASK_PRIORITIES[2][0]
+    )
+    out_date = models.DateField(
+        _('Reality'), null=True,
+        blank=True, default=delta_add_days
+    )
+    time_of_create = models.DateTimeField(
+        _('Date of create'), auto_now_add=True
+    )
+    state = models.CharField(
+        _('Condition'), max_length=1, choices=TASK_STATES,
+        default=TASK_STATES[0][0]
+    )
+    attachment = models.ImageField(
+        _('Attached image'), upload_to='task_attachments/%Y.%m.%d',
+        blank=True, null=True
+    )
+    mode = models.CharField(
+        _('The nature of the damage'), max_length=2,
+        choices=TASK_TYPES, default=TASK_TYPES[0][0]
+    )
+    abon = models.ForeignKey(
+        Abon, on_delete=models.CASCADE, null=True,
+        blank=True, verbose_name=_('Subscriber')
+    )
 
     class Meta:
         db_table = 'task'
@@ -115,8 +146,14 @@ class Task(models.Model):
 
 class ExtraComment(models.Model):
     text = models.TextField(_('Text of comment'))
-    task = models.ForeignKey(Task, verbose_name=_('Owner task'), on_delete=models.CASCADE)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('Author'), on_delete=models.CASCADE)
+    task = models.ForeignKey(
+        Task, verbose_name=_('Owner task'),
+        on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_('Author'),
+        on_delete=models.CASCADE
+    )
     date_create = models.DateTimeField(_('Time of create'), auto_now_add=True)
 
     def __str__(self):

@@ -7,7 +7,7 @@ from string import digits, ascii_lowercase
 from djing.lib import LogicError
 from ip_pool.models import NetworkModel
 from gw_app.models import NASModel
-from . import models
+from abonapp.models import generic
 from django.conf import settings
 
 
@@ -15,12 +15,18 @@ def _generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
     username = ''.join(choice(chars) for i in range(length))
 
     if split:
-        username = delimiter.join(username[start:start + split] for start in range(0, len(username), split))
+        username = delimiter.join(
+            username[start:start + split]
+            for start in range(0, len(username), split)
+        )
 
     try:
-        models.Abon.objects.get(username=username)
-        return _generate_random_chars(length=length, chars=chars, split=split, delimiter=delimiter)
-    except models.Abon.DoesNotExist:
+        generic.Abon.objects.get(username=username)
+        return _generate_random_chars(
+            length=length, chars=chars,
+            split=split, delimiter=delimiter
+        )
+    except generic.Abon.DoesNotExist:
         return username
 
 
@@ -38,9 +44,13 @@ class AbonForm(forms.ModelForm):
         super(AbonForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance')
         if instance is not None and instance.group is not None:
-            abon_group_queryset = models.AbonStreet.objects.filter(group=instance.group)
+            abon_group_queryset = generic.AbonStreet.objects.filter(
+                group=instance.group
+            )
         elif 'group' in self.initial.keys() and self.initial['group'] is not None:
-            abon_group_queryset = models.AbonStreet.objects.filter(group=self.initial['group'])
+            abon_group_queryset = generic.AbonStreet.objects.filter(
+                group=self.initial['group']
+            )
         else:
             abon_group_queryset = None
         if abon_group_queryset is not None:
@@ -48,20 +58,26 @@ class AbonForm(forms.ModelForm):
         if instance.pk is None:
             self.initial['nas'] = NASModel.objects.filter(default=True).first()
 
-    username = forms.CharField(max_length=127, required=False, initial=_generate_random_username,
+    username = forms.CharField(max_length=127, required=False,
+                               initial=_generate_random_username,
                                widget=forms.TextInput(attrs={
                                    'placeholder': _('login'),
                                    'required': '',
                                    'pattern': r'^\w{1,127}$'
                                }), label=_('login'))
 
-    password = forms.CharField(max_length=64, initial=_generate_random_password, widget=forms.TextInput(attrs={
-        'type': 'password', 'autocomplete': 'new-password'
-    }), label=_('Password'))
+    password = forms.CharField(
+        max_length=64, initial=_generate_random_password,
+        widget=forms.TextInput(attrs={
+            'type': 'password', 'autocomplete': 'new-password'
+        }),
+        label=_('Password')
+    )
 
     class Meta:
-        model = models.Abon
-        fields = ('username', 'telephone', 'fio', 'group', 'description', 'street', 'house', 'is_active', 'nas')
+        model = generic.Abon
+        fields = ('username', 'telephone', 'fio', 'group',
+                  'description', 'street', 'house', 'is_active', 'nas')
         widgets = {
             'fio': forms.TextInput(attrs={
                 'placeholder': _('fio'),
@@ -69,7 +85,10 @@ class AbonForm(forms.ModelForm):
             }),
             'telephone': forms.TextInput(attrs={
                 'placeholder': _('telephone placeholder'),
-                'pattern': getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
+                'pattern': getattr(
+                    settings, 'TELEPHONE_REGEXP',
+                    r'^(\+[7,8,9,3]\d{10,11})?$'
+                )
             }),
             'description': forms.Textarea(attrs={'rows': '4'})
         }
@@ -81,11 +100,11 @@ class AbonForm(forms.ModelForm):
         if commit:
             acc.save()
         try:
-            abon_raw_passw = models.AbonRawPassword.objects.get(account=acc)
+            abon_raw_passw = generic.AbonRawPassword.objects.get(account=acc)
             abon_raw_passw.passw_text = raw_password
             abon_raw_passw.save(update_fields=('passw_text',))
-        except models.AbonRawPassword.DoesNotExist:
-            models.AbonRawPassword.objects.create(
+        except generic.AbonRawPassword.DoesNotExist:
+            generic.AbonRawPassword.objects.create(
                 account=acc,
                 passw_text=raw_password
             )
@@ -94,44 +113,59 @@ class AbonForm(forms.ModelForm):
 
 class PassportForm(forms.ModelForm):
     class Meta:
-        model = models.PassportInfo
+        model = generic.PassportInfo
         exclude = ('abon',)
         widgets = {
-            'series': forms.TextInput(attrs={'required': '', 'pattern': '^\d{4}$'}),
-            'number': forms.TextInput(attrs={'required': '', 'pattern': '^\d{6}$'}),
+            'series': forms.TextInput(attrs={
+                'required': '',
+                'pattern': '^\d{4}$'}
+            ),
+            'number': forms.TextInput(
+                attrs={'required': '', 'pattern': '^\d{6}$'}
+            ),
             'distributor': forms.TextInput(attrs={'required': ''}),
-            'date_of_acceptance': forms.DateInput(attrs={'class': 'form-control', 'required': ''}, format='%Y-%m-%d')
+            'date_of_acceptance': forms.DateInput(attrs={
+                'class': 'form-control', 'required': ''
+            }, format='%Y-%m-%d')
         }
 
 
 class AbonStreetForm(forms.ModelForm):
     class Meta:
-        model = models.AbonStreet
+        model = generic.AbonStreet
         fields = '__all__'
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'required': '', 'autofocus': ''}),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'required': '', 'autofocus': ''
+            }),
             'group': forms.Select(attrs={'class': 'form-control'})
         }
 
 
 class AdditionalTelephoneForm(forms.ModelForm):
     class Meta:
-        model = models.AdditionalTelephone
+        model = generic.AdditionalTelephone
         exclude = ('abon',)
         widgets = {
             'telephone': forms.TextInput(attrs={
                 'placeholder': _('telephone placeholder'),
-                'pattern': getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$'),
+                'pattern': getattr(
+                    settings, 'TELEPHONE_REGEXP',
+                    r'^(\+[7,8,9,3]\d{10,11})?$'
+                ),
                 'required': '',
                 'class': 'form-control'
             }),
-            'owner_name': forms.TextInput(attrs={'class': 'form-control', 'required': ''})
+            'owner_name': forms.TextInput(attrs={
+                'class': 'form-control', 'required': ''
+            })
         }
 
 
 class PeriodicPayForIdForm(forms.ModelForm):
     class Meta:
-        model = models.PeriodicPayForId
+        model = generic.PeriodicPayForId
         exclude = ('account',)
 
 
@@ -151,14 +185,16 @@ class ExportUsersForm(forms.Form):
         ('dev_port__descr', _('Device port')),
         ('is_dynamic_ip', _('Is dynamic ip'))
     )
-    fields = forms.MultipleChoiceField(choices=FIELDS_CHOICES,
-                                       widget=forms.CheckboxSelectMultiple(attrs={"checked": ""}),
-                                       label=_('Fields'))
+    fields = forms.MultipleChoiceField(
+        choices=FIELDS_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={"checked": ""}),
+        label=_('Fields')
+    )
 
 
 class MarkersForm(forms.ModelForm):
     class Meta:
-        model = models.Abon
+        model = generic.Abon
         fields = 'markers',
 
     def save(self, commit=True):
@@ -169,7 +205,10 @@ class MarkersForm(forms.ModelForm):
 
 class AmountMoneyForm(forms.Form):
     amount = forms.FloatField(max_value=5000, label=_('Amount of money'))
-    comment = forms.CharField(max_length=128, label=_('Comment'), required=False)
+    comment = forms.CharField(
+        max_length=128, label=_('Comment'),
+        required=False
+    )
 
 
 class AddIpForm(forms.ModelForm):
@@ -178,21 +217,33 @@ class AddIpForm(forms.ModelForm):
         instance = getattr(self, 'instance')
         if instance:
             if instance.group:
-                self.fields['networks'].queryset = NetworkModel.objects.filter(groups=instance.group)
+                self.fields['networks'].queryset = NetworkModel.objects.filter(
+                    groups=instance.group
+                )
         if not self.initial['ip_address']:
             if instance:
-                net = NetworkModel.objects.filter(groups=instance.group).first()
+                net = NetworkModel.objects.filter(
+                    groups=instance.group
+                ).first()
                 if net is not None:
-                    ips = (ip.ip_address for ip in
-                           models.Abon.objects.filter(group__in=net.groups.all()).order_by('ip_address').only(
-                               'ip_address').iterator())
+                    ips = (
+                        ip.ip_address for ip in generic.Abon.objects.filter(
+                            group__in=net.groups.all()
+                        ).order_by('ip_address').only(
+                            'ip_address'
+                        ).iterator()
+                    )
                     free_ip = net.get_free_ip(ips)
                     self.initial['ip_address'] = free_ip
             else:
                 raise LogicError(_('Subnet has not attached to current group'))
 
-    networks = forms.ModelChoiceField(label=_('Networks'), queryset=NetworkModel.objects.none(), empty_label=None)
+    networks = forms.ModelChoiceField(
+        label=_('Networks'),
+        queryset=NetworkModel.objects.none(),
+        empty_label=None
+    )
 
     class Meta:
-        model = models.Abon
+        model = generic.Abon
         fields = 'ip_address',

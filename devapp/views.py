@@ -1,7 +1,7 @@
 import re
 from ipaddress import ip_address
 
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from accounts_app.models import UserProfile
 from chatbot.models import ChatException
 from devapp.base_intr import DeviceImplementationError
@@ -131,13 +131,19 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
                 mac_addr=self.request.POST.get('mac_addr'))
             self.already_dev = already_dev
             if already_dev.group:
-                messages.warning(self.request,
-                                 _('You have redirected to existing device'))
-                return redirect('devapp:view', already_dev.group.pk,
-                                already_dev.pk)
+                messages.warning(
+                    self.request,
+                    _('You have redirected to existing device')
+                )
+                return redirect(
+                    'devapp:view', already_dev.group.pk,
+                    already_dev.pk
+                )
             else:
-                messages.warning(self.request,
-                                 _('Please attach group for device'))
+                messages.warning(
+                    self.request,
+                    _('Please attach group for device')
+                )
                 return redirect('devapp:fix_device_group', already_dev.pk)
         except Device.DoesNotExist:
             pass
@@ -161,8 +167,10 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        messages.error(self.request,
-                       _('Form is invalid, check fields and try again'))
+        messages.error(
+            self.request,
+            _('Form is invalid, check fields and try again')
+        )
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
@@ -186,16 +194,23 @@ class DeviceCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
         # check if that device is exist
         try:
             already_dev = self.model.objects.get(
-                mac_addr=self.request.POST.get('mac_addr'))
+                mac_addr=self.request.POST.get('mac_addr')
+            )
             self.already_dev = already_dev
             if already_dev.group:
-                messages.warning(self.request,
-                                 _('You have redirected to existing device'))
-                return redirect('devapp:view', already_dev.group.pk,
-                                already_dev.pk)
+                messages.warning(
+                    self.request,
+                    _('You have redirected to existing device')
+                )
+                return redirect(
+                    'devapp:view', already_dev.group.pk,
+                    already_dev.pk
+                )
             else:
-                messages.warning(self.request,
-                                 _('Please attach group for device'))
+                messages.warning(
+                    self.request,
+                    _('Please attach group for device')
+                )
                 return redirect('devapp:fix_device_group', already_dev.pk)
         except Device.DoesNotExist:
             pass
@@ -575,10 +590,11 @@ def search_dev(request):
         results = Device.objects.filter(qs).only('pk', 'ip_address',
                                                  'comment')[:16]
         results = tuple({
-                            'id': device.pk,
-                            'text': "%s: %s" % (
-                            device.ip_address or '', device.comment)
-                        } for device in results)
+            'id': device.pk,
+            'text': "%s: %s" % (
+                device.ip_address or '', device.comment
+            )
+        } for device in results)
     return results
 
 
@@ -595,11 +611,14 @@ def fix_device_group(request, device_id):
                     messages.success(request, _('Device fixed'))
                     return redirect('devapp:devs', ch_dev.group.pk)
                 else:
-                    messages.error(request,
-                                   _('Please attach group for device'))
+                    messages.error(
+                        request,
+                        _('Please attach group for device')
+                    )
             else:
-                messages.error(request, _(
-                    'Form is invalid, check fields and try again'))
+                messages.error(
+                    request, _('Form is invalid, check fields and try again')
+                )
         else:
             frm = DeviceForm(instance=device)
     except ValueError:
@@ -626,7 +645,8 @@ def fix_onu(request):
             ports = manobj.get_list_keyval('.1.3.6.1.4.1.3320.101.10.1.1.3')
             text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % \
                    (_('Device with mac address %(mac)s does not exist') % {
-                       'mac': mac})
+                       'mac': mac
+                   })
             for srcmac, snmpnum in ports:
                 # convert bytes mac address to str presentation mac address
                 real_mac = ':'.join('%x' % ord(i) for i in srcmac)
@@ -634,8 +654,7 @@ def fix_onu(request):
                     onu.snmp_extra = str(snmpnum)
                     onu.save(update_fields=('snmp_extra',))
                     status = 0
-                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _(
-                        'Fixed')
+                    text = '<span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">%s</span>' % _('Fixed')
                     break
         else:
             text += '\n%s' % _('Parent device not found')

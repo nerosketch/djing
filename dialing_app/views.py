@@ -12,7 +12,7 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from django.db.models import Q
 from django.conf import settings
 
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from djing.global_base_views import SecureApiView
 from djing import JSONType
 from djing.lib import safe_int
@@ -52,16 +52,24 @@ class LastCallsListView(BaseListView):
 @login_required
 @only_admins
 def to_abon(request, tel):
-    abon = Abon.objects.filter(Q(telephone__icontains=tel) | Q(additional_telephones__telephone__icontains=tel))
+    abon = Abon.objects.filter(
+        Q(telephone__icontains=tel) |
+        Q(additional_telephones__telephone__icontains=tel)
+    )
     abon_count = abon.count()
     if abon_count > 1:
-        messages.warning(request, _('Multiple users with the telephone number'))
+        messages.warning(
+            request, _('Multiple users with the telephone number')
+        )
     elif abon_count == 0:
         messages.error(request, _('User with the telephone number not found'))
         return redirect('dialapp:home')
     abon = abon[0]
     if abon.group:
-        return redirect('abonapp:abon_home', gid=abon.group.pk, uname=abon.username)
+        return redirect(
+            'abonapp:abon_home', gid=abon.group.pk,
+            uname=abon.username
+        )
     else:
         return redirect('abonapp:group_list')
 

@@ -1,10 +1,11 @@
 from typing import Optional
 from django.core.exceptions import MultipleObjectsReturned
-from abonapp.models import Abon
+from abonapp.models.generic import Abon
 from devapp.models import Device, Port
 
 
-def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: int) -> Optional[str]:
+def dhcp_commit(client_ip: str, client_mac: str,
+                switch_mac: str, switch_port: int) -> Optional[str]:
     try:
         dev = Device.objects.get(mac_addr=switch_mac)
         mngr_class = dev.get_manager_klass()
@@ -35,11 +36,15 @@ def dhcp_commit(client_ip: str, client_mac: str, switch_mac: str, switch_port: i
             'switch_mac': switch_mac
         }
     except MultipleObjectsReturned as e:
-        return 'MultipleObjectsReturned:' + ' '.join((type(e), e, str(switch_port)))
+        return 'MultipleObjectsReturned:' + ' '.join(
+            (type(e), e, str(switch_port))
+        )
 
 
 def dhcp_expiry(client_ip: str) -> Optional[str]:
-    abon = Abon.objects.filter(ip_address=client_ip, is_active=True).exclude(current_tariff=None).first()
+    abon = Abon.objects.filter(
+        ip_address=client_ip, is_active=True
+    ).exclude(current_tariff=None).first()
     if abon is None:
         return "Subscriber with ip %s does not exist" % client_ip
     else:

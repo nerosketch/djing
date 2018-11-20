@@ -16,7 +16,6 @@ from django.utils.translation import ugettext_lazy as _, gettext
 from djing.lib import LogicError
 from group_app.models import Group
 from gw_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
-from ip_pool.models import NetworkModel
 from tariff_app.models import Tariff, PeriodicPay
 
 

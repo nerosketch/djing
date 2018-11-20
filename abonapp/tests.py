@@ -11,7 +11,7 @@ from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from xmltodict import parse
 
-from abonapp.models import Abon, AbonStreet, PassportInfo
+from abonapp.models.generic import Abon, AbonStreet, PassportInfo
 from abonapp.pay_systems import allpay
 from group_app.models import Group
 from tariff_app.models import Tariff
