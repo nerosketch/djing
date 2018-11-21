@@ -11,7 +11,6 @@ var cnt='<div class="modal-header '+type_class+'">' +
         '<div class="modal-body">'+content+'</div>' +
         '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button></div>';
 	show_ModalMyContent(cnt);
-	$('#loading').hide();
 }
 
 function showErr(errContent) {show_Modal('Ошибка', errContent, 'warning');}
@@ -125,11 +124,9 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 		}, opt);
 
 		var fill_block_fn = function(){
-		    $('#loading').show();
 		    var url = $(this).attr('data-href');
 		    $.get(url, function(r){
 		        $(settings.dst_block).html(r);
-		        $('#loading').hide();
 		    });
 		};
 
