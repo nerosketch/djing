@@ -84,7 +84,7 @@
 {#                            {% endif %}#}
                         </td>
                         <td class="col-xs-1">
-                            <a href="{% url 'abonapp:abon_home' human.group_id human.username %}">{{ human.username }}</a>
+                            <a href="{% url 'abonapp:abon_home' human.group_id human.username %}" title="{{ human.birth_day|date:'d E y' }}" data-toggle="tooltip">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
 {#                            {% if human.statcache %}#}
