@@ -102,13 +102,16 @@ def main():
         is_active=True,
         current_tariff=None
     ).exclude(last_connected_tariff=None).iterator():
-        tariff = ab.last_connected_tariff
-        if tariff is None:
-            continue
-        ab.pick_tariff(
-            tariff, None,
-            "Автоматическое продление услуги '%s'" % tariff.title
-        )
+        try:
+            tariff = ab.last_connected_tariff
+            if tariff is None or tariff.is_admin:
+                continue
+            ab.pick_tariff(
+                tariff, None,
+                "Автоматическое продление услуги '%s'" % tariff.title
+            )
+        except LogicError as e:
+            print(e)
 
     # manage periodic pays
     ppays = PeriodicPayForId.objects.filter(next_pay__lt=now) \
