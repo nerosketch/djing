@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Payment system' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'List of payment gateways' %}
+{% endblock %}
+
+
+{% block main %}
+
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th class="col-sm-7">{% trans 'Title' %}</th>
+            <th class="col-sm-3">{% trans 'Service id' %}</th>
+            <th class="col-sm-1">{% trans 'Pays count' %}</th>
+            <th class="col-sm-1"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for gw in object_list %}
+            <tr>
+                <td>{{ gw.title }}</td>
+                <td>{{ gw.service_id }}</td>
+                <td>{{ gw.pays_count }}</td>
+                <td class="btn-group btn-group-sm">
+                    {% if perms.finapp.change_payalltimegateway %}
+                        <a href="{% url 'finapp:edit_pay_gw' gw.slug %}" class="btn btn-default" title="{% trans 'Edit' %}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-default" title="{% trans 'Permission required' %}" disabled data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    {% endif %}
+                    {% if perms.finapp.view_alltimepaylog %}
+                        <a href="{% url 'finapp:pay_history' gw.slug %}" class="btn btn-default" title="{% trans 'Payment history' %}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-list"></span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">{% trans 'Payment gateways not found' %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4" class="btn-group btn-group-sm">
+                {% if perms.finapp.add_payalltimegateway %}
+                    <a href="{% url 'finapp:add_alltime_gateway' %}" class="btn btn-default">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                    </a>
+                {% else %}
+                    <a href="#" class="btn btn-default" title="{%  trans 'Permission required' %}" disabled>
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        </tfoot>
+
+    </table>
+
+{% endblock %}

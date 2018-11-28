@@ -2,7 +2,7 @@ import re
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils.html import escape
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from devapp.models import Device
 from djing import MAC_ADDR_REGEX
 from django.contrib.auth.decorators import login_required

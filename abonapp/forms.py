@@ -7,7 +7,7 @@ from string import digits, ascii_lowercase
 from djing.lib import LogicError
 from ip_pool.models import NetworkModel
 from gw_app.models import NASModel
-from abonapp.models import generic
+from abonapp import models
 from django.conf import settings
 
 
@@ -21,12 +21,12 @@ def _generate_random_chars(length=6, chars=digits, split=2, delimiter=''):
         )
 
     try:
-        generic.Abon.objects.get(username=username)
+        models.Abon.objects.get(username=username)
         return _generate_random_chars(
             length=length, chars=chars,
             split=split, delimiter=delimiter
         )
-    except generic.Abon.DoesNotExist:
+    except models.Abon.DoesNotExist:
         return username
 
 
@@ -44,11 +44,11 @@ class AbonForm(forms.ModelForm):
         super(AbonForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance')
         if instance is not None and instance.group is not None:
-            abon_group_queryset = generic.AbonStreet.objects.filter(
+            abon_group_queryset = models.AbonStreet.objects.filter(
                 group=instance.group
             )
         elif 'group' in self.initial.keys() and self.initial['group'] is not None:
-            abon_group_queryset = generic.AbonStreet.objects.filter(
+            abon_group_queryset = models.AbonStreet.objects.filter(
                 group=self.initial['group']
             )
         else:
@@ -75,7 +75,7 @@ class AbonForm(forms.ModelForm):
     )
 
     class Meta:
-        model = generic.Abon
+        model = models.Abon
         fields = ('username', 'telephone', 'fio', 'group',
                   'description', 'street', 'house', 'is_active', 'nas')
         widgets = {
@@ -100,11 +100,11 @@ class AbonForm(forms.ModelForm):
         if commit:
             acc.save()
         try:
-            abon_raw_passw = generic.AbonRawPassword.objects.get(account=acc)
+            abon_raw_passw = models.AbonRawPassword.objects.get(account=acc)
             abon_raw_passw.passw_text = raw_password
             abon_raw_passw.save(update_fields=('passw_text',))
-        except generic.AbonRawPassword.DoesNotExist:
-            generic.AbonRawPassword.objects.create(
+        except models.AbonRawPassword.DoesNotExist:
+            models.AbonRawPassword.objects.create(
                 account=acc,
                 passw_text=raw_password
             )
@@ -113,7 +113,7 @@ class AbonForm(forms.ModelForm):
 
 class PassportForm(forms.ModelForm):
     class Meta:
-        model = generic.PassportInfo
+        model = models.PassportInfo
         exclude = ('abon',)
         widgets = {
             'series': forms.TextInput(attrs={
@@ -132,7 +132,7 @@ class PassportForm(forms.ModelForm):
 
 class AbonStreetForm(forms.ModelForm):
     class Meta:
-        model = generic.AbonStreet
+        model = models.AbonStreet
         fields = '__all__'
         widgets = {
             'name': forms.TextInput(attrs={
@@ -145,7 +145,7 @@ class AbonStreetForm(forms.ModelForm):
 
 class AdditionalTelephoneForm(forms.ModelForm):
     class Meta:
-        model = generic.AdditionalTelephone
+        model = models.AdditionalTelephone
         exclude = ('abon',)
         widgets = {
             'telephone': forms.TextInput(attrs={
@@ -165,7 +165,7 @@ class AdditionalTelephoneForm(forms.ModelForm):
 
 class PeriodicPayForIdForm(forms.ModelForm):
     class Meta:
-        model = generic.PeriodicPayForId
+        model = models.PeriodicPayForId
         exclude = ('account',)
 
 
@@ -194,7 +194,7 @@ class ExportUsersForm(forms.Form):
 
 class MarkersForm(forms.ModelForm):
     class Meta:
-        model = generic.Abon
+        model = models.Abon
         fields = 'markers',
 
     def save(self, commit=True):
@@ -227,7 +227,7 @@ class AddIpForm(forms.ModelForm):
                 ).first()
                 if net is not None:
                     ips = (
-                        ip.ip_address for ip in generic.Abon.objects.filter(
+                        ip.ip_address for ip in models.Abon.objects.filter(
                             group__in=net.groups.all()
                         ).order_by('ip_address').only(
                             'ip_address'
@@ -245,5 +245,5 @@ class AddIpForm(forms.ModelForm):
     )
 
     class Meta:
-        model = generic.Abon
+        model = models.Abon
         fields = 'ip_address',

@@ -6,7 +6,7 @@ from bitfield import BitField
 from django.conf import settings
 from django.core import validators
 from django.core.validators import RegexValidator
-from django.db import models, connection, transaction
+from django.db import models, transaction
 from django.db.models.signals import post_delete, pre_delete, post_init, \
     pre_save
 from django.dispatch import receiver
@@ -22,8 +22,10 @@ from tariff_app.models import Tariff, PeriodicPay
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon', on_delete=models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL,
-                               related_name='+', blank=True, null=True)
+    author = models.ForeignKey(
+        UserProfile, on_delete=models.SET_NULL,
+        related_name='+', blank=True, null=True
+    )
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -452,79 +454,9 @@ class InvoiceForPayment(models.Model):
         verbose_name_plural = _('Debts')
 
 
-class AllTimePayLogManager(models.Manager):
-    @staticmethod
-    def by_days():
-        cur = connection.cursor()
-        cur.execute(
-            'SELECT SUM(summ) AS alsum, '
-            'DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date '
-            'FROM  all_time_pay_log '
-            'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")'
-        )
-        while True:
-            r = cur.fetchone()
-            if r is None:
-                break
-            summ, dat = r
-            yield {
-                'summ': summ,
-                'pay_date': datetime.strptime(dat, '%Y-%m-%d')
-            }
-
-
-# Log for pay system "AllTime"
-class AllTimePayLog(models.Model):
-    abon = models.ForeignKey(
-        Abon,
-        on_delete=models.SET_DEFAULT,
-        blank=True,
-        null=True,
-        default=None
-    )
-    pay_id = models.CharField(
-        max_length=36,
-        unique=True,
-        primary_key=True
-    )
-    date_add = models.DateTimeField(auto_now_add=True)
-    summ = models.FloatField(default=0.0)
-    trade_point = models.CharField(
-        _('Trade point'),
-        max_length=20,
-        default=None,
-        null=True,
-        blank=True
-    )
-    receipt_num = models.BigIntegerField(_('Receipt number'), default=0)
-
-    objects = AllTimePayLogManager()
-
-    def __str__(self):
-        return self.pay_id
-
-    class Meta:
-        db_table = 'all_time_pay_log'
-        ordering = ('-date_add',)
-
-
-# log for all terminals
-class AllPayLog(models.Model):
-    pay_id = models.CharField(max_length=64, primary_key=True)
-    date_action = models.DateTimeField(auto_now_add=True)
-    summ = models.FloatField(default=0.0)
-    pay_system_name = models.CharField(max_length=16)
-
-    def __str__(self):
-        return self.pay_system_name
-
-    class Meta:
-        db_table = 'all_pay_log'
-        ordering = ('-date_action',)
-
-
 class AbonRawPassword(models.Model):
     account = models.OneToOneField(Abon, models.CASCADE, primary_key=True)
+    # TODO: make password to EncryptedCharField
     passw_text = models.CharField(max_length=64)
 
     def __str__(self):

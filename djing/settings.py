@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'encrypted_model_fields',
     'ip_pool',
     'accounts_app',
     'gw_app',
@@ -49,7 +50,7 @@ INSTALLED_APPS = [
     'searchapp',
     'devapp',
     'mapapp',
-    'statistics',
+    'finapp',
     'taskapp',
     'clientsideapp',
     'chatbot',
@@ -186,9 +187,6 @@ LOGOUT_URL = reverse_lazy('acc_app:logout')
 
 PAGINATION_ITEMS_PER_PAGE = local_settings.PAGINATION_ITEMS_PER_PAGE
 
-PAY_SERV_ID = local_settings.PAY_SERV_ID
-PAY_SECRET = local_settings.PAY_SECRET
-
 DIALING_MEDIA = local_settings.DIALING_MEDIA
 
 DEFAULT_SNMP_PASSWORD = local_settings.DEFAULT_SNMP_PASSWORD
@@ -234,3 +232,12 @@ REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+
+# Encrypted fields
+# https://pypi.org/project/django-encrypted-model-fields/
+FIELD_ENCRYPTION_KEY = getattr(
+    local_settings,
+    'FIELD_ENCRYPTION_KEY',
+    'vZpDlDPQyU6Ha7NyUGj9uYMuPigejtEPMOZfkYXIQRw='
+)

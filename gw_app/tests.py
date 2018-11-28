@@ -1,6 +1,6 @@
 from abc import ABCMeta
 
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from django.conf import settings
 from django.shortcuts import resolve_url

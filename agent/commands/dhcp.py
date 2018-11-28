@@ -1,6 +1,6 @@
 from typing import Optional
 from django.core.exceptions import MultipleObjectsReturned
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from devapp.models import Device, Port
 
 

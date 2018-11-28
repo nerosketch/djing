@@ -1,0 +1,24 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block page-header %}
+    <small>{% trans 'Payment gateways' %}</small>
+{% endblock %}
+
+{% block main %}
+    <ul class="nav nav-tabs nav-justified">
+
+        <li class="active">
+            <a href="#">{% trans 'Payment gateways' %}</a>
+        </li>
+
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

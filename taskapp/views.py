@@ -14,7 +14,7 @@ from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 from guardian.decorators import permission_required_or_403 as permission_required
 
 from chatbot.models import MessageQueue
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from djing import httpresponse_to_referrer
 from djing.lib import safe_int, MultipleException, RuTimedelta
 from djing.lib.decorators import only_admins, json_view

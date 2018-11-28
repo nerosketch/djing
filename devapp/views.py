@@ -1,7 +1,7 @@
 import re
 from ipaddress import ip_address
 
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from chatbot.models import ChatException
 from devapp.base_intr import DeviceImplementationError

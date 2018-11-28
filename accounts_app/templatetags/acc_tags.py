@@ -3,7 +3,7 @@ from ipaddress import ip_address, AddressValueError
 from django import template
 from django.db.models import Model
 from django.apps import apps
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from six import string_types, class_types
 
 register = template.Library()

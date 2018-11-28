@@ -25,6 +25,7 @@ pyst2
 django-bitfield
 transliterate
 asterisk
+django-encrypted-model-fields
 
 # django-xmlview for pay system allpay
 -e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview

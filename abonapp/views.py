@@ -11,14 +11,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, \
     PermissionRequiredMixin as PermissionRequiredMixin_django, \
     PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError, ProgrammingError, transaction, \
-    DatabaseError
+from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseBadRequest, \
     HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.urls import reverse_lazy
-from django.utils import timezone
+
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView
@@ -37,9 +36,8 @@ from gw_app.nas_managers import NasFailedResult, NasNetworkError
 from ip_pool.models import NetworkModel
 from tariff_app.models import Tariff
 from taskapp.models import Task
-from xmlview.decorators import xml_view
 from abonapp import forms
-from abonapp.models import generic
+from abonapp import models
 
 
 class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
@@ -49,7 +47,7 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
     def get_queryset(self):
         street_id = lib.safe_int(self.request.GET.get('street'))
         gid = lib.safe_int(self.kwargs.get('gid'))
-        peoples_list = generic.Abon.objects.filter(group__pk=gid)
+        peoples_list = models.Abon.objects.filter(group__pk=gid)
         if street_id > 0:
             peoples_list = peoples_list.filter(street=street_id)
         peoples_list = peoples_list.select_related(
@@ -75,7 +73,7 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
 
         context = super(PeoplesListView, self).get_context_data(**kwargs)
 
-        context['streets'] = generic.AbonStreet.objects.filter(
+        context['streets'] = models.AbonStreet.objects.filter(
             group=gid
         ).only('name')
         context['street_id'] = lib.safe_int(self.request.GET.get('street'))
@@ -104,7 +102,7 @@ class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,
     group = None
     abon = None
     form_class = forms.AbonForm
-    model = generic.Abon
+    model = models.Abon
     template_name = 'abonapp/addAbon.html'
     context_object_name = 'group'
 
@@ -161,7 +159,7 @@ class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,
 
 class DelAbonDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
     permission_required = 'abonapp.delete_abon'
-    model = generic.Abon
+    model = models.Abon
     slug_url_kwarg = 'uname'
     slug_field = 'username'
     success_url = reverse_lazy('abonapp:group_list')
@@ -203,7 +201,7 @@ class DelAbonDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
 @permission_required('abonapp.can_add_ballance')
 @transaction.atomic
 def abonamount(request, gid: int, uname):
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     frm = None
     try:
         if request.method == 'POST':
@@ -218,7 +216,7 @@ def abonamount(request, gid: int, uname):
                 messages.success(
                     request, _('Account filled successfully on %.2f') % amnt
                 )
-                return redirect('abonapp:abon_phistory', gid=gid, uname=uname)
+                return redirect('abonapp:abon_home', gid=gid, uname=uname)
             else:
                 messages.error(request, _('I not know the account id'))
         else:
@@ -244,39 +242,13 @@ class DebtsListView(LoginAdminPermissionMixin, OrderedFilteredList):
         return self.abon.group
 
     def get_queryset(self):
-        abon = get_object_or_404(generic.Abon,
+        abon = get_object_or_404(models.Abon,
                                  username=self.kwargs.get('uname'))
         self.abon = abon
-        return generic.InvoiceForPayment.objects.filter(abon=abon)
+        return models.InvoiceForPayment.objects.filter(abon=abon)
 
     def get_context_data(self, **kwargs):
         context = super(DebtsListView, self).get_context_data(**kwargs)
-        context['group'] = self.abon.group
-        context['abon'] = self.abon
-        return context
-
-
-class PayHistoryListView(LoginAdminPermissionMixin, OrderedFilteredList):
-    permission_required = 'group_app.view_group'
-    context_object_name = 'pay_history'
-    template_name = 'abonapp/payHistory.html'
-
-    def get_permission_object(self):
-        if hasattr(self, 'abon'):
-            return self.abon.group
-        return generic.Group.objects.filter(pk=self.kwargs.get('gid')).first()
-
-    def get_queryset(self):
-        abon = get_object_or_404(generic.Abon,
-                                 username=self.kwargs.get('uname'))
-        self.abon = abon
-        pay_history = generic.AbonLog.objects.filter(
-            abon=abon
-        ).order_by('-date')
-        return pay_history
-
-    def get_context_data(self, **kwargs):
-        context = super(PayHistoryListView, self).get_context_data(**kwargs)
         context['group'] = self.abon.group
         context['abon'] = self.abon
         return context
@@ -288,7 +260,7 @@ def abon_services(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
     if not request.user.has_perm('group_app.view_group', grp):
         raise PermissionDenied
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
 
     if abon.group != grp:
         messages.warning(
@@ -298,10 +270,10 @@ def abon_services(request, gid: int, uname):
         return redirect('abonapp:abon_services', abon.group.id, abon.username)
 
     try:
-        periodic_pay = generic.PeriodicPayForId.objects.filter(
+        periodic_pay = models.PeriodicPayForId.objects.filter(
             account=abon
         ).first()
-    except generic.PeriodicPayForId.DoesNotExist:
+    except models.PeriodicPayForId.DoesNotExist:
         periodic_pay = None
 
     return render(request, 'abonapp/service.html', {
@@ -315,7 +287,7 @@ def abon_services(request, gid: int, uname):
 
 class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'abonapp.view_abon'
-    model = generic.Abon
+    model = models.Abon
     form_class = forms.AbonForm
     slug_field = 'username'
     slug_url_kwarg = 'uname'
@@ -370,13 +342,13 @@ class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
         if self.initial:
             return self.initial
         try:
-            passw = generic.AbonRawPassword.objects.get(
+            passw = models.AbonRawPassword.objects.get(
                 account=abon
             ).passw_text
             return {
                 'password': passw
             }
-        except generic.AbonRawPassword.DoesNotExist:
+        except models.AbonRawPassword.DoesNotExist:
             messages.warning(
                 self.request,
                 _('User has not have password, and cannot login')
@@ -396,21 +368,11 @@ class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
         return super(AbonHomeUpdateView, self).get_context_data(**context)
 
 
-@transaction.atomic
-def terminal_pay(request):
-    from .pay_systems import allpay
-    ret_text = allpay(request)
-    if isinstance(ret_text, HttpResponse):
-        return ret_text
-    else:
-        return HttpResponse(ret_text)
-
-
 @login_required
 @only_admins
 @permission_required('abonapp.add_invoiceforpayment')
 def add_invoice(request, gid: int, uname: str):
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     grp = get_object_or_404(Group, pk=gid)
 
     try:
@@ -418,7 +380,7 @@ def add_invoice(request, gid: int, uname: str):
             curr_amount = lib.safe_int(request.POST.get('curr_amount'))
             comment = request.POST.get('comment')
 
-            newinv = generic.InvoiceForPayment()
+            newinv = models.InvoiceForPayment()
             newinv.abon = abon
             newinv.amount = curr_amount
             newinv.comment = comment
@@ -438,7 +400,7 @@ def add_invoice(request, gid: int, uname: str):
             messages.error(request, err)
     return render(request, 'abonapp/addInvoice.html', {
         'abon': abon,
-        'invcount': generic.InvoiceForPayment.objects.filter(abon=abon).count(),
+        'invcount': models.InvoiceForPayment.objects.filter(abon=abon).count(),
         'group': grp
     })
 
@@ -448,7 +410,7 @@ def add_invoice(request, gid: int, uname: str):
 @permission_required('abonapp.can_buy_tariff')
 def pick_tariff(request, gid: int, uname):
     grp = get_object_or_404(Group, pk=gid)
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     tariffs = Tariff.objects.get_tariffs_by_group(grp.pk)
     try:
         if request.method == 'POST':
@@ -503,7 +465,7 @@ def pick_tariff(request, gid: int, uname):
 @permission_required('abonapp.can_complete_service')
 def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     try:
-        abon_tariff = get_object_or_404(generic.AbonTariff,
+        abon_tariff = get_object_or_404(models.AbonTariff,
                                         pk=int(abon_tariff_id))
         abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
@@ -523,7 +485,7 @@ class LogListView(LoginAdminPermissionMixin, ListView):
     http_method_names = ('get',)
     context_object_name = 'logs'
     template_name = 'abonapp/log.html'
-    model = generic.AbonLog
+    model = models.AbonLog
 
 
 class DebtorsListView(LoginAdminPermissionMixin, ListView):
@@ -532,7 +494,7 @@ class DebtorsListView(LoginAdminPermissionMixin, ListView):
     http_method_names = ('get',)
     context_object_name = 'invoices'
     template_name = 'abonapp/debtors.html'
-    queryset = generic.InvoiceForPayment.objects.filter(status=True)
+    queryset = models.InvoiceForPayment.objects.filter(status=True)
 
 
 class TaskLogListView(LoginAdminPermissionMixin, ListView):
@@ -546,10 +508,10 @@ class TaskLogListView(LoginAdminPermissionMixin, ListView):
         if hasattr(self, 'abon'):
             return self.abon.group
         else:
-            return get_object_or_404(generic.Group, pk=self.kwargs.get('gid'))
+            return get_object_or_404(models.Group, pk=self.kwargs.get('gid'))
 
     def get_queryset(self):
-        abon = get_object_or_404(generic.Abon,
+        abon = get_object_or_404(models.Abon,
                                  username=self.kwargs.get('uname'))
         self.abon = abon
         return Task.objects.filter(abon=abon)
@@ -564,17 +526,17 @@ class TaskLogListView(LoginAdminPermissionMixin, ListView):
 class PassportUpdateView(LoginAdminPermissionMixin, UpdateView):
     permission_required = 'abonapp.view_passportinfo'
     form_class = forms.PassportForm
-    model = generic.PassportInfo
+    model = models.PassportInfo
     template_name = 'abonapp/modal_passport_view.html'
 
     def get_object(self, queryset=None):
-        self.abon = get_object_or_404(generic.Abon,
+        self.abon = get_object_or_404(models.Abon,
                                       username=self.kwargs.get('uname'))
         try:
-            passport_instance = generic.PassportInfo.objects.get(
+            passport_instance = models.PassportInfo.objects.get(
                 abon=self.abon
             )
-        except generic.PassportInfo.DoesNotExist:
+        except models.PassportInfo.DoesNotExist:
             passport_instance = None
         return passport_instance
 
@@ -611,7 +573,7 @@ class PassportUpdateView(LoginAdminPermissionMixin, UpdateView):
 class IpUpdateView(LoginAdminPermissionMixin, UpdateView):
     permission_required = 'abonapp.change_abon'
     form_class = forms.AddIpForm
-    model = generic.Abon
+    model = models.Abon
     slug_url_kwarg = 'uname'
     slug_field = 'username'
     template_name = 'abonapp/modal_ip_form.html'
@@ -674,7 +636,7 @@ def chgroup_tariff(request, gid):
 def dev(request, gid: int, uname):
     abon_dev = None
     try:
-        abon = generic.Abon.objects.get(username=uname)
+        abon = models.Abon.objects.get(username=uname)
         if request.method == 'POST':
             abon.device = Device.objects.get(pk=request.POST.get('dev'))
             abon.save(update_fields=('device',))
@@ -687,7 +649,7 @@ def dev(request, gid: int, uname):
             request,
             _('Device your selected already does not exist')
         )
-    except generic.Abon.DoesNotExist:
+    except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
     return render(request, 'abonapp/modal_dev.html', {
@@ -703,13 +665,13 @@ def dev(request, gid: int, uname):
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def clear_dev(request, gid: int, uname):
     try:
-        abon = generic.Abon.objects.get(username=uname)
+        abon = models.Abon.objects.get(username=uname)
         abon.device = None
         abon.dev_port = None
         abon.is_dynamic_ip = False
         abon.save(update_fields=('device', 'dev_port', 'is_dynamic_ip'))
         messages.success(request, _('Device has successfully unattached'))
-    except generic.Abon.DoesNotExist:
+    except models.Abon.DoesNotExist:
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
     return redirect('abonapp:abon_home', gid=gid, uname=uname)
@@ -724,7 +686,7 @@ def abon_ping(request, gid: int, uname):
     status = False
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
         'no ping')
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     try:
         if ip is None:
             raise lib.LogicError(_('Ip not passed'))
@@ -780,7 +742,7 @@ def abon_ping(request, gid: int, uname):
 def set_auto_continue_service(request, gid: int, uname):
     checked = request.GET.get('checked')
     checked = True if checked == 'true' else False
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     abon.autoconnect_service = checked
     abon.save(update_fields=('autoconnect_service',))
     return {
@@ -791,14 +753,14 @@ def set_auto_continue_service(request, gid: int, uname):
 @login_required
 @only_admins
 def vcards(r):
-    users = generic.Abon.objects.exclude(group=None).select_related(
+    users = models.Abon.objects.exclude(group=None).select_related(
         'group',
         'street'
     ).only(
         'username', 'fio', 'group__title', 'telephone',
         'street__name', 'house'
     )
-    additional_tels = generic.AdditionalTelephone.objects.select_related(
+    additional_tels = models.AdditionalTelephone.objects.select_related(
         'abon',
         'abon__group',
         'abon__street'
@@ -844,7 +806,7 @@ class DialsListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     template_name = 'abonapp/dial_log.html'
 
     def get_queryset(self):
-        abon = get_object_or_404(generic.Abon,
+        abon = get_object_or_404(models.Abon,
                                  username=self.kwargs.get('uname'))
         if not self.request.user.has_perm('group_app.view_group', abon.group):
             raise PermissionDenied
@@ -853,7 +815,7 @@ class DialsListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
             tel = abon.telephone.replace('+', '')
             additional_tels = tuple(
                 t.telephone for t in
-                generic.AdditionalTelephone.objects.filter(
+                models.AdditionalTelephone.objects.filter(
                     abon=abon
                 ).iterator()
             )
@@ -904,14 +866,14 @@ def save_user_dev_port(request, gid: int, uname):
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
     is_dynamic_ip = True if is_dynamic_ip == 'on' else False
     try:
-        abon = generic.Abon.objects.get(username=uname)
+        abon = models.Abon.objects.get(username=uname)
         if user_port == 0:
             port = None
         else:
             port = DevPort.objects.get(pk=user_port)
             if abon.device is not None:
                 try:
-                    other_abon = generic.Abon.objects.get(
+                    other_abon = models.Abon.objects.get(
                         device=abon.device,
                         dev_port=port
                     )
@@ -928,9 +890,9 @@ def save_user_dev_port(request, gid: int, uname):
                             }
                         )
                         return redirect('abonapp:abon_home', gid, uname)
-                except generic.Abon.DoesNotExist:
+                except models.Abon.DoesNotExist:
                     pass
-                except generic.Abon.MultipleObjectsReturned:
+                except models.Abon.MultipleObjectsReturned:
                     messages.error(request,
                                    _('Multiple users on the same device port'))
                     return redirect('devapp:view', abon.device.group.pk,
@@ -945,7 +907,7 @@ def save_user_dev_port(request, gid: int, uname):
         messages.success(request, _('User port has been saved'))
     except DevPort.DoesNotExist:
         messages.error(request, _('Selected port does not exist'))
-    except generic.Abon.DoesNotExist:
+    except models.Abon.DoesNotExist:
         messages.error(request, _('User does not exist'))
     return redirect('abonapp:abon_home', gid, uname)
 
@@ -980,17 +942,17 @@ def street_edit(request, gid):
         if request.method == 'POST':
             for sid, sname in zip(request.POST.getlist('sid'),
                                   request.POST.getlist('sname')):
-                street = generic.AbonStreet.objects.get(pk=sid)
+                street = models.AbonStreet.objects.get(pk=sid)
                 street.name = sname
                 street.save()
             messages.success(request, _('Streets has been saved'))
         else:
             return render(request, 'abonapp/modal_editstreet.html', {
                 'gid': gid,
-                'streets': generic.AbonStreet.objects.filter(group=gid)
+                'streets': models.AbonStreet.objects.filter(group=gid)
             })
 
-    except generic.AbonStreet.DoesNotExist:
+    except models.AbonStreet.DoesNotExist:
         messages.error(request, _('One of these streets has not been found'))
 
     return redirect('abonapp:people_list', gid)
@@ -1002,9 +964,9 @@ def street_edit(request, gid):
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def street_del(request, gid: int, sid: int):
     try:
-        generic.AbonStreet.objects.get(pk=sid, group=gid).delete()
+        models.AbonStreet.objects.get(pk=sid, group=gid).delete()
         messages.success(request, _('The street successfully deleted'))
-    except generic.AbonStreet.DoesNotExist:
+    except models.AbonStreet.DoesNotExist:
         messages.error(request, _('The street has not been found'))
     return redirect('abonapp:people_list', gid)
 
@@ -1024,7 +986,7 @@ def active_nets(request, gid):
 @permission_required('abonapp.view_additionaltelephones')
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def tels(request, gid: int, uname):
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     telephones = abon.additional_telephones.all()
     return render(request, 'abonapp/modal_additional_telephones.html', {
         'telephones': telephones,
@@ -1041,7 +1003,7 @@ def tel_add(request, gid: int, uname):
         frm = forms.AdditionalTelephoneForm(request.POST)
         if frm.is_valid():
             new_tel = frm.save(commit=False)
-            abon = get_object_or_404(generic.Abon, username=uname)
+            abon = get_object_or_404(models.Abon, username=uname)
             new_tel.abon = abon
             new_tel.save()
             messages.success(request, _('New telephone has been saved'))
@@ -1063,11 +1025,11 @@ def tel_add(request, gid: int, uname):
 def tel_del(request, gid: int, uname):
     try:
         tid = lib.safe_int(request.GET.get('tid'))
-        tel = generic.AdditionalTelephone.objects.get(pk=tid)
+        tel = models.AdditionalTelephone.objects.get(pk=tid)
         tel.delete()
         messages.success(request,
                          _('Additional telephone successfully deleted'))
-    except generic.AdditionalTelephone.DoesNotExist:
+    except models.AdditionalTelephone.DoesNotExist:
         messages.error(request, _('Telephone not found'))
     return redirect('abonapp:abon_home', gid, uname)
 
@@ -1077,12 +1039,12 @@ def tel_del(request, gid: int, uname):
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def phonebook(request, gid):
     res_format = request.GET.get('f')
-    t1 = generic.Abon.objects.filter(
+    t1 = models.Abon.objects.filter(
         group__id=int(gid)
     ).only('telephone', 'fio').values_list(
         'telephone', 'fio'
     )
-    t2 = generic.AdditionalTelephone.objects.filter(
+    t2 = models.AdditionalTelephone.objects.filter(
         abon__group__id=gid
     ).only(
         'telephone', 'owner_name'
@@ -1115,7 +1077,7 @@ def abon_export(request, gid):
         if frm.is_valid():
             cleaned_data = frm.clean()
             fields = cleaned_data.get('fields')
-            subscribers = generic.Abon.objects.filter(group__id=gid).only(
+            subscribers = models.Abon.objects.filter(group__id=gid).only(
                 *fields).values_list(*fields)
             if res_format == 'csv':
                 import csv
@@ -1153,37 +1115,17 @@ def abon_export(request, gid):
 
 @login_required
 @only_admins
-def fin_report(request):
-    q = generic.AllTimePayLog.objects.by_days()
-    res_format = request.GET.get('f')
-    if res_format == 'csv':
-        import csv
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="report.csv"'
-        writer = csv.writer(response, quoting=csv.QUOTE_NONNUMERIC)
-        for row in q:
-            writer.writerow(
-                (row['summ'], row['pay_date'].strftime('%Y-%m-%d'))
-            )
-        return response
-    return render(request, 'abonapp/fin_report.html', {
-        'logs': q
-    })
-
-
-@login_required
-@only_admins
 @permission_required('group_app.view_group', (Group, 'pk', 'gid'))
 def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
     if periodic_pay_id == 0:
         if not request.user.has_perm('abonapp.add_periodicpayforid'):
             raise PermissionDenied
-        periodic_pay_instance = generic.PeriodicPayForId()
+        periodic_pay_instance = models.PeriodicPayForId()
     else:
         if not request.user.has_perm('abonapp.change_periodicpayforid'):
             raise PermissionDenied
         periodic_pay_instance = get_object_or_404(
-            generic.PeriodicPayForId,
+            models.PeriodicPayForId,
             pk=periodic_pay_id
         )
     if request.method == 'POST':
@@ -1192,7 +1134,7 @@ def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
             instance=periodic_pay_instance
         )
         if frm.is_valid():
-            abon = get_object_or_404(generic.Abon, username=uname)
+            abon = get_object_or_404(models.Abon, username=uname)
             inst = frm.save(commit=False)
             inst.account = abon
             inst.save()
@@ -1215,7 +1157,7 @@ def add_edit_periodic_pay(request, gid: int, uname, periodic_pay_id=0):
 @permission_required('abonapp.delete_periodicpayforid')
 def del_periodic_pay(request, gid: int, uname, periodic_pay_id):
     periodic_pay_instance = get_object_or_404(
-        generic.PeriodicPayForId,
+        models.PeriodicPayForId,
         pk=periodic_pay_id
     )
     if periodic_pay_instance.account.username != uname:
@@ -1230,7 +1172,7 @@ class EditSibscriberMarkers(LoginAdminPermissionMixin, UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'abonapp/modal_user_markers.html'
     form_class = forms.MarkersForm
-    model = generic.Abon
+    model = models.Abon
     slug_url_kwarg = 'uname'
     slug_field = 'username'
 
@@ -1266,7 +1208,7 @@ class EditSibscriberMarkers(LoginAdminPermissionMixin, UpdateView):
 @only_admins
 @permission_required('abonapp.change_abon')
 def user_session_free(request, gid: int, uname):
-    abon = get_object_or_404(generic.Abon, username=uname)
+    abon = get_object_or_404(models.Abon, username=uname)
     if abon.nas is None:
         messages.error(request, _('gateway required'))
         return redirect('abonapp:abon_home', gid, uname)
@@ -1286,7 +1228,7 @@ def attach_nas(request, gid):
         gateway_id = lib.safe_int(request.POST.get('gateway'))
         if gateway_id:
             nas = get_object_or_404(NASModel, pk=gateway_id)
-            abons = generic.Abon.objects.filter(group__id=gid)
+            abons = models.Abon.objects.filter(group__id=gid)
             if abons.exists():
                 abons.update(nas=nas)
                 messages.success(
@@ -1315,7 +1257,7 @@ def abons(request):
                   'tarif_id': abn.active_tariff().tariff.pk
                   if abn.active_tariff() is not None else 0,
                   'ip': abn.ip_address
-              } for abn in generic.Abon.objects.iterator())
+              } for abn in models.Abon.objects.iterator())
 
     tarlist = ({
                    'id': trf.pk,
@@ -1338,7 +1280,7 @@ def search_abon(request):
     word = request.GET.get('s')
     if not word:
         return None
-    results = generic.Abon.objects.filter(fio__icontains=word)[:8]
+    results = models.Abon.objects.filter(fio__icontains=word)[:8]
     return list(
         {'id': usr.pk, 'text': "%s: %s" % (usr.username, usr.fio)}
         for usr in results
@@ -1398,103 +1340,27 @@ class DhcpLever(SecureApiView):
             return str(e)
 
 
-class DublicatePay(SecureApiView):
-    http_method_names = 'get',
+class PayHistoryListView(LoginAdminPermissionMixin, OrderedFilteredList):
+    permission_required = 'group_app.view_group'
+    context_object_name = 'pay_history'
+    template_name = 'abonapp/payHistory.html'
 
-    @staticmethod
-    def _bad_ret(err_id, err_description=None):
-        now = timezone.now()
-        r = {
-            'status_code': lib.safe_int(err_id),
-            'time_stamp': now.strftime("%d.%m.%Y %H:%M")
+    def get_permission_object(self):
+        if hasattr(self, 'abon'):
+            return self.abon.group
+        return Group.objects.filter(pk=self.kwargs.get('gid')).first()
+
+    def get_queryset(self):
+        abon = get_object_or_404(models.Abon,
+                                 username=self.kwargs.get('uname'))
+        self.abon = abon
+        pay_history = models.AbonLog.objects.filter(abon=abon).order_by('-date')
+        return pay_history
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'group': self.abon.group,
+            'abon': self.abon
         }
-        if err_description:
-            r.update({'description': err_description})
-        return r
-
-    @method_decorator(xml_view(root_node='pay-response'))
-    def get(self, request, *args, **kwargs):
-        act = lib.safe_int(request.GET.get('ACT'))
-        self.current_date = timezone.now().strftime("%d.%m.%Y %H:%M")
-
-        if act <= 0:
-            return self._bad_ret(-101, 'ACT less than zero')
-
-        try:
-            if act == 1:
-                return self._fetch_user_info(request.GET)
-            elif act == 4:
-                return self._make_pay(request.GET)
-            elif act == 7:
-                return self._check_pay(request.GET)
-            else:
-                return self._bad_ret(-101, 'ACT is not passed')
-        except generic.Abon.DoesNotExist:
-            return self._bad_ret(-40)
-        except DatabaseError:
-            return self._bad_ret(-90)
-        except generic.AllTimePayLog.DoesNotExist:
-            return self._bad_ret(-10)
-        except AttributeError:
-            return self._bad_ret(-101)
-
-    def _fetch_user_info(self, data: dict):
-        pay_account = data.get('PAY_ACCOUNT')
-        abon = generic.Abon.objects.get(pk=pay_account)
-        fio = abon.fio
-        ballance = float(abon.ballance)
-        return {
-            'balance': ballance,
-            'name': fio,
-            'account': pay_account,
-            'service_id': getattr(settings, 'PAY_SERV_ID'),
-            'min_amount': 10.0,
-            'max_amount': 5000,
-            'status_code': 21,
-            'time_stamp': self.current_date
-        }
-
-    def _make_pay(self, data: dict):
-        trade_point = lib.safe_int(data.get('TRADE_POINT'))
-        receipt_num = lib.safe_int(data.get('RECEIPT_NUM'))
-        pay_account = data.get('PAY_ACCOUNT')
-        pay_id = data.get('PAY_ID')
-        pay_amount = lib.safe_float(data.get('PAY_AMOUNT'))
-        abon = generic.Abon.objects.get(pk=pay_account)
-        pays = generic.AllTimePayLog.objects.filter(pay_id=pay_id)
-        if pays.count() > 0:
-            return self._bad_ret(-100)
-
-        abon.add_ballance(None, pay_amount,
-                          comment='KonikaForward %.2f' % pay_amount)
-        abon.save(update_fields=('ballance',))
-
-        generic.AllTimePayLog.objects.create(
-            pay_id=pay_id,
-            summ=pay_amount,
-            abon=abon,
-            trade_point=trade_point,
-            receipt_num=receipt_num
-        )
-        return {
-            'pay_id': pay_id,
-            'service_id': data.get('SERVICE_ID'),
-            'amount': pay_amount,
-            'status_code': 22,
-            'time_stamp': self.current_date
-        }
-
-    def _check_pay(self, data: dict):
-        pay_id = data.get('PAY_ID')
-        pay = generic.AllTimePayLog.objects.get(pay_id=pay_id)
-        return {
-            'status_code': 11,
-            'time_stamp': self.current_date,
-            'transaction': {
-                'pay_id': pay_id,
-                'service_id': data.get('SERVICE_ID'),
-                'amount': pay.summ,
-                'status': 111,
-                'time_stamp': pay.date_add.strftime("%d.%m.%Y %H:%M")
-            }
-        }
+        context.update(kwargs)
+        return super(PayHistoryListView, self).get_context_data(**context)

@@ -50,16 +50,13 @@ group_patterns = [
 
 urlpatterns = [
     path('', views.GroupListView.as_view(), name='group_list'),
-    path('fin_report/', views.fin_report, name='fin_report'),
     path('<int:gid>/', include(group_patterns)),
     path('log/', views.LogListView.as_view(), name='log'),
-    path('pay/', views.terminal_pay, name='terminal_pay'),
     path('debtors/', views.DebtorsListView.as_view(), name='debtors'),
     path('contacts/vcards/', views.vcards, name='vcards'),
 
     # Api's
     path('api/abons/', views.abons),
     path('api/abon_filter/', views.search_abon),
-    path('api/dhcp_lever/', views.DhcpLever.as_view()),
-    path('api/duplicate_pay/', views.DublicatePay.as_view())
+    path('api/dhcp_lever/', views.DhcpLever.as_view())
 ]

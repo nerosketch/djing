@@ -1,0 +1,62 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'finapp:alltime_gateways_list' %}">{% trans 'Payment system' %}</a></li>
+        <li class="active">
+            {% if object %}
+                {% trans 'Change payment gateway' %}
+            {% else %}
+                {% trans 'Add payment gateway' %}
+            {% endif %}
+        </li>
+    </ol>
+{% endblock %}
+
+
+{% block page-header %}
+    {% trans 'Make new payment gateway' %}
+{% endblock %}
+
+
+{% block main %}
+    {% if object %}
+        {% url 'finapp:edit_pay_gw' object.slug as form_url %}
+    {% else %}
+        {% url 'finapp:add_alltime_gateway' as form_url %}
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'Type info about payment gateway' %}</h3>
+        </div>
+        <div class="panel-body">
+            <form role="form" action="{{ form_url }}" method="post">{% csrf_token %}
+                <div class="form-group">
+                    {% bootstrap_form form %}
+                </div>
+                <div class="btn-group btn-group-sm">
+                    {% if object %}
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success">
+                            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                        </button>
+                    {% endif %}
+                    <button type="reset" class="btn btn-default">
+                        <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
+                    </button>
+                    {% if object %}
+                        <a href="{% url 'finapp:pay_history' object.slug %}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-list"></span> {% trans 'Payment history' %}
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

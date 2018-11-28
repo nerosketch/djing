@@ -2,7 +2,7 @@ from ipaddress import ip_address, AddressValueError
 
 from django.contrib.auth.backends import ModelBackend
 from accounts_app.models import BaseAccount, UserProfile
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 
 
 class CustomAuthBackend(ModelBackend):

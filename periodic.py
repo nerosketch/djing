@@ -8,7 +8,7 @@ django.setup()
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import signals, Count
-from abonapp.models.generic import Abon, AbonTariff, abontariff_pre_delete, \
+from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, \
     PeriodicPayForId, AbonLog
 from gw_app.nas_managers import NasNetworkError, NasFailedResult
 from gw_app.models import NASModel

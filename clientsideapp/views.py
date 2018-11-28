@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _, gettext
 
-from abonapp.models.generic import AbonLog, InvoiceForPayment, Abon
+from abonapp.models import AbonLog, InvoiceForPayment, Abon
 from djing.lib.decorators import json_view
 from tariff_app.models import Tariff
 from taskapp.models import Task

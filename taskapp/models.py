@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from .handle import handle as task_handle
 
 TASK_PRIORITIES = (

@@ -12,7 +12,7 @@ from guardian.decorators import permission_required_or_403 as permission_require
 from django.db.models import Q
 from django.conf import settings
 
-from abonapp.models.generic import Abon
+from abonapp.models import Abon
 from djing.global_base_views import SecureApiView
 from djing import JSONType
 from djing.lib import safe_int

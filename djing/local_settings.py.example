@@ -33,10 +33,6 @@ DATABASES = {
     }
 }
 
-# service id for AllPay payment system
-PAY_SERV_ID = '<service id>'
-PAY_SECRET = '<secret>'
-
 # path to asterisk dial records
 DIALING_MEDIA = 'path/to/asterisk_records'
 
@@ -69,3 +65,8 @@ EMAIL_HOST = 'smtp.mailserver.com'
 EMAIL_PORT = 587
 EMAIL_HOST_PASSWORD = 'password'
 EMAIL_USE_TLS = True
+
+# Encrypted fields
+# https://pypi.org/project/django-encrypted-model-fields/
+# You must change this value
+#FIELD_ENCRYPTION_KEY = 'vZpDlDPQyU6Ha7NyUGj9uYMuPigejtEPMOZfkYXIQRw='

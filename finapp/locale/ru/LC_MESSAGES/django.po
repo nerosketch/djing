@@ -1,0 +1,159 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-27 11:42+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: models.py:32 templates/finapp/payalltimegateway_list.html:22
+msgid "Title"
+msgstr "Название"
+
+#: models.py:33
+msgid "Secret"
+msgstr "Секрет"
+
+#: models.py:34 templates/finapp/payalltimegateway_list.html:23
+msgid "Service id"
+msgstr ""
+
+#: models.py:35
+msgid "Slug"
+msgstr ""
+
+#: models.py:46
+msgid "All time gateway"
+msgstr "Платёжный шлюз AllTime"
+
+#: models.py:65 templates/finapp/payHistory.html:24
+msgid "Cost"
+msgstr "Цена"
+
+#: models.py:67 templates/finapp/payHistory.html:25
+msgid "Trade point"
+msgstr "Торговая точка"
+
+#: models.py:73 templates/finapp/payHistory.html:26
+msgid "Receipt num"
+msgstr "Номер квитанции"
+
+#: models.py:75
+msgid "Pay gateway"
+msgstr "Платёжный шлюз"
+
+#: templates/finapp/fin_report.html:7
+msgid "Fin report"
+msgstr "Фин. отчёт"
+
+#: templates/finapp/fin_report.html:12
+msgid "Money by days"
+msgstr "Денег за дни"
+
+#: templates/finapp/fin_report.html:21 templates/finapp/payHistory.html:23
+msgid "Date"
+msgstr "Дата"
+
+#: templates/finapp/fin_report.html:32
+msgid "Pays not found"
+msgstr "Платежи не найдены"
+
+#: templates/finapp/fin_report.html:41
+msgid "Export to csv"
+msgstr "Экспортировать в csv"
+
+#: templates/finapp/payHistory.html:8
+#: templates/finapp/payalltimegateway_form.html:7
+#: templates/finapp/payalltimegateway_list.html:8
+msgid "Payment system"
+msgstr "Платёжная система"
+
+#: templates/finapp/payHistory.html:9
+msgid "Payment history"
+msgstr "История платежей"
+
+#: templates/finapp/payHistory.html:21
+msgid "User"
+msgstr "Абонент"
+
+#: templates/finapp/payHistory.html:22
+msgid "Pay id"
+msgstr "ID платежа"
+
+#: templates/finapp/payHistory.html:41
+msgid "Payment history is empty"
+msgstr "История платежей пуста"
+
+#: templates/finapp/payalltimegateway_form.html:10
+msgid "Change payment gateway"
+msgstr "Редактировать платёжный шлюз"
+
+#: templates/finapp/payalltimegateway_form.html:12
+msgid "Add payment gateway"
+msgstr "Добавить платёжный шлюз"
+
+#: templates/finapp/payalltimegateway_form.html:20
+msgid "Make new payment gateway"
+msgstr "Создать новый платёжный шлюз"
+
+#: templates/finapp/payalltimegateway_form.html:33
+msgid "Type info about payment gateway"
+msgstr "Укажите данные для платёжной системы"
+
+#: templates/finapp/payalltimegateway_form.html:43
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/finapp/payalltimegateway_form.html:47
+#: templates/finapp/payalltimegateway_list.html:62
+#: templates/finapp/payalltimegateway_list.html:66
+msgid "Add"
+msgstr "Добвить"
+
+#: templates/finapp/payalltimegateway_form.html:51
+msgid "Reset"
+msgstr "Сбросить"
+
+#: templates/finapp/payalltimegateway_list.html:13
+msgid "List of payment gateways"
+msgstr "Список платёжных систем"
+
+#: templates/finapp/payalltimegateway_list.html:24
+msgid "Pays count"
+msgstr "Количество платежей всего"
+
+#: templates/finapp/payalltimegateway_list.html:36
+msgid "Edit"
+msgstr "Изменить"
+
+#: templates/finapp/payalltimegateway_list.html:40
+msgid "Permission required"
+msgstr "Не хватает прав"
+
+#: templates/finapp/payalltimegateway_list.html:53
+msgid "Payment gateways not found"
+msgstr "Платёжные шлюзы не найдены"
+
+#: views.py:198
+msgid "New pay gateway created successfully"
+msgstr "Новый платёжный шлюз успешно создан"
+
+#: views.py:221
+msgid "Payment gateway successfully updated"
+msgstr "Платёжный шлюз успешно обновлён"
+
+msgid "Deleted"
+msgstr "Удалён"
