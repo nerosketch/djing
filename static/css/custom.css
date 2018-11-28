@@ -256,14 +256,6 @@ div#loading {
     z-index: 1;
     display: none;
 }
-div#loading>div.gif {
-    position: absolute;
-    left: 49%;
-    top: 39%;
-    background-color: white;
-    border-radius: 13px;
-    border-style: ridge;
-}
 
 
 

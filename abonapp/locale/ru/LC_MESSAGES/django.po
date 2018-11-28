@@ -1162,3 +1162,9 @@ msgstr "IP адрес уже есть"
 
 msgid "Last connected service"
 msgstr "Последняя подключённая услуга"
+
+msgid "Ballance"
+msgstr "Балланс"
+
+msgid "Date joined"
+msgstr "Дата создания"
