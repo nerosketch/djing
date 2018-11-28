@@ -102,7 +102,7 @@ def main():
         current_tariff=None
     ).exclude(last_connected_tariff=None).iterator():
         tariff = ab.last_connected_tariff
-        if tariff is None:
+        if tariff is None or tariff.is_admin:
             continue
         ab.pick_tariff(
             tariff, None,
