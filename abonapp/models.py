@@ -239,7 +239,9 @@ class Abon(BaseAccount):
 
         # if not enough money
         if self.ballance < amount:
-            raise LogicError(_('not enough money'))
+            raise LogicError(_('%s not enough money for service %s') % (
+                self.username, tariff.title
+            ))
 
         with transaction.atomic():
             new_abtar = AbonTariff.objects.create(
