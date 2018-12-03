@@ -76,6 +76,12 @@
                                     <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
                                     <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
                                     <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
+                                    {% if onu_details.ip_addr %}
+                                        <b>{% trans 'Ip addr' %}</b>: {{ onu_details.ip_addr }}<br>
+                                    {% endif %}
+                                    {% if onu_details.vlans %}
+                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}
+                                    {% endif %}
 
                                 </div>
                             </div>

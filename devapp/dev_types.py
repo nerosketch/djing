@@ -428,15 +428,20 @@ class ZteOnuDevice(OnuDevice):
         try:
             fiber_num, onu_num = snmp_extra.split('.')
             fiber_num, onu_num = int(fiber_num), int(onu_num)
-            status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%d.%d.1' % (fiber_num, onu_num))
-            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d.%d.1' % (fiber_num, onu_num))
-            distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%d.%d.1' % (fiber_num, onu_num))
-            name = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d.%d' % (fiber_num, onu_num))
+            fiber_addr = '%d.%d' % (fiber_num, onu_num)
+            status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%s.1' % fiber_addr)
+            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%s.1' % fiber_addr)
+            distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%s.1' % fiber_addr)
+            name = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%s' % fiber_addr)
+            ip_addr = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.16.1.1.10.%s' % fiber_addr)
+            vlans = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.15.100.1.1.7.%s.1.1' % fiber_addr)
             return {
                 'status': status,
                 'signal': conv_signal(safe_int(signal)),
                 'name': name,
-                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
+                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0,
+                'ip_addr': ip_addr if ip_addr != 'NOSUCHINSTANCE' and ip_addr else None,
+                'vlans': vlans if vlans != 'NOSUCHINSTANCE' else None
             }
         except ValueError:
             pass
