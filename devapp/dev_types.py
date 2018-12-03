@@ -514,3 +514,18 @@ class ZteOnuDevice(OnuDevice):
             snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
             device.snmp_extra = "%d.%d" % (snmp_fiber_num, new_onu_port_num)
             device.save(update_fields=('snmp_extra',))
+
+    def get_fiber_str(self):
+        dev = self.db_instance
+        if not dev:
+            return
+        dat = dev.snmp_extra
+        if dat and '.' in dat:
+            snmp_fiber_num, onu_port_num = dat.split('.')
+            snmp_fiber_num = int(snmp_fiber_num)
+            bin_snmp_fiber_num = bin(snmp_fiber_num)[2:]
+            rack_num = int(bin_snmp_fiber_num[5:13], 2)
+            fiber_num = int(bin_snmp_fiber_num[13:21], 2)
+            return 'gpon-onu_1/%d/%d:%s' % (
+                rack_num, fiber_num, onu_port_num
+            )

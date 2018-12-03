@@ -639,6 +639,9 @@ msgstr "Процесс занят другой задачей, подождит�
 msgid "You have not info in extra_data field, please fill it in JSON"
 msgstr "Не заполнено поле 'Техническая информация', обратитесь к администратору"
 
+msgid "Fiber"
+msgstr "Интерфейс"
+
 #~ msgid "Device %(device_name)s is up"
 #~ msgstr "%(device_name)s в сети"
 

@@ -18,6 +18,7 @@
                         <li class="list-group-item">{% trans 'Ip address' %}: {{ dev.ip_address|default:'-' }}</li>
                         <li class="list-group-item">{% trans 'Mac' %}: {{ dev.mac_addr }}</li>
                         <li class="list-group-item">{% trans 'Description' %}: {{ dev.comment }}</li>
+                        <li class="list-group-item">{% trans 'Fiber' %}: {{ dev_manager.get_fiber_str }}</li>
                         {% for da in dev_accs %}
                             <li class="list-group-item">{% trans 'Attached user' %}:
                                 {% if da.group %}
