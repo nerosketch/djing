@@ -23,10 +23,18 @@
                         {% with can_ch_trf=perms.tariff_app.change_tariff %}
                         {% for service in services %}
                         <tr>
-                            <td><a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}?selected_tariff={{ service.pk }}"
-                                   class="btn btn-sm btn-default" title="{{ service.get_calc_type_display }}" data-toggle="tooltip"{% if abon_tariff %} disabled{% endif %}>
-                                <span class="glyphicon glyphicon-shopping-cart"></span>
-                            </a></td>
+                            <td>
+                                {% if abon_tariff %}
+                                    <a href="#" class="btn btn-sm btn-default disabled">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}?selected_tariff={{ service.pk }}"
+                                       class="btn btn-sm btn-default" title="{{ service.get_calc_type_display }}" data-toggle="tooltip">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    </a>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if can_ch_trf %}
                                     <a href="{% url 'tarifs:edit' service.pk %}" title="{{ service.descr }}" data-toggle="tooltip"><b>{{ service.title }}</b></a>

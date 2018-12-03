@@ -38,7 +38,7 @@ def main():
     signals.pre_delete.disconnect(abontariff_pre_delete, sender=AbonTariff)
     AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
-    fields = ('id', 'tariff__title', 'abon__id')
+    fields = ('id', 'tariff__title', 'abon__id', 'abon__username')
     expired_services = AbonTariff.objects.exclude(abon=None).filter(
         deadline__lt=now,
         abon__autoconnect_service=False
@@ -52,8 +52,9 @@ def main():
                 amount=0,
                 author=None,
                 date=now,
-                comment="Срок действия услуги '%(service_name)s' истёк" % {
-                    'service_name': ex_srv['tariff__title']
+                comment="Срок действия услуги '%(service_name)s' для '%(username)s' истёк" % {
+                    'service_name': ex_srv['tariff__title'],
+                    'username': ex_srv['abon__username']
                 }
             )
             print(log)

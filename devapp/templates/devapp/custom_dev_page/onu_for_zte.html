@@ -18,6 +18,7 @@
                         <li class="list-group-item">{% trans 'Ip address' %}: {{ dev.ip_address|default:'-' }}</li>
                         <li class="list-group-item">{% trans 'Mac' %}: {{ dev.mac_addr }}</li>
                         <li class="list-group-item">{% trans 'Description' %}: {{ dev.comment }}</li>
+                        <li class="list-group-item">{% trans 'Fiber' %}: {{ dev_manager.get_fiber_str }}</li>
                         {% for da in dev_accs %}
                             <li class="list-group-item">{% trans 'Attached user' %}:
                                 {% if da.group %}
@@ -75,6 +76,12 @@
                                     <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
                                     <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
                                     <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
+                                    {% if onu_details.ip_addr %}
+                                        <b>{% trans 'Ip addr' %}</b>: {{ onu_details.ip_addr }}<br>
+                                    {% endif %}
+                                    {% if onu_details.vlans %}
+                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}
+                                    {% endif %}
 
                                 </div>
                             </div>

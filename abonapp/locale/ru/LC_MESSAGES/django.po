@@ -195,8 +195,8 @@ msgid "Service already activated"
 msgstr "Услуга уже подключена"
 
 #: models.py:174
-msgid "not enough money"
-msgstr "Не хватает денег на счету"
+msgid "%s not enough money for service %s"
+msgstr "%s не имеет достаточно средств для %s"
 
 #: models.py:190
 msgid "Buy service default log"
@@ -939,8 +939,8 @@ msgstr "Квитанция на оплату была создана"
 
 #: views.py:419
 #, python-format
-msgid "Service '%(service_name)s' has connected via admin"
-msgstr "Услуга '%(service_name)s' подключена администратором"
+msgid "Service '%(service_name)s' has connected via admin until %(deadline)s"
+msgstr "Услуга '%(service_name)s' подключена администратором до %(deadline)s"
 
 #: views.py:429
 msgid "Tariff has been picked"
