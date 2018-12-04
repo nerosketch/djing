@@ -73,15 +73,17 @@
                                 </div>
                                 <div class="media-body">
 
-                                    <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
                                     <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
                                     <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
                                     {% if onu_details.ip_addr %}
                                         <b>{% trans 'Ip addr' %}</b>: {{ onu_details.ip_addr }}<br>
                                     {% endif %}
                                     {% if onu_details.vlans %}
-                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}
+                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}<br>
                                     {% endif %}
+                                    <b>{% trans 'Serial' %}</b>: {{ onu_details.serial }}<br>
+                                    <b>{% trans 'Onu type' %}</b>: {{ onu_details.onu_type }}<br>
+                                    <b>{% trans 'Name' %}</b>: {{ onu_details.int_name }}
 
                                 </div>
                             </div>
