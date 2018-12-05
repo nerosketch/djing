@@ -100,7 +100,8 @@ def main():
     # connect service when autoconnect is True, and user have enough money
     for ab in Abon.objects.filter(
         is_active=True,
-        current_tariff=None
+        current_tariff=None,
+        autoconnect_service=True
     ).exclude(last_connected_tariff=None).iterator():
         try:
             tariff = ab.last_connected_tariff
