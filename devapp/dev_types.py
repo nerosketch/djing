@@ -161,7 +161,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                     status=True if status == '3' else False,
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
-                    signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+                    signal=int(signal or 0),
                     snmp_worker=self)
                 res.append(onu)
         except EasySNMPTimeoutError as e:
@@ -325,7 +325,7 @@ class EltexSwitch(DLinkDevice):
                                  self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                                 int(speed) if speed != 'NOSUCHINSTANCE' else 0,
+                                 int(speed or 0),
                                  ))
         return res
 

@@ -1168,3 +1168,6 @@ msgstr "Балланс"
 
 msgid "Date joined"
 msgstr "Дата создания"
+
+msgid "Update ip address"
+msgstr "Обновить ip адрес"
