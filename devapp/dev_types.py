@@ -438,16 +438,16 @@ class ZteOnuDevice(OnuDevice):
             onu_type = self.get_item('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%s' % fiber_addr)
 
             sn = self.get_item('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%s' % fiber_addr)
-            # sn = sn.encode()
-            sn = ''.join('%.2X' % ord(x) for x in sn[-4:])
+            if sn is not None:
+                sn = 'ZTEG%s' % ''.join('%.2X' % ord(x) for x in sn[-4:])
 
             return {
                 'status': status,
                 'signal': conv_signal(safe_int(signal)),
-                'distance': int(distance) / 10,
-                'ip_addr': ip_addr if ip_addr else None,
+                'distance': safe_int(distance) / 10,
+                'ip_addr': ip_addr,
                 'vlans': vlans,
-                'serial': "ZTEG%s" % ''.join(sn),
+                'serial': sn,
                 'int_name': int_name,
                 'onu_type': onu_type
             }
