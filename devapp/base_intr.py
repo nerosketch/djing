@@ -139,4 +139,6 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
 
     def get_item(self, oid):
         self.start_ses()
-        return self.ses.get(oid).value
+        v = self.ses.get(oid).value
+        if v != 'NOSUCHINSTANCE':
+            return v

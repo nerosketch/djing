@@ -5,7 +5,7 @@ Description=Dialing inbox sms unit
 Type=simple
 ExecStart=/usr/bin/python3 dialing.py
 PIDFile=/run/dialing.py.pid
-WorkingDirectory=/srv/http/djing
+WorkingDirectory=/var/www/djing
 User=http
 Group=http
 

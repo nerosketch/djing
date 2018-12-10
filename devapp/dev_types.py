@@ -161,7 +161,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                     status=True if status == '3' else False,
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
-                    signal=int(signal) / 10 if signal != 'NOSUCHINSTANCE' else 0,
+                    signal=int(signal or 0),
                     snmp_worker=self)
                 res.append(onu)
         except EasySNMPTimeoutError as e:
@@ -325,7 +325,7 @@ class EltexSwitch(DLinkDevice):
                                  self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
                                  self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                                 int(speed) if speed != 'NOSUCHINSTANCE' else 0,
+                                 int(speed or 0),
                                  ))
         return res
 
@@ -428,17 +428,30 @@ class ZteOnuDevice(OnuDevice):
         try:
             fiber_num, onu_num = snmp_extra.split('.')
             fiber_num, onu_num = int(fiber_num), int(onu_num)
-            status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%d.%d.1' % (fiber_num, onu_num))
-            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d.%d.1' % (fiber_num, onu_num))
-            distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%d.%d.1' % (fiber_num, onu_num))
-            name = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d.%d' % (fiber_num, onu_num))
+            fiber_addr = '%d.%d' % (fiber_num, onu_num)
+            status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%s.1' % fiber_addr)
+            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%s.1' % fiber_addr)
+            distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%s.1' % fiber_addr)
+            ip_addr = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.16.1.1.10.%s' % fiber_addr)
+            vlans = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.15.100.1.1.7.%s.1.1' % fiber_addr)
+            int_name = self.get_item('.1.3.6.1.4.1.3902.1012.3.28.1.1.3.%s' % fiber_addr)
+            onu_type = self.get_item('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%s' % fiber_addr)
+
+            sn = self.get_item('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%s' % fiber_addr)
+            if sn is not None:
+                sn = 'ZTEG%s' % ''.join('%.2X' % ord(x) for x in sn[-4:])
+
             return {
                 'status': status,
                 'signal': conv_signal(safe_int(signal)),
-                'name': name,
-                'distance': int(distance) / 10 if distance != 'NOSUCHINSTANCE' else 0
+                'distance': safe_int(distance) / 10,
+                'ip_addr': ip_addr,
+                'vlans': vlans,
+                'serial': sn,
+                'int_name': int_name,
+                'onu_type': onu_type
             }
-        except ValueError:
+        except IndexError:
             pass
 
     def get_template_name(self):
@@ -514,3 +527,18 @@ class ZteOnuDevice(OnuDevice):
             snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
             device.snmp_extra = "%d.%d" % (snmp_fiber_num, new_onu_port_num)
             device.save(update_fields=('snmp_extra',))
+
+    def get_fiber_str(self):
+        dev = self.db_instance
+        if not dev:
+            return
+        dat = dev.snmp_extra
+        if dat and '.' in dat:
+            snmp_fiber_num, onu_port_num = dat.split('.')
+            snmp_fiber_num = int(snmp_fiber_num)
+            bin_snmp_fiber_num = bin(snmp_fiber_num)[2:]
+            rack_num = int(bin_snmp_fiber_num[5:13], 2)
+            fiber_num = int(bin_snmp_fiber_num[13:21], 2)
+            return 'gpon-onu_1/%d/%d:%s' % (
+                rack_num, fiber_num, onu_port_num
+            )

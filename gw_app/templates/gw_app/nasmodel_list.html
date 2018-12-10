@@ -18,11 +18,10 @@
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">dasdasd</h3>
+                        <h3 class="panel-title">{{ nas.title }}</h3>
                     </div>
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            <dt>{% trans 'Title' %}</dt>            <dd>{{ nas.title }}</dd>
                             <dt>{% trans 'Ip address' %}</dt>       <dd>{{ nas.ip_address }}</dd>
                             <dt>{% trans 'Port' %}</dt>             <dd>{{ nas.ip_port }}</dd>
                             <dt>{% trans 'Auth login' %}</dt>       <dd>{{ nas.auth_login }}</dd>
@@ -32,16 +31,22 @@
                             <dd>
                                 <input type="checkbox" {{ nas.default|yesno:'checked,' }}>
                             </dd>
+                            <dt>{% trans 'Enabled' %}</dt>
+                            <dd>
+                                <input type="checkbox" {{ nas.enabled|yesno:'checked,' }}>
+                            </dd>
                         </dl>
                     </div>
-                    <div class="panel-footer">
-                        <div class="btn-group btn-group-sm">
-                            <a href="{% url 'gw_app:edit' nas.pk %}" class="btn btn-default">
-                                <span class="glyphicon glyphicon-eye-open"></span>
-                                <span class="hidden-md">{% trans 'View' %}</span>
-                            </a>
+                    {% if perms.gw_app.change_nasmodel %}
+                        <div class="panel-footer">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'gw_app:edit' nas.pk %}" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                    <span class="hidden-md">{% trans 'Edit' %}</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         {% empty %}

@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from typing import Dict, Optional
 
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, \
     PermissionRequiredMixin as PermissionRequiredMixin_django, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction, \
-    OperationalError, DatabaseError
+    DatabaseError
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseBadRequest, \
     HttpResponseRedirect
@@ -33,7 +33,6 @@ from guardian.shortcuts import get_objects_for_user, assign_perm
 from gw_app.models import NASModel
 from gw_app.nas_managers import NasFailedResult, NasNetworkError
 from ip_pool.models import NetworkModel
-from statistics.models import getModel
 from tariff_app.models import Tariff
 from taskapp.models import Task
 from xmlview.decorators import xml_view
@@ -52,9 +51,9 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
         if street_id > 0:
             peoples_list = peoples_list.filter(street=street_id)
         peoples_list = peoples_list.select_related(
-            'group', 'street', 'statcache', 'current_tariff'
+            'group', 'street', 'current_tariff'
         ).only(
-            'group', 'street', 'statcache', 'fio',
+            'group', 'street', 'fio',
             'street', 'house', 'telephone', 'ballance', 'markers',
             'username', 'is_active', 'current_tariff'
         )
@@ -440,15 +439,17 @@ def pick_tariff(request, gid: int, uname):
             trf = Tariff.objects.get(pk=request.POST.get('tariff'))
             deadline = request.POST.get('deadline')
             log_comment = _(
-                "Service '%(service_name)s' has connected via admin") % {
-                              'service_name': trf.title
-                          }
-            if deadline == '' or deadline is None:
-                abon.pick_tariff(trf, request.user, comment=log_comment)
-            else:
+                "Service '%(service_name)s' "
+                "has connected via admin until %(deadline)s") % {
+                    'service_name': trf.title,
+                    'deadline': deadline
+                    }
+            if deadline:
                 deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline,
                                  comment=log_comment)
+            else:
+                abon.pick_tariff(trf, request.user, comment=log_comment)
             r = abon.nas_sync_self()
             if r is None:
                 messages.success(request, _('Tariff has been picked'))
@@ -469,11 +470,15 @@ def pick_tariff(request, gid: int, uname):
     except ValueError as e:
         messages.error(request, "%s: %s" % (_('fix form errors'), e))
 
+    selected_tariff = request.GET.get('selected_tariff')
+    if selected_tariff:
+        selected_tariff = get_object_or_404(Tariff, pk=selected_tariff)
+
     return render(request, 'abonapp/buy_tariff.html', {
         'tariffs': tariffs,
         'abon': abon,
         'group': grp,
-        'selected_tariff': lib.safe_int(request.GET.get('selected_tariff'))
+        'selected_tariff': selected_tariff
     })
 
 
@@ -594,6 +599,12 @@ class IpUpdateView(LoginAdminPermissionMixin, UpdateView):
             return super(IpUpdateView, self).dispatch(request, *args, **kwargs)
         except lib.LogicError as e:
             messages.error(request, e)
+        except IntegrityError as e:
+            str_text = str(e)
+            if 'abonent_ip_address_nas_id' in str_text and 'duplicate key value' in str_text:
+                messages.error(request, _('IP address conflict'))
+            else:
+                messages.error(request, e)
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def form_valid(self, form):
@@ -677,58 +688,6 @@ def clear_dev(request, gid: int, uname):
         messages.error(request, _('Abon does not exist'))
         return redirect('abonapp:people_list', gid=gid)
     return redirect('abonapp:abon_home', gid=gid, uname=uname)
-
-
-@login_required
-@only_admins
-@permission_required('group_app.view_group', (Group, 'pk', 'gid'))
-def charts(request, gid: int, uname):
-    high = 100
-
-    wandate = request.GET.get('wantdate')
-    if wandate:
-        wandate = datetime.strptime(wandate, '%d%m%Y').date()
-    else:
-        wandate = date.today()
-
-    try:
-        StatElem = getModel(wandate)
-        abon = models.Abon.objects.get(username=uname)
-        if abon.group is None:
-            abon.group = Group.objects.get(pk=gid)
-            abon.save(update_fields=('group',))
-
-        charts_data = StatElem.objects.chart(
-            abon,
-            count_of_parts=30,
-            want_date=wandate
-        )
-
-        abontariff = abon.active_tariff()
-        if abontariff is not None:
-            trf = abontariff.tariff
-            high = trf.speedIn + trf.speedOut
-            if high > 100:
-                high = 100
-
-    except models.Abon.DoesNotExist:
-        messages.error(request, _('Abon does not exist'))
-        return redirect('abonapp:people_list', gid)
-    except Group.DoesNotExist:
-        messages.error(request, _("Group what you want doesn't exist"))
-        return redirect('abonapp:group_list')
-    except (ProgrammingError, OperationalError) as e:
-        messages.error(request, e)
-        return redirect('abonapp:charts', gid=gid, uname=uname)
-
-    return render(request, 'abonapp/charts.html', {
-        'group': abon.group,
-        'abon': abon,
-        'charts_data': ',\n'.join(
-            charts_data) if charts_data is not None else None,
-        'high': high,
-        'wantdate': wandate
-    })
 
 
 @login_required

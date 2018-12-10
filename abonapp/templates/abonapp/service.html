@@ -23,10 +23,18 @@
                         {% with can_ch_trf=perms.tariff_app.change_tariff %}
                         {% for service in services %}
                         <tr>
-                            <td><a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}?selected_tariff={{ service.pk }}"
-                                   class="btn btn-sm btn-default" title="{{ service.get_calc_type_display }}" data-toggle="tooltip"{% if abon_tariff %} disabled{% endif %}>
-                                <span class="glyphicon glyphicon-shopping-cart"></span>
-                            </a></td>
+                            <td>
+                                {% if abon_tariff %}
+                                    <a href="#" class="btn btn-sm btn-default disabled">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}?selected_tariff={{ service.pk }}"
+                                       class="btn btn-sm btn-default" title="{{ service.get_calc_type_display }}" data-toggle="tooltip">
+                                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    </a>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if can_ch_trf %}
                                     <a href="{% url 'tarifs:edit' service.pk %}" title="{{ service.descr }}" data-toggle="tooltip"><b>{{ service.title }}</b></a>
@@ -62,9 +70,8 @@
                     <h3 class="panel-title">{% trans "Subscriber's service" %}</h3>
                 </div>
                 <div class="panel-body">
-                    {% if abon_tariff %}
-
-                        <dl class="dl-horizontal">
+                    <dl class="dl-horizontal">
+                        {% if abon_tariff %}
                             <dt>{% trans 'Service' %}</dt>
                             <dd>
                                 {% if abon_tariff.tariff %}
@@ -93,21 +100,29 @@
 
                             <dt>{% trans 'Works until' %}</dt>
                             <dd>{{ abon_tariff.deadline|date:"d E Y, l H:i" }}</dd>
-                        </dl>
+                        {% else %}
+                            <dt>{% trans 'Subscriber has no service' %}</dt>
+                            <dd>
+                                <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}">
+                                    {% trans 'Buy service' %}
+                                </a>
+                            </dd>
+                        {% endif %}
 
-                        <blockquote>
-                            <p>
-                                {% trans 'Auto continue service.' %}
-                                <input type="checkbox" data-url="{% url 'abonapp:set_auto_continue_service' group.pk abon.username %}" class="autosave" {{ abon.autoconnect_service|yesno:'checked,' }}>
-                            </p>
-                            <p>{{ abon_tariff.tariff.descr }}</p>
-                        </blockquote>
+                        {% if abon.last_connected_tariff %}
+                            <dt>{% trans 'Last connected service' %}</dt>
+                            <dd><a href="{{ abon.last_connected_tariff.get_absolute_url }}">{{ abon.last_connected_tariff.title }}</a></dd>
+                        {% endif %}
 
-                    {% else %}
-                        {% trans 'Subscriber has no service' %}.
-                        <a href="{% url 'abonapp:pick_tariff' group.pk abon.username %}">
-                            {% trans 'Buy service' %}
-                        </a>
+                        <dt>{% trans 'Auto continue service.' %}</dt>
+                        <dd>
+                            <input type="checkbox" data-url="{% url 'abonapp:set_auto_continue_service' group.pk abon.username %}" class="autosave" {{ abon.autoconnect_service|yesno:'checked,' }}>
+                            <a href="https://github.com/nerosketch/djing/blob/devel/docs/tarifs.md" title="{% trans 'Help' %}" target="_blank" data-toggle="tooltip">?</a>
+                        </dd>
+                    </dl>
+
+                    {% if abon_tariff.tariff.descr %}
+                        <p>{{ abon_tariff.tariff.descr }}</p>
                     {% endif %}
 
                     {% if abon_tariff %}

@@ -157,3 +157,9 @@ msgstr "Убедитесь что значение меньше или равн�
 
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s с таким %(field_label)s уже существует."
+
+msgid "Enabled"
+msgstr "Включен"
+
+msgid "Gateway disabled"
+msgstr "Шлюз выключен"

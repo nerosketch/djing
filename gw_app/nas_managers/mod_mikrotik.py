@@ -170,14 +170,17 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                                          (ABCMeta, LazyInitMetaclass), {})):
     description = _('Mikrotik NAS')
 
-    def __init__(self, login: str, password: str, ip: str, port: int, *args,
-                 **kwargs):
+    def __init__(self, login: str, password: str, ip: str, port: int,
+                 enabled: bool, *args, **kwargs):
+        if not enabled:
+            raise core.NasFailedResult(_('Gateway disabled'))
         try:
-            core.BaseTransmitter.__init__(self,
-                                          login=login, password=password,
-                                          ip=ip,
-                                          port=port, *args, **kwargs
-                                          )
+            core.BaseTransmitter.__init__(
+                self, login=login,
+                password=password,
+                ip=ip, port=port,
+                *args, **kwargs
+            )
             ApiRos.__init__(self, ip, port)
             self.login(username=login, pwd=password)
         except ConnectionRefusedError:
@@ -268,9 +271,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             # FIXME: тут в разных микротиках или =target-addresses или =target
             '=target=%s' % queue.network,
             '=max-limit=%.3fM/%.3fM' % queue.max_limit,
-            '=queue=Djing_pcq/Djing_pcq',
-            '=burst-time=1/1',
-            '=total-queue=Djing_pcq'
+            '=queue=Djing_pcq_up/Djing_pcq_down',
+            '=burst-time=1/5',
+            #'=total-queue=Djing_pcq_down'
         ))
 
     def remove_queue(self, queue: i_structs.SubnetQueue) -> None:
@@ -304,7 +307,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 # FIXME: тут в разных версиях прошивки микротика
                 # или =target-addresses или =target
                 '=target=%s' % queue.network,
-                '=queue=Djing_pcq/Djing_pcq',
+                '=queue=Djing_pcq_up/Djing_pcq_down',
                 '=burst-time=1/1'
             ]
             if queue.queue_id:

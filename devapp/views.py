@@ -4,7 +4,6 @@ from ipaddress import ip_address
 from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from chatbot.models import ChatException
-from chatbot.send_func import send_notify
 from devapp.base_intr import DeviceImplementationError
 from django.conf import settings
 from django.contrib import messages
@@ -25,6 +24,7 @@ from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
 from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, \
     ZteOltLoginFailed
+from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
 from guardian.decorators import \
@@ -32,6 +32,7 @@ from guardian.decorators import \
 from guardian.shortcuts import get_objects_for_user
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
+from .tasks import onu_register
 
 
 class DevicesListView(LoginAdminPermissionMixin,
@@ -91,7 +92,9 @@ class DeviceDeleteView(LoginAdminPermissionMixin, DeleteView):
                 self.object.mac_addr or '-',
                 self.object.comment or '-'
             ))
-            self.object.update_dhcp()
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
         except (DeviceDBException, PermissionError) as e:
             messages.error(request, e)
         messages.success(request, _('Device successfully deleted'))
@@ -141,7 +144,9 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
-            self.object.update_dhcp()
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:
             messages.error(self.request, e)
@@ -197,13 +202,16 @@ class DeviceCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
         r = super().form_valid(form)
         # change device info in dhcpd.conf
         try:
-            self.request.user.log(self.request.META, 'cdev',
-                                  'ip %s, mac: %s, "%s"' % (
-                                      self.object.ip_address,
-                                      self.object.mac_addr,
-                                      self.object.comment
-                                  ))
-            self.object.update_dhcp()
+            self.request.user.log(
+                self.request.META, 'cdev',
+                'ip %s, mac: %s, "%s"' % (
+                    self.object.ip_address,
+                    self.object.mac_addr,
+                    self.object.comment
+                ))
+            onu_register.delay(
+                tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
+            )
             messages.success(self.request, _('Device info has been saved'))
         except PermissionError as e:
             messages.error(self.request, e)
@@ -382,6 +390,8 @@ class EditSinglePort(LoginAdminPermissionMixin, UpdateView):
     pk_url_kwarg = 'port_id'
     permission_required = 'devapp.change_port'
     template_name = 'devapp/manage_ports/modal_add_edit_port.html'
+    model = Port
+    form_class = PortForm
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -403,7 +413,8 @@ class EditSinglePort(LoginAdminPermissionMixin, UpdateView):
 
     def get_success_url(self):
         group_id = self.kwargs.get('group_id')
-        return resolve_url('devapp:view', group_id, self.pk)
+        device_id = self.kwargs.get('device_id')
+        return resolve_url('devapp:view', group_id, device_id)
 
     def get_context_data(self, **kwargs):
         group_id = self.kwargs.get('group_id')
@@ -697,24 +708,18 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
 
             recipients = UserProfile.objects.get_profiles_by_group(
                 device_down.group.pk)
-            names = list()
 
-            for recipient in recipients.iterator():
-                send_notify(
-                    msg_text=gettext(notify_text) % {
-                        'device_name': "%s(%s) %s" % (
-                            device_down.ip_address,
-                            device_down.mac_addr,
-                            device_down.comment
-                        )
-                    },
-                    account=recipient,
-                    tag='devmon'
+            multicast_email_notify.delay(msg_text=gettext(notify_text) % {
+                'device_name': "%s(%s) %s" % (
+                    device_down.ip_address,
+                    device_down.mac_addr,
+                    device_down.comment
                 )
-                names.append(recipient.username)
+            }, account_ids=(
+                recipient.pk for recipient in recipients.only('pk').iterator()
+            ))
             return {
-                'text': 'notification successfully sent',
-                'recipients': names
+                'text': 'notification successfully sent'
             }
         except ChatException as e:
             return {

@@ -1,29 +1,30 @@
 from datetime import datetime
 from typing import Optional
 
+from accounts_app.models import UserProfile, MyUserManager, BaseAccount
+from bitfield import BitField
 from django.conf import settings
 from django.core import validators
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import post_delete, pre_delete, post_init, pre_save
+from django.db.models.signals import post_delete, pre_delete, post_init, \
+    pre_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, gettext
-
-from accounts_app.models import UserProfile, MyUserManager, BaseAccount
-from gw_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
-from group_app.models import Group
 from djing.lib import LogicError
+from group_app.models import Group
+from gw_app.nas_managers import SubnetQueue, NasFailedResult, NasNetworkError
 from ip_pool.models import NetworkModel
 from tariff_app.models import Tariff, PeriodicPay
-from bitfield import BitField
 
 
 class AbonLog(models.Model):
     abon = models.ForeignKey('Abon', on_delete=models.CASCADE)
     amount = models.FloatField(default=0.0)
-    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='+', blank=True, null=True)
+    author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL,
+                               related_name='+', blank=True, null=True)
     comment = models.CharField(max_length=128)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -36,7 +37,11 @@ class AbonLog(models.Model):
 
 
 class AbonTariff(models.Model):
-    tariff = models.ForeignKey(Tariff, on_delete=models.CASCADE, related_name='linkto_tariff')
+    tariff = models.ForeignKey(
+        Tariff,
+        on_delete=models.CASCADE,
+        related_name='linkto_tariff'
+    )
 
     time_start = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -45,10 +50,6 @@ class AbonTariff(models.Model):
     def calc_amount_service(self):
         amount = self.tariff.amount
         return round(amount, 2)
-
-    # is used service now, if time start is present than it activated
-    def is_started(self):
-        return False if self.time_start is None else True
 
     def __str__(self):
         return "%s: %s" % (
@@ -86,19 +87,75 @@ class AbonManager(MyUserManager):
 
 
 class Abon(BaseAccount):
-    current_tariff = models.OneToOneField(AbonTariff, null=True, blank=True, on_delete=models.SET_NULL, default=None)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('User group'))
+    current_tariff = models.OneToOneField(
+        AbonTariff,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        default=None
+    )
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.SET_NULL,
+        blank=True, null=True,
+        verbose_name=_('User group')
+    )
     ballance = models.FloatField(default=0.0)
-    ip_address = models.GenericIPAddressField(verbose_name=_('Ip address'), null=True, blank=True)
-    description = models.TextField(_('Comment'), null=True, blank=True)
-    street = models.ForeignKey(AbonStreet, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Street'))
-    house = models.CharField(_('House'), max_length=12, null=True, blank=True)
-    device = models.ForeignKey('devapp.Device', null=True, blank=True, on_delete=models.SET_NULL)
-    dev_port = models.ForeignKey('devapp.Port', null=True, blank=True, on_delete=models.SET_NULL)
-    is_dynamic_ip = models.BooleanField(_('Is dynamic ip'), default=False)
-    nas = models.ForeignKey('gw_app.NASModel', null=True, blank=True, on_delete=models.SET_NULL,
-                            verbose_name=_('Network access server'), default=None)
-    autoconnect_service = models.BooleanField(_('Automatically connect next service'), default=False)
+    ip_address = models.GenericIPAddressField(
+        verbose_name=_('Ip address'),
+        null=True,
+        blank=True
+    )
+    description = models.TextField(
+        _('Comment'),
+        null=True,
+        blank=True
+    )
+    street = models.ForeignKey(
+        AbonStreet,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Street')
+    )
+    house = models.CharField(
+        _('House'),
+        max_length=12,
+        null=True,
+        blank=True
+    )
+    device = models.ForeignKey(
+        'devapp.Device',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+    dev_port = models.ForeignKey(
+        'devapp.Port',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+    is_dynamic_ip = models.BooleanField(
+        _('Is dynamic ip'),
+        default=False
+    )
+    nas = models.ForeignKey(
+        'gw_app.NASModel',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name=_('Network access server'),
+        default=None
+    )
+    autoconnect_service = models.BooleanField(
+        _('Automatically connect next service'),
+        default=False
+    )
+    last_connected_tariff = models.ForeignKey(
+        Tariff, verbose_name=_('Last connected service'),
+        on_delete=models.SET_NULL, null=True, blank=True, default=None
+    )
 
     MARKER_FLAGS = (
         ('icon_donkey', _('Donkey')),
@@ -144,7 +201,8 @@ class Abon(BaseAccount):
         AbonLog.objects.create(
             abon=self,
             amount=amount,
-            author=current_user if isinstance(current_user, UserProfile) else None,
+            author=current_user if isinstance(current_user,
+                                              UserProfile) else None,
             comment=comment
         )
         self.ballance += amount
@@ -153,10 +211,11 @@ class Abon(BaseAccount):
         """
         Trying to buy a service if enough money.
         :param tariff: instance of tariff_app.models.Tariff.
-        :param author: Instance of accounts_app.models.UserProfile. Who connected this
-        service. May be None if author is a system.
+        :param author: Instance of accounts_app.models.UserProfile.
+        Who connected this service. May be None if author is a system.
         :param comment: Optional text for logging this pay.
-        :param deadline: Instance of datetime.datetime. Date when service is expired.
+        :param deadline: Instance of datetime.datetime. Date when service is
+        expired.
         :return: Nothing
         """
         if not isinstance(tariff, Tariff):
@@ -166,7 +225,9 @@ class Abon(BaseAccount):
 
         if tariff.is_admin and author is not None:
             if not author.is_staff:
-                raise LogicError(_('User that is no staff can not buy admin services'))
+                raise LogicError(
+                    _('User that is no staff can not buy admin services')
+                )
 
         if self.current_tariff is not None:
             if self.current_tariff.tariff == tariff:
@@ -178,18 +239,26 @@ class Abon(BaseAccount):
 
         # if not enough money
         if self.ballance < amount:
-            raise LogicError(_('not enough money'))
+            raise LogicError(_('%s not enough money for service %s') % (
+                self.username, tariff.title
+            ))
 
         with transaction.atomic():
             new_abtar = AbonTariff.objects.create(
                 deadline=deadline, tariff=tariff
             )
             self.current_tariff = new_abtar
+            if self.last_connected_tariff != tariff:
+                self.last_connected_tariff = tariff
 
             # charge for the service
             self.ballance -= amount
 
-            self.save(update_fields=('ballance', 'current_tariff'))
+            self.save(update_fields=(
+                'ballance',
+                'current_tariff',
+                'last_connected_tariff'
+            ))
 
             # make log about it
             AbonLog.objects.create(
@@ -217,7 +286,8 @@ class Abon(BaseAccount):
             return True
         return False
 
-    # is subscriber have access to service, view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
+    # is subscriber have access to service,
+    # view in tariff_app.custom_tariffs.<TariffBase>.manage_access()
     def is_access(self) -> bool:
         if not self.is_active:
             return False
@@ -301,7 +371,7 @@ class Abon(BaseAccount):
 
     def enable_service(self, tariff: Tariff, deadline=None, time_start=None):
         """
-        Makes a services for current user
+        Makes a services for current user, without money
         :param tariff: Instance of service
         :param deadline: Time when service is expired
         :param time_start: Time when service has started
@@ -316,15 +386,32 @@ class Abon(BaseAccount):
             time_start=time_start
         )
         self.current_tariff = new_abtar
-        self.save(update_fields=('current_tariff',))
+        self.last_connected_tariff = tariff
+        self.save(update_fields=('current_tariff', 'last_connected_tariff'))
 
 
 class PassportInfo(models.Model):
-    series = models.CharField(_('Pasport serial'), max_length=4, validators=(validators.integer_validator,))
-    number = models.CharField(_('Pasport number'), max_length=6, validators=(validators.integer_validator,))
-    distributor = models.CharField(_('Distributor'), max_length=64)
+    series = models.CharField(
+        _('Pasport serial'),
+        max_length=4,
+        validators=(validators.integer_validator,)
+    )
+    number = models.CharField(
+        _('Pasport number'),
+        max_length=6,
+        validators=(validators.integer_validator,)
+    )
+    distributor = models.CharField(
+        _('Distributor'),
+        max_length=64
+    )
     date_of_acceptance = models.DateField(_('Date of acceptance'))
-    abon = models.OneToOneField(Abon, on_delete=models.CASCADE, blank=True, null=True)
+    abon = models.OneToOneField(
+        Abon,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         db_table = 'passport_info'
@@ -343,7 +430,13 @@ class InvoiceForPayment(models.Model):
     comment = models.CharField(max_length=128)
     date_create = models.DateTimeField(auto_now_add=True)
     date_pay = models.DateTimeField(blank=True, null=True)
-    author = models.ForeignKey(UserProfile, related_name='+', on_delete=models.SET_NULL, blank=True, null=True)
+    author = models.ForeignKey(
+        UserProfile,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return "%s -> %.2f" % (self.abon.username, self.amount)
@@ -367,7 +460,9 @@ class AllTimePayLogManager(models.Manager):
     def by_days():
         cur = connection.cursor()
         cur.execute(
-            'SELECT SUM(summ) AS alsum, DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date FROM  all_time_pay_log '
+            'SELECT SUM(summ) AS alsum, '
+            'DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date '
+            'FROM  all_time_pay_log '
             'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")'
         )
         while True:
@@ -375,16 +470,35 @@ class AllTimePayLogManager(models.Manager):
             if r is None:
                 break
             summ, dat = r
-            yield {'summ': summ, 'pay_date': datetime.strptime(dat, '%Y-%m-%d')}
+            yield {
+                'summ': summ,
+                'pay_date': datetime.strptime(dat, '%Y-%m-%d')
+            }
 
 
 # Log for pay system "AllTime"
 class AllTimePayLog(models.Model):
-    abon = models.ForeignKey(Abon, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None)
-    pay_id = models.CharField(max_length=36, unique=True, primary_key=True)
+    abon = models.ForeignKey(
+        Abon,
+        on_delete=models.SET_DEFAULT,
+        blank=True,
+        null=True,
+        default=None
+    )
+    pay_id = models.CharField(
+        max_length=36,
+        unique=True,
+        primary_key=True
+    )
     date_add = models.DateTimeField(auto_now_add=True)
     summ = models.FloatField(default=0.0)
-    trade_point = models.CharField(_('Trade point'), max_length=20, default=None, null=True, blank=True)
+    trade_point = models.CharField(
+        _('Trade point'),
+        max_length=20,
+        default=None,
+        null=True,
+        blank=True
+    )
     receipt_num = models.BigIntegerField(_('Receipt number'), default=0)
 
     objects = AllTimePayLogManager()
@@ -424,7 +538,11 @@ class AbonRawPassword(models.Model):
 
 
 class AdditionalTelephone(models.Model):
-    abon = models.ForeignKey(Abon, on_delete=models.CASCADE, related_name='additional_telephones')
+    abon = models.ForeignKey(
+        Abon,
+        on_delete=models.CASCADE,
+        related_name='additional_telephones'
+    )
     telephone = models.CharField(
         max_length=16,
         verbose_name=_('Telephone'),
@@ -446,10 +564,18 @@ class AdditionalTelephone(models.Model):
 
 
 class PeriodicPayForId(models.Model):
-    periodic_pay = models.ForeignKey(PeriodicPay, on_delete=models.CASCADE, verbose_name=_('Periodic pay'))
+    periodic_pay = models.ForeignKey(
+        PeriodicPay,
+        on_delete=models.CASCADE,
+        verbose_name=_('Periodic pay')
+    )
     last_pay = models.DateTimeField(_('Last pay time'), blank=True, null=True)
     next_pay = models.DateTimeField(_('Next time to pay'))
-    account = models.ForeignKey(Abon, on_delete=models.CASCADE, verbose_name=_('Account'))
+    account = models.ForeignKey(
+        Abon,
+        on_delete=models.CASCADE,
+        verbose_name=_('Account')
+    )
 
     def payment_for_service(self, author: UserProfile = None, now=None):
         """
@@ -465,9 +591,10 @@ class PeriodicPayForId(models.Model):
             next_pay_date = pp.get_next_time_to_pay(self.last_pay)
             abon = self.account
             with transaction.atomic():
-                abon.add_ballance(author, -amount, comment=gettext('Charge for "%(service)s"') % {
-                    'service': self.periodic_pay
-                })
+                abon.add_ballance(author, -amount, comment=gettext(
+                    'Charge for "%(service)s"') % {
+                        'service': self.periodic_pay
+                    })
                 abon.save(update_fields=('ballance',))
                 self.last_pay = now
                 self.next_pay = next_pay_date

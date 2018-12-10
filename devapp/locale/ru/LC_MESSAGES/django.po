@@ -337,7 +337,6 @@ msgid "ONU error"
 msgstr "ONU ошибка"
 
 #: templates/devapp/custom_dev_page/onu.html:72
-#: templates/devapp/custom_dev_page/onu_for_zte.html:75
 msgid "Name on OLT"
 msgstr "Имя на OLT"
 
@@ -639,20 +638,29 @@ msgstr "Процесс занят другой задачей, подождит�
 msgid "You have not info in extra_data field, please fill it in JSON"
 msgstr "Не заполнено поле 'Техническая информация', обратитесь к администратору"
 
-#~ msgid "Device %(device_name)s is up"
-#~ msgstr "%(device_name)s в сети"
+msgid "Fiber"
+msgstr "Интерфейс"
 
-#~ msgid "Device %(device_name)s is down"
-#~ msgstr "%(device_name)s не в сети"
+msgid "Onu type"
+msgstr "Тип onu"
 
-#~ msgid "Device %(device_name)s is unreachable"
-#~ msgstr "%(device_name)s недостижим"
+msgid "Serial"
+msgstr "Серийник"
 
-#~ msgid "Device %(device_name)s getting undefined status code"
-#~ msgstr "Устройство %(device_name)s получило не определённый код состояния"
+msgid "Device %(device_name)s is up"
+msgstr "%(device_name)s в сети"
 
-#~ msgid "View"
-#~ msgstr "Посмотреть"
+msgid "Device %(device_name)s is down"
+msgstr "%(device_name)s не в сети"
 
-#~ msgid "Enter valid JSON"
-#~ msgstr "Введите данные в формате JSON"
+msgid "Device %(device_name)s is unreachable"
+msgstr "%(device_name)s недостижим"
+
+msgid "Device %(device_name)s getting undefined status code"
+msgstr "Устройство %(device_name)s получило не определённый код состояния"
+
+msgid "View"
+msgstr "Посмотреть"
+
+msgid "Enter valid JSON"
+msgstr "Введите данные в формате JSON"

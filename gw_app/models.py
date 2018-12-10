@@ -16,6 +16,7 @@ class NASModel(models.Model):
     auth_passw = models.CharField(_('Auth password'), max_length=127)
     nas_type = models.CharField(_('Type'), max_length=4, choices=MyChoicesAdapter(NAS_TYPES), default=NAS_TYPES[0][0])
     default = models.BooleanField(_('Is default'), default=False)
+    enabled = models.BooleanField(_('Enabled'), default=True)
 
     def get_nas_manager_klass(self):
         try:
@@ -32,7 +33,8 @@ class NASModel(models.Model):
                 login=self.auth_login,
                 password=self.auth_passw,
                 ip=self.ip_address,
-                port=int(self.ip_port)
+                port=int(self.ip_port),
+                enabled=bool(self.enabled)
             )
             setattr(self, '_nas_mngr', o)
         return o
