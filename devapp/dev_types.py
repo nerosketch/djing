@@ -78,20 +78,18 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         stats = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.7'))
         macs = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.6'))
         speeds = tuple(self.get_list('.1.3.6.1.2.1.2.2.1.5'))
-        res = []
         try:
             for n in range(interfaces_count):
                 status = True if int(stats[n]) == 1 else False
-                res.append(DLinkPort(
+                yield DLinkPort(
                     n + 1,
                     nams[n] if len(nams) > 0 else '',
                     status,
                     macs[n] if len(macs) > 0 else _('does not fetch the mac'),
                     int(speeds[n]) if len(speeds) > 0 else 0,
-                    self))
-            return res
+                    self)
         except IndexError:
-            return DeviceImplementationError('Dlink port index error'), res
+            return DeviceImplementationError('Dlink port index error')
 
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.1.0')
@@ -293,11 +291,12 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
 
 class EltexPort(BasePort):
-    def __init__(self, snmp_worker, *args, **kwargs):
+    def __init__(self, snmp_worker, writable=True, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
         if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmp_worker
+        self.writable = writable
 
     def disable(self):
         self.snmp_worker.set_int_value(
@@ -319,17 +318,16 @@ class EltexSwitch(DLinkDevice):
     tech_code = 'eltex_sw'
 
     def get_ports(self) -> ListOrError:
-        res = []
         for i, n in enumerate(range(49, 77), 1):
             speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
-            res.append(EltexPort(self,
-                                 i,
-                                 self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
-                                 self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
-                                 self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                                 int(speed or 0),
-                                 ))
-        return res
+            yield EltexPort(self,
+                num=i,
+                name=self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
+                status=self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
+                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
+                speed=int(speed or 0),
+                writable=False,
+            )
 
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.5.0')
@@ -543,4 +541,29 @@ class ZteOnuDevice(OnuDevice):
             fiber_num = int(bin_snmp_fiber_num[13:21], 2)
             return 'gpon-onu_1/%d/%d:%s' % (
                 rack_num, fiber_num, onu_port_num
+            )
+
+
+class HuaweiSwitch(EltexSwitch):
+    description = _('Huawei switch')
+    is_use_device_port = True
+    has_attachable_to_subscriber = True
+    tech_code = 'huawei_s2300'
+
+    def get_ports(self):
+        interfaces_ids = self.get_list('.1.3.6.1.2.1.17.1.4.1.2')
+        if interfaces_ids is None:
+            raise DeviceImplementationError('Switch returned null')
+        for i, n in enumerate(interfaces_ids):
+            n = int(n)
+            speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
+            status = self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n)
+            yield EltexPort(
+                self,
+                num=i+1,
+                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),  # name
+                status=int(status or 0),                              # status
+                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),  # mac
+                speed=int(speed or 0),                               # speed
+                writable=False
             )

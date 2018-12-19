@@ -120,7 +120,10 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
 
     def start_ses(self):
         if self.ses is None:
-            self.ses = Session(hostname=self._ip, community=self._community, version=self._ver)
+            self.ses = Session(
+                hostname=self._ip, community=self._community,
+                version=self._ver, use_numeric=True
+            )
 
     def set_int_value(self, oid: str, value):
         self.start_ses()
