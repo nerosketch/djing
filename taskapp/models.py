@@ -75,7 +75,7 @@ class Task(models.Model):
 
     class Meta:
         db_table = 'task'
-        ordering = ('-id',)
+        ordering = ('priority', '-id')
         permissions = (
             ('can_viewall', _('Access to all tasks')),
             ('can_remind', _('Reminders of tasks'))
