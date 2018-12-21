@@ -43,7 +43,7 @@ def plain_ip_device_mon_template(device) -> Optional[AnyStr]:
 
 class DLinkPort(BasePort):
     def __init__(self, num, name, status, mac, speed, snmp_worker):
-        BasePort.__init__(self, num, name, status, mac, speed)
+        BasePort.__init__(self, num, name, status, mac, speed, writable=True)
         if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmp_worker
@@ -291,12 +291,11 @@ class OnuDevice(DevBase, SNMPBaseWorker):
 
 
 class EltexPort(BasePort):
-    def __init__(self, snmp_worker, writable=True, *args, **kwargs):
+    def __init__(self, snmp_worker, *args, **kwargs):
         BasePort.__init__(self, *args, **kwargs)
         if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmp_worker
-        self.writable = writable
 
     def disable(self):
         self.snmp_worker.set_int_value(
@@ -325,8 +324,7 @@ class EltexSwitch(DLinkDevice):
                 name=self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
                 status=self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
                 mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
-                speed=int(speed or 0),
-                writable=False,
+                speed=int(speed or 0)
             )
 
     def get_device_name(self):
@@ -561,9 +559,8 @@ class HuaweiSwitch(EltexSwitch):
             yield EltexPort(
                 self,
                 num=i+1,
-                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),  # name
-                status=int(status or 0),                              # status
-                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),  # mac
-                speed=int(speed or 0),                               # speed
-                writable=False
+                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),   # name
+                status=int(status or 0),                             # status
+                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),    # mac
+                speed=int(speed or 0)                                # speed
             )

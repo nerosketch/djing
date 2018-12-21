@@ -89,12 +89,13 @@ class DevBase(object, metaclass=ABCMeta):
 
 
 class BasePort(object, metaclass=ABCMeta):
-    def __init__(self, num, name, status, mac, speed):
+    def __init__(self, num, name, status, mac, speed, writable=False):
         self.num = int(num)
         self.nm = name
         self.st = status
         self._mac = mac
         self.sp = speed
+        self.writable = writable
 
     @abstractmethod
     def disable(self):
