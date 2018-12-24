@@ -73,8 +73,7 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
 
         context = super(PeoplesListView, self).get_context_data(**kwargs)
 
-        context['streets'] = models.AbonStreet.objects.filter(group=gid).only(
-            'name')
+        context['streets'] = models.AbonStreet.objects.filter(group=gid).only('name')
         context['street_id'] = lib.safe_int(self.request.GET.get('street'))
         context['group'] = group
         return context
@@ -83,14 +82,15 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
 class GroupListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     context_object_name = 'groups'
     template_name = 'abonapp/group_list.html'
-    queryset = Group.objects.annotate(usercount=Count('abon'))
 
     def get_queryset(self):
-        queryset = super(GroupListView, self).get_queryset()
-        queryset = get_objects_for_user(self.request.user,
-                                        'group_app.view_group', klass=queryset,
-                                        accept_global_perms=False)
-        return queryset
+        queryset = get_objects_for_user(
+            self.request.user,
+            'group_app.view_group', klass=Group,
+            use_groups=False,
+            accept_global_perms=False
+        )
+        return queryset.annotate(usercount=Count('abon'))
 
 
 class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,

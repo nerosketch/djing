@@ -181,7 +181,7 @@ DEFAULT_PICTURE = '/static/img/user_ava.gif'
 AUTH_USER_MODEL = 'accounts_app.UserProfile'
 
 LOGIN_URL = reverse_lazy('acc_app:login')
-LOGIN_REDIRECT_URL = reverse_lazy('acc_app:profile')
+LOGIN_REDIRECT_URL = reverse_lazy('acc_app:setup_info')
 LOGOUT_URL = reverse_lazy('acc_app:logout')
 
 PAGINATION_ITEMS_PER_PAGE = local_settings.PAGINATION_ITEMS_PER_PAGE

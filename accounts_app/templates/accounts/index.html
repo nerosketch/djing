@@ -27,8 +27,8 @@
         </tr>
         {% if request.user.is_superuser %}
             <tr>
-                <td class="col-sm-2">{% trans 'All permissions' %}</td>
-                <td class="col-sm-10"><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
+                <td class="col-sm-2">{% trans 'Is superuser' %}</td>
+                <td class="col-sm-10"><input type="checkbox"{{ userprofile.is_superuser|yesno:' checked,' }}></td>
             </tr>
         {% endif %}
         </tbody>

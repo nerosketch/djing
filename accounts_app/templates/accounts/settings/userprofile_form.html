@@ -2,7 +2,7 @@
 {% load globaltags i18n bootstrap3 %}
 {% block content %}
 
-    <form role="form" action="{% url 'acc_app:setup_info' %}" method="post">{% csrf_token %}
+    <form role="form" action="{{ form_url }}" method="post">{% csrf_token %}
 
         {% bootstrap_form form %}
 

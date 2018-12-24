@@ -241,10 +241,6 @@ msgstr "Включён-ли"
 msgid "Last login"
 msgstr "Последняя авторизация"
 
-#: templates/accounts/index.html:30
-msgid "All permissions"
-msgstr "Административный доступ (все права)"
-
 #: templates/accounts/login.html:5
 msgid "Auth"
 msgstr "Аутентификация"
@@ -308,10 +304,6 @@ msgstr "Изменение прав доступа для выбранного �
 #: templates/accounts/set_abon_groups_permission.html:5
 msgid "The list of user groups to which the account has access"
 msgstr "Список групп абонентов, к которым учётка имеет доступ"
-
-#: views.py:33
-msgid "Wrong login or password, please try again"
-msgstr "Неправильный логин или пароль, попробуйте ещё раз"
 
 #: views.py:121
 msgid "New password is empty, fill it"
@@ -382,3 +374,6 @@ msgstr "Настройки"
 
 msgid "Name and surname"
 msgstr "Имя и отчество"
+
+msgid "Is superuser"
+msgstr "Является суперпользователем"

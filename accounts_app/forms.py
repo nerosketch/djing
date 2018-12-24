@@ -46,10 +46,11 @@ class UserPermissionsForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('avatar', 'password', 'groups', 'user_permissions', 'responsibility_groups', 'is_superuser')
+        fields = ('user_permissions', 'is_superuser')
 
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        exclude = ('avatar', 'password', 'groups', 'user_permissions', 'responsibility_groups', 'is_superuser')
+        exclude = ('avatar', 'password', 'groups', 'user_permissions',
+                   'responsibility_groups', 'is_admin', 'is_superuser', 'last_login')

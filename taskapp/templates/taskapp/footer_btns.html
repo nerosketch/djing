@@ -1,16 +1,23 @@
 {% load i18n %}
 <div class="btn-group btn-group-sm">
+
   {% if perms.taskapp.add_task %}
     <a href="{% url 'taskapp:add' %}" class="btn btn-success">
       <span class="glyphicon glyphicon-plus"></span> {% trans 'Add new task' %}
     </a>
   {% endif %}
+
   {% if perms.taskapp.can_viewall %}
     <a href="{% url 'taskapp:all_tasks' %}" class="btn btn-info">
       <span class="glyphicon glyphicon-baby-formula"></span> {% trans 'View all tasks' %}
     </a>
+    <a href="{% url 'taskapp:all_new_tasks' %}" class="btn btn-default">
+      <span class="glyphicon glyphicon-new-window"></span> {% trans 'View all new tasks' %}
+    </a>
   {% endif %}
+
   <a href="{% url 'taskapp:empty_tasks' %}" class="btn btn-default">
     <span class="glyphicon glyphicon-eye-close"></span> {% trans 'View empty tasks' %}
   </a>
+
 </div>

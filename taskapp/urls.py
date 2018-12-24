@@ -20,6 +20,7 @@ urlpatterns = [
     path('own/', views.OwnTaskListView.as_view(), name='own_tasks'),
     path('my/', views.MyTaskListView.as_view(), name='my_tasks'),
     path('all/', views.AllTasksListView.as_view(), name='all_tasks'),
+    path('all_new/', views.AllNewTasksListView.as_view(), name='all_new_tasks'),
     path('empty/', views.EmptyTasksListView.as_view(), name='empty_tasks'),
     path('check_news/', views.check_news, name='check_news')
 ]

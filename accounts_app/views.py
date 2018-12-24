@@ -10,14 +10,14 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.urls import NoReverseMatch
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, gettext
 from django.views.generic import ListView, UpdateView, DetailView
 from django.conf import settings
 
 from group_app.models import Group
 
 from .models import UserProfile, UserProfileLog
-from .forms import AvatarChangeForm, UserPermissionsForm, MyUserObjectPermissionsForm, UserProfileForm
+from accounts_app import forms
 from djing.lib.decorators import only_admins
 from djing.lib.mixins import OnlyAdminsMixin, LoginAdminPermissionMixin, OnlySuperUserMixin
 from guardian.decorators import permission_required_or_403 as permission_required
@@ -28,7 +28,9 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
     def form_invalid(self, form):
-        messages.error(self.request, _('Wrong login or password, please try again'))
+        login_localed = gettext('profile username')
+        for msg in form.error_messages.values():
+            messages.error(self.request, msg % {'username': login_localed})
         return super().form_invalid(form)
 
     def get_success_url(self):
@@ -36,7 +38,7 @@ class CustomLoginView(LoginView):
         if next_url:
             return next_url
         if self.request.user.is_staff:
-            return resolve_url('acc_app:profile')
+            return resolve_url('acc_app:setup_info')
         return resolve_url('client_side:home')
 
 
@@ -49,7 +51,7 @@ def location_login(request):
             login(request, auser)
             if nextl == 'None' or nextl is None or nextl == '':
                 if request.user.is_staff:
-                    return redirect('acc_app:profile')
+                    return redirect('acc_app:setup_info')
                 return redirect('client_side:home')
             return redirect(nextl)
         return render(request, 'accounts/login.html', {
@@ -81,7 +83,7 @@ class ProfileShowDetailView(LoginRequiredMixin, OnlyAdminsMixin, DetailView):
 
 
 class AvatarUpdateView(LoginRequiredMixin, OnlyAdminsMixin, UpdateView):
-    form_class = AvatarChangeForm
+    form_class = forms.AvatarChangeForm
     template_name = 'accounts/settings/ch_info.html'
 
     def get_object(self, queryset=None):
@@ -92,23 +94,44 @@ class AvatarUpdateView(LoginRequiredMixin, OnlyAdminsMixin, UpdateView):
 
 
 class UpdateAccount(LoginRequiredMixin, OnlySuperUserMixin, UpdateView):
-    form_class = UserProfileForm
+    form_class = forms.UserProfileForm
     pk_url_kwarg = 'uid'
-
     model = UserProfile
     template_name = 'accounts/settings/userprofile_form.html'
 
     def form_valid(self, form):
-        r = super(UpdateAccount, self).form_valid(form)
+        r = super().form_valid(form)
         messages.success(self.request, _('Saved successfully'))
         return r
 
+    def get_context_data(self, **kwargs):
+        context = {
+            'form_url': resolve_url('acc_app:edit_profile', self.object.pk)
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)
 
-class UpdateSelfAccount(UpdateAccount):
-    form_class = UserProfileForm
+
+class UpdateSelfAccount(LoginRequiredMixin, UpdateView):
+    form_class = forms.UserProfileForm
+    pk_url_kwarg = 'uid'
+    model = UserProfile
+    template_name = 'accounts/settings/userprofile_form.html'
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def form_valid(self, form):
+        r = super().form_valid(form)
+        messages.success(self.request, _('Saved successfully'))
+        return r
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'form_url': resolve_url('acc_app:setup_info')
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)
 
 
 @login_required
@@ -195,7 +218,7 @@ class PermsUpdateView(UpdateView):
     http_method_names = 'get', 'post'
     template_name = 'accounts/perms/change_global_perms.html'
     model = UserProfile
-    form_class = UserPermissionsForm
+    form_class = forms.UserPermissionsForm
     pk_url_kwarg = 'uid'
 
     def get_success_url(self):
@@ -259,7 +282,7 @@ def perms_edit(request, uid: int, klass_name, obj_id):
     klass = apps.get_model(app_label, model_name)
     obj = get_object_or_404(klass, pk=obj_id)
 
-    frm = MyUserObjectPermissionsForm(userprofile, obj, request.POST or None)
+    frm = forms.MyUserObjectPermissionsForm(userprofile, obj, request.POST or None)
     if request.method == 'POST' and frm.is_valid():
         frm.save_obj_perms()
         messages.success(request, _('Permissions has successfully updated'))
