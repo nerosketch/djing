@@ -6,29 +6,29 @@
     <table class="table-striped table-bordered">
         <tbody>
         <tr>
-            <td class="col-sm-4">{% trans 'Telephone' %}</td>
-            <td><a href="tel:{{ userprofile.telephone }}">{{ userprofile.telephone }}</a></td>
+            <td class="col-sm-2">{% trans 'Telephone' %}</td>
+            <td class="col-sm-10"><a href="tel:{{ userprofile.telephone }}">{{ userprofile.telephone }}</a></td>
         </tr>
         <tr>
-            <td>{% trans 'User name' %}</td>
-            <td>{{ userprofile.username }}</td>
+            <td class="col-sm-2">{% trans 'User name' %}</td>
+            <td class="col-sm-10">{{ userprofile.username }}</td>
         </tr>
         <tr>
-            <td>{% trans 'Name and surname' %}</td>
-            <td>{{ userprofile.fio }}</td>
+            <td class="col-sm-2">{% trans 'Name and surname' %}</td>
+            <td class="col-sm-10">{{ userprofile.fio }}</td>
         </tr>
         <tr>
-            <td>{% trans 'Is enable' %}</td>
-            <td><input type="checkbox" {{ userprofile.is_active|yesno:' checked,' }}></td>
+            <td class="col-sm-2">{% trans 'Is enable' %}</td>
+            <td class="col-sm-10"><input type="checkbox" {{ userprofile.is_active|yesno:' checked,' }}></td>
         </tr>
         <tr>
-            <td>{% trans 'Last login' %}</td>
-            <td>{{ userprofile.last_login|date:"l d E Y H:i" }}</td>
+            <td class="col-sm-2">{% trans 'Last login' %}</td>
+            <td class="col-sm-10">{{ userprofile.last_login|date:"l d E Y H:i" }}</td>
         </tr>
         {% if request.user.is_superuser %}
             <tr>
-                <td>{% trans 'All permissions' %}</td>
-                <td><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
+                <td class="col-sm-2">{% trans 'All permissions' %}</td>
+                <td class="col-sm-10"><input type="checkbox"{{ userprofile.is_staff|yesno:' checked,' }}></td>
             </tr>
         {% endif %}
         </tbody>

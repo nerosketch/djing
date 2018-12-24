@@ -376,3 +376,9 @@ msgstr "Сотрудник"
 
 msgid "Saved successfully"
 msgstr "Успешно сохранено"
+
+msgid "Options"
+msgstr "Настройки"
+
+msgid "Name and surname"
+msgstr "Имя и отчество"

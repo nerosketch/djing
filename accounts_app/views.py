@@ -1,6 +1,6 @@
 from django.apps import apps
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
@@ -11,20 +11,17 @@ from django.contrib import messages
 from django.urls import NoReverseMatch
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, DetailView
 from django.conf import settings
 
 from group_app.models import Group
 
 from .models import UserProfile, UserProfileLog
 from .forms import AvatarChangeForm, UserPermissionsForm, MyUserObjectPermissionsForm, UserProfileForm
-from djing import lib
 from djing.lib.decorators import only_admins
+from djing.lib.mixins import OnlyAdminsMixin, LoginAdminPermissionMixin, OnlySuperUserMixin
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user, assign_perm, remove_perm
-
-
-login_decs = login_required, only_admins
 
 
 class CustomLoginView(LoginView):
@@ -63,34 +60,27 @@ def location_login(request):
         return redirect('client_side:home')
 
 
-@login_required
-@only_admins
-def profile_show(request, uid=0):
-    uid = lib.safe_int(uid)
+class ProfileShowDetailView(LoginRequiredMixin, OnlyAdminsMixin, DetailView):
+    model = UserProfile
+    pk_url_kwarg = 'uid'
+    template_name = 'accounts/index.html'
+    context_object_name = 'userprofile'
 
-    if uid == 0:
-        return redirect('acc_app:other_profile', uid=request.user.id)
+    def get_context_data(self, **kwargs):
+        context = {
+            'uid': self.kwargs.get('uid')
+        }
+        context.update(kwargs)
+        return super(ProfileShowDetailView, self).get_context_data(**context)
 
-    usr = get_object_or_404(UserProfile, id=uid)
-    if request.user != usr and not request.user.has_perm('accounts_app.view_userprofile', usr):
-        raise PermissionDenied
-    if request.method == 'POST':
-        usr.username = request.POST.get('username')
-        usr.fio = request.POST.get('fio')
-        usr.telephone = request.POST.get('telephone')
-        usr.is_active = request.POST.get('stat')
-        usr.is_admin = request.POST.get('is_admin')
-        usr.save()
-        return redirect('acc_app:other_profile', uid=uid)
-
-    return render(request, 'accounts/index.html', {
-        'uid': uid,
-        'userprofile': usr
-    })
+    def dispatch(self, request, *args, **kwargs):
+        uid = self.kwargs.get('uid')
+        if uid == 0:
+            return redirect('acc_app:other_profile', uid=request.user.id)
+        return super(ProfileShowDetailView, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(login_decs, name='dispatch')
-class AvatarUpdateView(UpdateView):
+class AvatarUpdateView(LoginRequiredMixin, OnlyAdminsMixin, UpdateView):
     form_class = AvatarChangeForm
     template_name = 'accounts/settings/ch_info.html'
 
@@ -101,18 +91,24 @@ class AvatarUpdateView(UpdateView):
         return resolve_url('acc_app:other_profile', uid=self.request.user.id)
 
 
-class UpdateSelfAccount(LoginRequiredMixin, UpdateView):
+class UpdateAccount(LoginRequiredMixin, OnlySuperUserMixin, UpdateView):
     form_class = UserProfileForm
+    pk_url_kwarg = 'uid'
+
     model = UserProfile
-    template_name = 'accounts/userprofile_form.html'
+    template_name = 'accounts/settings/userprofile_form.html'
+
+    def form_valid(self, form):
+        r = super(UpdateAccount, self).form_valid(form)
+        messages.success(self.request, _('Saved successfully'))
+        return r
+
+
+class UpdateSelfAccount(UpdateAccount):
+    form_class = UserProfileForm
 
     def get_object(self, queryset=None):
         return self.request.user
-
-    def form_valid(self, form):
-        r = super(UpdateSelfAccount, self).form_valid(form)
-        messages.success(self.request, _('Saved successfully'))
-        return r
 
 
 @login_required
@@ -165,8 +161,7 @@ def delete_profile(request, uid: int):
     return redirect('acc_app:accounts_list')
 
 
-@method_decorator(login_decs, name='dispatch')
-class AccountsListView(ListView):
+class AccountsListView(LoginRequiredMixin, OnlyAdminsMixin, ListView):
     http_method_names = 'get',
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'accounts/acc_list.html'
@@ -227,8 +222,7 @@ class PermsUpdateView(UpdateView):
         return super(PermsUpdateView, self).form_valid(form)
 
 
-@method_decorator(login_decs, name='dispatch')
-class PermissionClassListView(ListView):
+class PermissionClassListView(LoginRequiredMixin, OnlyAdminsMixin, ListView):
     http_method_names = 'get',
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'accounts/perms/object/objects_of_type.html'
@@ -308,8 +302,7 @@ def set_abon_groups_permission(request, uid: int):
     })
 
 
-@method_decorator(login_decs, name='dispatch')
-class ManageResponsibilityGroups(ListView):
+class ManageResponsibilityGroups(LoginRequiredMixin, OnlyAdminsMixin, ListView):
     http_method_names = ('get', 'post')
     template_name = 'accounts/manage_responsibility_groups.html'
     context_object_name = 'groups'
@@ -339,11 +332,10 @@ class ManageResponsibilityGroups(ListView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('accounts_app.view_userprofilelog'), name='dispatch')
-class ActionListView(ListView):
+class ActionListView(LoginAdminPermissionMixin, ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'accounts/action_log.html'
+    permission_required = 'accounts_app.view_userprofilelog'
     model = UserProfileLog
 
     def get_queryset(self):

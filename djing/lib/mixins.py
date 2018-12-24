@@ -2,6 +2,14 @@ from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from guardian.mixins import PermissionRequiredMixin
 
 
+class OnlySuperUserMixin(AccessMixin):
+    """Verify that the current user is superuser."""
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
 class OnlyAdminsMixin(AccessMixin):
     """Verify that the current user is admin."""
     def dispatch(self, request, *args, **kwargs):
