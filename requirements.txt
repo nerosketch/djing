@@ -22,12 +22,14 @@ django-jsonfield
 requests
 webdavclient
 pyst2
-django-bitfield
 transliterate
 asterisk
 
 # django-xmlview for pay system allpay
 -e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview
+
+# django-bitfield
+-e git://github.com/disqus/django-bitfield.git#egg=django-bitfield
 
 Celery
 redis==2.10.6
