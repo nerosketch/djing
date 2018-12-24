@@ -213,10 +213,11 @@ class Conversation(models.Model):
                     if participant == author:
                         continue
                     MessageStatus.objects.create(msg=msg, user=participant)
-                    send_email_notify.delay(
-                        msg_text=text,
-                        account_id=participant.pk
-                    )
+                    if participant.flags.notify_msg:
+                        send_email_notify.delay(
+                            msg_text=text,
+                            account_id=participant.pk
+                        )
             return msg
         except ChatException as e:
             raise MessageError(e)

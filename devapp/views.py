@@ -716,7 +716,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
                     device_down.comment
                 )
             }, account_ids=(
-                recipient.pk for recipient in recipients.only('pk').iterator()
+                recipient.pk for recipient in recipients.only('pk').iterator() if recipient.flags.notify_mon
             ))
             return {
                 'text': 'notification successfully sent'

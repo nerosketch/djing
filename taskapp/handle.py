@@ -13,6 +13,8 @@ class TaskException(Exception):
 def handle(task, author, recipients):
     errors = []
     for recipient in recipients:
+        if not recipient.flags.notify_task:
+            continue
         try:
             task_status = _('Task')
             # If signal to myself then quietly

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-31 16:28+0300\n"
+"POT-Creation-Date: 2018-12-24 15:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,114 +18,129 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: models.py:22
+#: models.py:23
 msgid "Users must have an telephone number"
 msgstr "У пользователей должен быть номер телефона"
 
-#: models.py:50 templates/accounts/acc_list.html:21
+#: models.py:51 templates/accounts/acc_list.html:21 views.py:31
 msgid "profile username"
 msgstr "Логин"
 
-#: models.py:55
+#: models.py:56
 msgid "fio"
 msgstr "ФИО"
 
-#: models.py:56
+#: models.py:57
 msgid "birth day"
 msgstr "дата рождения"
 
-#: models.py:57
+#: models.py:58
 msgid "Is active"
 msgstr "Активен"
 
-#: models.py:61 templates/accounts/acc_list.html:23
-#: templates/accounts/create_acc.html:62 templates/accounts/index.html:9
-#: templates/accounts/settings/ch_info.html:38
+#: models.py:62 templates/accounts/acc_list.html:23
+#: templates/accounts/create_acc.html:61 templates/accounts/index.html:9
 msgid "Telephone"
 msgstr "Телефон"
 
-#: models.py:95
+#: models.py:96
 msgid "Author"
 msgstr "Автор"
 
-#: models.py:96 templates/accounts/action_log.html:12
+#: models.py:97 templates/accounts/action_log.html:12
 msgid "Meta information"
 msgstr "Мета информация"
 
-#: models.py:98
+#: models.py:99
 msgid "Create user"
 msgstr "Создание абонента"
 
-#: models.py:99
+#: models.py:100
 msgid "Delete user"
 msgstr "Удаление абонента"
 
-#: models.py:100
+#: models.py:101
 msgid "Create device"
 msgstr "Создание устройства"
 
-#: models.py:101
+#: models.py:102
 msgid "Delete device"
 msgstr "Удаление устройства"
 
-#: models.py:102
+#: models.py:103
 msgid "Create NAS"
 msgstr "Создание NAS"
 
-#: models.py:103
+#: models.py:104
 msgid "Delete NAS"
 msgstr "Удаление NAS"
 
-#: models.py:104
+#: models.py:105
 msgid "Create service"
 msgstr "Создание тарифа"
 
-#: models.py:105
+#: models.py:106
 msgid "Delete service"
 msgstr "Удаление тарифа"
 
-#: models.py:107
+#: models.py:108
 msgid "Action type"
 msgstr "Тип действия"
 
-#: models.py:108
+#: models.py:109
 msgid "Additional info"
 msgstr "Дополнительная информация"
 
-#: models.py:109
+#: models.py:110
 msgid "Action date"
 msgstr "Дата действия"
 
-#: models.py:116
+#: models.py:117
 msgid "User profile log"
 msgstr "Лог действий учётной записи"
 
-#: models.py:117
+#: models.py:118
 msgid "User profile logs"
 msgstr "Логи действий учётной записи"
 
-#: models.py:126
+#: models.py:127
 msgid "Avatar"
 msgstr "Аватар"
 
-#: models.py:128
+#: models.py:129
 msgid "Responsibility groups"
 msgstr "Группы администратора"
 
-#: models.py:142
+#: models.py:131
+msgid "Notification about tasks"
+msgstr "Оповещения о задачах"
+
+#: models.py:132
+msgid "Notification about messages"
+msgstr "Оповещения о сообщениях"
+
+#: models.py:133
+msgid "Notification from monitoring"
+msgstr "Оповещения из мониторинга"
+
+#: models.py:135
+msgid "Settings flags"
+msgstr "Флаги настройки"
+
+#: models.py:149
 msgid "Staff account profile"
 msgstr "Учётная запись работника"
 
-#: models.py:143
+#: models.py:150
 msgid "Staff account profiles"
 msgstr "Учётные записи работников"
 
-#: templates/accounts/acc_list.html:7 templates/accounts/create_acc.html:8
-#: templates/accounts/perms/change_global_perms.html:8
+#: templates/accounts/acc_list.html:7 templates/accounts/create_acc.html:7
+#: templates/accounts/perms/change_global_perms.html:7
 #: templates/accounts/perms/ext.html:7
 #: templates/accounts/perms/object/objects_of_type.html:7
-#: templates/accounts/perms/object/objects_types.html:8
-#: templates/accounts/perms/object/perms_edit.html:8
+#: templates/accounts/perms/object/objects_types.html:7
+#: templates/accounts/perms/object/perms_edit.html:7
 msgid "Administrators"
 msgstr "Сотрудники"
 
@@ -142,7 +157,6 @@ msgid "Fullname, or login if name is empty"
 msgstr "ФИО (или ник если нет)"
 
 #: templates/accounts/acc_list.html:24
-#: templates/accounts/settings/ch_info.html:28
 msgid "Email"
 msgstr "Адрес электронной почты"
 
@@ -178,60 +192,62 @@ msgstr "Описание"
 msgid "That admin has no logs"
 msgstr "Эта учётная запись не имеет логов"
 
-#: templates/accounts/create_acc.html:9
+#: templates/accounts/create_acc.html:8
 msgid "Add"
 msgstr "Добавить"
 
-#: templates/accounts/create_acc.html:16
+#: templates/accounts/create_acc.html:15
 msgid "Create new account"
 msgstr "Создать новую учётную запись"
 
-#: templates/accounts/create_acc.html:33 templates/accounts/create_acc.html:37
+#: templates/accounts/create_acc.html:32 templates/accounts/create_acc.html:36
 msgid "Username"
 msgstr "Логин"
 
-#: templates/accounts/create_acc.html:42 templates/accounts/create_acc.html:47
+#: templates/accounts/create_acc.html:41 templates/accounts/create_acc.html:46
 msgid "Fullname"
 msgstr "Полное имя"
 
-#: templates/accounts/create_acc.html:52
+#: templates/accounts/create_acc.html:51
 msgid "EMail"
 msgstr "Адрес электронной почты"
 
-#: templates/accounts/create_acc.html:67
-#: templates/accounts/settings/ch_info.html:43
+#: templates/accounts/create_acc.html:66
 msgid "+[7,8,9,3] and 10,11 digits"
 msgstr "+[7,8,9,3] и 10,11 цифр"
 
-#: templates/accounts/create_acc.html:72
+#: templates/accounts/create_acc.html:71
 msgid "Type password"
 msgstr "Введите пароль"
 
-#: templates/accounts/create_acc.html:80
+#: templates/accounts/create_acc.html:79
 msgid "Repeat password"
 msgstr "Повторите пароль"
 
-#: templates/accounts/create_acc.html:89
+#: templates/accounts/create_acc.html:88
 #: templates/accounts/manage_responsibility_groups.html:20
-#: templates/accounts/perms/change_global_perms.html:22
-#: templates/accounts/perms/object/perms_edit.html:43
+#: templates/accounts/perms/change_global_perms.html:21
+#: templates/accounts/perms/object/perms_edit.html:42
 #: templates/accounts/set_abon_groups_permission.html:20
-#: templates/accounts/settings/ch_info.html:67
+#: templates/accounts/settings/userprofile_form.html:11
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/accounts/create_acc.html:92
+#: templates/accounts/create_acc.html:91
 #: templates/accounts/manage_responsibility_groups.html:21
-#: templates/accounts/perms/object/perms_edit.html:46
+#: templates/accounts/perms/object/perms_edit.html:45
 #: templates/accounts/set_abon_groups_permission.html:21
-#: templates/accounts/settings/ch_info.html:70
+#: templates/accounts/settings/userprofile_form.html:14
 msgid "Reset"
 msgstr "Сбросить"
 
-#: templates/accounts/index.html:13 templates/accounts/settings/ch_info.html:9
-#: templates/accounts/settings/ch_info.html:13
+#: templates/accounts/index.html:13
 msgid "User name"
 msgstr "Логин"
+
+#: templates/accounts/index.html:17
+msgid "Name and surname"
+msgstr "Имя и отчество"
 
 #: templates/accounts/index.html:21
 msgid "Is enable"
@@ -240,6 +256,10 @@ msgstr "Включён-ли"
 #: templates/accounts/index.html:25
 msgid "Last login"
 msgstr "Последняя авторизация"
+
+#: templates/accounts/index.html:30
+msgid "Is superuser"
+msgstr "Является суперпользователем"
 
 #: templates/accounts/login.html:5
 msgid "Auth"
@@ -257,47 +277,47 @@ msgstr "Войти по местоположению"
 msgid "The responsibility of the administrator of the group of subscribers"
 msgstr "Ответственность администратора за группы абонентов"
 
-#: templates/accounts/perms/change_global_perms.html:10
+#: templates/accounts/perms/change_global_perms.html:9
 #: templates/accounts/perms/ext.html:9 templates/accounts/perms/ext.html:14
 msgid "Permission options"
 msgstr "Права"
 
-#: templates/accounts/perms/change_global_perms.html:11
+#: templates/accounts/perms/change_global_perms.html:10
 #: templates/accounts/perms/ext.html:22
 msgid "Global permission options"
 msgstr "Глобальные права"
 
-#: templates/accounts/perms/change_global_perms.html:16
+#: templates/accounts/perms/change_global_perms.html:15
 msgid "Select permissions for picked account"
 msgstr "Отметьте права для выбранной учётной записи"
 
 #: templates/accounts/perms/ext.html:27
 #: templates/accounts/perms/object/objects_of_type.html:9
+#: templates/accounts/perms/object/objects_types.html:9
 #: templates/accounts/perms/object/objects_types.html:10
-#: templates/accounts/perms/object/objects_types.html:11
-#: templates/accounts/perms/object/perms_edit.html:10
+#: templates/accounts/perms/object/perms_edit.html:9
 msgid "Object permission options"
 msgstr "Права для каждого объекта"
 
 #: templates/accounts/perms/object/objects_of_type.html:16
-#: templates/accounts/perms/object/perms_edit.html:18
+#: templates/accounts/perms/object/perms_edit.html:17
 msgid "Pick object for edit permissions"
 msgstr "Выберите объект для редактирования прав доступа"
 
-#: templates/accounts/perms/object/objects_types.html:16
+#: templates/accounts/perms/object/objects_types.html:15
 msgid "Pick the type of object"
 msgstr "Выберите тип объекта"
 
-#: templates/accounts/perms/object/objects_types.html:24
+#: templates/accounts/perms/object/objects_types.html:23
 msgid "Group"
 msgstr "Группа"
 
-#: templates/accounts/perms/object/perms_edit.html:27
+#: templates/accounts/perms/object/perms_edit.html:26
 msgid "Profile is superuser, permissions to change it makes no sense"
 msgstr ""
-"Учётная запись является суперпользователем. Разрешения менять нет смысла.,"
+"Учётная запись является суперпользователем. Разрешения менять нет смысла."
 
-#: templates/accounts/perms/object/perms_edit.html:33
+#: templates/accounts/perms/object/perms_edit.html:32
 msgid "Change permission for that object"
 msgstr "Изменение прав доступа для выбранного объекта"
 
@@ -305,43 +325,35 @@ msgstr "Изменение прав доступа для выбранного �
 msgid "The list of user groups to which the account has access"
 msgstr "Список групп абонентов, к которым учётка имеет доступ"
 
-#: views.py:121
-msgid "New password is empty, fill it"
-msgstr "Новый пароль пустой, придумайте себе пароль"
+#: views.py:104 views.py:126
+msgid "Saved successfully"
+msgstr "Успешно сохранено"
 
-#: views.py:123
-msgid "Wrong password"
-msgstr "Неправильный пароль"
-
-#: views.py:125
-msgid "Empty password, fill it"
-msgstr "Пустой пароль, впишите что-то в пароль"
-
-#: views.py:149
+#: views.py:154
 msgid "You forget specify a password for the new account"
 msgstr "Забыли указать пароль для нового аккаунта"
 
-#: views.py:152
+#: views.py:157
 msgid "You forget to repeat a password for the new account"
 msgstr "Забыли повторить пароль для нового аккаунта"
 
-#: views.py:161
+#: views.py:166
 msgid "Subscriber with this name already exist"
 msgstr "Пользователь с таким именем уже есть"
 
-#: views.py:163
+#: views.py:168
 msgid "Passwords does not match, try again"
 msgstr "Пароли не совпадают, попробуйте ещё раз"
 
-#: views.py:178
+#: views.py:183
 msgid "Profile has been deleted"
 msgstr "Учётная запись удалена"
 
-#: views.py:240
+#: views.py:244 views.py:288
 msgid "Permissions has successfully updated"
 msgstr "Права успешно обновлены"
 
-#: views.py:352
+#: views.py:354
 msgid "Responsibilities has been updated"
 msgstr "Ответственность за группы обновлена"
 
@@ -366,14 +378,5 @@ msgstr "Лог действий"
 msgid "Administrator"
 msgstr "Сотрудник"
 
-msgid "Saved successfully"
-msgstr "Успешно сохранено"
-
 msgid "Options"
 msgstr "Настройки"
-
-msgid "Name and surname"
-msgstr "Имя и отчество"
-
-msgid "Is superuser"
-msgstr "Является суперпользователем"
