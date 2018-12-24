@@ -141,6 +141,16 @@ class TaskUpdateView(LoginAdminMixin, UpdateView):
         else:
             if not request.user.has_perm('taskapp.change_task'):
                 raise PermissionDenied
+
+        # check if new task with user already exists
+        uname = request.GET.get('uname')
+        if uname:
+            exists_task = Task.objects.filter(abon__username=uname, state='S')
+            if exists_task.exists():
+                messages.info(request, _('New task with this user already exists.'
+                                          ' You are redirected to it.'))
+                return redirect('taskapp:edit', exists_task.first().pk)
+
         try:
             return super(TaskUpdateView, self).dispatch(request, *args, **kwargs)
         except TaskException as e:
@@ -154,6 +164,14 @@ class TaskUpdateView(LoginAdminMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
+        # check if new task with picked user already exists
+        if form.cleaned_data['state'] == 'S':
+            exists_task = Task.objects.filter(abon=form.cleaned_data['abon'], state='S')
+            if exists_task.exists():
+                messages.info(self.request, _('New task with this user already exists.'
+                                               ' You are redirected to it.'))
+                return redirect('taskapp:edit', exists_task.first().pk)
+
         try:
             self.object = form.save()
             if self.object.author is None:

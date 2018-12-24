@@ -18,7 +18,7 @@
                 <td>{{ ph.date|date:'d F Y, H:i:s' }}</td>
                 <td>
                 {% if ph.author %}
-                    <a target="_blank" href="{% url 'acc_app:other_profile' ph.author.pk %}">{{ ph.author.username }}</a>
+                    <a href="{% url 'acc_app:other_profile' ph.author.pk %}">{{ ph.author.username }}</a>
                 {% else %}
                     {% trans 'System' %}
                 {% endif %}

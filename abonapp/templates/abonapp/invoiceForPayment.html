@@ -49,7 +49,7 @@
                         {% endif %}
                     </td>
                     <td class="col-xs-2">
-                        <a href="{% url 'acc_app:other_profile' inv.author.id %}" target="_blank">{{ inv.author.username }}</a>
+                        <a href="{% url 'acc_app:other_profile' inv.author.id %}">{{ inv.author.username }}</a>
                     </td>
                 </tr>
             {% empty %}
