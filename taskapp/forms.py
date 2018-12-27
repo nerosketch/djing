@@ -11,7 +11,7 @@ class TaskFrm(forms.ModelForm):
             'out_date': delta_add_days().strftime("%Y-%m-%d")
         }})
         super(TaskFrm, self).__init__(*args, **kwargs)
-        self.fields['recipients'].queryset = UserProfile.objects.filter(is_admin=True)
+        self.fields['recipients'].queryset = UserProfile.objects.filter(is_admin=True, is_active=True)
 
         if initial_abon is not None:
             # fetch profiles that has been attached on group of selected subscriber

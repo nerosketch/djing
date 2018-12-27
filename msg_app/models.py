@@ -209,7 +209,7 @@ class Conversation(models.Model):
                 attachment=attachment, author=author
             )
             if with_status:
-                for participant in self.participants.all():
+                for participant in self.participants.filter(is_active=True):
                     if participant == author:
                         continue
                     MessageStatus.objects.create(msg=msg, user=participant)

@@ -103,7 +103,7 @@ class Task(models.Model):
     def send_notification(self):
         task_handle(
            self, self.author,
-           self.recipients.all()
+           self.recipients.filter(is_active=True)
         )
 
     def get_attachment_fname(self):
