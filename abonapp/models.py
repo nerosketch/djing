@@ -461,9 +461,9 @@ class AllTimePayLogManager(models.Manager):
         cur = connection.cursor()
         cur.execute(
             'SELECT SUM(summ) AS alsum, '
-            'DATE_FORMAT(date_add, "%Y-%m-%d") AS pay_date '
+            "DATE_TRUNC('day', date_add) AS pay_date "
             'FROM  all_time_pay_log '
-            'GROUP BY DATE_FORMAT(date_add, "%Y-%m-%d")'
+            'GROUP BY 2 ORDER BY 2'
         )
         while True:
             r = cur.fetchone()
@@ -472,7 +472,7 @@ class AllTimePayLogManager(models.Manager):
             summ, dat = r
             yield {
                 'summ': summ,
-                'pay_date': datetime.strptime(dat, '%Y-%m-%d')
+                'pay_date': dat
             }
 
 
