@@ -144,11 +144,11 @@ class TaskUpdateView(LoginAdminMixin, UpdateView):
 
         # check if new task with user already exists
         uname = request.GET.get('uname')
-        if uname:
+        if uname and self.kwargs.get('task_id') is None:
             exists_task = Task.objects.filter(abon__username=uname, state='S')
             if exists_task.exists():
                 messages.info(request, _('New task with this user already exists.'
-                                          ' You are redirected to it.'))
+                                         ' You are redirected to it.'))
                 return redirect('taskapp:edit', exists_task.first().pk)
 
         try:
@@ -165,11 +165,11 @@ class TaskUpdateView(LoginAdminMixin, UpdateView):
 
     def form_valid(self, form):
         # check if new task with picked user already exists
-        if form.cleaned_data['state'] == 'S':
+        if form.cleaned_data['state'] == 'S' and self.kwargs.get('task_id') is None:
             exists_task = Task.objects.filter(abon=form.cleaned_data['abon'], state='S')
             if exists_task.exists():
                 messages.info(self.request, _('New task with this user already exists.'
-                                               ' You are redirected to it.'))
+                                              ' You are redirected to it.'))
                 return redirect('taskapp:edit', exists_task.first().pk)
 
         try:
