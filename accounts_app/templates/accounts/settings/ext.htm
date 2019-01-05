@@ -5,7 +5,13 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
-        <li><a href="{% url 'acc_app:setup_info' %}">{{ object.username }}</a></li>
+        <li>
+            {% if object == request.user %}
+                <a href="{% url 'acc_app:setup_info' %}">{{ object.username }}</a>
+            {% else %}
+                <a href="{% url 'acc_app:other_profile' object.pk %}">{{ object.username }}</a>
+            {% endif %}
+        </li>
         <li class="active">{% trans 'Options' %}</li>
     </ol>
 {% endblock %}
