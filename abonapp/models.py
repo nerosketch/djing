@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core import validators
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import post_delete, pre_delete, post_init, \
+from django.db.models.signals import pre_delete, post_init, \
     pre_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
@@ -348,24 +348,6 @@ class Abon(BaseAccount):
         except LogicError:
             pass
 
-    def nas_remove_self(self):
-        """
-        Will remove this user to network access server
-        :return:
-        """
-        if self.nas is None:
-            raise LogicError(_('gateway required'))
-        try:
-            agent_abon = self.build_agent_struct()
-            if agent_abon is not None:
-                mngr = self.nas.get_nas_manager()
-                mngr.remove_user(agent_abon)
-        except (NasFailedResult, NasNetworkError, ConnectionResetError) as e:
-            print('ERROR:', e)
-            return e
-        except LogicError:
-            pass
-
     def get_absolute_url(self):
         return resolve_url('abonapp:abon_home', self.group.id, self.username)
 
@@ -608,17 +590,6 @@ class PeriodicPayForId(models.Model):
         ordering = ('last_pay',)
 
 
-@receiver(post_delete, sender=Abon)
-def abon_del_signal(sender, **kwargs):
-    abon = kwargs.get("instance")
-    if abon is None:
-        raise ValueError('Instance does not passed to a signal')
-    try:
-        abon.nas_remove_self()
-    except (NasFailedResult, NasNetworkError, LogicError):
-        return True
-
-
 @receiver(post_init, sender=AbonTariff)
 def abon_tariff_post_init(sender, **kwargs):
     abon_tariff = kwargs["instance"]
@@ -635,17 +606,3 @@ def abon_tariff_pre_save(sender, **kwargs):
     if getattr(abon_tariff, 'deadline') is None:
         calc_obj = abon_tariff.tariff.get_calc_type()(abon_tariff)
         abon_tariff.deadline = calc_obj.calc_deadline()
-
-
-@receiver(pre_delete, sender=AbonTariff)
-def abontariff_pre_delete(sender, **kwargs):
-    abon_tariff = kwargs.get("instance")
-    if abon_tariff is None:
-        raise ValueError('Instance does not passed to a signal')
-    try:
-        abon = Abon.objects.get(current_tariff=abon_tariff)
-        abon.nas_remove_self()
-    except (NasFailedResult, NasNetworkError, LogicError):
-        return True
-    except Abon.DoesNotExist:
-        print('Error: abontariff_pre_delete - user not found')
