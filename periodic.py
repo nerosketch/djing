@@ -7,8 +7,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djing.settings")
 django.setup()
 from django.utils import timezone
 from django.db import transaction
-from django.db.models import signals, Count
-from abonapp.models import Abon, AbonTariff, abontariff_pre_delete, PeriodicPayForId, AbonLog
+from django.db.models import Count
+from abonapp.models import Abon, AbonTariff, PeriodicPayForId, AbonLog
 from gw_app.nas_managers import NasNetworkError, NasFailedResult
 from gw_app.models import NASModel
 from djing.lib import LogicError
@@ -34,7 +34,6 @@ class NasSyncThread(Thread):
 
 
 def main():
-    signals.pre_delete.disconnect(abontariff_pre_delete, sender=AbonTariff)
     AbonTariff.objects.filter(abon=None).delete()
     now = timezone.now()
     fields = ('id', 'tariff__title', 'abon__id', 'abon__username')
@@ -78,7 +77,7 @@ def main():
                 # make log about it
                 l = AbonLog.objects.create(
                     abon=abon, amount=-amount,
-                    comment="Автоматическое продление услуги '%s'" % trf.title
+                    comment="Автоматическое продление услуги '%s' для %s" % (trf.title, abon)
                 )
                 print(l.comment)
         else:
