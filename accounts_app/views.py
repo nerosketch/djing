@@ -28,9 +28,8 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
     def form_invalid(self, form):
-        login_localed = gettext('profile username')
-        for msg in form.error_messages.values():
-            messages.error(self.request, msg % {'username': login_localed})
+        for msg in form.non_field_errors():
+            messages.error(self.request, msg)
         return super().form_invalid(form)
 
     def get_success_url(self):
