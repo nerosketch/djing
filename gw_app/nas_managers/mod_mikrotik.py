@@ -311,7 +311,8 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 '=queue=Djing_pcq_up/Djing_pcq_down',
                 '=burst-time=5/5',
                 '=burst-limit=%.3fM/%.3fM' % tuple(i * 2 for i in queue.max_limit),
-                '=burst-threshold=%.3fM/%.3fM' % tuple(i / 1.2 for i in queue.max_limit)
+                '=burst-threshold=%.3fM/%.3fM' % tuple(i / 1.2 for i in queue.max_limit),
+                '=numbers=%s' % queue_gw.queue_id
             ]
             if queue.queue_id:
                 cmd.insert(1, '=.id=%s' % queue.queue_id)
