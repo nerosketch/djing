@@ -99,7 +99,9 @@ def json_view(fn):
     @wraps(fn)
     def wrapped(request, *args, **kwargs):
         r = fn(request, *args, **kwargs)
-        return JsonResponse(r, safe=False, json_dumps_params={
+        if not isinstance(r['text'], str):
+            r['text'] = str(r['text'])
+        return JsonResponse(dict(r), safe=False, json_dumps_params={
             'ensure_ascii': False
         })
     return wrapped
