@@ -18,7 +18,10 @@ pid
 django-guardian
 pinax-theme-bootstrap
 django-bootstrap3
-django-jsonfield
+
+# django-jsonfield
+-e git://github.com/dmkoch/django-jsonfield.git#egg=django-jsonfield
+
 requests
 webdavclient
 pyst2
