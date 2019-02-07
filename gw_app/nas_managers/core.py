@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from typing import Iterator, Tuple, Optional
 from djing import ping
 from gw_app.nas_managers.structs import SubnetQueue, VectorQueue
@@ -16,7 +16,8 @@ class NasNetworkError(Exception):
 
 # Communicate with gw
 class BaseTransmitter(ABC):
-    @abstractproperty
+    @property
+    @abstractmethod
     def description(self):
         """
         :return: Returnd a description of nas implementation

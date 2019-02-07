@@ -23,7 +23,7 @@ class SubnetQueue(BaseStruct):
         return self._max_limit
 
     def set_max_limit(self, v):
-        if isinstance(v, tuple):
+        if isinstance(v, (tuple, list)):
             self._max_limit = v
         elif isinstance(v, str):
             s_in, s_out = v.split('/')
@@ -32,7 +32,7 @@ class SubnetQueue(BaseStruct):
             sp = float(v)
             self._max_limit = sp, sp
         else:
-            raise ValueError('Unexpected format for max_limit')
+            raise ValueError('Unexpected format for max_limit %s' % v)
 
     max_limit = property(get_max_limit, set_max_limit)
 

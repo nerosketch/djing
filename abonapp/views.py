@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Dict, Optional
 
+from abonapp.tasks import customer_nas_command, customer_nas_remove
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
 from devapp.models import Device, Port as DevPort
 from dialing_app.models import AsteriskCDR
@@ -172,6 +173,13 @@ class DelAbonDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
         try:
             abon = self.get_object()
             gid = abon.group.id
+            if abon.current_tariff:
+                abon_tariff = abon.current_tariff.tariff
+                customer_nas_remove.delay(
+                    customer_uid=abon.pk, ip_addr=abon.ip_address,
+                    speed=(abon_tariff.speedIn, abon_tariff.speedOut),
+                    is_access=abon.is_access(), nas_pk=abon.nas_id
+                )
             abon.delete()
             request.user.log(request.META, 'dusr', (
                 '%(uname)s, "%(fio)s", %(group)s %(street)s %(house)s' % {
@@ -336,9 +344,7 @@ class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         r = super(AbonHomeUpdateView, self).form_valid(form)
         abon = self.object
-        res = abon.nas_sync_self()
-        if isinstance(res, Exception):
-            messages.warning(self.request, res)
+        customer_nas_command.delay(abon.pk, 'sync')
         messages.success(self.request, _('edit abon success msg'))
         return r
 
@@ -450,11 +456,8 @@ def pick_tariff(request, gid: int, uname):
                                  comment=log_comment)
             else:
                 abon.pick_tariff(trf, request.user, comment=log_comment)
-            r = abon.nas_sync_self()
-            if r is None:
-                messages.success(request, _('Tariff has been picked'))
-            else:
-                messages.error(request, r)
+            customer_nas_command.delay(abon.pk, 'sync')
+            messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid,
                             uname=abon.username)
     except (lib.LogicError, NasFailedResult) as e:
@@ -489,6 +492,13 @@ def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
     try:
         abon_tariff = get_object_or_404(models.AbonTariff,
                                         pk=int(abon_tariff_id))
+        abon = abon_tariff.abon
+        trf = abon_tariff.tariff
+        customer_nas_remove.delay(
+            customer_uid=abon.pk, ip_addr=abon.ip_address,
+            speed=(trf.speedIn, trf.speedOut),
+            is_access=abon.is_access(), nas_pk=abon.nas_id
+        )
         abon_tariff.delete()
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
@@ -610,9 +620,7 @@ class IpUpdateView(LoginAdminPermissionMixin, UpdateView):
     def form_valid(self, form):
         r = super(IpUpdateView, self).form_valid(form)
         abon = self.object
-        res = abon.nas_sync_self()
-        if isinstance(res, Exception):
-            messages.warning(self.request, res)
+        customer_nas_command.delay(abon.pk, 'sync')
         messages.success(self.request, _('Ip successfully updated'))
         return r
 
@@ -1219,6 +1227,7 @@ def user_session_free(request, gid: int, uname):
         return redirect('abonapp:abon_home', gid, uname)
     if abon.ip_address:
         abon.free_ip_addr()
+        customer_nas_command.delay(abon.pk, 'remove')
         messages.success(request, _('Ip lease has been freed'))
     else:
         messages.error(request, _('User not have ip'))

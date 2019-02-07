@@ -81,6 +81,8 @@ def json_view(fn):
     @wraps(fn)
     def wrapped(request, *args, **kwargs):
         r = fn(request, *args, **kwargs)
+        if isinstance(r, dict) and not isinstance(r.get('text'), str):
+            r['text'] = str(r.get('text'))
         return JsonResponse(r, safe=False, json_dumps_params={
             'ensure_ascii': False
         })

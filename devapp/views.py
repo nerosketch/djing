@@ -469,9 +469,8 @@ def devview(request, group_id: int, device_id: int):
 
     template_name = 'generic_switch.html'
     try:
-        if device.ip_address:
-            if not ping(str(device.ip_address)):
-                messages.error(request, _('Dot was not pinged'))
+        if device.ip_address and not ping(str(device.ip_address)):
+            messages.error(request, _('Dot was not pinged'))
         if device.man_passw:
             manager = device.get_manager_object()
             ports = tuple(manager.get_ports())
@@ -482,13 +481,15 @@ def devview(request, group_id: int, device_id: int):
             template_name = manager.get_template_name()
         else:
             messages.warning(request, _('Not Set snmp device password'))
+
         return render(request, 'devapp/custom_dev_page/' + template_name, {
             'dev': device,
             'ports': ports,
             'dev_accs': Abon.objects.filter(device=device),
             'dev_manager': manager,
             'ports_db': Port.objects.filter(device=device).annotate(
-                num_abons=Count('abon')),
+                num_abons=Count('abon')
+            ),
         })
     except EasySNMPError as e:
         messages.error(request,

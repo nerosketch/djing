@@ -14,7 +14,7 @@
         <tbody>
         {% for ph in pay_history %}
             <tr>
-                <td>{{ ph.amount }}</td>
+                <td>{{ ph.amount|floatformat:2 }}</td>
                 <td>{{ ph.date|date:'d F Y, H:i:s' }}</td>
                 <td>
                 {% if ph.author %}
