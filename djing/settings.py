@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_cleanup.apps.CleanupConfig',
     'ip_pool',
     'accounts_app',
     'gw_app',
@@ -52,7 +53,7 @@ INSTALLED_APPS = [
     'statistics',
     'taskapp',
     'clientsideapp',
-    'chatbot',
+    'messenger',
     'msg_app',
     'dialing_app',
     'group_app',
@@ -234,3 +235,7 @@ REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+
+# public url for Viber Bot
+VIBER_BOT_PUBLIC_URL = local_settings.VIBER_BOT_PUBLIC_URL

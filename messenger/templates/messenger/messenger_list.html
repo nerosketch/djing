@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load dpagination i18n %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'messengers' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'messengers' %}
+{% endblock %}
+
+{% block main %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th class="col-sm-4">{% trans 'Title' %}</th>
+                <th class="col-sm-3">{% trans 'Type' %}</th>
+                <th class="col-sm-4">{% trans 'Slug' %}</th>
+                <th class="col-sm-1">#</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for messenger in object_list %}
+                <tr>
+                    <td>{{ messenger.title }}</td>
+                    <td>{{ messenger.get_bot_type_display }}</td>
+                    <td>{{ messenger.slug }}</td>
+                    <td>
+                        <a href="{{ messenger.get_absolute_url }}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4"><a href="#">{% trans 'messengers was not found' %}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            {% if perms.messenger.add_messenger %}
+            <tfoot>
+            <tr>
+                <td colspan="4" class="btn-group btn-group-sm">
+                    <a href="{% url 'messenger:add_messenger' %}" class="btn btn-default btn-modal">
+                        <span class="glyphicon glyphicon-plus"></span> <span class="hidden-xs">{% trans 'New' %}</span>
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+{% endblock %}

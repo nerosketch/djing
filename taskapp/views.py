@@ -11,11 +11,10 @@ from django.conf import settings
 from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 
 from guardian.shortcuts import assign_perm
-from chatbot.models import MessageQueue
 from abonapp.models import Abon
 from djing import httpresponse_to_referrer
 from djing.lib import safe_int, MultipleException, RuTimedelta
-from djing.lib.decorators import only_admins, json_view
+from djing.lib.decorators import only_admins
 from djing.lib.mixins import LoginAdminMixin, LoginAdminPermissionMixin
 from .handle import TaskException
 from .models import Task, ExtraComment
@@ -270,24 +269,6 @@ def remind(request, task_id):
     except TaskException as e:
         messages.error(request, e)
     return redirect('taskapp:home')
-
-
-@json_view
-def check_news(request):
-    if request.user.is_authenticated and request.user.is_admin:
-        msg = MessageQueue.objects.pop(user=request.user, tag='taskap')
-        if msg is not None:
-            r = {
-                'auth': True,
-                'exist': True,
-                'content': msg,
-                'title': _('Task')
-            }
-        else:
-            r = {'auth': True, 'exist': False}
-    else:
-        r = {'auth': False}
-    return r
 
 
 class NewCommentView(LoginAdminMixin, LoginRequiredMixin, CreateView):

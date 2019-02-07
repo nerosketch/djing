@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
-from djing.tasks import send_email_notify
-from chatbot.models import ChatException
-from djing.lib import MultipleException
+from djing.tasks import send_email_notify, multicast_email_notify
+from messenger.tasks import multicast_viber_notify, send_viber_message
 
 
 class TaskException(Exception):
@@ -11,31 +10,31 @@ class TaskException(Exception):
 
 
 def handle(task, author, recipients):
-    errors = []
+    profile_ids = []
     for recipient in recipients:
         if not recipient.flags.notify_task:
             continue
-        try:
-            task_status = _('Task')
-            # If signal to myself then quietly
-            if author == recipient:
-                return
-            # If task completed or failed
-            elif task.state == 'F' or task.state == 'C':
-                task_status = _('Task completed')
+        # If signal to myself then quietly
+        if author == recipient:
+            return
+        profile_ids.append(recipient.pk)
 
-            fulltext = render_to_string('taskapp/notification.html', {
-                'task': task,
-                'abon': task.abon,
-                'task_status': task_status
-            })
+    task_status = _('Task')
 
-            if task.state == 'F' or task.state == 'C':
-                # If task completed or failed than send one message to author
-                send_email_notify.delay(fulltext, author.pk)
-            else:
-                send_email_notify.delay(fulltext, recipient.pk)
-        except ChatException as e:
-            errors.append(e)
-    if len(errors) > 0:
-        raise MultipleException(errors)
+    # If task completed or failed
+    if task.state == 'F' or task.state == 'C':
+        task_status = _('Task completed')
+
+    fulltext = render_to_string('taskapp/notification.html', {
+        'task': task,
+        'abon': task.abon,
+        'task_status': task_status
+    })
+
+    if task.state == 'F' or task.state == 'C':
+        # If task completed or failed than send one message to author
+        send_email_notify.delay(fulltext, author.pk)
+        send_viber_message.delay(None, author.pk, fulltext)
+    else:
+        multicast_email_notify.delay(fulltext, profile_ids)
+        multicast_viber_notify.delay(None, profile_ids, fulltext)

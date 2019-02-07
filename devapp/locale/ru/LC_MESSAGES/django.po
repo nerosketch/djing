@@ -324,7 +324,7 @@ msgstr "Название типа свича"
 #: templates/devapp/custom_dev_page/onu.html:22
 #: templates/devapp/custom_dev_page/onu_for_zte.html:22
 msgid "Attached user"
-msgstr "Прикрепленный абонент"
+msgstr "Прикреплённый абонент"
 
 #: templates/devapp/custom_dev_page/onu.html:48
 #: templates/devapp/custom_dev_page/onu_for_zte.html:50

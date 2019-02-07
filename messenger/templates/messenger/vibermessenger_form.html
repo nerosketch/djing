@@ -1,0 +1,49 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n bootstrap3 %}
+
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'messenger:messengers_list' %}">{% trans 'messengers' %}</a></li>
+        {% if object %}
+            <li><a href="{{ object.get_absolute_url }}">{% trans 'Update messenger' %}</a></li>
+            <li class="active">{% trans 'Change viber' %}</li>
+        {% else %}
+            <li><a href="{% url 'messenger:add_messenger' %}">{% trans 'Add messenger' %}</a></li>
+            <li class="active">{% trans 'Add viber' %}</li>
+        {% endif %}
+
+    </ol>
+{% endblock %}
+
+
+{% block main %}
+
+    {% if object %}
+        {% url 'messenger:update_viber_messenger' object.slug as form_url %}
+        {% trans 'Change messenger' as panel_title %}
+    {% else %}
+        {% url 'messenger:add_viber_messenger' as form_url %}
+        {% trans 'Add new messenger' as panel_title %}
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ panel_title }}</h3>
+        </div>
+        <div class="panel-body">
+            <form role="form" action="{{ form_url }}" method="post" enctype="multipart/form-data">{% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-sm btn-default">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                </button>
+                {% if object %}
+                    <a href="{% url 'messenger:webhook_viber_bot' object.slug %}" class="btn btn-default btn-sm btn-modal">
+                        <span class="glyphicon glyphicon-share"></span> {% trans 'Send webhook' %}
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

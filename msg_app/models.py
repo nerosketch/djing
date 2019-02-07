@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from accounts_app.models import UserProfile
 from djing.tasks import send_email_notify
-from chatbot.models import ChatException
 
 
 class MessageError(Exception):
@@ -203,24 +202,21 @@ class Conversation(models.Model):
             return messages[0]
 
     def new_message(self, text, attachment, author, with_status=True):
-        try:
-            msg = Message.objects.create(
-                text=text, conversation=self,
-                attachment=attachment, author=author
-            )
-            if with_status:
-                for participant in self.participants.filter(is_active=True):
-                    if participant == author:
-                        continue
-                    MessageStatus.objects.create(msg=msg, user=participant)
-                    if participant.flags.notify_msg:
-                        send_email_notify.delay(
-                            msg_text=text,
-                            account_id=participant.pk
-                        )
-            return msg
-        except ChatException as e:
-            raise MessageError(e)
+        msg = Message.objects.create(
+            text=text, conversation=self,
+            attachment=attachment, author=author
+        )
+        if with_status:
+            for participant in self.participants.filter(is_active=True):
+                if participant == author:
+                    continue
+                MessageStatus.objects.create(msg=msg, user=participant)
+                if participant.flags.notify_msg:
+                    send_email_notify.delay(
+                        msg_text=text,
+                        account_id=participant.pk
+                    )
+        return msg
 
     @staticmethod
     def remove_message(msg):

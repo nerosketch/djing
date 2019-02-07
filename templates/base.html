@@ -113,6 +113,15 @@
                 </li>
             {% endif %}
 
+            {% if perms.gw_app.view_nasmodel %}
+                {% url 'messenger:messengers_list' as mesngrhome %}
+                <li{% if mesngrhome in request.path %} class="active"{% endif %}>
+                    <a href="{{ mesngrhome }}">
+                        <span class="glyphicon glyphicon-comment"></span> {% trans 'Messengers' %}
+                    </a>
+                </li>
+            {% endif %}
+
         </ul>
 
     </div>

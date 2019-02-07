@@ -3,7 +3,6 @@ from ipaddress import ip_address
 
 from abonapp.models import Abon
 from accounts_app.models import UserProfile
-from chatbot.models import ChatException
 from devapp.base_intr import DeviceImplementationError
 from django.conf import settings
 from django.contrib import messages
@@ -27,8 +26,8 @@ from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, \
 from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
-from guardian.decorators import \
-    permission_required_or_403 as permission_required
+from messenger.tasks import multicast_viber_notify
+from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
 from .forms import DeviceForm, PortForm, DeviceExtraDataForm
 from .models import Device, Port, DeviceDBException, DeviceMonitoringException
@@ -709,19 +708,20 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             recipients = UserProfile.objects.get_profiles_by_group(
                 device_down.group.pk)
 
-            multicast_email_notify.delay(msg_text=gettext(notify_text) % {
+            user_ids = tuple(recipient.pk for recipient in recipients.only('pk').iterator() if recipient.flags.notify_mon)
+            text = gettext(notify_text) % {
                 'device_name': "%s(%s) %s" % (
                     device_down.ip_address,
                     device_down.mac_addr,
                     device_down.comment
                 )
-            }, account_ids=(
-                recipient.pk for recipient in recipients.only('pk').iterator() if recipient.flags.notify_mon
-            ))
+            }
+            multicast_email_notify.delay(msg_text=text, account_ids=user_ids)
+            multicast_viber_notify.delay(None, account_id_list=user_ids, message_text=text)
             return {
                 'text': 'notification successfully sent'
             }
-        except ChatException as e:
+        except ValueError as e:
             return {
                 'text': str(e)
             }

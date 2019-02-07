@@ -1,7 +1,6 @@
 urllib3
 Django>=2
 Pillow
-telepot
 
 # for mac address field
 netaddr
@@ -30,6 +29,12 @@ asterisk
 
 # django-bitfield
 -e git://github.com/disqus/django-bitfield.git#egg=django-bitfield
+
+# django_cleanup for clean unused media
+-e git://github.com/un1t/django-cleanup.git#egg=django_cleanup
+
+# viberbot
+-e git://github.com/Viber/viber-bot-python.git#egg=viberbot
 
 Celery
 redis==2.10.6
