@@ -26,7 +26,7 @@ class Messenger(models.Model):
     class Meta:
         db_table = 'messengers'
         verbose_name = _('messenger')
-        verbose_name_plural = _('messengers')
+        verbose_name_plural = _('Messengers')
         ordering = ('title',)
 
     def get_absolute_url(self):

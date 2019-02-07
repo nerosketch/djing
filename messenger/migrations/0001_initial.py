@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'messenger',
-                'verbose_name_plural': 'messengers',
+                'verbose_name_plural': 'Messengers',
                 'db_table': 'messengers',
                 'ordering': ('title',),
             },

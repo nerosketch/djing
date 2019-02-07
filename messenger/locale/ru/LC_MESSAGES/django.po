@@ -41,7 +41,7 @@ msgstr "Мэссенджер"
 #: models.py:29 templates/messenger/messenger_list.html:7
 #: templates/messenger/messenger_list.html:12
 #: templates/messenger/vibermessenger_form.html:8
-msgid "messengers"
+msgid "Messengers"
 msgstr "Мэссенджэры"
 
 #: models.py:48

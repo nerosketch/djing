@@ -5,7 +5,7 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
-        <li><a href="{% url 'messenger:messengers_list' %}">{% trans 'messengers' %}</a></li>
+        <li><a href="{% url 'messenger:messengers_list' %}">{% trans 'Messengers' %}</a></li>
         {% if object %}
             <li><a href="{{ object.get_absolute_url }}">{% trans 'Update messenger' %}</a></li>
             <li class="active">{% trans 'Change viber' %}</li>
