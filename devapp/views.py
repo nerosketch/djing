@@ -707,9 +707,9 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
                 }
 
             recipients = UserProfile.objects.get_profiles_by_group(
-                device_down.group.pk)
+                device_down.group.pk).filter(flags=UserProfile.flags.notify_mon)
 
-            user_ids = tuple(recipient.pk for recipient in recipients.only('pk').iterator() if recipient.flags.notify_mon)
+            user_ids = tuple(recipient.pk for recipient in recipients.only('pk').iterator())
             text = gettext(notify_text) % {
                 'device_name': "%s(%s) %s" % (
                     device_down.ip_address,
