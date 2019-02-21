@@ -2,11 +2,12 @@ import re
 from typing import AnyStr, Iterable, Optional, Dict
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
+from pexpect import TIMEOUT
 from transliterate import translit
 from django.utils.translation import gettext_lazy as _, gettext
 
 from djing.lib import RuTimedelta, safe_int
-from djing.lib.tln.tln import ValidationError as TlnValidationError, register_onu_ZTE_F660
+from devapp.onu_config import register_f601_onu, register_f660_onu, ExpectValidationError, OnuZteRegisterError
 from .base_intr import (
     DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError,
     ListOrError, DeviceConfigurationError
@@ -135,7 +136,7 @@ class ONUdev(BasePort):
 
 class OLTDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = False
-    description = _('PON OLT')
+    description = 'PON OLT'
     is_use_device_port = False
 
     def __init__(self, dev_instance):
@@ -194,7 +195,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
 class OnuDevice(DevBase, SNMPBaseWorker):
     has_attachable_to_subscriber = True
-    description = _('PON ONU')
+    description = 'PON ONU BDCOM'
     tech_code = 'bdcom_onu'
     is_use_device_port = False
 
@@ -260,7 +261,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
         try:
             int(v)
         except ValueError:
-            raise TlnValidationError(_('Onu snmp field must be en integer'))
+            raise ExpectValidationError(_('Onu snmp field must be en integer'))
 
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance
@@ -351,7 +352,7 @@ def conv_signal(lvl: int) -> float:
 
 
 class Olt_ZTE_C320(OLTDevice):
-    description = _('OLT ZTE C320')
+    description = 'OLT ZTE C320'
 
     def get_fibers(self):
         fibers = ({
@@ -413,8 +414,45 @@ class Olt_ZTE_C320(OLTDevice):
         return 'olt_ztec320.html'
 
 
+def _reg_dev_zte(device, extra_data: Dict, reg_func):
+    if not extra_data:
+        raise DeviceConfigurationError(_('You have not info in extra_data '
+                                         'field, please fill it in JSON'))
+    ip = None
+    if device.ip_address:
+        ip = device.ip_address
+    elif device.parent_dev:
+        ip = device.parent_dev.ip_address
+    if ip:
+        mac = str(device.mac_addr) if device.mac_addr else None
+
+        # Format serial number from mac address
+        # because saved mac address was make from serial number
+        sn = "ZTEG%s" % ''.join('%.2X' % int(x, base=16) for x in mac.split(':')[-4:])
+        telnet = extra_data.get('telnet')
+        try:
+            onu_snmp = reg_func(
+                onu_mac=mac,
+                serial=sn,
+                zte_ip_addr=str(ip),
+                telnet_login=telnet.get('login'),
+                telnet_passw=telnet.get('password'),
+                telnet_prompt=telnet.get('prompt'),
+                onu_vlan=extra_data.get('default_vid')
+            )
+            if onu_snmp is not None:
+                device.snmp_extra = onu_snmp
+                device.save(update_fields=('snmp_extra',))
+            else:
+                raise DeviceConfigurationError('unregistered onu not found, sn=%s' % sn)
+        except TIMEOUT as e:
+            raise OnuZteRegisterError(e)
+    else:
+        raise DeviceConfigurationError('not have ip')
+
+
 class ZteOnuDevice(OnuDevice):
-    description = _('ZTE PON ONU')
+    description = 'Zte ONU F660'
     tech_code = 'zte_onu'
 
     def get_details(self) -> Optional[Dict]:
@@ -462,7 +500,7 @@ class ZteOnuDevice(OnuDevice):
             fiber_num, onu_port = v.split('.')
             int(fiber_num), int(onu_port)
         except ValueError:
-            raise TlnValidationError(_('Zte onu snmp field must be two dot separated integers'))
+            raise ExpectValidationError(_('Zte onu snmp field must be two dot separated integers'))
 
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance
@@ -489,42 +527,7 @@ class ZteOnuDevice(OnuDevice):
         return '\n'.join(i for i in r if i)
 
     def register_device(self, extra_data: Dict):
-        if not extra_data:
-            raise DeviceConfigurationError(_('You have not info in extra_data field, please fill it in JSON'))
-        device = self.db_instance
-        ip = None
-        if device.ip_address:
-            ip = device.ip_address
-        elif device.parent_dev:
-            ip = device.parent_dev.ip_address
-        if ip:
-            mac = str(device.mac_addr).encode()
-
-            # Format serial number from mac address
-            # because saved mac address was make from serial number
-            sn = (b'%.2X' % int(x, base=16) for x in mac.split(b':')[-4:])
-            sn = b"ZTEG%s" % b''.join(sn)
-
-            telnet = extra_data.get('telnet')
-            if telnet is None:
-                raise DeviceConfigurationError('For ZTE configuration needed "telnet" section in extra_data')
-            login = telnet.get('login')
-            password = telnet.get('password')
-            prompt = telnet.get('prompt')
-            default_vid = extra_data.get('default_vid')
-            if login is None or password is None or prompt is None:
-                raise DeviceConfigurationError('For ZTE configuration needed login, password and'
-                                               ' prompt for telnet access in extra_data')
-            if default_vid is None:
-                raise DeviceConfigurationError('Please specify default vlan id "default_vid" for configuration onu')
-            stack_num, rack_num, fiber_num, new_onu_port_num = register_onu_ZTE_F660(
-                olt_ip=ip, onu_sn=sn, login_passwd=(login.encode(), password.encode()),
-                onu_mac=mac, prompt_title=prompt.encode(), vlan_id=int(default_vid)
-            )
-            bin_snmp_fiber_number = "10000{0:08b}{1:08b}00000000".format(rack_num, fiber_num)
-            snmp_fiber_num = int(bin_snmp_fiber_number, base=2)
-            device.snmp_extra = "%d.%d" % (snmp_fiber_num, new_onu_port_num)
-            device.save(update_fields=('snmp_extra',))
+        _reg_dev_zte(self.db_instance, extra_data, register_f660_onu)
 
     def get_fiber_str(self):
         dev = self.db_instance
@@ -540,6 +543,13 @@ class ZteOnuDevice(OnuDevice):
             return 'gpon-onu_1/%d/%d:%s' % (
                 rack_num, fiber_num, onu_port_num
             )
+
+
+class ZteF601(ZteOnuDevice):
+    description = 'Zte ONU F601'
+
+    def register_device(self, extra_data: Dict):
+        _reg_dev_zte(self.db_instance, extra_data, register_f601_onu)
 
 
 class HuaweiSwitch(EltexSwitch):

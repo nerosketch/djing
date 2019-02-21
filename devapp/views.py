@@ -21,17 +21,16 @@ from djing.lib import safe_int, ProcessLocked, DuplicateEntry
 from djing.lib.decorators import json_view
 from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
-from djing.lib.tln import ZteOltConsoleError, OnuZteRegisterError, \
-    ZteOltLoginFailed
 from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
 from messenger.tasks import multicast_viber_notify
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
-from .forms import DeviceForm, PortForm, DeviceExtraDataForm
-from .models import Device, Port, DeviceDBException, DeviceMonitoringException
-from .tasks import onu_register
+from devapp.forms import DeviceForm, PortForm, DeviceExtraDataForm
+from devapp.models import Device, Port, DeviceDBException, DeviceMonitoringException
+from devapp.tasks import onu_register
+from devapp import onu_config
 
 
 class DevicesListView(LoginAdminPermissionMixin,
@@ -784,17 +783,25 @@ def register_device(request, group_id: int, device_id: int):
     try:
         device.register_device()
         status = 0
-    except OnuZteRegisterError:
+    except onu_config.OnuZteRegisterError:
         text = format_msg(gettext('Unregistered onu not found'), 'eye-close')
-    except ZteOltLoginFailed:
-        text = format_msg(gettext('Wrong login or password for telnet access'),
-                          'lock')
-    except (ConnectionRefusedError, ZteOltConsoleError) as e:
+    except onu_config.ZteOltLoginFailed:
+        text = format_msg(
+            gettext('Wrong login or password for telnet access'),
+            'lock'
+        )
+    except (
+            ConnectionRefusedError, onu_config.ZteOltConsoleError,
+            onu_config.ExpectValidationError, onu_config.ZTEFiberIsFull
+    ) as e:
         text = format_msg(e, 'exclamation-sign')
     except DeviceImplementationError as e:
-        text = format_msg(e, 'wrench')
+        text = format_msg(str(e), 'wrench')
     except ProcessLocked:
-        text = format_msg(gettext('Process locked by another process'), 'time')
+        text = format_msg(
+            gettext('Process locked by another process'),
+            'time'
+        )
     else:
         text = format_msg(msg='ok', icon='ok')
     return {

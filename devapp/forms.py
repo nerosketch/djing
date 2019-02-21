@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 
 from djing.lib import DuplicateEntry
-from djing.lib.tln.tln import ValidationError as TlnValidationError
+from devapp.onu_config import ExpectValidationError
 from . import models
 from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 
@@ -43,7 +43,7 @@ class DeviceForm(forms.ModelForm):
             manager_class = device.get_manager_klass()
             try:
                 manager_class.validate_extra_snmp_info(snmp_extra)
-            except TlnValidationError as e:
+            except ExpectValidationError as e:
                 raise ValidationError(
                     e, code='invalid'
                 )

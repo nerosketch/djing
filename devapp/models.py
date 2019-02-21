@@ -33,6 +33,7 @@ class Device(models.Model):
         ('Ex', dev_types.EltexSwitch),
         ('Zt', dev_types.Olt_ZTE_C320),
         ('Zo', dev_types.ZteOnuDevice),
+        ('Z6', dev_types.ZteF601),
         ('Hw', dev_types.HuaweiSwitch)
     )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],

@@ -30,17 +30,9 @@ msgstr "Свич D'Link"
 msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
-#: dev_types.py:140
-msgid "PON OLT"
-msgstr ""
-
 #: dev_types.py:169 views.py:345 views.py:503
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
-
-#: dev_types.py:199
-msgid "PON ONU"
-msgstr ""
 
 #: dev_types.py:214
 msgid "Ip address or parent device with ip address required for ONU device"
@@ -59,14 +51,6 @@ msgstr "Поле для snmp информации об ONU должно быть
 #: dev_types.py:314
 msgid "Eltex switch"
 msgstr "Элтекс свич"
-
-#: dev_types.py:356
-msgid "OLT ZTE C320"
-msgstr ""
-
-#: dev_types.py:419
-msgid "ZTE PON ONU"
-msgstr ""
 
 #: dev_types.py:454
 msgid "Zte onu snmp field must be two dot separated integers"

@@ -70,7 +70,7 @@ class DevBase(object, metaclass=ABCMeta):
     def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
-        If validation failed then raise en exception from djing.lib.tln.ValidationError
+        If validation failed then raise en exception from devapp.onu_config.ExpectValidationError
         with description of error.
         :param v: String value for validate
         """

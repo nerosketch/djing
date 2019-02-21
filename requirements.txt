@@ -6,7 +6,7 @@ Pillow
 netaddr
 
 # for testing required xmltodict
-xmltodict
+#xmltodict
 dicttoxml
 
 # db client for Postgres
@@ -38,6 +38,9 @@ asterisk
 
 # viberbot
 -e git://github.com/Viber/viber-bot-python.git#egg=viberbot
+
+# pexpect
+-e git://github.com/pexpect/pexpect.git#egg=pexpect
 
 Celery
 redis==2.10.6
