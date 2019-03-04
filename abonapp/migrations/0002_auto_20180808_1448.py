@@ -20,14 +20,17 @@ def backup_info(apps, _):
     print('\tbackup_info')
     Abon = apps.get_model('abonapp', 'Abon')
     obs = Abon.objects.exclude(ip_address=None).only('ip_address', 'is_dynamic_ip')
-    with open(TMP_FILE, 'w') as f:
-        serializers.serialize('json', obs, stream=f, fields=('ip_address', 'is_dynamic_ip'))
+    if obs.exists():
+        with open(TMP_FILE, 'w') as f:
+            serializers.serialize('json', obs, stream=f, fields=('ip_address', 'is_dynamic_ip'))
     print('\tEND backup_info')
 
 
 def restore_info_to_new_scheme(apps, _):
     print('\trestore_info_to_new_scheme')
     Abon = apps.get_model('abonapp', 'Abon')
+    if not os.path.isfile(TMP_FILE):
+        return
     with open(TMP_FILE, 'r') as f:
         for abon in load(f):
             ip_addr = abon['fields'].get('ip_address')
@@ -66,8 +69,7 @@ def restore_info_to_new_scheme(apps, _):
             else:
                 print('\tUser with pk=%s not found' % abon['pk'])
     print('\tEND restore_info_to_new_scheme')
-    if os.path.isfile(TMP_FILE):
-        os.remove(TMP_FILE)
+    os.remove(TMP_FILE)
 
 
 class Migration(migrations.Migration):

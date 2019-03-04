@@ -7,8 +7,7 @@ from django.conf import settings
 from django.core import validators
 from django.core.validators import RegexValidator
 from django.db import models, connection, transaction
-from django.db.models.signals import pre_delete, post_init, \
-    pre_save
+from django.db.models.signals import post_init, pre_save
 from django.dispatch import receiver
 from django.shortcuts import resolve_url
 from django.utils import timezone

@@ -1,4 +1,3 @@
-from typing import Iterable
 from urllib.parse import urljoin
 
 from django.conf import settings
