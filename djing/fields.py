@@ -111,6 +111,7 @@ except ImportError:
     pass
 
 
+# DEPRECATED: remove after clean old migrations
 class MyGenericIPAddressField(models.GenericIPAddressField):
     description = "Int32 notation ip address"
 

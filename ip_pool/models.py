@@ -160,6 +160,7 @@ class NetworkModel(models.Model):
         ordering = ('network',)
 
 
+# Deprecated. Remove after migrations squashed
 class IpLeaseManager(models.Manager):
 
     def get_free_ip(self, network: NetworkModel):
@@ -234,6 +235,7 @@ class IpLeaseModel(models.Model):
         unique_together = ('ip', 'network', 'mac_addr')
 
 
+# Deprecated. Remove after migrations squashed
 class LeasesHistory(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Ip address'))
     lease_time = models.DateTimeField(_('Lease time'), auto_now_add=True)

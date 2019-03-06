@@ -110,7 +110,7 @@ class Port(models.Model):
 
     class Meta:
         db_table = 'dev_port'
-        unique_together = (('device', 'num'),)
+        unique_together = ('device', 'num')
         permissions = (
             ('can_toggle_ports', _('Can toggle ports')),
         )
