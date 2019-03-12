@@ -1,0 +1,190 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-02-06 13:45+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: models.py:16 templates/messenger/messenger_list.html:20
+msgid "Title"
+msgstr "Название"
+
+#: models.py:18
+msgid "Viber"
+msgstr "Вайбер"
+
+#: models.py:20
+msgid "Bot type"
+msgstr "Тип бота"
+
+#: models.py:21 templates/messenger/messenger_list.html:22
+msgid "Slug"
+msgstr "Ссыль"
+
+#: models.py:28 models.py:92
+msgid "messenger"
+msgstr "Мэссенджер"
+
+#: models.py:29 templates/messenger/messenger_list.html:7
+#: templates/messenger/messenger_list.html:12
+#: templates/messenger/vibermessenger_form.html:8
+msgid "Messengers"
+msgstr "Мэссенджэры"
+
+#: models.py:48
+msgid "Bot secret token"
+msgstr "Секретный токен viber"
+
+#: models.py:49 models.py:108
+msgid "Avatar"
+msgstr "Аватар"
+
+#: models.py:83
+msgid "Viber messenger"
+msgstr "Viber мэссенджэр"
+
+#: models.py:84
+msgid "Viber messengers"
+msgstr "Viber мэссенджэры"
+
+#: models.py:89
+msgid "Message"
+msgstr "Сообщение"
+
+#: models.py:90
+msgid "Date"
+msgstr "Дата"
+
+#: models.py:91
+msgid "Sender"
+msgstr "Отправитель"
+
+#: models.py:93
+msgid "Subscriber"
+msgstr "Подписчик"
+
+#: models.py:100
+msgid "Viber message"
+msgstr "Сообщение viber"
+
+#: models.py:101
+msgid "Viber messages"
+msgstr "Сообщения viber"
+
+#: models.py:106
+msgid "User unique id in viber"
+msgstr "Уникальный id viber"
+
+#: models.py:107
+msgid "Name"
+msgstr "Имя"
+
+#: models.py:109
+msgid "System account"
+msgstr "Системная учётная запись"
+
+#: models.py:116
+msgid "Viber subscriber"
+msgstr "Подписчик viber"
+
+#: models.py:117
+msgid "Viber subscribers"
+msgstr "Подписчики viber"
+
+#: templates/messenger/add_messenger.html:5
+msgid "Select bot type"
+msgstr "Выберите тип бота"
+
+#: templates/messenger/add_messenger.html:11
+msgid "Add"
+msgstr "Добавить"
+
+#: templates/messenger/messenger_list.html:21
+msgid "Type"
+msgstr "Тип"
+
+#: templates/messenger/messenger_list.html:33
+msgid "Edit"
+msgstr "Изменить"
+
+#: templates/messenger/messenger_list.html:40
+msgid "messengers was not found"
+msgstr "Мэссенджеры не найдены"
+
+#: templates/messenger/messenger_list.html:49
+msgid "New"
+msgstr "Новый"
+
+#: templates/messenger/vibermessenger_form.html:10
+msgid "Update messenger"
+msgstr "Обновить мэссенджэр"
+
+#: templates/messenger/vibermessenger_form.html:11
+msgid "Change viber"
+msgstr "Изменить viber"
+
+#: templates/messenger/vibermessenger_form.html:13
+msgid "Add messenger"
+msgstr "Добавить мэссенджэр"
+
+#: templates/messenger/vibermessenger_form.html:14
+msgid "Add viber"
+msgstr "Добавить viber"
+
+#: templates/messenger/vibermessenger_form.html:25
+msgid "Change messenger"
+msgstr "Изменить мэссенджэр"
+
+#: templates/messenger/vibermessenger_form.html:28
+msgid "Add new messenger"
+msgstr "Добавить мэссенджэр"
+
+#: templates/messenger/vibermessenger_form.html:39
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/messenger/vibermessenger_form.html:43
+msgid "Send webhook"
+msgstr "Отправить webhook"
+
+#: views.py:38
+msgid "Unexpected bot type"
+msgstr "Не известный тип бота"
+
+#: views.py:51
+msgid "New viber messenger successfully created"
+msgstr "Новый viber мэссенджэр успешно создан"
+
+#: views.py:62
+msgid "Viber messenger successfully updated"
+msgstr "viber мэссенджэр успешно обновлён"
+
+#: views.py:73
+msgid "Viber messenger successfully deleted"
+msgstr "viber мэссенджэр успешно удалён"
+
+#: views.py:132
+msgid "My telephone number"
+msgstr "Мой номер телефона"
+
+#: views.py:150
+msgid ""
+"Telephone not found, please specify telephone number in account in billing"
+msgstr ""
+"Номер телефона не найден. Укажите свой номер телефона в учётке в биллинге"
+
+msgid "Your account is attached. Now you will be receive notifications from billing"
+msgstr "Ваша учётка из биллинга привязана. Теперь вы будете получать оповещения из биллинга."

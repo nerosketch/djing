@@ -1,27 +1,9 @@
 from functools import wraps
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
 
 from djing.lib import check_sign
-
-
-def require_ssl(view):
-    """
-    Decorator that requires an SSL connection. If the current connection is not SSL, we redirect to the SSL version of
-    the page.
-    from: https://gist.github.com/ckinsey/9709984
-    """
-
-    @wraps(view)
-    def wrapper(request, *args, **kwargs):
-        debug = getattr(settings, 'DEBUG', False)
-        if not debug and not request.is_secure():
-            target_url = "https://%s%s" % (request.META['HTTP_HOST'], request.path_info)
-            return HttpResponseRedirect(target_url)
-        return view(request, *args, **kwargs)
-
-    return wrapper
 
 
 # Allow to view only admins
@@ -99,6 +81,8 @@ def json_view(fn):
     @wraps(fn)
     def wrapped(request, *args, **kwargs):
         r = fn(request, *args, **kwargs)
+        if isinstance(r, dict) and not isinstance(r.get('text'), str):
+            r['text'] = str(r.get('text'))
         return JsonResponse(r, safe=False, json_dumps_params={
             'ensure_ascii': False
         })

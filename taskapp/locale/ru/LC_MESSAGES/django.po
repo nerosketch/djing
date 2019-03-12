@@ -505,3 +505,9 @@ msgstr "Задачи, которые необходимо выполнить"
 
 msgid "Task has been reminded"
 msgstr "Напоминание о задаче отправлено"
+
+msgid "View all new tasks"
+msgstr "Все незавершённые задачи"
+
+msgid "New task with this user already exists. You are redirected to it."
+msgstr "Заявка для этого абонента уже создана. Вы перенаправлены к ней."

@@ -5,6 +5,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _, gettext
 
 from abonapp.models import AbonLog, InvoiceForPayment, Abon
+from abonapp.tasks import customer_nas_command
 from djing.lib.decorators import json_view
 from tariff_app.models import Tariff
 from taskapp.models import Task
@@ -58,7 +59,7 @@ def buy_service(request, srv_id):
                 service, None,
                 _("Buy the service via user side, service '%s'") % service
             )
-            abon.nas_sync_self()
+            customer_nas_command.delay(abon.pk, 'sync')
             messages.success(
                 request,
                 _("The service '%s' wan successfully activated") % service.title

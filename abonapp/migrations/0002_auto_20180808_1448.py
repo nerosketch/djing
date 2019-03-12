@@ -19,12 +19,15 @@ TMP_FILE = '/tmp/djing_ip_field_abonapp_migrate.json'
 def backup_info(apps, _):
     Abon = apps.get_model('abonapp', 'Abon')
     obs = Abon.objects.exclude(ip_address=None).only('ip_address', 'is_dynamic_ip')
-    with open(TMP_FILE, 'w') as f:
-        serializers.serialize('json', obs, stream=f, fields=('ip_address', 'is_dynamic_ip'))
+    if obs.exists():
+        with open(TMP_FILE, 'w') as f:
+            serializers.serialize('json', obs, stream=f, fields=('ip_address', 'is_dynamic_ip'))
 
 
 def restore_info_to_new_scheme(apps, _):
     Abon = apps.get_model('abonapp', 'Abon')
+    if not os.path.isfile(TMP_FILE):
+        return
     with open(TMP_FILE, 'r') as f:
         for abon in load(f):
             ip_addr = abon['fields'].get('ip_address')

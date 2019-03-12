@@ -1,0 +1,15 @@
+{% load i18n bootstrap3 %}
+<form role="form" action="{% url 'messenger:add_messenger' %}" method="post">{% csrf_token %}
+    <div class="modal-header primary">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><span class="glyphicon glyphicon-blackboard"></span>{% trans 'Select bot type' %}</h4>
+    </div>
+
+    <div class="modal-body">
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+        </button>
+    </div>
+
+</form>

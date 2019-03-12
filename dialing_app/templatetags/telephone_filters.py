@@ -14,7 +14,7 @@ def abon_if_telephone(value):
         if value[0] != '+':
             value = '+' + value
         url = resolve_url('dialapp:to_abon', tel=value)
-        a = '<a href="%s" target="_blank">%s</a>' % (url, value)
+        a = '<a href="%s">%s</a>' % (url, value)
         return a
     else:
         return value

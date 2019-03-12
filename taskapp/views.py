@@ -1,34 +1,27 @@
-from django.contrib.auth.decorators import login_required
+from datetime import datetime
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.shortcuts import redirect, get_object_or_404, resolve_url
 from django.contrib import messages
-from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView
 from django.utils.translation import ugettext as _
 from django.conf import settings
-
-from datetime import datetime
-
 from django.views.generic.edit import FormMixin, DeleteView, UpdateView
-from guardian.decorators import permission_required_or_403 as permission_required
 
-from chatbot.models import MessageQueue
+from guardian.shortcuts import assign_perm
 from abonapp.models import Abon
 from djing import httpresponse_to_referrer
 from djing.lib import safe_int, MultipleException, RuTimedelta
-from djing.lib.decorators import only_admins, json_view
+from djing.lib.decorators import only_admins
+from djing.lib.mixins import LoginAdminMixin, LoginAdminPermissionMixin
 from .handle import TaskException
 from .models import Task, ExtraComment
 from .forms import TaskFrm, ExtraCommentForm
 
 
-login_decs = login_required, only_admins
-
-
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
-class NewTasksView(ListView):
+class NewTasksView(LoginAdminPermissionMixin, ListView):
     """
     Show new tasks
     """
@@ -36,6 +29,7 @@ class NewTasksView(ListView):
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'taskapp/tasklist.html'
     context_object_name = 'tasks'
+    permission_required = 'taskapp.view_task'
 
     def get_queryset(self):
         return Task.objects.filter(
@@ -47,8 +41,6 @@ class NewTasksView(ListView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class FailedTasksView(NewTasksView):
     """
     Show crashed tasks
@@ -64,8 +56,6 @@ class FailedTasksView(NewTasksView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class FinishedTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_finish.html'
 
@@ -77,8 +67,6 @@ class FinishedTaskListView(NewTasksView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class OwnTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist_own.html'
 
@@ -91,8 +79,6 @@ class OwnTaskListView(NewTasksView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
 class MyTaskListView(NewTasksView):
     template_name = 'taskapp/tasklist.html'
 
@@ -105,13 +91,12 @@ class MyTaskListView(NewTasksView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.can_viewall'), name='dispatch')
-class AllTasksListView(ListView):
+class AllTasksListView(LoginAdminMixin, LoginRequiredMixin, ListView):
     http_method_names = ('get',)
     paginate_by = getattr(settings, 'PAGINATION_ITEMS_PER_PAGE', 10)
     template_name = 'taskapp/tasklist_all.html'
     context_object_name = 'tasks'
+    permission_required = 'taskapp.can_viewall'
 
     def get_queryset(self):
         return Task.objects.annotate(
@@ -121,8 +106,12 @@ class AllTasksListView(ListView):
         )
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.view_task'), name='dispatch')
+class AllNewTasksListView(AllTasksListView):
+
+    def get_queryset(self):
+        return super(AllNewTasksListView, self).get_queryset().filter(state='S')
+
+
 class EmptyTasksListView(NewTasksView):
     template_name = 'taskapp/tasklist_empty.html'
 
@@ -147,8 +136,7 @@ def task_delete(request, task_id):
     return redirect('taskapp:home')
 
 
-@method_decorator(login_decs, name='dispatch')
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(LoginAdminMixin, UpdateView):
     http_method_names = ('get', 'post')
     template_name = 'taskapp/add_edit_task.html'
     form_class = TaskFrm
@@ -174,6 +162,16 @@ class TaskUpdateView(UpdateView):
         else:
             if not request.user.has_perm('taskapp.change_task'):
                 raise PermissionDenied
+
+        # check if new task with user already exists
+        uname = request.GET.get('uname')
+        if uname and self.kwargs.get('task_id') is None:
+            exists_task = Task.objects.filter(abon__username=uname, state='S')
+            if exists_task.exists():
+                messages.info(request, _('New task with this user already exists.'
+                                         ' You are redirected to it.'))
+                return redirect('taskapp:edit', exists_task.first().pk)
+
         try:
             return super(TaskUpdateView, self).dispatch(request, *args, **kwargs)
         except TaskException as e:
@@ -187,6 +185,14 @@ class TaskUpdateView(UpdateView):
         return kwargs
 
     def form_valid(self, form):
+        # check if new task with picked user already exists
+        if form.cleaned_data['state'] == 'S' and self.kwargs.get('task_id') is None:
+            exists_task = Task.objects.filter(abon=form.cleaned_data['abon'], state='S')
+            if exists_task.exists():
+                messages.info(self.request, _('New task with this user already exists.'
+                                              ' You are redirected to it.'))
+                return redirect('taskapp:edit', exists_task.first().pk)
+
         try:
             self.object = form.save()
             if self.object.author is None:
@@ -292,30 +298,11 @@ def remind(request, task_id):
     return redirect('taskapp:home')
 
 
-@json_view
-def check_news(request):
-    if request.user.is_authenticated and request.user.is_admin:
-        msg = MessageQueue.objects.pop(user=request.user, tag='taskap')
-        if msg is not None:
-            r = {
-                'auth': True,
-                'exist': True,
-                'content': msg,
-                'title': _('Task')
-            }
-        else:
-            r = {'auth': True, 'exist': False}
-    else:
-        r = {'auth': False}
-    return r
-
-
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.add_extracomment'), name='dispatch')
-class NewCommentView(CreateView):
+class NewCommentView(LoginAdminMixin, LoginRequiredMixin, CreateView):
     form_class = ExtraCommentForm
     model = ExtraComment
     http_method_names = ('get', 'post')
+    permission_required = 'taskapp.add_extracomment'
 
     def form_valid(self, form):
         self.task = get_object_or_404(Task, pk=self.kwargs.get('task_id'))
@@ -323,16 +310,19 @@ class NewCommentView(CreateView):
             author=self.request.user,
             task=self.task
         )
+        author = self.object.author
+        assign_perm('taskapp.change_extracomment', author, self.object)
+        assign_perm('taskapp.delete_extracomment', author, self.object)
+        assign_perm('taskapp.view_extracomment', author, self.object)
         return FormMixin.form_valid(self, form)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('taskapp.delete_extracomment'), name='dispatch')
-class DeleteCommentView(DeleteView):
+class DeleteCommentView(LoginAdminPermissionMixin, DeleteView):
     model = ExtraComment
     pk_url_kwarg = 'comment_id'
     http_method_names = ('get', 'post')
     template_name = 'taskapp/comments/extracomment_confirm_delete.html'
+    permission_required = 'taskapp.delete_extracomment'
 
     def get_context_data(self, **kwargs):
         context = {

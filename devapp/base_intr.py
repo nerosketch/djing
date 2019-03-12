@@ -70,7 +70,7 @@ class DevBase(object, metaclass=ABCMeta):
     def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
-        If validation failed then raise en exception from djing.lib.tln.ValidationError
+        If validation failed then raise en exception from devapp.onu_config.ExpectValidationError
         with description of error.
         :param v: String value for validate
         """
@@ -89,12 +89,13 @@ class DevBase(object, metaclass=ABCMeta):
 
 
 class BasePort(object, metaclass=ABCMeta):
-    def __init__(self, num, name, status, mac, speed):
+    def __init__(self, num, name, status, mac, speed, writable=False):
         self.num = int(num)
         self.nm = name
         self.st = status
         self._mac = mac
         self.sp = speed
+        self.writable = writable
 
     @abstractmethod
     def disable(self):
@@ -120,7 +121,10 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
 
     def start_ses(self):
         if self.ses is None:
-            self.ses = Session(hostname=self._ip, community=self._community, version=self._ver)
+            self.ses = Session(
+                hostname=self._ip, community=self._community,
+                version=self._ver
+            )
 
     def set_int_value(self, oid: str, value):
         self.start_ses()
@@ -139,4 +143,6 @@ class SNMPBaseWorker(object, metaclass=ABCMeta):
 
     def get_item(self, oid):
         self.start_ses()
-        return self.ses.get(oid).value
+        v = self.ses.get(oid).value
+        if v != 'NOSUCHINSTANCE':
+            return v

@@ -21,8 +21,7 @@
                         {% for da in dev_accs %}
                             <li class="list-group-item">{% trans 'Attached user' %}:
                                 {% if da.group %}
-                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.username %}"
-                                       target="_blank">{{ da.get_full_name }}</a>
+                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.username %}">{{ da.get_full_name }}</a>
                                 {% else %}
                                     {{ da.get_full_name }}
                                 {% endif %}
@@ -32,7 +31,7 @@
                             <li class="list-group-item">
                                 {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.group %}
                                     {% trans 'Parent device' %}:
-                                    <a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}" title="{{ pdev.mac_addr|default:'' }}" target="_blank">
+                                    <a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}" title="{{ pdev.mac_addr|default:'' }}">
                                         {{ pdev.ip_address|default:'-' }} {{ pdev.comment }}
                                     </a>
                                 {% endwith %}

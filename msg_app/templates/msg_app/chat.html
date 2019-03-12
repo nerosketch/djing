@@ -37,7 +37,7 @@
                     <div class="row">
                         <div class="col-sm-1">
                             {% if can_view_profile %}
-                                <a href="{% url 'acc_app:other_profile' author.pk %}" class="thumbnail" target="_blank" title="{{ author.get_full_name }}" data-toggle="tooltip">
+                                <a href="{% url 'acc_app:other_profile' author.pk %}" class="thumbnail" title="{{ author.get_full_name }}" data-toggle="tooltip">
                                     <img src="{{ author.get_min_ava }}" alt="ava">
                                 </a>
                             {% else %}
@@ -51,7 +51,7 @@
 
                             <pre>{{ msg.text }}</pre>
                             {% if msg.attachment %}
-                                <a href="{{ msg.attachment }}" class="btn btn-default btn-sm" target="_blank">
+                                <a href="{{ msg.attachment }}" class="btn btn-default btn-sm">
                                     <span class="glyphicon glyphicon-gift"></span> {{ msg.attachment }}
                                 </a>
                             {% endif %}

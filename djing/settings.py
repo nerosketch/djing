@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'encrypted_model_fields',
+    'django_cleanup.apps.CleanupConfig',
     'ip_pool',
     'accounts_app',
     'gw_app',
@@ -50,10 +51,11 @@ INSTALLED_APPS = [
     'searchapp',
     'devapp',
     'mapapp',
+    'traf_stat',
     'finapp',
     'taskapp',
     'clientsideapp',
-    'chatbot',
+    'messenger',
     'msg_app',
     'dialing_app',
     'group_app',
@@ -182,7 +184,7 @@ DEFAULT_PICTURE = '/static/img/user_ava.gif'
 AUTH_USER_MODEL = 'accounts_app.UserProfile'
 
 LOGIN_URL = reverse_lazy('acc_app:login')
-LOGIN_REDIRECT_URL = reverse_lazy('acc_app:profile')
+LOGIN_REDIRECT_URL = reverse_lazy('acc_app:setup_info')
 LOGOUT_URL = reverse_lazy('acc_app:logout')
 
 PAGINATION_ITEMS_PER_PAGE = local_settings.PAGINATION_ITEMS_PER_PAGE
@@ -232,6 +234,10 @@ REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+
+# public url for Viber Bot
+VIBER_BOT_PUBLIC_URL = local_settings.VIBER_BOT_PUBLIC_URL
 
 
 # Encrypted fields

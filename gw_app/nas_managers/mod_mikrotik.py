@@ -272,8 +272,9 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             '=target=%s' % queue.network,
             '=max-limit=%.3fM/%.3fM' % queue.max_limit,
             '=queue=Djing_pcq_up/Djing_pcq_down',
-            '=burst-time=1/5',
-            #'=total-queue=Djing_pcq_down'
+            '=burst-time=5/5',
+            '=burst-limit=%.3fM/%.3fM' % tuple(i * 2 for i in queue.max_limit),
+            '=burst-threshold=%.3fM/%.3fM' % tuple(i / 1.2 for i in queue.max_limit)
         ))
 
     def remove_queue(self, queue: i_structs.SubnetQueue) -> None:
@@ -300,7 +301,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
         if queue_gw is None:
             return self.add_queue(queue)
         else:
-            cmd = [
+            cmd = (
                 '/queue/simple/set',
                 '=name=%s' % queue.name,
                 '=max-limit=%.3fM/%.3fM' % queue.max_limit,
@@ -308,10 +309,11 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
                 # или =target-addresses или =target
                 '=target=%s' % queue.network,
                 '=queue=Djing_pcq_up/Djing_pcq_down',
-                '=burst-time=1/1'
-            ]
-            if queue.queue_id:
-                cmd.insert(1, '=.id=%s' % queue.queue_id)
+                '=burst-time=5/5',
+                '=burst-limit=%.3fM/%.3fM' % tuple(i * 2 for i in queue.max_limit),
+                '=burst-threshold=%.3fM/%.3fM' % tuple(i / 1.2 for i in queue.max_limit),
+                '=numbers=%s' % queue_gw.queue_id
+            )
             r = self._exec_cmd(cmd)
             return r
 

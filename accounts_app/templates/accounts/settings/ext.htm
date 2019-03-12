@@ -5,7 +5,13 @@
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'acc_app:accounts_list' %}">{% trans 'Administrators' %}</a></li>
-        <li><a href="{% url 'acc_app:profile' %}">{{ user.username }}</a></li>
+        <li>
+            {% if object == request.user %}
+                <a href="{% url 'acc_app:setup_info' %}">{{ object.username }}</a>
+            {% else %}
+                <a href="{% url 'acc_app:other_profile' object.pk %}">{{ object.username }}</a>
+            {% endif %}
+        </li>
         <li class="active">{% trans 'Options' %}</li>
     </ol>
 {% endblock %}
@@ -17,10 +23,9 @@
 {% block main %}
     <div class="row">
         <div class="col-sm-3">
-            <form action="{% url 'acc_app:setup_avatar' %}" method="post" class="thumbnail"
-                  enctype="multipart/form-data">{% csrf_token %}
+            <form action="{% url 'acc_app:setup_avatar' %}" method="post" class="thumbnail" enctype="multipart/form-data">{% csrf_token %}
 
-                <img alt="ava" src="{{ user.get_min_ava }}"/>
+                <img alt="ava" src="{{ object.get_min_ava }}"/>
 
                 <div class="caption">
                     <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
@@ -30,11 +35,10 @@
         </div>
 
         <div class="col-sm-9">
-            <h3>{{ user.username|default:_('Not assigned') }}</h3>
+            <h3>{{ object.username|default:_('Not assigned') }}</h3>
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a href="#livetab_content" data-tab-remote="{% url 'acc_app:setup_info' %}" role="tab"
-                       data-toggle="tab">
+                    <a href="#livetab_content" data-tab-remote="{% url 'acc_app:setup_info' %}" role="tab" data-toggle="tab">
                         {% trans 'Change self onfo' %}
                     </a>
                 </li>

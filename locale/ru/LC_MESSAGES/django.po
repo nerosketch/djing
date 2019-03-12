@@ -128,3 +128,6 @@ msgstr "Вы уверены в этом?"
 
 msgid "Finance"
 msgstr "Финансы"
+
+msgid "Traffic"
+msgstr "Траффик"

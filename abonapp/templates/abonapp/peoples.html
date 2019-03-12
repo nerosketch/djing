@@ -24,7 +24,7 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th>#</th>
+						<th>#</th>
                         <th class="col-xs-1">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_order_by request order_by='username' %}">
                                 {% trans 'Sub' %}
@@ -64,11 +64,11 @@
                             {% if order_by == 'ballance' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
                         <th class="hidden-xs">{% trans 'Markers' %}</th>
-                        <th class="col-xs-1">#</th>
+                        <th class="col-xs-1">Ping</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% with can_ch_trf=perms.tariff_app.change_tariff can_del_abon=perms.abonapp.delete_abon %}
+                    {% with can_ch_trf=perms.tariff_app.change_tariff %}
                     {% for human in object_list %}
                         {% if human.is_active %}
                             <tr>
@@ -76,27 +76,26 @@
                             <tr class="danger">
                         {% endif %}
                         <td>
-                            <span class="glyphicon glyphicon-question-sign text-muted"></span>
-{#                            {% if human.statcache.is_online %}#}
-{#                                <span class="glyphicon glyphicon-ok text-success"></span>#}
-{#                            {% else %}#}
-{#                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>#}
-{#                            {% endif %}#}
+                            {% if human.statcache.is_online %}
+                                <span class="glyphicon glyphicon-ok text-success"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>
+                            {% endif %}
                         </td>
                         <td class="col-xs-1">
                             <a href="{% url 'abonapp:abon_home' human.group_id human.username %}" title="{% trans 'Date joined' %}: {{ human.birth_day|date:'d E y' }}" data-toggle="tooltip">{{ human.username }}</a>
                         </td>
                         <td class="hidden-xs">
-{#                            {% if human.statcache %}#}
-{#                                {% if human.statcache.is_today %}#}
-{#                                    {{ human.statcache.last_time|date:"H:i" }}#}
-{#                                {% else %}#}
-{#                                    {{ human.statcache.last_time|date:"D H:i" }}#}
-{#                                {% endif %}#}
-{#                            {% endif %}#}
+                            {% if human.statcache %}
+                                {% if human.statcache.is_today %}
+                                    {{ human.statcache.last_time|date:"H:i" }}
+                                {% else %}
+                                    {{ human.statcache.last_time|date:"D H:i" }}
+                                {% endif %}
+                            {% endif %}
                         </td>
                         <td class="col-xs-1">{{ human.ip_address|default_if_none:'&mdash;' }}</td>
-                        <td class="col-xs-2">{{ human.fio|default:'&mdash;' }}</td>
+                        <td class="col-xs-1">{{ human.fio|default:'&mdash;' }}</td>
                         <td class="col-xs-1">{{ human.street|default:_('Not assigned') }}</td>
                         <td class="col-xs-1">{{ human.house|default:'&mdash;' }}</td>
                         <td class="col-xs-1"><a href="tel:{{ human.telephone }}">{{ human.telephone }}</a></td>
@@ -115,17 +114,17 @@
                             {% for user_icon in human.get_flag_icons %}<span class="m-icon {{ user_icon }}"></span>
                             {% endfor %}
                         </td>
-                        <td class="col-xs-1">
-                            {% if can_del_abon %}
-                                <a href="{% url 'abonapp:del_abon' group.pk human.username %}" class="btn btn-danger btn-sm btn-modal">
-                                    <span class="glyphicon glyphicon-remove"></span>
+                        <td class="col-xs-2">
+                            {% if perms.abonapp.can_ping %}
+                                <a href="{% url 'abonapp:ping' group.pk human.username %}" class="btn btn-default btn-sm btn-cmd" title="Ping" data-param="{{ human.ip_address }}" data-toggle="tooltip">
+                                    <span class="glyphicon glyphicon-flash"></span>
                                 </a>
                             {% endif %}
                         </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="12">
+                            <td colspan="10">
                                 {% trans 'Subscribers not found' %}.
                                 {% if perms.abonapp.add_abon %}
                                     <a href="{% url 'abonapp:add_abon' group.pk %}">{% trans 'Add abon' %}</a>

@@ -11,13 +11,14 @@ urlpatterns = [
     path('search/', include('searchapp.urls', namespace='searchapp')),
     path('dev/', include('devapp.urls', namespace='devapp')),
     path('map/', include('mapapp.urls', namespace='mapapp')),
-    # path('statistic/', include('statistics.urls', namespace='statistics')),
+    path('statistic/', include('traf_stat.urls', namespace='traf_stat')),
     path('tasks/', include('taskapp.urls', namespace='taskapp')),
     path('client/', include('clientsideapp.urls', namespace='client_side')),
     path('msg/', include('msg_app.urls', namespace='msg_app')),
     path('dialing/', include('dialing_app.urls', namespace='dialapp')),
     path('groups/', include('group_app.urls', namespace='group_app')),
     path('ip_pool/', include('ip_pool.urls', namespace='ip_pool')),
+    path('messenger/', include('messenger.urls', namespace='messenger')),
     path('gw/', include('gw_app.urls', namespace='gw_app')),
     path('fin/', include('finapp.urls', namespace='finapp'))
 

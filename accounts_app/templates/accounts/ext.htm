@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-sm-3">
             <div class="thumbnail">
-                <a href="{{ userprofile.get_big_ava }}" class="thumbnail" target="_blank">
+                <a href="{{ userprofile.get_big_ava }}" class="thumbnail">
                     <img alt="ava" src="{{ userprofile.get_min_ava }}"/>
                 </a>
                 <div class="caption btn-group btn-group-sm">
@@ -26,6 +26,13 @@
                             <span class="glyphicon glyphicon-edit"></span>
                             <span class="hidden-sm hidden-md">{% trans 'Edit' %}</span>
                         </a>
+                    {% else %}
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'acc_app:edit_profile' userprofile.id %}" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-edit"></span>
+                                <span class="hidden-sm hidden-md">{% trans 'Edit' %}</span>
+                            </a>
+                        {% endif %}
                     {% endif %}
                     {% if request.user.is_superuser %}
                         <a href="{% url 'acc_app:setup_perms' userprofile.pk %}" class="btn btn-default"

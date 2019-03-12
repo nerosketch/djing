@@ -22,8 +22,7 @@
                         {% for da in dev_accs %}
                             <li class="list-group-item">{% trans 'Attached user' %}:
                                 {% if da.group %}
-                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.username %}"
-                                       target="_blank">{{ da.get_full_name }}</a>
+                                    <a href="{% url 'abonapp:abon_home' da.group.pk da.username %}">{{ da.get_full_name }}</a>
                                 {% else %}
                                     {{ da.get_full_name }}
                                 {% endif %}
@@ -33,9 +32,7 @@
                             <li class="list-group-item">
                                 {% with pdev=dev.parent_dev pdgrp=dev.parent_dev.group %}
                                     {% trans 'Parent device' %}:
-                                    <a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}"
-                                                                   title="{{ pdev.mac_addr|default:'' }}"
-                                                                   target="_blank">
+                                    <a href="{% url 'devapp:view' pdgrp.pk pdev.pk %}" title="{{ pdev.mac_addr|default:'' }}">
                                         {{ pdev.ip_address|default:'-' }} {{ pdev.comment }}
                                     </a>
                                 {% endwith %}
@@ -73,15 +70,17 @@
                                 </div>
                                 <div class="media-body">
 
-                                    <b>{% trans 'Name on OLT' %}</b>: {{ onu_details.name }}<br>
-                                    <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance }}<br>
+                                    <b>{% trans 'Distance(m)' %}</b>: {{ onu_details.distance|default:'-' }}<br>
                                     <b>{% trans 'Signal' %}</b>: {{ onu_details.signal }}<br>
                                     {% if onu_details.ip_addr %}
                                         <b>{% trans 'Ip addr' %}</b>: {{ onu_details.ip_addr }}<br>
                                     {% endif %}
                                     {% if onu_details.vlans %}
-                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}
+                                        <b>{% trans 'VLan list' %}</b>: {{ onu_details.vlans }}<br>
                                     {% endif %}
+                                    <b>{% trans 'Serial' %}</b>: {{ onu_details.serial|default:'-' }}<br>
+                                    <b>{% trans 'Onu type' %}</b>: {{ onu_details.onu_type|default:'-' }}<br>
+                                    <b>{% trans 'Name' %}</b>: {{ onu_details.int_name|default:'-' }}
 
                                 </div>
                             </div>

@@ -136,7 +136,7 @@
                         <label for="id_method" class="col-sm-4 control-label">{% trans 'Device' %}</label>
                             <div class="col-sm-8 btn-group btn-group-sm">
                                 {% if device %}
-                                    <a href="{% url 'devapp:view' group.pk device.pk %}" target="_blank" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %}: {{ device.mac_addr|default:_('Not assigned') }}">
+                                    <a href="{% url 'devapp:view' group.pk device.pk %}" class="btn btn-sm btn-default" title="{% trans 'Mac Address' %}: {{ device.mac_addr|default:_('Not assigned') }}">
                                         <span class="glyphicon glyphicon-hdd"></span>
                                         <span class="hidden-md">{{ device.comment|truncatechars:11 }} {{ device.ip_address|default:'' }}</span>
                                     </a>

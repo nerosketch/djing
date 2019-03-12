@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/bin
 
 mkdir -p /tmp/djing_flow
 

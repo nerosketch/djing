@@ -30,17 +30,9 @@ msgstr "Свич D'Link"
 msgid "does not fetch the mac"
 msgstr "не нашёл мак"
 
-#: dev_types.py:140
-msgid "PON OLT"
-msgstr ""
-
 #: dev_types.py:169 views.py:345 views.py:503
 msgid "wait for a reply from the SNMP Timeout"
 msgstr "Время ожидания ответа от SNMP истекло"
-
-#: dev_types.py:199
-msgid "PON ONU"
-msgstr ""
 
 #: dev_types.py:214
 msgid "Ip address or parent device with ip address required for ONU device"
@@ -59,14 +51,6 @@ msgstr "Поле для snmp информации об ONU должно быть
 #: dev_types.py:314
 msgid "Eltex switch"
 msgstr "Элтекс свич"
-
-#: dev_types.py:356
-msgid "OLT ZTE C320"
-msgstr ""
-
-#: dev_types.py:419
-msgid "ZTE PON ONU"
-msgstr ""
 
 #: dev_types.py:454
 msgid "Zte onu snmp field must be two dot separated integers"
@@ -324,7 +308,7 @@ msgstr "Название типа свича"
 #: templates/devapp/custom_dev_page/onu.html:22
 #: templates/devapp/custom_dev_page/onu_for_zte.html:22
 msgid "Attached user"
-msgstr "Прикрепленный абонент"
+msgstr "Прикреплённый абонент"
 
 #: templates/devapp/custom_dev_page/onu.html:48
 #: templates/devapp/custom_dev_page/onu_for_zte.html:50
@@ -337,7 +321,6 @@ msgid "ONU error"
 msgstr "ONU ошибка"
 
 #: templates/devapp/custom_dev_page/onu.html:72
-#: templates/devapp/custom_dev_page/onu_for_zte.html:75
 msgid "Name on OLT"
 msgstr "Имя на OLT"
 
@@ -642,20 +625,26 @@ msgstr "Не заполнено поле 'Техническая информа�
 msgid "Fiber"
 msgstr "Интерфейс"
 
-#~ msgid "Device %(device_name)s is up"
-#~ msgstr "%(device_name)s в сети"
+msgid "Onu type"
+msgstr "Тип onu"
 
-#~ msgid "Device %(device_name)s is down"
-#~ msgstr "%(device_name)s не в сети"
+msgid "Serial"
+msgstr "Серийник"
 
-#~ msgid "Device %(device_name)s is unreachable"
-#~ msgstr "%(device_name)s недостижим"
+msgid "Device %(device_name)s is up"
+msgstr "%(device_name)s в сети"
 
-#~ msgid "Device %(device_name)s getting undefined status code"
-#~ msgstr "Устройство %(device_name)s получило не определённый код состояния"
+msgid "Device %(device_name)s is down"
+msgstr "%(device_name)s не в сети"
 
-#~ msgid "View"
-#~ msgstr "Посмотреть"
+msgid "Device %(device_name)s is unreachable"
+msgstr "%(device_name)s недостижим"
 
-#~ msgid "Enter valid JSON"
-#~ msgstr "Введите данные в формате JSON"
+msgid "Device %(device_name)s getting undefined status code"
+msgstr "Устройство %(device_name)s получило не определённый код состояния"
+
+msgid "View"
+msgstr "Посмотреть"
+
+msgid "Enter valid JSON"
+msgstr "Введите данные в формате JSON"

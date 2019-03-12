@@ -1,13 +1,12 @@
 urllib3
 Django>=2
 Pillow
-telepot
 
 # for mac address field
 netaddr
 
 # for testing required xmltodict
-xmltodict
+#xmltodict
 dicttoxml
 
 # db client for Postgres
@@ -18,17 +17,31 @@ pid
 django-guardian
 pinax-theme-bootstrap
 django-bootstrap3
-django-jsonfield
+
+# django-jsonfield
+-e git://github.com/dmkoch/django-jsonfield.git#egg=django-jsonfield
+
 requests
 webdavclient
 pyst2
-django-bitfield
 transliterate
 asterisk
 django-encrypted-model-fields
 
 # django-xmlview for pay system allpay
 -e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview
+
+# django-bitfield
+-e git://github.com/disqus/django-bitfield.git#egg=django-bitfield
+
+# django_cleanup for clean unused media
+-e git://github.com/un1t/django-cleanup.git#egg=django_cleanup
+
+# viberbot
+-e git://github.com/Viber/viber-bot-python.git#egg=viberbot
+
+# pexpect
+-e git://github.com/pexpect/pexpect.git#egg=pexpect
 
 Celery
 redis==2.10.6

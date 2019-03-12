@@ -305,8 +305,4 @@ $(document).ready(function () {
 	$('[data-toggle="tooltip"]').tooltip({container:'body'});
 
 	$('.btn_ajloader').ajloader({'dst_block': '#id_block_devices'});
-
-	$(document).notifys({news_url: '/tasks/check_news', check_interval: 50});
-	$(document).notifys({news_url: '/msg/check_news', check_interval: 55});
-
 });

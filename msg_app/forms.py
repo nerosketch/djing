@@ -7,7 +7,7 @@ from accounts_app.models import UserProfile
 class ConversationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ConversationForm, self).__init__(*args, **kwargs)
-        user_profile_queryset = UserProfile.objects.filter(is_admin=True)
+        user_profile_queryset = UserProfile.objects.filter(is_admin=True, is_active=True)
         if user_profile_queryset is not None:
             self.fields['participants'].choices = [(up.pk, up.get_full_name()) for up in user_profile_queryset]
 

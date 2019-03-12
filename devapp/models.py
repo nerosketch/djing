@@ -32,7 +32,9 @@ class Device(models.Model):
         ('On', dev_types.OnuDevice),
         ('Ex', dev_types.EltexSwitch),
         ('Zt', dev_types.Olt_ZTE_C320),
-        ('Zo', dev_types.ZteOnuDevice)
+        ('Zo', dev_types.ZteOnuDevice),
+        ('Z6', dev_types.ZteF601),
+        ('Hw', dev_types.HuaweiSwitch)
     )
     devtype = models.CharField(_('Device type'), max_length=2, default=DEVICE_TYPES[0][0],
                                choices=MyChoicesAdapter(DEVICE_TYPES))
@@ -108,7 +110,7 @@ class Port(models.Model):
 
     class Meta:
         db_table = 'dev_port'
-        unique_together = (('device', 'num'),)
+        unique_together = ('device', 'num')
         permissions = (
             ('can_toggle_ports', _('Can toggle ports')),
         )

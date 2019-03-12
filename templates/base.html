@@ -8,7 +8,7 @@
         <div class="row profile_img">
             <div class="col-sm-5">
 
-                <a href="{% url 'acc_app:profile' %}">
+                <a href="{% url 'acc_app:setup_info' %}">
                     <img alt="profile image" class="img-circle img-responsive" src="{{ user.get_min_ava }}"/>
                 </a>
 
@@ -106,6 +106,15 @@
                 </li>
             {% endif %}
 
+            {% if perms.traf_stat.statcache_view %}
+                {% url 'traf_stat:home' as stathome %}
+                <li{% if stathome in request.path %} class="active"{% endif %}>
+                    <a href="{{ stathome }}">
+                        <span class="glyphicon glyphicon-dashboard"></span> {% trans 'Traffic' %}
+                    </a>
+                </li>
+            {% endif %}
+
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_groups }}">
@@ -118,6 +127,15 @@
                 <li{% if nashome in request.path %} class="active"{% endif %}>
                     <a href="{{ nashome }}">
                         <span class="glyphicon glyphicon-globe"></span> {% trans 'Gateways' %}
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if perms.gw_app.view_nasmodel %}
+                {% url 'messenger:messengers_list' as mesngrhome %}
+                <li{% if mesngrhome in request.path %} class="active"{% endif %}>
+                    <a href="{{ mesngrhome }}">
+                        <span class="glyphicon glyphicon-comment"></span> {% trans 'Messengers' %}
                     </a>
                 </li>
             {% endif %}

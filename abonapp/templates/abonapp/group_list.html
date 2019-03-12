@@ -65,7 +65,12 @@
                             <span class="glyphicon glyphicon-exclamation-sign"></span> <span class="hidden-xs">{% trans 'List of debtors' %}</span>
                         </a>
                     {% endif %}
-                    <a href="{% url 'abonapp:vcards' %}" target="_blank" class="btn btn-default">
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'abonapp:fin_report' %}" class="btn btn-default">
+                            <span class="glyphicon glyphicon-usd"></span> <span class="hidden-xs">{% trans 'Fin report' %}</span>
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'abonapp:vcards' %}" class="btn btn-default">
                         <span class="glyphicon glyphicon-phone"></span>
                         <span class="hidden-xs">{% trans 'Export vCards' %}</span>
                     </a>

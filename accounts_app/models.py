@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import os
 from PIL import Image
+from bitfield.models import BitField
 
 from jsonfield import JSONField
 from django.db import models
@@ -124,8 +125,14 @@ class UserProfileManager(MyUserManager):
 
 class UserProfile(BaseAccount):
     avatar = models.ImageField(_('Avatar'), upload_to=os.path.join('user', 'avatar'), null=True, default=None, blank=True)
-    email = models.EmailField(default='')
+    email = models.EmailField(default='', blank=True)
     responsibility_groups = models.ManyToManyField(Group, blank=True, verbose_name=_('Responsibility groups'))
+    USER_PROFILE_FLAGS = (
+        ('notify_task', _('Notification about tasks')),
+        ('notify_msg', _('Notification about messages')),
+        ('notify_mon', _('Notification from monitoring'))
+    )
+    flags = BitField(flags=USER_PROFILE_FLAGS, default=0, verbose_name=_('Settings flags'))
 
     objects = UserProfileManager()
 

@@ -27,11 +27,12 @@
             </thead>
             <tbody>
             {% for usr in users %}
-                <tr>
-                    <td><a href="{% url 'acc_app:other_profile' usr.id %}">
-                        <img width="50" src="{{ usr.get_min_ava }}"
-                             alt="{{ usr.username }}"/>
-                    </a></td>
+                <tr {{ usr.is_active|yesno:',class="danger"'|safe }}>
+                    <td>
+                        <a href="{% url 'acc_app:other_profile' usr.id %}">
+                            <img width="50" src="{{ usr.get_min_ava }}" alt="{{ usr.username }}"/>
+                        </a>
+                    </td>
                     <td><a href="{% url 'acc_app:other_profile' usr.id %}">{{ usr.username }}</a></td>
                     <td>{{ usr.get_full_name }}</td>
                     <td class="hidden-xs">

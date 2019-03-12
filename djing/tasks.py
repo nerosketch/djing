@@ -37,6 +37,8 @@ def send_email_notify(msg_text: str, account_id: int):
 def multicast_email_notify(msg_text: str, account_ids: Iterable):
     text_content = strip_tags(msg_text)
     for acc_id in account_ids:
+        if not acc_id:
+            continue
         try:
             account = UserProfile.objects.get(pk=acc_id)
             target_email = account.email
