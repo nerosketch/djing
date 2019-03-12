@@ -97,6 +97,15 @@
                 </li>
             {% endif %}
 
+            {% if perms.traf_stat.statcache_view %}
+                {% url 'traf_stat:home' as stathome %}
+                <li{% if stathome in request.path %} class="active"{% endif %}>
+                    <a href="{{ stathome }}">
+                        <span class="glyphicon glyphicon-dashboard"></span> {% trans 'Traffic' %}
+                    </a>
+                </li>
+            {% endif %}
+
             {% url 'devapp:group_list' as devapp_groups %}
             <li{% if devapp_groups in request.path %} class="active"{% endif %}>
                 <a href="{{ devapp_groups }}">

@@ -52,11 +52,11 @@ class PeoplesListView(LoginRequiredMixin, OnlyAdminsMixin,
         if street_id > 0:
             peoples_list = peoples_list.filter(street=street_id)
         peoples_list = peoples_list.select_related(
-            'group', 'street', 'current_tariff'
+            'group', 'street', 'current_tariff__tariff', 'statcache'
         ).only(
-            'group', 'street', 'fio',
+            'group', 'street', 'fio', 'birth_day',
             'street', 'house', 'telephone', 'ballance', 'markers',
-            'username', 'is_active', 'current_tariff'
+            'username', 'is_active', 'current_tariff', 'ip_address'
         )
         ordering = self.get_ordering()
         if ordering and isinstance(ordering, str):

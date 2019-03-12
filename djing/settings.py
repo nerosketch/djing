@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'searchapp',
     'devapp',
     'mapapp',
-    'statistics',
+    'traf_stat',
     'taskapp',
     'clientsideapp',
     'messenger',

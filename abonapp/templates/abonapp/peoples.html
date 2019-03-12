@@ -24,14 +24,14 @@
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-{#						<th>#</th> #}
+						<th>#</th>
                         <th class="col-xs-1">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_order_by request order_by='username' %}">
                                 {% trans 'Sub' %}
                             </a>
                             {% if order_by == 'username' %}<span class="glyphicon glyphicon-filter"></span>{% endif %}
                         </th>
-{#                        <th class="hidden-xs">{% trans 'Last traffic' %}</th> #}
+                        <th class="hidden-xs">{% trans 'Last traffic' %}</th>
                         <th>{% trans 'Network' %}</th>
                         <th class="col-xs-3">
                             <a href="{% url 'abonapp:people_list' group.pk %}?{% url_order_by request order_by='fio' %}">
@@ -75,26 +75,25 @@
                         {% else %}
                             <tr class="danger">
                         {% endif %}
-{#                        <td> #}
-{#                            <span class="glyphicon glyphicon-question-sign text-muted"></span> #}
-{#                            {% if human.statcache.is_online %}#}
-{#                                <span class="glyphicon glyphicon-ok text-success"></span>#}
-{#                            {% else %}#}
-{#                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>#}
-{#                            {% endif %}#}
-{#                        </td> #}
+                        <td>
+                            {% if human.statcache.is_online %}
+                                <span class="glyphicon glyphicon-ok text-success"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove-sign text-muted"></span>
+                            {% endif %}
+                        </td>
                         <td class="col-xs-1">
                             <a href="{% url 'abonapp:abon_home' human.group_id human.username %}" title="{% trans 'Date joined' %}: {{ human.birth_day|date:'d E y' }}" data-toggle="tooltip">{{ human.username }}</a>
                         </td>
-{#                        <td class="hidden-xs"> #}
-{#                            {% if human.statcache %}#}
-{#                                {% if human.statcache.is_today %}#}
-{#                                    {{ human.statcache.last_time|date:"H:i" }}#}
-{#                                {% else %}#}
-{#                                    {{ human.statcache.last_time|date:"D H:i" }}#}
-{#                                {% endif %}#}
-{#                            {% endif %}#}
-{#                        </td> #}
+                        <td class="hidden-xs">
+                            {% if human.statcache %}
+                                {% if human.statcache.is_today %}
+                                    {{ human.statcache.last_time|date:"H:i" }}
+                                {% else %}
+                                    {{ human.statcache.last_time|date:"D H:i" }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
                         <td class="col-xs-1">{{ human.ip_address|default_if_none:'&mdash;' }}</td>
                         <td class="col-xs-1">{{ human.fio|default:'&mdash;' }}</td>
                         <td class="col-xs-1">{{ human.street|default:_('Not assigned') }}</td>
