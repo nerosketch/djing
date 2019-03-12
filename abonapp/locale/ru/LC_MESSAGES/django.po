@@ -531,10 +531,6 @@ msgstr "Флаги абонента"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: templates/abonapp/fin_report.html:7 templates/abonapp/group_list.html:70
-msgid "Fin report"
-msgstr "Финансовый отчёт"
-
 #: templates/abonapp/fin_report.html:12
 msgid "Money by days"
 msgstr "Сумма денег за сутки"

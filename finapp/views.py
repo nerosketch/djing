@@ -177,7 +177,7 @@ class PayHistoryListView(LoginAdminMixin, PermissionRequiredMixin,
     def get_queryset(self):
         pay_history = AllTimePayLog.objects.filter(
             pay_gw__slug=self.kwargs.get('pay_slug')
-        ).order_by('-date_add')
+        ).select_related('abon__group').order_by('-date_add')
         return pay_history
 
     def get_context_data(self, **kwargs):

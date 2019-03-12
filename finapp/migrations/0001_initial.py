@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('abonapp', '0009_auto_20181123_1556'),
+        ('abonapp', '0001_squashed_0008_auto_20181115_1206'),
     ]
 
     operations = [

@@ -62,15 +62,6 @@
                 </a>
             </li>
 
-            {% if perms.fonapp.view_payalltimegateway %}
-                {% url 'finapp:alltime_gateways_list' as finhome %}
-                <li{% if finhome in request.path %} class="active"{% endif %}>
-                    <a href="{{ finhome }}">
-                        <span class="glyphicon glyphicon-credit-card"></span> {% trans 'Finance' %}
-                    </a>
-                </li>
-            {% endif %}
-
             {% url 'ip_pool:networks' as ippool_home %}
             <li{% if ippool_home in request.path %} class="active"{% endif %}>
                 <a href="{{ ippool_home }}">

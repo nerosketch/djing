@@ -66,6 +66,11 @@
                         <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
                     </a>
                 {% endif %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'finapp:fin_report' %}" class="btn btn-default">
+                        <span class="glyphicon glyphicon-usd"></span> <span class="hidden-xs">{% trans 'Fin report' %}</span>
+                    </a>
+                {% endif %}
             </td>
         </tr>
         </tfoot>
