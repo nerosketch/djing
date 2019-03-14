@@ -61,7 +61,10 @@ class AllTimePay(DetailView):
 
         if act <= 0:
             return self._bad_ret(-101, 'ACT must be more than 0')
-        if not self.check_sign(request.GET, request.GET.get('SIGN').lower()):
+        sign = request.GET.get('SIGN')
+        if not sign:
+            return self._bad_ret(-101, 'SIGN not passed')
+        if not self.check_sign(request.GET, sign.lower()):
             return self._bad_ret(-101, 'Bad sign')
 
         try:
