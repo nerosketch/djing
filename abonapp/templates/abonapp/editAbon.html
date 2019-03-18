@@ -192,25 +192,46 @@
                     <h3 class="panel-title">{% trans 'Ip address' %}</h3>
                 </div>
                 <div class="panel-body">
+                    <dl class="dl-horizontal">
                     {% if abon.ip_address %}
-                        <div class="btn-group btn-group-xs">
-                            <a href="{% url 'abonapp:user_session_free' group.pk abon.username %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
-                                <span class="glyphicon glyphicon-remove"></span>
-                            </a>
-                            <b>{{ abon.ip_address }}</b>
-                            {% if perms.abonapp.can_ping %}
-                                <a href="{% url 'abonapp:ping' group.pk abon.username %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ abon.ip_address }}">
-                                    <span class="glyphicon glyphicon-flash"></span> Ping
+                        <dt>{{ abon.ip_address }}</dt>
+                        <dd>
+                            <div class="btn-group btn-group-xs">
+                                <a href="{% url 'abonapp:user_session_free' group.pk abon.username %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
+                                    <span class="glyphicon glyphicon-remove"></span>
                                 </a>
-                            {% else %}
-                                <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
-                                    <span class="glyphicon glyphicon-flash"></span> Ping
-                                </a>
-                            {% endif %}
-                        </div>
+                                {% if perms.abonapp.can_ping %}
+                                    <a href="{% url 'abonapp:ping' group.pk abon.username %}" class="btn btn-default btn-cmd" title="Ping" data-param="{{ abon.ip_address }}">
+                                        <span class="glyphicon glyphicon-flash"></span> Ping
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
+                                        <span class="glyphicon glyphicon-flash"></span> Ping
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </dd>
                     {% else %}
-                        <span class="text-info">{% trans 'No ip address' %}</span>
+                        <dt><span class="glyphicon glyphicon-warning-sign text-danger"></span></dt>
+                        <dd><span class="text-info">{% trans 'No ip address' %}</span></dd>
                     {% endif %}
+
+                    {% if abon.statcache %}
+                        <dt>{% trans 'Last traffic:' %}</dt>
+                        <dd>
+                            {% if abon.statcache.is_today %}
+                                {{ abon.statcache.last_time|date:"H:i" }}
+                            {% else %}
+                                {{ abon.statcache.last_time|date:"D H:i" }}
+                            {% endif %}
+                        </dd>
+                        <dt>{% trans 'Octets:' %}</dt>
+                        <dd>{{ abon.statcache.octets_to|floatformat:2 }}Mb / 1 min.</dd>
+                        <dt>{% trans 'Packets:' %}</dt>
+                        <dd>{{ abon.statcache.packets }}</dd>
+                    {% endif %}
+                    </dl>
+
                 </div>
                 <div class="panel-footer">
                     <div class="btn-group btn-group-sm">

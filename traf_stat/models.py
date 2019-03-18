@@ -124,6 +124,22 @@ class StatCache(models.Model):
     def is_today(self):
         return date.today() == self.last_time.date()
 
+    def octets_to(self, to='m', bsize=1024):
+        """convert octets <bytes> to megabytes, etc.
+           sample code:
+               print('mb= ' + str(bytesto(314575262000000, 'm')))
+           sample output:
+               mb= 300002347.946
+           to:
+        :param to: may be one of k m g t p e
+        :param bsize: byte size
+        """
+        a = {'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5, 'e': 6}
+        r = float(self.octets)
+        for i in range(a[to]):
+            r = r / bsize
+        return r
+
     class Meta:
         db_table = 'flowcache'
         ordering = ('-last_time',)
