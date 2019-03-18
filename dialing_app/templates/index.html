@@ -32,14 +32,7 @@
                         <div class="form-group">
                             <label class="sr-only" for="dialtime">{% trans 'Find by dates' %}</label>
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" id="dialtime" placeholder="{% trans 'calldate' %}" name="sd"{% if sd %} value="{{ sd }}"{% endif %}>
-                                <script type="text/javascript">
-                                    $(function () {
-                                        $('#dialtime').datetimepicker({
-                                            format: 'YYYY-MM-DD'
-                                        });
-                                    });
-                                </script>
+                                <input type="datetime-local" class="form-control" id="dialtime" placeholder="{% trans 'calldate' %}" name="sd"{% if sd %} value="{{ sd }}"{% endif %}>
                                 <div class="input-group-btn">
                                     <button class="btn btn-default" type="submit">
                                         <span class="glyphicon glyphicon-search"></span>

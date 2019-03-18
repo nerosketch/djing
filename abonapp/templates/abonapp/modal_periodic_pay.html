@@ -14,13 +14,6 @@
 
         {% bootstrap_icon 'time' as ic %}
         {% bootstrap_field form.next_pay addon_before=ic %}
-        <script type="text/javascript">
-            $(function () {
-                $('#{{ form.next_pay.id_for_label }}').datetimepicker({
-                    format: 'YYYY-MM-DD'
-                });
-            });
-        </script>
 
         <div class="btn-group">
             <button type="submit" class="btn btn-sm btn-success">

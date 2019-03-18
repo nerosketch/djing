@@ -38,7 +38,7 @@ class TaskFrm(forms.ModelForm):
             'recipients': forms.SelectMultiple(attrs={
                 'size': 10
             }),
-            'out_date': forms.DateInput(attrs={'class': 'form-control'}),
+            'out_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'abon': forms.Select(attrs={'class': 'form-control'})
         }
 

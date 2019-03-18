@@ -69,13 +69,6 @@
                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                             {{ form.out_date }}{{ form.out_date.errors }}
                         </div>
-                        <script type="text/javascript">
-                            $(function () {
-                                $('#id_out_date').datetimepicker({
-                                    format: 'YYYY-MM-DD'
-                                });
-                            });
-                        </script>
                     </div>
 
                     {% bootstrap_icon 'picture' as ic %}

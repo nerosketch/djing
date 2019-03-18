@@ -167,6 +167,9 @@ class PeriodicPayForIdForm(forms.ModelForm):
     class Meta:
         model = models.PeriodicPayForId
         exclude = ('account',)
+        widgets = {
+            'next_pay': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+        }
 
 
 class ExportUsersForm(forms.Form):

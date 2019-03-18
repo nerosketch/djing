@@ -8,14 +8,14 @@ from dialing_app.models import AsteriskCDR
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, \
-    PermissionRequiredMixin as PermissionRequiredMixin_django, \
-    PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.db.models import Count, Q
-from django.http import HttpResponse, HttpResponseBadRequest, \
+from django.http import (
+    HttpResponse, HttpResponseBadRequest,
     HttpResponseRedirect
+)
 from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.urls import reverse_lazy
 
@@ -26,8 +26,11 @@ from djing import lib
 from djing import ping
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 from djing.lib.decorators import json_view, only_admins
-from djing.lib.mixins import OnlyAdminsMixin, LoginAdminPermissionMixin, \
+from djing.lib.mixins import (
+    OnlyAdminsMixin,
+    LoginAdminPermissionMixin,
     LoginAdminMixin
+)
 from group_app.models import Group
 from guardian.decorators import \
     permission_required_or_403 as permission_required
@@ -97,7 +100,7 @@ class GroupListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
 
 
 class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,
-                     PermissionRequiredMixin_django, CreateView):
+                     PermissionRequiredMixin, CreateView):
     permission_required = 'abonapp.add_abon'
     group = None
     abon = None
@@ -428,7 +431,7 @@ def pick_tariff(request, gid: int, uname):
                     'deadline': deadline
                     }
             if deadline:
-                deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
+                deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M:%S')
                 abon.pick_tariff(trf, request.user, deadline=deadline,
                                  comment=log_comment)
             else:
