@@ -310,9 +310,12 @@ class ShowSubscriberOnPort(LoginAdminMixin,
 @permission_required('devapp.add_port')
 def add_ports(request, group_id: int, device_id: int):
     class TempPort:
-        def __init__(self, pid, text, status, from_db, pk=None):
+        __slots__ = 'pid', 'text', 'placeholder', 'status', 'from_db', 'pk'
+
+        def __init__(self, pid, text, status, from_db, pk=None, placeholder=None):
             self.pid = pid
             self.text = text
+            self.placeholder = placeholder
             self.status = status
             self.from_db = from_db
             self.pk = pk
@@ -359,7 +362,7 @@ def add_ports(request, group_id: int, device_id: int):
         manager = device.get_manager_object()
         ports = manager.get_ports()
         if ports is not None:
-            ports = tuple(TempPort(p.num, p.nm, p.st, False) for p in ports)
+            ports = tuple(TempPort(p.num, None, p.st, False, placeholder=p.nm) for p in ports)
             res_ports = set(db_ports + ports)
         else:
             res_ports = db_ports

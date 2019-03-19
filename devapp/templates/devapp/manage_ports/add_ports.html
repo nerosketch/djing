@@ -44,7 +44,7 @@
                         <td>{{ port.pid }}</td>
                         <td>{{ port.mode }}</td>
                         <td class="input-group">
-                            <input type="text" class="form-control input-sm" name="p_text" value="{{ port.text }}">
+                            <input type="text" class="form-control input-sm" name="p_text" value="{{ port.text|default_if_none:'' }}" placeholder="{{ port.placeholder|default_if_none:'' }}">
                             <input type="hidden" name="pids" value="{{ port.pid }}">
                             <span class="input-group-btn">
                                 {% if port.from_db %}
