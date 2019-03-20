@@ -5,7 +5,7 @@ from django.shortcuts import resolve_url
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from djing.lib import MyChoicesAdapter
-from gw_app.nas_managers import NAS_TYPES
+from gw_app.nas_managers import NAS_TYPES, NasNetworkError
 
 
 class NASModel(models.Model):
@@ -25,19 +25,22 @@ class NASModel(models.Model):
             raise TypeError(_('One of nas types implementation is not found'))
 
     def get_nas_manager(self):
-        klass = self.get_nas_manager_klass()
-        if hasattr(self, '_nas_mngr'):
-            o = getattr(self, '_nas_mngr')
-        else:
-            o = klass(
-                login=self.auth_login,
-                password=self.auth_passw,
-                ip=self.ip_address,
-                port=int(self.ip_port),
-                enabled=bool(self.enabled)
-            )
-            setattr(self, '_nas_mngr', o)
-        return o
+        try:
+            klass = self.get_nas_manager_klass()
+            if hasattr(self, '_nas_mngr'):
+                o = getattr(self, '_nas_mngr')
+            else:
+                o = klass(
+                    login=self.auth_login,
+                    password=self.auth_passw,
+                    ip=self.ip_address,
+                    port=int(self.ip_port),
+                    enabled=bool(self.enabled)
+                )
+                setattr(self, '_nas_mngr', o)
+            return o
+        except ConnectionResetError:
+            raise NasNetworkError('ConnectionResetError')
 
     def get_absolute_url(self):
         return resolve_url('gw_app:edit', self.pk)

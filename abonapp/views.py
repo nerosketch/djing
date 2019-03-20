@@ -694,8 +694,7 @@ def clear_dev(request, gid: int, uname):
 def abon_ping(request, gid: int, uname):
     ip = request.GET.get('cmd_param')
     status = False
-    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
-        'no ping')
+    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
     abon = get_object_or_404(models.Abon, username=uname)
     try:
         if ip is None:
@@ -710,35 +709,44 @@ def abon_ping(request, gid: int, uname):
         mngr = abon.nas.get_nas_manager()
         ping_result = mngr.ping(ip)
         if ping_result is None:
-            if ping(ip, 10):
-                status = True
-                text = '<span class="glyphicon glyphicon-ok"></span> %s' % _(
-                    'ping ok')
-        else:
-            if type(ping_result) is tuple:
-                loses_percent = (
-                    ping_result[0] / ping_result[1] if ping_result[
-                                                           1] != 0 else 1)
-                ping_result = {'all': ping_result[0], 'return': ping_result[1]}
-                if loses_percent > 1.0:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
-                        'IP Conflict! %(all)d/%(return)d results') % ping_result
-                elif loses_percent > 0.5:
-                    text = '<span class="glyphicon glyphicon-ok"></span> %s' % _(
-                        'ok ping, %(all)d/%(return)d loses') % ping_result
-                    status = True
+            return {
+                'status': False,
+                'dat': text
+            }
+        if isinstance(ping_result, tuple):
+            received, sent = ping_result
+            print(ping_result)
+            if received == 0:
+                ping_result = mngr.ping(ip, arp=True)
+                if ping_result is not None and isinstance(ping_result, tuple):
+                    received, sent = ping_result
                 else:
-                    text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
-                        'no ping, %(all)d/%(return)d loses') % ping_result
-            else:
+                    return {
+                        'status': False,
+                        'dat': text
+                    }
+            loses_percent = (
+                received / sent if sent != 0 else 1
+            )
+            ping_result = {'return': received, 'all': sent}
+            if loses_percent > 1.0:
+                text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
+                    'IP Conflict! %(return)d/%(all)d results'
+                ) % ping_result
+            elif loses_percent > 0.5:
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _(
-                    'ping ok') + ' ' + str(ping_result)
+                    'ok ping, %(return)d/%(all)d loses'
+                ) % ping_result
                 status = True
+            else:
+                text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
+                    'no ping, %(return)d/%(all)d loses'
+                ) % ping_result
 
     except (NasFailedResult, lib.LogicError) as e:
-        messages.error(request, e)
+        text = str(e)
     except NasNetworkError as e:
-        messages.warning(request, e)
+        text = str(e)
 
     return {
         'status': 0 if status else 1,

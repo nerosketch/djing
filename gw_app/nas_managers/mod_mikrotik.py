@@ -430,19 +430,24 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             if res_ips:
                 self.remove_ip(res_ips.get('=.id'))
 
-    def ping(self, host, count=10) -> Optional[Tuple[int, int]]:
-        r = self._exec_cmd((
-            '/ip/arp/print',
-            '?address=%s' % host
-        ))
-        if r == {}:
-            return
-        interface = r['!re'].get('=interface')
-        r = self._exec_cmd((
-            '/ping', '=address=%s' % host, '=arp-ping=yes', '=interval=100ms',
-            '=count=%d' % count,
-            '=interface=%s' % interface
-        ))
+    def ping(self, host, count=10, arp=False) -> Optional[Tuple[int, int]]:
+        params = [
+            '/ping', '=address=%s' % host,
+            '=interval=100ms', '=count=%d' % count
+        ]
+        if arp:
+            r = self._exec_cmd((
+                '/ip/arp/print',
+                '?address=%s' % host
+            ))
+            if r == {}:
+                return
+            interface = r['!re'].get('=interface')
+            params.extend((
+                '=arp-ping=yes',
+                '=interface=%s' % interface
+            ))
+        r = self._exec_cmd(params)
         res = r.get('!re')
         if res is not None:
             received, sent = int(res.get('=received')), int(res.get('=sent'))

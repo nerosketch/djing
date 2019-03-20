@@ -67,10 +67,11 @@ class BaseTransmitter(ABC):
         """
 
     @abstractmethod
-    def ping(self, host: str, count=10) -> Optional[Tuple[int, int]]:
+    def ping(self, host: str, count=10, arp=False) -> Optional[Tuple[int, int]]:
         """
         :param host: ip address in text view, for example '192.168.0.1'
         :param count: count of ping queries
+        :param arp: Is use arp ping
         :return: None if not response, else tuple it contains count returned and count sent
         for example (received, sent) -> (7, 10).
         """

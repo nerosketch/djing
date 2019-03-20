@@ -992,18 +992,18 @@ msgstr "пингуется"
 
 #: views.py:698
 #, python-format
-msgid "IP Conflict! %(all)d/%(return)d results"
-msgstr "IP Конфликт! ping %(all)d из %(return)d"
+msgid "IP Conflict! %(return)d/%(all)d results"
+msgstr "IP Конфликт! ping %(return)d из %(all)d"
 
 #: views.py:701
 #, python-format
-msgid "ok ping, %(all)d/%(return)d loses"
-msgstr "пингуется, %(all)d/%(return)d"
+msgid "ok ping, %(return)d/%(all)d loses"
+msgstr "пингуется, %(return)d/%(all)d"
 
 #: views.py:705
 #, python-format
-msgid "no ping, %(all)d/%(return)d loses"
-msgstr "не пингуется, %(all)d/%(return)d"
+msgid "no ping, %(return)d/%(all)d loses"
+msgstr "не пингуется, %(return)d/%(all)d"
 
 #: views.py:811
 msgid "Method is not POST"
