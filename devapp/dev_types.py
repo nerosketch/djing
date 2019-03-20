@@ -43,8 +43,8 @@ def plain_ip_device_mon_template(device) -> Optional[AnyStr]:
 
 
 class DLinkPort(BasePort):
-    def __init__(self, num, name, status, mac, speed, snmp_worker):
-        BasePort.__init__(self, num, name, status, mac, speed, writable=True)
+    def __init__(self, snmp_worker, *args, **kwargs):
+        BasePort.__init__(self, writable=True, *args, **kwargs)
         if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmp_worker
@@ -117,8 +117,8 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
 
 class ONUdev(BasePort):
-    def __init__(self, num, name, status, mac, speed, signal, snmp_worker):
-        super(ONUdev, self).__init__(num, name, status, mac, speed)
+    def __init__(self, signal, snmp_worker, *args, **kwargs):
+        super(ONUdev, self).__init__(*args, **kwargs)
         if not issubclass(snmp_worker.__class__, SNMPBaseWorker):
             raise TypeError
         self.snmp_worker = snmp_worker
@@ -565,15 +565,18 @@ class HuaweiSwitch(EltexSwitch):
         for i, n in enumerate(interfaces_ids):
             n = int(n)
             speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
-            # oper_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.7.%d' % n))
-            oper_status = True # if oper_status == 1 else False
+            oper_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.7.%d' % n))
+            oper_status = True if oper_status == 1 else False
             link_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n))
             link_status = True if link_status == 1 else False
-            yield EltexPort(
+            ep = EltexPort(
                 self,
                 num=i+1,
+                snmp_num=n,
                 name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),         # name
                 status=oper_status,                                        # status
                 mac='', # self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),    # mac
                 speed=0 if not link_status else safe_int(speed)            # speed
             )
+            ep.writable = True
+            yield ep

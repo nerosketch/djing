@@ -89,8 +89,11 @@ class DevBase(object, metaclass=ABCMeta):
 
 
 class BasePort(object, metaclass=ABCMeta):
-    def __init__(self, num, name, status, mac, speed, writable=False):
+    __slots__ = 'num', 'snmp_num', 'nm', 'st', '_mac', 'sp', 'writable'
+
+    def __init__(self, num, name, status, mac, speed, snmp_num=None, writable=False):
         self.num = int(num)
+        self.snmp_num = int(num) if snmp_num is None else int(snmp_num)
         self.nm = name
         self.st = status
         self._mac = mac
