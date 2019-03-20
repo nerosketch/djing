@@ -565,12 +565,15 @@ class HuaweiSwitch(EltexSwitch):
         for i, n in enumerate(interfaces_ids):
             n = int(n)
             speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
-            status = self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n)
+            # oper_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.7.%d' % n))
+            oper_status = True # if oper_status == 1 else False
+            link_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n))
+            link_status = True if link_status == 1 else False
             yield EltexPort(
                 self,
                 num=i+1,
-                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),   # name
-                status=int(status or 0),                             # status
-                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),    # mac
-                speed=int(speed or 0)                                # speed
+                name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),         # name
+                status=oper_status,                                        # status
+                mac='', # self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),    # mac
+                speed=0 if not link_status else safe_int(speed)            # speed
             )
