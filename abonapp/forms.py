@@ -223,22 +223,21 @@ class AddIpForm(forms.ModelForm):
                 self.fields['networks'].queryset = NetworkModel.objects.filter(
                     groups=instance.group
                 )
-        if not self.initial['ip_address']:
-            if instance:
-                net = NetworkModel.objects.filter(
-                    groups=instance.group
-                ).first()
-                if net is not None:
-                    ips = (ip.ip_address for ip in
-                           models.Abon.objects.filter(
-                               group__in=net.groups.all(),
-                               nas=instance.nas
-                           ).order_by('ip_address').only(
-                               'ip_address').iterator())
-                    free_ip = net.get_free_ip(ips)
-                    self.initial['ip_address'] = free_ip
-            else:
+        if not self.initial.get('ip_address'):
+            if not instance:
                 raise LogicError(_('Subnet has not attached to current group'))
+            if not instance.nas:
+                raise LogicError(_('Please pick NAS for consumer'))
+            for net in NetworkModel.objects.filter(groups=instance.group).iterator():
+                ips = (ip.ip_address for ip in models.Abon.objects.filter_ip_address(
+                    group_ids=tuple(n.pk for n in net.groups.iterator()),
+                    nas_id=int(instance.nas_id)
+                ).iterator())
+                free_ip = net.get_free_ip(ips)
+                if free_ip is None:
+                    continue
+                self.initial['ip_address'] = str(free_ip)
+                break
 
     networks = forms.ModelChoiceField(
         label=_('Networks'),

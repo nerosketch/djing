@@ -1167,3 +1167,6 @@ msgstr "Дата создания"
 
 msgid "Update ip address"
 msgstr "Обновить ip адрес"
+
+msgid "Please pick NAS for consumer"
+msgstr "Выберите шлюз для абонента"

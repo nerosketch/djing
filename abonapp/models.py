@@ -85,6 +85,17 @@ class AbonManager(MyUserManager):
     def get_queryset(self):
         return super(MyUserManager, self).get_queryset().filter(is_admin=False)
 
+    def filter_ip_address(self, group_ids: tuple, nas_id: int):
+        nas_id = int(nas_id)
+        if not isinstance(group_ids, tuple):
+            group_ids = tuple(group_ids)
+        return self.raw(
+            'SELECT baseaccount_ptr_id, ip_address FROM abonent '
+            'WHERE group_id IN %s AND nas_id=%s AND ip_address IS NOT NULL '
+            'ORDER BY inet_aton(ip_address) ASC',
+            params=(group_ids, str(nas_id))
+        )
+
 
 class Abon(BaseAccount):
     current_tariff = models.OneToOneField(

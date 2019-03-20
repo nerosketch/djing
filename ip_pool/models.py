@@ -131,7 +131,7 @@ class NetworkModel(models.Model):
         Find free ip in network.
         :param employed_ips: Sorted from less to more
          ip addresses from current network.
-        :return: single finded ip
+        :return: single found ip
         """
         network = self.get_network()
         work_range_start_ip = ip_address(self.ip_start)
