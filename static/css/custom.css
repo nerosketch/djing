@@ -75,7 +75,6 @@ body {
 
 .main {
     margin-top: 10px;
-    /*display: table;*/
 }
 
 .table-responsive thead {
@@ -257,13 +256,10 @@ div#loading {
     display: none;
 }
 
-
-
 .scroll-area {
     overflow-y: auto;
     max-height: 65vh;
 }
-
 
 pre {
     border: 0; background-color: transparent;
@@ -303,3 +299,5 @@ pre {
 .font-extra-large{
     font-size: 75px;
 }
+
+.form-group-sm .form-control{height: 25px;}
