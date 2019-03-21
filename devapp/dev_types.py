@@ -1,4 +1,5 @@
 import re
+import re
 from typing import AnyStr, Iterable, Optional, Dict
 from datetime import timedelta
 from easysnmp import EasySNMPTimeoutError
@@ -83,12 +84,12 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
             for n in range(interfaces_count):
                 status = True if int(stats[n]) == 1 else False
                 yield DLinkPort(
-                    n + 1,
-                    nams[n] if len(nams) > 0 else '',
-                    status,
-                    macs[n] if len(macs) > 0 else _('does not fetch the mac'),
-                    int(speeds[n]) if len(speeds) > 0 else 0,
-                    self)
+                    num=n + 1,
+                    name=nams[n] if len(nams) > 0 else '',
+                    status=status,
+                    mac=macs[n] if len(macs) > 0 else _('does not fetch the mac'),
+                    speed=int(speeds[n]) if len(speeds) > 0 else 0,
+                    snmp_worker=self)
         except IndexError:
             return DeviceImplementationError('Dlink port index error')
 
