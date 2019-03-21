@@ -197,7 +197,7 @@
                         <dt>{{ abon.ip_address }}</dt>
                         <dd>
                             <div class="btn-group btn-group-xs">
-                                <a href="{% url 'abonapp:user_session_free' group.pk abon.username %}" class="btn btn-danger" title="{% trans 'Free session' %}" data-toggle="tooltip">
+                                <a href="{% url 'abonapp:user_session_free' group.pk abon.username %}" class="btn btn-danger btn-modal" title="{% trans 'Free session' %}" data-toggle="tooltip">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </a>
                                 {% if perms.abonapp.can_ping %}

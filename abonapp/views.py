@@ -23,7 +23,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, UpdateView, CreateView, DeleteView
 from djing import lib
-from djing import ping
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 from djing.lib.decorators import json_view, only_admins
 from djing.lib.mixins import (
@@ -1222,21 +1221,47 @@ class EditSibscriberMarkers(LoginAdminPermissionMixin, UpdateView):
         return v
 
 
-@login_required
-@only_admins
-@permission_required('abonapp.change_abon')
-def user_session_free(request, gid: int, uname):
-    abon = get_object_or_404(models.Abon, username=uname)
-    if abon.nas is None:
-        messages.error(request, _('gateway required'))
-        return redirect('abonapp:abon_home', gid, uname)
-    if abon.ip_address:
-        abon.free_ip_addr()
-        customer_nas_command.delay(abon.pk, 'remove')
-        messages.success(request, _('Ip lease has been freed'))
-    else:
-        messages.error(request, _('User not have ip'))
-    return redirect('abonapp:abon_home', gid, uname)
+class UserSessionFree(LoginRequiredMixin, OnlyAdminsMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'abonapp.change_abon'
+    model = models.Abon
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
+    fields = 'ip_address',
+    template_name = 'abonapp/modal_confirm_ip_free.html'
+
+    def get(self, request, *args, **kwargs):
+        r = super().get(request, *args, **kwargs)
+        abon = self.object
+        if abon.nas is None:
+            messages.error(self.request, _('gateway required'))
+            return redirect(
+                'abonapp:abon_home',
+                gid=self.kwargs.get('gid'),
+                uname=self.kwargs.get('uname')
+            )
+        return r
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        abon = self.object
+        if abon.ip_address:
+            abon.free_ip_addr()
+            customer_nas_command.delay(abon.pk, 'remove')
+            messages.success(request, _('Ip lease has been freed'))
+        else:
+            messages.error(request, _('User not have ip'))
+        return redirect(
+            'abonapp:abon_home',
+            gid=self.kwargs.get('gid'),
+            uname=self.kwargs.get('uname')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'gid': self.kwargs.get('gid'),
+        })
+        return context
 
 
 @login_required
