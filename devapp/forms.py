@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 
 from djing.lib import DuplicateEntry
-from devapp.onu_config import ExpectValidationError
+from devapp.expect_scripts import ExpectValidationError
 from . import models
 from djing import MAC_ADDR_REGEX, IP_ADDR_REGEX
 
@@ -87,3 +87,10 @@ class PortForm(forms.ModelForm):
                 raise DuplicateEntry(_('Port number on device must be unique'))
             else:
                 raise models.DeviceDBException(e)
+
+
+class DeviceRebootForm(forms.Form):
+    def __init__(self, instance=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    is_save = forms.BooleanField(label=_('Is save before reboot'), required=False)

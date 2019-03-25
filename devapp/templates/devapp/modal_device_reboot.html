@@ -1,0 +1,17 @@
+{% extends 'base_delete_modal.html' %}
+{% load i18n bootstrap3 %}
+
+{% block modal_form_url %}
+    {% url 'devapp:reboot' object.pk %}
+{% endblock %}
+
+{% block modal_form_title %}
+    {% trans 'Reboot' %}
+{% endblock %}
+
+{% block modal_form_text %}
+    <h4>{% trans 'Are you sure you want to reboot that device?' %}</h4>
+    {% bootstrap_form form %}
+{% endblock %}
+
+{% block modal_btn_delete_text %}{% trans 'Reboot' %}{% endblock %}

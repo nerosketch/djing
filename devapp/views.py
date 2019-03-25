@@ -27,10 +27,10 @@ from group_app.models import Group
 from messenger.tasks import multicast_viber_notify
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
-from devapp.forms import DeviceForm, PortForm, DeviceExtraDataForm
+from devapp.forms import DeviceForm, PortForm, DeviceExtraDataForm, DeviceRebootForm
 from devapp.models import Device, Port, DeviceDBException, DeviceMonitoringException
 from devapp.tasks import onu_register
-from devapp import onu_config
+from devapp import expect_scripts
 
 
 class DevicesListView(LoginAdminPermissionMixin,
@@ -533,6 +533,31 @@ def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
                   })
 
 
+class RebootDevice(LoginAdminPermissionMixin, UpdateView):
+    permission_required = 'devapp.change_device'
+    template_name = 'devapp/modal_device_reboot.html'
+    model = Device
+    pk_url_kwarg = 'device_id'
+    form_class = DeviceRebootForm
+
+    def form_valid(self, form):
+        device = self.object
+        manager = device.get_manager_object()
+        is_save = form.cleaned_data.get('is_save')
+        ret = manager.reboot(save_before_reboot=is_save)
+        if ret == 0:
+            messages.success(self.request, _('Signal for reboot has been sent'))
+        elif ret is None:
+            messages.warning(self.request, _('Command return nothing'))
+        else:
+            messages.error(self.request, _('Command returned %s') % str(ret))
+        return redirect(
+            'devapp:view',
+            device.group.pk if device.group is not None else 0,
+            device.pk
+        )
+
+
 @login_required
 @only_admins
 @permission_required('devapp.can_toggle_ports')
@@ -805,16 +830,16 @@ def register_device(request, group_id: int, device_id: int):
     try:
         device.register_device()
         status = 0
-    except onu_config.OnuZteRegisterError:
+    except expect_scripts.OnuZteRegisterError:
         text = format_msg(gettext('Unregistered onu not found'), 'eye-close')
-    except onu_config.ZteOltLoginFailed:
+    except expect_scripts.ZteOltLoginFailed:
         text = format_msg(
             gettext('Wrong login or password for telnet access'),
             'lock'
         )
     except (
-            ConnectionRefusedError, onu_config.ZteOltConsoleError,
-            onu_config.ExpectValidationError, onu_config.ZTEFiberIsFull
+            ConnectionRefusedError, expect_scripts.ZteOltConsoleError,
+            expect_scripts.ExpectValidationError, expect_scripts.ZTEFiberIsFull
     ) as e:
         text = format_msg(e, 'exclamation-sign')
     except DeviceImplementationError as e:

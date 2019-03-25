@@ -33,7 +33,7 @@ class DevBase(object, metaclass=ABCMeta):
         return cls.description
 
     @abstractmethod
-    def reboot(self):
+    def reboot(self, save_before_reboot=False):
         pass
 
     @abstractmethod
@@ -70,7 +70,7 @@ class DevBase(object, metaclass=ABCMeta):
     def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
-        If validation failed then raise en exception from devapp.onu_config.ExpectValidationError
+        If validation failed then raise en exception from devapp.expect_scripts.ExpectValidationError
         with description of error.
         :param v: String value for validate
         """

@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.GroupsListView.as_view(), name='group_list'),
     path('devices_without_groups/', views.DevicesWithoutGroupsListView.as_view(), name='devices_null_group'),
     path('fix_onu/', views.fix_onu, name='fix_onu'),
+    path('<int:device_id>/reboot/', views.RebootDevice.as_view(), name='reboot'),
     path('<int:group_id>/', views.DevicesListView.as_view(), name='devs'),
     path('<int:group_id>/add/', views.DeviceCreateView.as_view(), name='add'),
     path('<int:group_id>/<int:device_id>/', views.devview, name='view'),

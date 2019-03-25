@@ -1,0 +1,57 @@
+#!/usr/bin/expect -f
+
+if { $argc <4 } {
+    puts "Usage: dlink_reboot.exp <ip addr> <login> <passw> <is save 0 or 1>\n"
+    exit 2
+}
+
+set timeout -1
+set ip [lindex $argv 0]
+set login [lindex $argv 1]
+set passw [lindex $argv 2]
+set is_save [lindex $argv 3]
+
+spawn telnet -4 $ip
+
+expect {
+    "UserName:" {
+        send -- "$login\r"
+        set prmpt "DGS-1100-06/ME:5"
+    }
+    "DGS-1100-10/ME login: " {
+        send -- "$login\r"
+        set prmpt "DGS-1100-10/ME:5"
+    }
+}
+
+expect -exact "Password: "
+send -- "$passw\r"
+
+expect {
+    "Incorrect Login/Password" {
+        puts "Wrong password"
+        exit 1
+    }
+    "$prmpt# " {
+        puts "Login ok"
+    }
+}
+
+if { $is_save == 1 } {
+    puts "Save"
+    send -- "save\r"
+} elseif { $is_save == 0 } {
+    puts "Without save"
+} else {
+    puts "Unexpected choice"
+    exit 2
+}
+
+
+send -- "reboot\r"
+expect "Are you sure you want to proceed with the system reboot"
+
+send -- "y\r"
+expect -exact "rebooting"
+
+expect eof

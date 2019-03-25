@@ -648,3 +648,18 @@ msgstr "Посмотреть"
 
 msgid "Enter valid JSON"
 msgstr "Введите данные в формате JSON"
+
+msgid "Reboot"
+msgstr "Перезагрузить"
+
+msgid "Are you sure you want to reboot that device?"
+msgstr "Вы уверены что хотите перезагрузить это устройство?"
+
+msgid "Signal for reboot has been sent"
+msgstr "Сигнал для перезагрузки отправлен"
+
+msgid "Command returned %s"
+msgstr "Комманда вернула %s"
+
+msgid "Command return nothing"
+msgstr "Комманда вернула пустое значение"
