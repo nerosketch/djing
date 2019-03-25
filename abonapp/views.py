@@ -430,7 +430,7 @@ def pick_tariff(request, gid: int, uname):
                     'deadline': deadline
                     }
             if deadline:
-                deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M:%S')
+                deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M')
                 abon.pick_tariff(trf, request.user, deadline=deadline,
                                  comment=log_comment)
             else:

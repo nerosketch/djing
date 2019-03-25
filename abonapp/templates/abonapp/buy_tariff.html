@@ -34,9 +34,9 @@
                             <select class="form-control" name="tariff" id="id_tariffs">
                                 {% for trf in tariffs %}
                                     {% if trf == selected_tariff %}
-                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d\TH:i:s" }}' selected>
+                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d\TH:i" }}' selected>
                                     {% else %}
-                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d\TH:i:s" }}'>
+                                        <option value="{{ trf.pk }}" data-deadline='{{ trf.calc_deadline|date:"Y-m-d\TH:i" }}'>
                                     {% endif %}
                                     {{ trf.title }}. {{ trf.amount }}{% trans 'currency' %} (Вх:{{ trf.speedIn }}MBit/s. Исх:{{ trf.speedOut }} MBit/s)
                                         </option>
@@ -47,14 +47,14 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                                 {% if selected_tariff %}
-                                    <input type="datetime-local" class="form-control" name="deadline" id="id_deadline" value="{{ selected_tariff.calc_deadline|date:'Y-m-d\TH:i:s' }}">
+                                    <input type="datetime-local" class="form-control" name="deadline" id="id_deadline" value="{{ selected_tariff.calc_deadline|date:'Y-m-d\TH:i' }}">
                                 {% else %}
-                                    <input type="datetime-local" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:'Y-m-d\TH:i:s' }}">
+                                    <input type="datetime-local" class="form-control" name="deadline" id="id_deadline" value="{{ tariffs.0.calc_deadline|date:'Y-m-d\TH:i' }}">
                                 {% endif %}
                                 <script type="text/javascript">
                                     $(function () {
                                         $('#id_tariffs').on('change', function(){
-                                            var a = $(this).find('option:selected');
+                                            let a = $(this).find('option:selected');
                                             $('#id_deadline').val(a.attr('data-deadline'));
                                         });
                                     });
