@@ -87,7 +87,10 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
     def reboot(self, save_before_reboot=False):
         dat = self.db_instance.extra_data
         if dat is None:
-            return
+            raise DeviceConfigurationError(
+                _('You have not info in extra_data '
+                  'field, please fill it in JSON')
+            )
         login = dat.get('login')
         passw = dat.get('password')
         if login and passw:
@@ -95,7 +98,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
                 self.db_instance.ip_address,
                 login, passw,
                 1 if save_before_reboot else 0
-            ))
+            )), None
 
     def get_ports(self) -> ListOrError:
         interfaces_count = safe_int(self.get_item('.1.3.6.1.2.1.2.1.0'))
@@ -167,9 +170,6 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
 
-    def reboot(self, save_before_reboot=False):
-        pass
-
     def get_ports(self) -> ListOrError:
         nms = self.get_list('.1.3.6.1.4.1.3320.101.10.1.1.79')
         res = []
@@ -237,9 +237,6 @@ class OnuDevice(DevBase, SNMPBaseWorker):
                 'Ip address or parent device with ip address required for ONU device'
             ))
         SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
-
-    def reboot(self, save_before_reboot=False):
-        pass
 
     def get_ports(self) -> ListOrError:
         return ()
@@ -365,7 +362,7 @@ class EltexSwitch(DLinkDevice):
         return plain_ip_device_mon_template(device)
 
     def reboot(self, save_before_reboot=False):
-        pass
+        return DevBase.reboot(self, save_before_reboot)
 
 
 def conv_signal(lvl: int) -> float:
@@ -607,6 +604,3 @@ class HuaweiSwitch(EltexSwitch):
             )
             ep.writable = True
             yield ep
-
-    def reboot(self, save_before_reboot=False):
-        pass

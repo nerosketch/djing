@@ -229,7 +229,7 @@ msgstr "Сбросить форму"
 #: templates/devapp/custom_dev_page/onu_for_zte.html:12
 #: templates/devapp/custom_dev_page/ports.html:12
 msgid "Uptime"
-msgstr "Без перезагрузки"
+msgstr "Время работы"
 
 #: templates/devapp/custom_dev_page/olt.html:17
 msgid "SNMP Num"
@@ -663,3 +663,12 @@ msgstr "Комманда вернула %s"
 
 msgid "Command return nothing"
 msgstr "Комманда вернула пустое значение"
+
+msgid "Command return unknown"
+msgstr "Комманда вернула что-то не понятное"
+
+msgid "Reboot not ready"
+msgstr "Перезагрузка для устройства не готова"
+
+msgid "Is save before reboot"
+msgstr "Сохраниться перед перезагрузкой"

@@ -1,9 +1,6 @@
 import re
 from ipaddress import ip_address
 
-from abonapp.models import Abon
-from accounts_app.models import UserProfile
-from devapp.base_intr import DeviceImplementationError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -24,12 +21,15 @@ from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
 from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
+from abonapp.models import Abon
+from accounts_app.models import UserProfile
 from messenger.tasks import multicast_viber_notify
 from guardian.decorators import permission_required_or_403 as permission_required
 from guardian.shortcuts import get_objects_for_user
 from devapp.forms import DeviceForm, PortForm, DeviceExtraDataForm, DeviceRebootForm
 from devapp.models import Device, Port, DeviceDBException, DeviceMonitoringException
 from devapp.tasks import onu_register
+from devapp.base_intr import DeviceImplementationError, DeviceConfigurationError
 from devapp import expect_scripts
 
 
@@ -544,13 +544,22 @@ class RebootDevice(LoginAdminPermissionMixin, UpdateView):
         device = self.object
         manager = device.get_manager_object()
         is_save = form.cleaned_data.get('is_save')
-        ret = manager.reboot(save_before_reboot=is_save)
-        if ret == 0:
-            messages.success(self.request, _('Signal for reboot has been sent'))
-        elif ret is None:
-            messages.warning(self.request, _('Command return nothing'))
-        else:
-            messages.error(self.request, _('Command returned %s') % str(ret))
+        try:
+            r = manager.reboot(save_before_reboot=is_save)
+            if isinstance(r, tuple) and len(r) == 2:
+                ret, ret_text = r
+                if ret == 0:
+                    messages.success(self.request, ret_text or _('Signal for reboot has been sent'))
+                elif ret is None:
+                    messages.warning(self.request, ret_text or _('Command return nothing'))
+                else:
+                    messages.error(self.request, ret_text or _('Command returned %s') % str(ret))
+            elif r is None:
+                messages.warning(self.request, _('Command return nothing'))
+            else:
+                messages.warning(self.request, _('Command return unknown'))
+        except DeviceConfigurationError as e:
+            messages.error(self.request, e)
         return redirect(
             'devapp:view',
             device.group.pk if device.group is not None else 0,

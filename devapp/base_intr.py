@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Union, Iterable, AnyStr, Generator, Optional, Dict
 from easysnmp import Session
 
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 ListOrError = Union[
     Iterable,
@@ -34,7 +34,12 @@ class DevBase(object, metaclass=ABCMeta):
 
     @abstractmethod
     def reboot(self, save_before_reboot=False):
-        pass
+        """
+        Send signal reboot to device
+        :param save_before_reboot:
+        :return: tuple of command return number and text of operation
+        """
+        return 5, _('Reboot not ready')
 
     @abstractmethod
     def get_ports(self) -> ListOrError:

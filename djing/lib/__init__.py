@@ -62,7 +62,7 @@ class RuTimedelta(timedelta):
             # text_date = '%d %s %s' % (self.days, ru_days, text_date)
             text_date = '%d %s' % (self.days, ru_days)
         else:
-            text_date = ''
+            text_date = super(RuTimedelta, self).__str__()
         return text_date
 
 
