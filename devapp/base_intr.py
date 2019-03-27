@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Union, Iterable, AnyStr, Generator, Optional, Dict
 from easysnmp import Session
 
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy as _
 
 ListOrError = Union[
     Iterable,
@@ -33,8 +33,13 @@ class DevBase(object, metaclass=ABCMeta):
         return cls.description
 
     @abstractmethod
-    def reboot(self):
-        pass
+    def reboot(self, save_before_reboot=False):
+        """
+        Send signal reboot to device
+        :param save_before_reboot:
+        :return: tuple of command return number and text of operation
+        """
+        return 5, _('Reboot not ready')
 
     @abstractmethod
     def get_ports(self) -> ListOrError:
@@ -70,7 +75,7 @@ class DevBase(object, metaclass=ABCMeta):
     def validate_extra_snmp_info(v: str) -> None:
         """
         Validate extra snmp field for each device.
-        If validation failed then raise en exception from devapp.onu_config.ExpectValidationError
+        If validation failed then raise en exception from devapp.expect_scripts.ExpectValidationError
         with description of error.
         :param v: String value for validate
         """

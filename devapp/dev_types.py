@@ -1,4 +1,4 @@
-import re
+import os
 import re
 from typing import AnyStr, Iterable, Optional, Dict
 from datetime import timedelta
@@ -6,9 +6,10 @@ from easysnmp import EasySNMPTimeoutError
 from pexpect import TIMEOUT
 from transliterate import translit
 from django.utils.translation import gettext_lazy as _, gettext
+from django.conf import settings
 
 from djing.lib import RuTimedelta, safe_int
-from devapp.onu_config import register_f601_onu, register_f660_onu, ExpectValidationError, OnuZteRegisterError
+from devapp.expect_scripts import register_f601_onu, register_f660_onu, ExpectValidationError, OnuZteRegisterError
 from .base_intr import (
     DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError,
     ListOrError, DeviceConfigurationError
@@ -43,6 +44,18 @@ def plain_ip_device_mon_template(device) -> Optional[AnyStr]:
     return '\n'.join(i for i in r if i)
 
 
+def ex_expect(filename, params=()):
+    base_dir = getattr(settings, 'BASE_DIR')
+    if base_dir is not None:
+        exec_file = os.path.join(base_dir, 'devapp', 'expect_scripts', filename)
+        if os.path.isfile(exec_file) and os.access(path=exec_file, mode=os.X_OK):
+            params = ' '.join(str(p) for p in params)
+            if params:
+                return os.system('%s %s' % (exec_file, params))
+            else:
+                return os.system(exec_file)
+
+
 class DLinkPort(BasePort):
     def __init__(self, snmp_worker, *args, **kwargs):
         BasePort.__init__(self, writable=True, *args, **kwargs)
@@ -71,8 +84,21 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
 
-    def reboot(self):
-        return self.get_item('.1.3.6.1.4.1.2021.8.1.101.1')
+    def reboot(self, save_before_reboot=False):
+        dat = self.db_instance.extra_data
+        if dat is None:
+            raise DeviceConfigurationError(
+                _('You have not info in extra_data '
+                  'field, please fill it in JSON')
+            )
+        login = dat.get('login')
+        passw = dat.get('password')
+        if login and passw:
+            return ex_expect('dlink_DGS1100_reboot.exp', (
+                self.db_instance.ip_address,
+                login, passw,
+                1 if save_before_reboot else 0
+            )), None
 
     def get_ports(self) -> ListOrError:
         interfaces_count = safe_int(self.get_item('.1.3.6.1.2.1.2.1.0'))
@@ -144,9 +170,6 @@ class OLTDevice(DevBase, SNMPBaseWorker):
         DevBase.__init__(self, dev_instance)
         SNMPBaseWorker.__init__(self, dev_instance.ip_address, dev_instance.man_passw, 2)
 
-    def reboot(self):
-        pass
-
     def get_ports(self) -> ListOrError:
         nms = self.get_list('.1.3.6.1.4.1.3320.101.10.1.1.79')
         res = []
@@ -214,9 +237,6 @@ class OnuDevice(DevBase, SNMPBaseWorker):
                 'Ip address or parent device with ip address required for ONU device'
             ))
         SNMPBaseWorker.__init__(self, dev_ip_addr, dev_instance.man_passw, 2)
-
-    def reboot(self):
-        pass
 
     def get_ports(self) -> ListOrError:
         return ()
@@ -340,6 +360,9 @@ class EltexSwitch(DLinkDevice):
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
         device = self.db_instance
         return plain_ip_device_mon_template(device)
+
+    def reboot(self, save_before_reboot=False):
+        return DevBase.reboot(self, save_before_reboot)
 
 
 def conv_signal(lvl: int) -> float:
