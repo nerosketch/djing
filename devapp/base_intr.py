@@ -32,7 +32,6 @@ class DevBase(object, metaclass=ABCMeta):
     def get_description(cls):
         return cls.description
 
-    @abstractmethod
     def reboot(self, save_before_reboot=False):
         """
         Send signal reboot to device
