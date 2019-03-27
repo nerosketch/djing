@@ -71,6 +71,8 @@ def get_free_registered_onu_number(lines):
             onu_olt_num = int(num)
             if onu_olt_num > i:
                 return i
+    if onu_olt_num is None:
+        return 1
     return onu_olt_num + 1
 
 
