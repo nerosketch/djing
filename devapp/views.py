@@ -828,5 +828,6 @@ def register_device(request, group_id: int, device_id: int):
         text = format_msg(msg='ok', icon='ok')
     return {
         'status': status,
-        'dat': text
+        'dat': text,
+        'extra_form_val': device.snmp_extra
     }

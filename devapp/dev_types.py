@@ -528,7 +528,7 @@ class ZteOnuDevice(OnuDevice):
         return '\n'.join(i for i in r if i)
 
     def register_device(self, extra_data: Dict):
-        _reg_dev_zte(self.db_instance, extra_data, register_f660_onu)
+        return _reg_dev_zte(self.db_instance, extra_data, register_f660_onu)
 
     def get_fiber_str(self):
         dev = self.db_instance
@@ -550,7 +550,7 @@ class ZteF601(ZteOnuDevice):
     description = 'Zte ONU F601'
 
     def register_device(self, extra_data: Dict):
-        _reg_dev_zte(self.db_instance, extra_data, register_f601_onu)
+        return _reg_dev_zte(self.db_instance, extra_data, register_f601_onu)
 
 
 class HuaweiSwitch(EltexSwitch):

@@ -70,7 +70,7 @@
                     </a>
                 {% endif %}
                 {% if perms.devapp.change_device %}
-                    <a href="{% url 'devapp:dev_register' grp_id dev.pk %}" class="btn btn-default btn-cmd">
+                    <a href="{% url 'devapp:dev_register' grp_id dev.pk %}" class="btn btn-default btn-cmd" data-form-val="#{{ form.snmp_extra.id_for_label }}">
                         <span class="glyphicon glyphicon-fire"></span> {% trans 'Register device' %}
                     </a>
                     <a href="{% url 'devapp:extra_data_edit' grp_id dev.pk %}" class="btn btn-default btn-modal">

@@ -277,6 +277,7 @@ $(document).ready(function () {
 	// button that send command and return response of that
 	$('.btn-cmd').on('click', function(){
 		var cmd_param = $(this).attr('data-param');
+		var form_val = $(this).attr('data-form-val');
 		var self = $(this);
 		self.removeClass('btn-default');
         self.removeClass('btn-danger');
@@ -290,6 +291,9 @@ $(document).ready(function () {
 			else
                 self.addClass('btn-danger');
             self.html(r.dat);
+            if(form_val){
+            	$(form_val).val(r.extra_form_val);
+			}
 		});
 		return false;
 	});
