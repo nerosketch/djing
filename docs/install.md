@@ -2,7 +2,7 @@
 Работа предполагается на python3.
 Я предпочитаю запускать wsgi сервер на связке uWSGI + Nginx, так что ставить будем соответствующие пакеты.
 
-##### На Fedora25 нужные пакеты можно установить так:
+##### Подготовка системы
 
 Для начала подготовим систему, очистим и обновим пакеты. Процесс обновления долгий, так что можно пойти заварить себе чай :)
 ```
@@ -10,37 +10,41 @@
 # dnf -y update
 ```
 
-Затем установим зависимости
+Затем установим зависимости, в Fedora 25 пакеты называются так:
 ```
-# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config curl-devel
+# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config curl-devel expect
 ```
 
-Необходимо чтоб версия python по умолчанию была третья:
+Для Debian 9 это выглядит так:
 ```
-# ln -sf python3 /usr/bin/python
+# apt install mariadb-server libmariadb-dev mariadb-client python3-dev python3-pip python3-pil uwsgi nginx uwsgi-plugin-python3 libsnmp-dev git gettext libcurl4-openssl-dev libssl-dev expect
 ```
 
 Условимся что путь к папке с проектом находится по адресу: */var/www/djing*.
-Дальше создадим каталок для web, затем обновляем pip и ставим проект через pip:
+Дальше создадим каталок для web, затем создаём virtualenv, обновляем pip и ставим проект через pip:
 ```
 # mkdir /var/www
 # cd /var/www
-# pip3 install --upgrade pip
-# git clone https://github.com/nerosketch/djing.git
-# export PYCURL_SSL_LIBRARY=openssl
-# pip3 install -r djing/requirements.txt
+# git clone --depth=1 https://github.com/nerosketch/djing.git
+# chown -R http:http djing
+# python3 -m venv venv
+# sudo -u http -g http bash
+$ cd djing
+$ source ./venv/bin/activate
+$ pip3 install --upgrade pip
+$ export PYCURL_SSL_LIBRARY=openssl
+$ pip3 install -r djing/requirements.txt
 ```
 
-Скопируем конфиги из примеров в реальные:
+Скопируем конфиг из примера в реальные:
 ```
 $ cd /var/www/djing
-# cp djing/settings_example.py djing/settings.py
-# cp agent/settings.py.example agent/settings.py
+$ cp djing/local_settings.py.example djing/settings.py
 ```
 
-Затем отредактируйте конфиги для своих нужд.
+Затем отредактируйте конфиг для своих нужд.
 
-Для удобства я создаю пользователя и группу http:http, и всё что связано с web-сервером запускаю от имени http.
+Для удобства в Fedora я создаю пользователя и группу http:http, и всё что связано с web-сервером запускаю от имени http.
 ```
 # groupadd -r http
 # useradd -l -M -r -d /dev/null -g http -s /sbin/nologin http
@@ -49,6 +53,15 @@ $ cd /var/www/djing
 # chown -R http:http /etc/uwsgi.*
 # chown -R http:http /run/uwsgi/
 ```
+
+В Debian использую пользователя www-data, остаётся только назначить владельца на папки:
+```
+# chown -R http:http /var/www
+# chown -R http:http /etc/nginx
+# chown -R http:http /etc/uwsgi.*
+# chown -R http:http /run/uwsgi/
+```
+
 
 ### Настройка WEB Сервера
 Конфиг Nginx на моём рабочем сервере выглядит так:
