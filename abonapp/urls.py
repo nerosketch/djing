@@ -13,7 +13,6 @@ subscriber_patterns = [
     path('addinvoice/', views.add_invoice, name='add_invoice'),
     path('pick/', views.pick_tariff, name='pick_tariff'),
     path('passport_view/', views.PassportUpdateView.as_view(), name='passport_view'),
-    path('dials/', views.DialsListView.as_view(), name='dials'),
     # path('reset_ip/', views.reset_ip, name='reset_ip'),
     path('unsubscribe_service/<int:abon_tariff_id>/', views.unsubscribe_service, name='unsubscribe_service'),
     path('dev/', views.dev, name='dev'),

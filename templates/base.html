@@ -88,15 +88,6 @@
     		    </a>
             </li>
 
-            {% if perms.dialing_app.change_asteriskcdr %}
-                {% url 'dialapp:home' as dialhome %}
-                <li{% if dialhome in request.path %} class="active"{% endif %}>
-                    <a href="{{ dialhome }}">
-                        <span class="glyphicon glyphicon-phone-alt"></span> {% trans 'Dialing' %}
-                    </a>
-                </li>
-            {% endif %}
-
             {% if perms.traf_stat.statcache_view %}
                 {% url 'traf_stat:home' as stathome %}
                 <li{% if stathome in request.path %} class="active"{% endif %}>

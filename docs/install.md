@@ -241,7 +241,7 @@ __sha256__. то секретное слово должен знать билл�
 ```
 $ ./manage.py migrate
 Operations to perform:
-  Apply all migrations: mapapp, contenttypes, dialing_app, msg_app, taskapp, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
+  Apply all migrations: mapapp, contenttypes, msg_app, taskapp, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
 Running migrations:
   Rendering model states... DONE
   Applying mapapp.0001_initial... OK

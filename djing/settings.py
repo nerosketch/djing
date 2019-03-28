@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'clientsideapp',
     'messenger',
     'msg_app',
-    'dialing_app',
     'group_app',
     'guardian',
     'pinax_theme_bootstrap',

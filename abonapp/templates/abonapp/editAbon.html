@@ -83,16 +83,6 @@
                                     </a>
                                 {% endif %}
 
-                                {% if perms.dialing_app.add_smsout %}
-                                    <a href="{% url 'dialapp:send_sms' %}?path={{ request.path|urlencode }}&dst={{ form.telephone.value|urlencode }}" class="btn btn-default btn-modal">
-                                        <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
-                                    </a>
-                                {% else %}
-                                    <a href="#" class="btn btn-default disabled" title="{% trans 'Permission denied' %}">
-                                        <span class="glyphicon glyphicon-envelope"></span> {% trans 'Send sms' %}
-                                    </a>
-                                {% endif %}
-
                                 {% if perms.abonapp.view_passportinfo %}
                                     <a href="{% url 'abonapp:passport_view' group.pk abon.username %}" class="btn btn-default btn-modal">
                                         <span class="glyphicon glyphicon-paperclip"></span> {% trans 'Passport information' %}

@@ -403,46 +403,6 @@ msgstr "Автор"
 msgid "Debts not found"
 msgstr "Нет должников"
 
-#: templates/abonapp/dial_log.html:8
-msgid "Play"
-msgstr "Слушать"
-
-#: templates/abonapp/dial_log.html:9
-msgid "calldate"
-msgstr "дата звонка"
-
-#: templates/abonapp/dial_log.html:10
-msgid "src"
-msgstr "кто"
-
-#: templates/abonapp/dial_log.html:11
-msgid "dst"
-msgstr "куда"
-
-#: templates/abonapp/dial_log.html:12
-msgid "duration"
-msgstr "прод."
-
-#: templates/abonapp/dial_log.html:13
-msgid "start"
-msgstr "начало"
-
-#: templates/abonapp/dial_log.html:14
-msgid "answer"
-msgstr "ответ"
-
-#: templates/abonapp/dial_log.html:15
-msgid "end"
-msgstr "конец"
-
-#: templates/abonapp/dial_log.html:16
-msgid "disposition"
-msgstr "состояние"
-
-#: templates/abonapp/dial_log.html:38
-msgid "Calls was not found"
-msgstr "Звонки не найдены"
-
 #: templates/abonapp/editAbon.html:10
 msgid "Change subscriber"
 msgstr "Изменение абонента"

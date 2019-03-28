@@ -4,7 +4,6 @@ from typing import Dict, Optional
 from abonapp.tasks import customer_nas_command, customer_nas_remove
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
 from devapp.models import Device, Port as DevPort
-from dialing_app.models import AsteriskCDR
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -816,60 +815,6 @@ def vcards(r):
 
     response.content = _make_vcard()
     return response
-
-
-class DialsListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
-    context_object_name = 'logs'
-    template_name = 'abonapp/dial_log.html'
-
-    def get_queryset(self):
-        abon = get_object_or_404(models.Abon,
-                                 username=self.kwargs.get('uname'))
-        if not self.request.user.has_perm('group_app.view_group', abon.group):
-            raise PermissionDenied
-        self.abon = abon
-        if abon.telephone is not None and abon.telephone != '':
-            tel = abon.telephone.replace('+', '')
-            additional_tels = tuple(
-                t.telephone for t in
-                models.AdditionalTelephone.objects.filter(
-                    abon=abon
-                ).iterator()
-            )
-            logs = AsteriskCDR.objects.filter(
-                Q(src__contains=tel) | Q(dst__contains=tel) |
-                Q(src__in=additional_tels) | Q(dst__in=additional_tels)
-            )
-            return logs
-        else:
-            return AsteriskCDR.objects.none()
-
-    def get_context_data(self, **kwargs):
-        context = super(DialsListView, self).get_context_data(**kwargs)
-        context['group'] = get_object_or_404(Group, pk=self.kwargs.get('gid'))
-        context['abon'] = self.abon
-        return context
-
-    def render_to_response(self, context, **response_kwargs):
-        if hasattr(self.abon.group, 'pk') and self.abon.group.pk != int(
-                self.kwargs.get('gid')):
-            return redirect(
-                'abonapp:dials', self.abon.group.pk,
-                self.abon.username
-            )
-        return super(DialsListView, self).render_to_response(
-            context,
-            **response_kwargs
-        )
-
-    def get(self, request, *args, **kwargs):
-        try:
-            return super(DialsListView, self).get(request, *args, **kwargs)
-        except ProgrammingError as e:
-            messages.error(request, e)
-            return redirect('abonapp:abon_home',
-                            self.kwargs.get('gid'),
-                            self.kwargs.get('uname'))
 
 
 @login_required
