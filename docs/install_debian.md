@@ -3,6 +3,7 @@
 Я предпочитаю запускать wsgi сервер на связке uWSGI + Nginx, так что ставить будем соответствующие пакеты.
 
 ##### Подготовка системы
+Установка происходит в debian версии 9.5.
 
 Для начала подготовим систему, очистим и обновим пакеты. Процесс обновления долгий, так что можно пойти заварить себе чай :)
 ```
@@ -22,176 +23,183 @@
 
 Условимся что путь к папке с проектом находится по адресу: */var/www/djing*.
 Дальше создадим каталок для web, затем создаём virtualenv, обновляем pip и ставим проект через pip:
-```
+```bash
 # mkdir /var/www
 # cd /var/www
 # git clone --depth=1 https://github.com/nerosketch/djing.git
-# chown -R http:http djing
 # python3 -m venv venv
-# sudo -u http -g http bash
-$ cd djing
-$ source ./venv/bin/activate
-$ pip3 install --upgrade pip
-$ export PYCURL_SSL_LIBRARY=openssl
-$ pip3 install -r djing/requirements.txt
+# cd djing
+# source ./venv/bin/activate
+# pip3 install --upgrade pip
+# export PYCURL_SSL_LIBRARY=openssl
+# pip3 install -r djing/requirements.txt
+# chown -R www-data:www-data /var/www/djing
+# deactivate
 ```
 
-Скопируем конфиг из примера в реальные:
+Или, вместо этих комманд выполните инстальник из *install/install_debian.sh* если у вас *debian*,
+или по аналогии для других дистрибутивов.
+
+Теперь давайте перейдём в баш от имени пользователя www-data, так у нас будет хватать прав на все
+директории и файлы
+```bash
+sudo -u www-data -g www-data bash && cd /
 ```
+
+Скопируем конфиг из примера в реальный:
+```bash
 $ cd /var/www/djing
 $ cp djing/local_settings.py.example djing/settings.py
 ```
 
 Затем отредактируйте конфиг для своих нужд.
 
-Для удобства в Fedora я создаю пользователя и группу http:http, и всё что связано с web-сервером запускаю от имени http.
-```
-# groupadd -r http
-# useradd -l -M -r -d /dev/null -g http -s /sbin/nologin http
-# chown -R http:http /var/www
-# chown -R http:http /etc/nginx
-# chown -R http:http /etc/uwsgi.*
-# chown -R http:http /run/uwsgi/
-```
-
 В Debian использую пользователя www-data, остаётся только назначить владельца на папки:
-```
-# chown -R http:http /var/www
-# chown -R http:http /etc/nginx
-# chown -R http:http /etc/uwsgi.*
-# chown -R http:http /run/uwsgi/
+```bash
+# chown -R www-data:www-data /var/www/djing
 ```
 
 
 ### Настройка WEB Сервера
-Конфиг Nginx на моём рабочем сервере выглядит так:
+Конфиг Nginx в папке *sites-available* на моём рабочем сервере выглядит примерно так как указано
+ниже, не забудьте указать в нужных местах ваш домен.
 ```nginx
-user http;
-worker_processes auto;
-pid /run/nginx.pid;
-
-events {
-    worker_connections 1024;
+upstream djing{
+    server unix:///run/uwsgi/app/djing/socket;
 }
 
-http {
-    sendfile            on;
-    tcp_nopush          on;
-    tcp_nodelay         on;
-    keepalive_timeout   65;
-    types_hash_max_size 2048;
+# Для обращений в web серверу на localhost из скриптов
+server {
+    listen 80;
+    server_name localhost 127.0.0.1;
+    location / {
+        uwsgi_pass djing;
+        include uwsgi_params;
+    }
+    access_log /dev/null;
+    error_log /dev/null;
+}
 
-    include             /etc/nginx/mime.types;
-    default_type        application/octet-stream;
+# Это редирект с http на https, если у вас есть ssl сертификат
+server{
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://your-domain.com$request_uri;
+}
 
-    upstream djing { server unix:///run/uwsgi/djing.sock; }
+# обработка http запросов.
+server {
+    listen 80 default_server;
+    server_name <ваш домен>;
+    root /var/www/djing/;
+    charset utf-8;
 
-    server {
-        listen 80;
-        server_name  <ваш-домен>.com;
-        root         /var/www/djing;
-        charset      utf-8;
+    location = /favicon.ico { alias /var/www/djing/static/img/favicon_m.ico; }
+    location = /robots.txt { alias /var/www/djing/robots.txt; }
 
-        # укажите где лежит ваш раздел с медиа для сайта
-        location /media  {
-            alias /var/www/djing/media;
-        }
+    location /media  {
+        alias /var/www/djing/media;
+        expires 7d;
+    }
 
-        # местоположение статики           
-        location /static {
-            alias /var/www/djing/static;
-        }
+    location /static {
+        alias /var/www/djing/static;
+        expires 1d;
+    }
 
-        # тут надо указать путь куда у вас установился Django + путь к статике админки
-        # путь к Django тут: /usr/lib/python3.5/site-packages/django
-        # путь к статике соответственно: contrib/admin/static/admin
-        location /static/admin {
-            alias /usr/lib/python3.5/site-packages/django/contrib/admin/static/admin;
-        }
+    location / {
+        uwsgi_pass djing;
+        include uwsgi_params;
+    }
+}
 
-        # на корневом url / реагируем с помощью сокета проекта
-        # у нас он называется "djing": upstream djing { server ...
-        location / {
-            uwsgi_pass djing;
-            include uwsgi_params;
-        }
+# Обработка https запросов
+server {
+    listen 443 ssl;
+    ssl on;
+    server_name <ваш домен> www.<ваш домен>;
+
+    ssl_certificate "/путь/к/вашему/сертификату.crt";
+    ssl_certificate_key "/путь/к/вашему/сертификату.key";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  5m;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    location = /favicon.ico { alias /var/www/djing/static/img/favicon_m.ico; }
+    location = /robots.txt { alias /var/www/djing/robots.txt; }
+
+    location /media  {
+        alias /var/www/djing/media;
+        expires 7d;
+    }
+
+    location /static {
+        alias /var/www/djing/static;
+        expires 1d;
+    }
+
+    location / {
+        uwsgi_pass djing;
+        include uwsgi_params;
     }
 }
 ```
 
-Это минимальный конфиг Nginx для работы. Проверте файл /run/uwsgi/djing.sock на доступность пользователю http для чтения.
+Это минимальный конфиг Nginx для работы. Проверте файл /run/uwsgi/djing.sock на доступность пользователю www-data для чтения.
 
-Далее настраиваем uWSGI. Мой конфиг для uWSGI в режиме emperor:
-> /etc/uwsgi.ini
+Далее настраиваем uWSGI. Мой конфиг для uWSGI в debian:
+> /etc/uwsgi/apps-available/djing.ini
 ```ini
 [uwsgi]
-uid = http
-gid = http
-pidfile = /run/uwsgi/uwsgi.pid
-emperor = /etc/uwsgi.d
-stats = /run/uwsgi/stats.sock
-chmod-socket = 660
-emperor-tyrant = true
-cap = setgid,setuid
-```
-
-Зададим конфиг для *uwsgi vassal*:
-> /etc/uwsgi.d/djing.ini
-```ini
-[uwsgi]
-chdir=/var/www/djing/
+chdir=/var/www/djing
 module=djing.wsgi
 master=True
 processes=8
-;socket=/run/uwsgi/djing.sock
-http-socket=:8000
-chmod-socket=664
-pidfile=/run/uwsgi/django-master.pid
+socket=/run/uwsgi/app/djing/socket
+;http-socket=:8000
+chmod-socket=644
+;pidfile=/run/uwsgi/django-master.pid
 vacuum=True
 plugin=python3
+;disable-logging=True
+venv=/var/www/djing/venv
 ```
 
-Примените к созданному файлу пользователя http:
-> \# chown http:http /etc/uwsgi.d/djing.ini
+А теперь попробуем запустить биллинг в полной связке Python - Uwsgi - Nginx.
+Перейдём в папку биллинга, если вы вышли куда-то ещё, зайдём в баш из под пользователя www-data.
+```bash
+sudo -u www-data -g www-data bash
+cd /var/www/djing
+source ./venv/bin/activate
+```
 
-Перед пробой запуска отключим все ограничения фаервола:
-> \# systemctl stop firewalld
-
-Или даже отключить, если вы отложите настройку *firewalld* на потом:
-> \# systemctl disable firewalld
-
-Перед тем как попробовать запустить тестовый сервер скомпилируйте переводы:
+И скомпилируем переводы:
 > \$ ./manage.py compilemessages -l ru
 
-Попробуем запустить *uwsgi* и djing без Nginx:
-> \# uwsgi --gid http --uid http /etc/uwsgi.d/djing.ini
+
+Попробуем запустить *uwsgi* и *djing* без *Nginx*, на порт 8000:
+Раскомментируйте строку *http-socket=:8000* в файле *djing.ini*, и закомментируйте
+*socket=/run/uwsgi/app/djing/socket* и *chmod-socket=644*, теперь можно попробовать запустить
+> \# uwsgi --gid www-data --uid www-data /etc/uwsgi/apps-available/djing.ini
 
 пробуем зайти в биллинг с браузера на <адрес сервера>:8000. Вам должен показаться диалог входа в систему:
 ![Login screenshot](./img/login.png)
 
-Для того чтоб uwsgi применял к своим файлам пользователя http, надо подредактировать системный юнит uwsgi, у меня он имеет такой путь:
-> /usr/lib/systemd/system/uwsgi.service
-
-В нём надо чтоб chown менял пользователя на http, а не на uwsgi:
-> ExecStartPre=/bin/chown -r http:http /run/uwsgi
-
-Теперь, если всё прошло успешно, поменяйте в конфиге */etc/uwsgi.d/djing.ini* сокет с http на unix socket:
+Теперь, если всё прошло успешно, поменяйте в конфиге */etc/uwsgi.d/djing.ini* сокет с http-socket на unix socket:
 Раскомментируйте это:
-> socket=/run/uwsgi/djing.sock
+> socket=/run/uwsgi/app/djing/socket
 
 И закомментируйте эту строку:
 > http-socket=:8000
 
 Строка *http-socket=:8000* была для теста, чтоб посмотреть работает-ли uwsgi сам по себе.
 
-Теперь можно попробовать запустить *nginx* и *uwsgi*. Ставим в **djing/settings.py** опцию **DEBUG = False**, и пробуем запустить нужные юниты:
+Теперь можно попробовать запустить *nginx* и *uwsgi*. Ставим в **djing/settings.py** опцию **DEBUG = False**,
+и пробуем запустить нужные юниты:
 
 > \# systemctl start uwsgi\
 > \# systemctl start nginx
-
-По умолчанию на fedora включено SELinux и вы не сможете зайти на сайт пока не настроите его. Для того, чтоб проверить всё
-ли правильно мы настроили, отключите *SELinux* коммандой **setenforce 0* и попробуйте зайти. После успешного запуска вы
-можете снова включить опцию и настроить её.
 
 
 ### Настраиваем биллинг
@@ -212,23 +220,15 @@ plugin=python3
 **PAGINATION_ITEMS_PER_PAGE** &mdash; Количество выводимых элементов списка на странце с таблицей. Например, если поставить 30,
 то на странице абонентов на одной странице будет выведено 30 строк абонентов.
 
-**PAY_SERV_ID** &mdash; Эта опция, так же как и **PAY_SECRET** опции для платёжной системы *AllTime24*, если вы используете любую
-другую платёжную систему то можете удалить эти опции.
-
-**DIALING_MEDIA** &mdash; Путь, где биллинг сможет найти файлы записей asterisk чтоб вывести статистику звонков.
-Подробнее читайте в описании работы с [АТС](./ats.ms).
-
 **DEFAULT_SNMP_PASSWORD** &mdash; Пароль snmp по умолчанию для устройств, чтоб при создании устройства он был заполнен в нужном поле.
 Если нет такого пароля то оставьте пустым или None.
 
 **TELEPHONE_REGEXP** &mdash; Регулярное выражение для валидации номера телефона.
 
-**ASTERISK_MANAGER_AUTH** &mdash; Данные для управления АТС [Asterisk](https://www.asterisk.org/), пример заполнения есть в *djing/settings_example.py*.
-
 **API_AUTH_SECRET** &mdash; Секретное слово для безопасной передачи комманд от скриптов.
-Содержимое данных можно увидеть, но нельзя изменить. Это нельзя применять лоя передачи паролей,
+Содержимое данных можно увидеть, но нельзя изменить. Это нельзя применять для передачи паролей,
 секретных номеров, но вполне подходит для защищённого управления. Безопасность гарантируется хеш суммой
-__sha256__. то секретное слово должен знать биллинг в конфиге, и доверенный скрипт на примере *agent/monitoring_agent.py.py*
+__sha256__. Секретное слово должен знать биллинг в конфиге, и доверенный скрипт на примере *agent/monitoring_agent.py*
 Позаботьтесь о том чтоб скрипт нельзя было просто так прочитать, или вынесите секретное слово куда-то. Если кто-то лишний узнает
 его то ваша система будет под угрозой.
 
@@ -289,7 +289,7 @@ Superuser created successfully.
 > \# systemctl restart uwsgi
 
 Теперь произведите тестовый запуск:
-> \# ./manage.py runserver 192.168.0.100:8000
+> \$ ./manage.py runserver 192.168.0.100:8000
 
 Если не подтягивается статика то проверте чтоб опция **DEBUG** в настройках была **True**.
 
@@ -308,14 +308,3 @@ __Настоятельно рекомендую заглянуть внутрь 
 
 Перед включением юнита *djing_telebot.service* создайте Telegram бота и впишите в файл *djing/settings.py* в переменную *TELEGRAM_BOT_TOKEN* токен вашего бота.
 С помощью этого бота вы будете получать различные сообщения из биллинга. Подробнее в инструкции к [модулю оповещений](./bot.md).
-
-А теперь включим и запустим нужные демоны
-```shell
-# systemctl daemon-reload
-# systemctl enable djing_queue.service
-# systemctl start djing_queue.service
-# systemctl enable djing_rotate.timer
-# systemctl start djing_rotate.timer
-# systemctl enable djing_telebot.service
-# systemctl start djing_telebot.service
-```

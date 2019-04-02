@@ -9,8 +9,8 @@ netaddr
 #xmltodict
 dicttoxml
 
-# db client for Postgres
-psycopg2-binary
+# db client for Mariadb
+mysqlclient
 
 easysnmp
 pid
@@ -23,9 +23,7 @@ django-bootstrap3
 
 requests
 webdavclient
-pyst2
 transliterate
-asterisk
 django-encrypted-model-fields
 
 # django-xmlview for pay system allpay

@@ -1,6 +1,7 @@
 """
 Custom settings for each system
 """
+import os
 
 DEBUG = True
 
@@ -13,23 +14,23 @@ PAGINATION_ITEMS_PER_PAGE = 20
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!!!!!!!!!!!!!!!!!!!!!!!!YOUR SECRET KEY!!!!!!!!!!!!!!!!!!!!!!!!'
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 DATABASES = {
     'default': {
-        #'OPTIONS': {
-        #    'init_command': "SET sql_mode='STRICT_TRANS_TABLES', default_storage_engine=INNODB",
-        #    'isolation_level': 'read uncommitted'
-        #},
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        #'ENGINE': 'django.db.backends.mysql',
-        #'NAME': 'djing_db',
-        #'USER': 'DJING_MYSQL_USERNAME',  # You can change the user name
-        #'PASSWORD': 'DJING_MYSQL_PASSWORD',  # You can change the password
-        #'HOST': 'localhost',
-        #'TEST': {
-        #    'CHARSET': 'utf8',
-        #    'COLLATION': 'utf8_general_ci'
-        #}
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', default_storage_engine=INNODB",
+            'isolation_level': 'read uncommitted'
+        },
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'djing_db',
+        'USER': 'djinguser',  # You can change the user name
+        'PASSWORD': 'password',  # You can change the password
+        'HOST': 'localhost',
+        'TEST': {
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci'
+        }
     }
 }
 

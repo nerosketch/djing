@@ -6,7 +6,7 @@
 Использовано python 3, django 2, bootstrap 3, и другое в файле requirements.txt
 
 ## Содержание
-* [Установка](./docs/install.md)
+* [Установка](./docs/install_debian.md)
 * [Сервисы и API](./docs/services.md)
 * [Менеджеры устройств](./docs/dev.md)
 * [Сбор информации трафика по netflow](./docs/netflow.md)
