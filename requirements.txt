@@ -42,5 +42,5 @@ django-encrypted-model-fields
 -e git://github.com/pexpect/pexpect.git#egg=pexpect
 
 Celery
-redis==2.10.6
+redis
 celery[redis]

@@ -2,7 +2,7 @@
 Custom settings for each system
 """
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = '*',
 

@@ -2,26 +2,33 @@
 Работа предполагается на python3.
 Я предпочитаю запускать wsgi сервер на связке uWSGI + Nginx, так что ставить будем соответствующие пакеты.
 
+Для быстрой установки, чтоб посмотреть что из себя представляет web интерфейс биллинга, можно воспользоваться
+инстальником из *install/install_debian.sh*. Он установит зависимости, виртуальное окружение python, сервер очередей
+*Celery*, и создаст пользователя *admin* с паролем *admin*, так, что вы сразу сможете зайти в web интерфейс под этой
+учётной записью, а в последствии, если вам будет интересно, уже разбираться в детелях и тонкостях устройства биллинга.
+
+А ниже подробная инструкция по установке вручную, контролируя все этапы установки.
+
 ##### Подготовка системы
 Установка происходит в debian версии 9.5.
 
 Для начала подготовим систему, очистим и обновим пакеты. Процесс обновления долгий, так что можно пойти заварить себе чай :)
-```
+```bash
 # dnf clean all
 # dnf -y update
 ```
 
-Затем установим зависимости, в Fedora 25 пакеты называются так:
+Затем установим зависимости, в Debian9.5 пакеты называются так:
+```bash
+# apt install mariadb-server libmariadb-dev libmariadbclient-dev \
+    mariadb-client python3-dev python3-pip python3-pil python3-venv uwsgi \
+    nginx uwsgi-plugin-python3 libsnmp-dev git gettext libcurl4-openssl-dev \
+    libssl-dev expect redis-server
 ```
-# dnf -y install python3 python3-devel python3-pip python3-pillow mariadb mariadb-devel uwsgi nginx uwsgi-plugin-python3 net-snmp net-snmp-libs net-snmp-utils net-snmp-devel net-snmp-python git redhat-rpm-config curl-devel expect
-```
+Пакеты *libsnmp-dev* и *expect* нужны для управления и мониторинга оборудования, redis-server для
+сервера очередей *Celery*.
 
-Для Debian 9 это выглядит так:
-```
-# apt install mariadb-server libmariadb-dev mariadb-client python3-dev python3-pip python3-pil uwsgi nginx uwsgi-plugin-python3 libsnmp-dev git gettext libcurl4-openssl-dev libssl-dev expect
-```
-
-Условимся что путь к папке с проектом находится по адресу: */var/www/djing*.
+Условимся, что путь к папке с проектом находится по пути: */var/www/djing*.
 Дальше создадим каталок для web, затем создаём virtualenv, обновляем pip и ставим проект через pip:
 ```bash
 # mkdir /var/www
@@ -49,7 +56,7 @@ sudo -u www-data -g www-data bash && cd /
 Скопируем конфиг из примера в реальный:
 ```bash
 $ cd /var/www/djing
-$ cp djing/local_settings.py.example djing/settings.py
+$ cp djing/local_settings.py.example djing/local_settings.py
 ```
 
 Затем отредактируйте конфиг для своих нужд.
@@ -251,7 +258,7 @@ __sha256__. Секретное слово должен знать биллинг
 Убедитесть что вы в папке с проектом, комманда **pwd** должна выдать */var/www/djing*.
 Чтоб создать бд, как описано в документации [Django admin \& migrate](https://docs.djangoproject.com/en/2.1/ref/django-admin/#migrate),
 нужно запустить **./manage.py migrate** чтоб создать структуру БД. Вывод будет примерно таким:
-```
+```bash
 $ ./manage.py migrate
 Operations to perform:
   Apply all migrations: mapapp, contenttypes, msg_app, taskapp, accounts_app, devapp, statistics, tariff_app, admin, sessions, chatbot, auth, abonapp
@@ -270,11 +277,11 @@ Running migrations:
 ```
 
 После этого вам стоит создать супер пользователя чтоб зайти в систему.
-```
+```bash
 $ ./manage.py createsuperuser
 ```
 В интерактивном режиме ответьте на вопросы.
-```
+```bash
 $ ./manage.py createsuperuser
 Username: username
 Telephone: +12223334455
