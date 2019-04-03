@@ -2,8 +2,8 @@
 Description=A job for djing
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/python3 periodic.py
+Type=oneshot
+ExecStart=/var/www/djing/venv/bin/python periodic.py
 WorkingDirectory=/var/www/djing
 User=www-data
 Group=www-data

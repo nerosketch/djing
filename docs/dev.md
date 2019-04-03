@@ -7,7 +7,6 @@
 - [Дополнительная инфа в устройствах](#дополнительная-инфа-в-устройствах)
 
 
-
 ## Добавление поддерживаемого устройства (Свича)
 Для того чтоб добавить новый тип устройства с которым потом сможет работать биллинг нужно открыть файл *devapp/dev_types.py*
 и переопределить 2 интерфейса. Первый это *BasePort* для порта свича, а второй *DevBase* для самого свича соответственно.
@@ -51,23 +50,18 @@ class EltexSwitch(DLinkDevice):
     has_attachable_to_subscriber = False
     description = _('Eltex switch')
     is_use_device_port = False
+    tech_code = 'eltex_sw'
 
     def get_ports(self):
-        #nams = self.get_list('.1.3.6.1.4.1.171.10.134.2.1.1.100.2.1.3')
-        stats = self.get_list('.1.3.6.1.2.1.2.2.1.7')
-        oper_stats = self.get_list('.1.3.6.1.2.1.2.2.1.8')
-        #macs = self.get_list('.1.3.6.1.2.1.2.2.1.6')
-        speeds = self.get_list('.1.3.6.1.2.1.31.1.1.1.15')
-        res = []
-        for n in range(28):
-            res.append(EltexPort(self,
-                n+1,
-                '',#nams[n] if len(nams) > 0 else _('does not fetch the name'),
-                True if int(stats[n]) == 1 else False,
-                '',#macs[n] if len(macs) > 0 else _('does not fetch the mac'),
-                int(speeds[n]) if len(speeds) > 0 and int(oper_stats[n]) == 1 else 0,
-            ))
-        return res
+        for i, n in enumerate(range(49, 77), 1):
+            speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
+            yield EltexPort(self,
+                num=i,
+                name=self.get_item('.1.3.6.1.2.1.31.1.1.1.18.%d' % n),
+                status=self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n),
+                mac=self.get_item('.1.3.6.1.2.1.2.2.1.6.%d' % n),
+                speed=int(speed or 0)
+            )
 
     def get_device_name(self):
         return self.get_item('.1.3.6.1.2.1.1.5.0')
@@ -76,7 +70,19 @@ class EltexSwitch(DLinkDevice):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
         tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
         return tm
-
+    
+    def monitoring_template(self, *args, **kwargs) -> Optional[str]:
+        """
+        Рендерит отрывок конфига для системы мониторинга.
+        При вызове agent/downloader.py генерируется конфиг для Nagios, вызывая
+        для каждого устройства конфиг возовом метода monitoring_template.
+        """
+    
+    def register_device(self):
+        """
+        Вызывается при сохранении устройства, может быть использовано для
+        обновления конфига в различных сервисах.
+        """
 ```
 Свойство **@description** Просто отображает человекопонятное название вашего устройства в биллинге.
 Заметьте что строка на английском и заключена в процедуру **_** (это ugettext_lazy, см. в импорте вверху файла),
@@ -328,4 +334,3 @@ def check_news(request):
 Тут в секции *telnet* находятся данные для доступа к устройствам ZTE-C320 для возможности настроить ONU устройства
 по шаблону при поможи кнопки **Зарегистрировать устройство** рядом с кнопкой **Техническая информация**.
 Знчение *default_vid* это влан который будет использован в шаблоне настройки ONU для ZTE.
-
