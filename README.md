@@ -6,6 +6,10 @@
 Использовано python 3, django 2, bootstrap 3, и другое в файле requirements.txt
 
 ## Содержание
+### Для пользователя
+* [Инструкция пользователя](./docs/user/user_doc.md)
+
+### Для администратора
 * [Установка](./docs/install_debian.md)
 * [Сервисы и API](./docs/services.md)
 * [Менеджеры устройств](./docs/dev.md)
