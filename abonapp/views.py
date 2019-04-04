@@ -247,13 +247,16 @@ class DebtsListView(LoginAdminPermissionMixin, OrderedFilteredList):
     template_name = 'abonapp/invoiceForPayment.html'
 
     def get_permission_object(self):
+        if not hasattr(self, 'abon'):
+            abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
+            self.abon = abon
         return self.abon.group
 
     def get_queryset(self):
-        abon = get_object_or_404(models.Abon,
-                                 username=self.kwargs.get('uname'))
-        self.abon = abon
-        return models.InvoiceForPayment.objects.filter(abon=abon)
+        if not hasattr(self, 'abon'):
+            abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
+            self.abon = abonself.abon = abon
+        return models.InvoiceForPayment.objects.filter(abon=self.abon)
 
     def get_context_data(self, **kwargs):
         context = super(DebtsListView, self).get_context_data(**kwargs)
