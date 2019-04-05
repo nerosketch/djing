@@ -1,5 +1,3 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Dmitry Novikov nerosketch@gmail.com, 2017.
 #
@@ -8,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-09 15:01+0300\n"
+"POT-Creation-Date: 2019-04-05 17:02+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -47,15 +45,15 @@ msgstr "Название тарифа"
 msgid "Service description"
 msgstr "Описание тарифа"
 
-#: models.py:20 templates/tariff_app/tarifs.html:18
+#: models.py:20 templates/tariff_app/tarifs.html:17
 msgid "Speed In"
 msgstr "Входящая скорость"
 
-#: models.py:21 templates/tariff_app/tarifs.html:24
+#: models.py:21 templates/tariff_app/tarifs.html:23
 msgid "Speed Out"
 msgstr "Исходящая скорость"
 
-#: models.py:22 templates/tariff_app/tarifs.html:30
+#: models.py:22 templates/tariff_app/tarifs.html:29
 msgid "Price"
 msgstr "Стоимость"
 
@@ -73,7 +71,8 @@ msgstr "Услуга"
 
 #: models.py:56 templates/tariff_app/ext.html:7
 #: templates/tariff_app/ext.html:12 templates/tariff_app/ext.html:21
-#: templates/tariff_app/periodic_pays/add_edit.html:8
+#: templates/tariff_app/periodic_pays/add_edit.html:7
+#: templates/tariff_app/service_users.html:7
 msgid "Services"
 msgstr "Тарифы"
 
@@ -93,62 +92,84 @@ msgstr "Алгоритм расчёта"
 msgid "Total amount"
 msgstr "Стоимость"
 
-#: models.py:106
+#: models.py:103
 msgid "Periodic pay"
 msgstr "Периодический платёж"
 
-#: models.py:107 templates/tariff_app/ext.html:28
+#: models.py:104 templates/tariff_app/ext.html:28
 msgid "Periodic pays"
 msgstr "Периодические платежи"
 
-#: templates/tariff_app/editTarif.html:8
+#: templates/tariff_app/editTarif.html:7
 msgid "Tarifs"
 msgstr "Тарифы"
 
-#: templates/tariff_app/editTarif.html:11
+#: templates/tariff_app/editTarif.html:10
 #: templates/tariff_app/periodic_pays/list.html:50
-#: templates/tariff_app/tarifs.html:78
+#: templates/tariff_app/tarifs.html:83
 msgid "Add"
 msgstr "Добавить"
 
-#: templates/tariff_app/editTarif.html:13
-#: templates/tariff_app/editTarif.html:22
+#: templates/tariff_app/editTarif.html:12
+#: templates/tariff_app/editTarif.html:21
 #: templates/tariff_app/periodic_pays/list.html:17
 msgid "Edit"
 msgstr "Редактировать"
 
-#: templates/tariff_app/editTarif.html:22 templates/tariff_app/tarifs.html:65
+#: templates/tariff_app/editTarif.html:21 templates/tariff_app/tarifs.html:70
 msgid "Create"
 msgstr "Создать"
 
-#: templates/tariff_app/editTarif.html:22 templates/tariff_app/tarifs.html:12
+#: templates/tariff_app/editTarif.html:21 templates/tariff_app/tarifs.html:11
 msgid "tariff"
 msgstr "тариф"
 
-#: templates/tariff_app/editTarif.html:51
-#: templates/tariff_app/periodic_pays/add_edit.html:47
+#: templates/tariff_app/editTarif.html:50
+#: templates/tariff_app/periodic_pays/add_edit.html:46
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/tariff_app/editTarif.html:54
+#: templates/tariff_app/editTarif.html:53
 msgid "Reset"
 msgstr "Сбросить"
 
-#: templates/tariff_app/periodic_pays/add_edit.html:10
+#: templates/tariff_app/periodic_pays/add_edit.html:9
 msgid "Change periodic pay"
 msgstr "Может редактировать периодический платёж"
 
-#: templates/tariff_app/periodic_pays/add_edit.html:12
+#: templates/tariff_app/periodic_pays/add_edit.html:11
 msgid "Add new periodic pay"
 msgstr "Добавить периодический платёж"
 
-#: templates/tariff_app/periodic_pays/add_edit.html:32
+#: templates/tariff_app/periodic_pays/add_edit.html:31
 msgid "Pay details"
 msgstr "Подробности платежа"
 
 #: templates/tariff_app/periodic_pays/list.html:39
 msgid "The list is empty"
 msgstr "Список пуст"
+
+#: templates/tariff_app/service_users.html:8
+msgid "Service users"
+msgstr "Пользователи услуг"
+
+#: templates/tariff_app/service_users.html:13
+#, python-format
+msgid "'%(service_name)s' tariff users"
+msgstr "Пользователи услуги '%(service_name)s'"
+
+#: templates/tariff_app/service_users.html:14
+msgid "Total:"
+msgstr "Всего"
+
+#: templates/tariff_app/service_users.html:25
+#: templates/tariff_app/service_users.html:31
+msgid "Username"
+msgstr "Логин"
+
+#: templates/tariff_app/service_users.html:46
+msgid "Customers that uses this service not found."
+msgstr "Не найдены абоненты использующие эту услугу."
 
 #: templates/tariff_app/tariff_confirm_delete.html:9
 msgid "Delete service"
@@ -167,46 +188,34 @@ msgstr ""
 "сразу потеряют услугу по этому тарифу. Так что сначала убедитесь что уже "
 "никто не пользуется тарифом, и только после этого удалите его."
 
+#: templates/tariff_app/tarifs.html:33
+msgid "Users count"
+msgstr "Кол. пользователей"
+
 #: templates/tariff_app/tarifs.html:51
 msgid "currency"
 msgstr "руб."
 
-#: templates/tariff_app/tarifs.html:63
+#: templates/tariff_app/tarifs.html:68
 msgid "Services does not exist yet"
 msgstr "Ещё нет созданных тарифов"
 
-#: views.py:44
+#: views.py:60
 msgid "Service has been saved"
 msgstr "Тариф успешно сохранён"
 
-#: views.py:47 views.py:103
+#: views.py:63 views.py:123
 msgid "Some fields were filled incorrect, please try again"
 msgstr "Не все поля заполнены правильно, проверте и попробуйте ещё раз"
 
-#: views.py:66
+#: views.py:86
 msgid "Service has been deleted"
 msgstr "Тарифный план успешно удалён"
 
-#: views.py:97
+#: views.py:117
 msgid "New periodic pay successfully created"
 msgstr "Новый периодический платёж создан"
 
-#: views.py:99
+#: views.py:119
 msgid "Periodic pay has been changed"
 msgstr "Периодический платёж изменён"
-
-msgid "Attention"
-msgstr "Внимание"
-
-msgid "Delete"
-msgstr "Удалить"
-
-msgid "Not have a confirmations of delete"
-msgstr "Нет подтверждения удаления"
-
-msgid ""
-"Service with this Speed In, Speed Out, Price and Script already exists."
-msgstr "Услуга с такой скоростью, ценой и логикой уже есть"
-
-msgid "Users count"
-msgstr "Кол. пользователей"

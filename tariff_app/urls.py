@@ -7,6 +7,7 @@ app_name = 'tariff_app'
 urlpatterns = [
     path('', views.TariffsListView.as_view(), name='home'),
     path('<int:tarif_id>/', views.edit_tarif, name='edit'),
+    path('<int:tarif_id>/users/', views.ServiceUsers.as_view(), name='service_users'),
     path('add/', views.edit_tarif, name='add'),
     path('del/<int:tid>/', views.TariffDeleteView.as_view(), name='del'),
 

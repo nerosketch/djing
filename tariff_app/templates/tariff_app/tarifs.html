@@ -49,7 +49,11 @@
                         <td>{{ tar.speedIn }}</td>
                         <td>{{ tar.speedOut }}</td>
                         <td>{{ tar.amount }} {% trans 'currency' %}</td>
-                        <td>{{ tar.usercount }}</td>
+                        <td>
+                            {% if tar.usercount > 0 %}
+                                <a href="{% url 'tariff_app:service_users' tar.pk %}">{{ tar.usercount }}</a>
+                            {% else %}0{% endif %}
+                        </td>
                         <td>{{ tar.get_calc_type_display }}</td>
                         <td>
                             {% if can_del_trf %}

@@ -48,7 +48,7 @@ find . -type d \( -path ./venv -o -path ./src -o -path ./.git \) -prune -o -type
 # files
 find . -type d \( -path ./venv -o -path ./src -o -path ./.git \) -prune -o -type f -exec chmod 640 {} \;
 # exec scripts
-chmod 750 dhcp_lever.py manage.py periodic.py devapp/expect_scripts/dlink_DGS1100_reboot.exp
+chmod 750 dhcp_lever.py manage.py periodic.py devapp/expect_scripts/dlink_DGS1100_reboot.exp agent/netflow/netflow_handler.py
 chmod 400 djing/settings.py
 
 rm /etc/nginx/sites-enabled/default

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -10,6 +10,8 @@ from django.views.generic import DeleteView
 from guardian.decorators import permission_required_or_403 as permission_required
 
 from djing.global_base_views import OrderedFilteredList
+from djing.lib.mixins import LoginAdminMixin
+from abonapp.models import Abon
 from .models import Tariff, PeriodicPay
 from djing import lib
 from djing.lib.decorators import only_admins
@@ -19,12 +21,11 @@ from . import forms
 login_decs = login_required, only_admins
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('tariff_app.view_tariff'), name='dispatch')
-class TariffsListView(OrderedFilteredList):
+class TariffsListView(LoginAdminMixin, PermissionRequiredMixin, OrderedFilteredList):
     """
     Show Services(Tariffs) list
     """
+    permission_required = 'tariff_app.view_tariff'
     template_name = 'tariff_app/tarifs.html'
     context_object_name = 'tariflist'
     model = Tariff
@@ -69,9 +70,8 @@ def edit_tarif(request, tarif_id=0):
     })
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('tariff_app.delete_tariff'), name='dispatch')
-class TariffDeleteView(DeleteView):
+class TariffDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = 'tariff_app.delete_tariff'
     model = Tariff
     pk_url_kwarg = 'tid'
     success_url = reverse_lazy('tarifs:home')
@@ -91,9 +91,8 @@ class TariffDeleteView(DeleteView):
         return super().get_context_data(**kwargs)
 
 
-@method_decorator(login_decs, name='dispatch')
-@method_decorator(permission_required('tariff_app.view_periodicpay'), name='dispatch')
-class PeriodicPaysListView(OrderedFilteredList):
+class PeriodicPaysListView(LoginAdminMixin, PermissionRequiredMixin, OrderedFilteredList):
+    permission_required = 'tariff_app.view_periodicpay'
     context_object_name = 'pays'
     model = PeriodicPay
     template_name = 'tariff_app/periodic_pays/list.html'
@@ -129,3 +128,27 @@ def periodic_pay(request, pay_id=0):
         'pay_instance': pay_inst,
         'form': frm
     })
+
+
+class ServiceUsers(LoginAdminMixin, OrderedFilteredList):
+    template_name = 'tariff_app/service_users.html'
+    model = Abon
+
+    def get_queryset(self):
+        tarif_id = self.kwargs.get('tarif_id')
+        return Abon.objects.filter(current_tariff__tariff__id=tarif_id).select_related('group')
+
+    def get_context_data(self, **kwargs):
+        if hasattr(self, 'tariff'):
+            tariff = getattr(self, 'tariff')
+        else:
+            tarif_id = self.kwargs.get('tarif_id')
+            tariff = get_object_or_404(Tariff, pk=tarif_id)
+            setattr(self, 'tariff', tariff)
+        self.tariff = tariff
+        context = {
+            'tariff': tariff,
+            'total': self.object_list.count()
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)
