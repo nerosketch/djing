@@ -54,6 +54,10 @@ def ex_expect(filename, params=()):
                 return os.system('%s %s' % (exec_file, params))
             else:
                 return os.system(exec_file)
+        else:
+            raise DeviceConfigurationError(_('File %(filename)s is not exists or not executable') % {
+                'filename': exec_file
+            })
 
 
 class DLinkPort(BasePort):
