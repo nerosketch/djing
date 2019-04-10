@@ -30,14 +30,19 @@
                     <td>{{ messenger.get_bot_type_display }}</td>
                     <td>{{ messenger.slug }}</td>
                     <td>
-                        <a href="{{ messenger.get_absolute_url }}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">
-                            <span class="glyphicon glyphicon-edit"></span>
-                        </a>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ messenger.get_absolute_url }}" class="btn btn-sm btn-default" title="{% trans 'Edit' %}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a href="{% url 'messenger:subscribers' messenger.slug %}" class="btn btn-sm btn-default" title="{% trans 'Viber subscribers' %}">
+                                <span class="glyphicon glyphicon-ice-lolly"></span>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="4"><a href="#">{% trans 'messengers was not found' %}</a></td>
+                    <td colspan="4">{% trans 'Messengers was not found' %}</td>
                 </tr>
             {% endfor %}
             </tbody>

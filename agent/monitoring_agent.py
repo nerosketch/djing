@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import re
+import os
 from hashlib import sha256
 from typing import Iterable, Union, AnyStr
 
@@ -8,7 +9,7 @@ import requests
 
 API_AUTH_SECRET = 'your api key'
 
-SERVER_DOMAIN = 'http://localhost:8000'
+SERVER_DOMAIN = 'http://127.0.0.1:8000'
 
 MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
 
@@ -41,7 +42,7 @@ def validate_status(text: str):
 
 def send_request(mac, stat, sign_hash):
     r = requests.get(
-        "%(domain)s/dev/on_device_event/" % {'domain': SERVER_DOMAIN},
+        os.path.join(SERVER_DOMAIN, 'dev', 'on_device_event'),
         params={
             'mac': mac,
             'status': stat,

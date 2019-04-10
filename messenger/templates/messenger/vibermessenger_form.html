@@ -7,10 +7,8 @@
         <li><span class="glyphicon glyphicon-home"></span></li>
         <li><a href="{% url 'messenger:messengers_list' %}">{% trans 'Messengers' %}</a></li>
         {% if object %}
-            <li><a href="{{ object.get_absolute_url }}">{% trans 'Update messenger' %}</a></li>
             <li class="active">{% trans 'Change viber' %}</li>
         {% else %}
-            <li><a href="{% url 'messenger:add_messenger' %}">{% trans 'Add messenger' %}</a></li>
             <li class="active">{% trans 'Add viber' %}</li>
         {% endif %}
 

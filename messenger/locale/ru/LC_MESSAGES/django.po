@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-06 13:45+0300\n"
+"POT-Creation-Date: 2019-04-10 17:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
 "Language: ru\n"
@@ -18,89 +18,92 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: models.py:16 templates/messenger/messenger_list.html:20
+#: models.py:15 templates/messenger/messenger_list.html:20
 msgid "Title"
 msgstr "Название"
 
-#: models.py:18
+#: models.py:17
 msgid "Viber"
 msgstr "Вайбер"
 
-#: models.py:20
+#: models.py:19
 msgid "Bot type"
 msgstr "Тип бота"
 
-#: models.py:21 templates/messenger/messenger_list.html:22
+#: models.py:20 templates/messenger/messenger_list.html:22
 msgid "Slug"
 msgstr "Ссыль"
 
-#: models.py:28 models.py:92
+#: models.py:27 models.py:109
 msgid "messenger"
 msgstr "Мэссенджер"
 
-#: models.py:29 templates/messenger/messenger_list.html:7
+#: models.py:28 templates/messenger/messenger_list.html:7
 #: templates/messenger/messenger_list.html:12
 #: templates/messenger/vibermessenger_form.html:8
+#: templates/messenger/vibersubscriber_list.html:7
 msgid "Messengers"
 msgstr "Мэссенджэры"
 
-#: models.py:48
+#: models.py:47
 msgid "Bot secret token"
 msgstr "Секретный токен viber"
 
-#: models.py:49 models.py:108
+#: models.py:48 models.py:125
 msgid "Avatar"
 msgstr "Аватар"
 
-#: models.py:83
+#: models.py:100
 msgid "Viber messenger"
 msgstr "Viber мэссенджэр"
 
-#: models.py:84
+#: models.py:101
 msgid "Viber messengers"
 msgstr "Viber мэссенджэры"
 
-#: models.py:89
+#: models.py:106
 msgid "Message"
 msgstr "Сообщение"
 
-#: models.py:90
+#: models.py:107
 msgid "Date"
 msgstr "Дата"
 
-#: models.py:91
+#: models.py:108
 msgid "Sender"
 msgstr "Отправитель"
 
-#: models.py:93
+#: models.py:110
 msgid "Subscriber"
 msgstr "Подписчик"
 
-#: models.py:100
+#: models.py:117
 msgid "Viber message"
 msgstr "Сообщение viber"
 
-#: models.py:101
+#: models.py:118
 msgid "Viber messages"
 msgstr "Сообщения viber"
 
-#: models.py:106
+#: models.py:123
 msgid "User unique id in viber"
 msgstr "Уникальный id viber"
 
-#: models.py:107
+#: models.py:124 templates/messenger/vibersubscriber_list.html:22
 msgid "Name"
 msgstr "Имя"
 
-#: models.py:109
+#: models.py:126
 msgid "System account"
 msgstr "Системная учётная запись"
 
-#: models.py:116
+#: models.py:133
 msgid "Viber subscriber"
 msgstr "Подписчик viber"
 
-#: models.py:117
+#: models.py:134 templates/messenger/messenger_list.html:37
+#: templates/messenger/vibersubscriber_list.html:8
+#: templates/messenger/vibersubscriber_list.html:13
 msgid "Viber subscribers"
 msgstr "Подписчики viber"
 
@@ -116,75 +119,83 @@ msgstr "Добавить"
 msgid "Type"
 msgstr "Тип"
 
-#: templates/messenger/messenger_list.html:33
+#: templates/messenger/messenger_list.html:34
 msgid "Edit"
 msgstr "Изменить"
 
-#: templates/messenger/messenger_list.html:40
-msgid "messengers was not found"
+#: templates/messenger/messenger_list.html:45
+msgid "Messengers was not found"
 msgstr "Мэссенджеры не найдены"
 
-#: templates/messenger/messenger_list.html:49
+#: templates/messenger/messenger_list.html:54
 msgid "New"
 msgstr "Новый"
 
 #: templates/messenger/vibermessenger_form.html:10
-msgid "Update messenger"
-msgstr "Обновить мэссенджэр"
-
-#: templates/messenger/vibermessenger_form.html:11
 msgid "Change viber"
 msgstr "Изменить viber"
 
-#: templates/messenger/vibermessenger_form.html:13
-msgid "Add messenger"
-msgstr "Добавить мэссенджэр"
-
-#: templates/messenger/vibermessenger_form.html:14
+#: templates/messenger/vibermessenger_form.html:12
 msgid "Add viber"
 msgstr "Добавить viber"
 
-#: templates/messenger/vibermessenger_form.html:25
+#: templates/messenger/vibermessenger_form.html:23
 msgid "Change messenger"
 msgstr "Изменить мэссенджэр"
 
-#: templates/messenger/vibermessenger_form.html:28
+#: templates/messenger/vibermessenger_form.html:26
 msgid "Add new messenger"
 msgstr "Добавить мэссенджэр"
 
-#: templates/messenger/vibermessenger_form.html:39
+#: templates/messenger/vibermessenger_form.html:37
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/messenger/vibermessenger_form.html:43
+#: templates/messenger/vibermessenger_form.html:41
 msgid "Send webhook"
 msgstr "Отправить webhook"
 
-#: views.py:38
+#: templates/messenger/vibersubscriber_list.html:21
+msgid "uid"
+msgstr ""
+
+#: templates/messenger/vibersubscriber_list.html:23
+msgid "Account"
+msgstr "Учётка"
+
+#: templates/messenger/vibersubscriber_list.html:35
+msgid "Subscribers was not found"
+msgstr "Подписчики не найдены"
+
+#: views.py:36
 msgid "Unexpected bot type"
 msgstr "Не известный тип бота"
 
-#: views.py:51
+#: views.py:49
 msgid "New viber messenger successfully created"
 msgstr "Новый viber мэссенджэр успешно создан"
 
-#: views.py:62
+#: views.py:60
 msgid "Viber messenger successfully updated"
 msgstr "viber мэссенджэр успешно обновлён"
 
-#: views.py:73
+#: views.py:71
 msgid "Viber messenger successfully deleted"
 msgstr "viber мэссенджэр успешно удалён"
 
-#: views.py:132
+#: views.py:125
 msgid "My telephone number"
 msgstr "Мой номер телефона"
 
-#: views.py:150
+#: views.py:148
+msgid ""
+"Your account is attached. Now you will be receive notifications from billing"
+msgstr ""
+"Ваша учётка из биллинга привязана. Теперь вы будете получать оповещения из "
+"биллинга."
+
+#: views.py:152
 msgid ""
 "Telephone not found, please specify telephone number in account in billing"
 msgstr ""
 "Номер телефона не найден. Укажите свой номер телефона в учётке в биллинге"
-
-msgid "Your account is attached. Now you will be receive notifications from billing"
-msgstr "Ваша учётка из биллинга привязана. Теперь вы будете получать оповещения из биллинга."

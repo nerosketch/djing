@@ -3,9 +3,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFound
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView, View
 from django.views.generic.detail import SingleObjectMixin
 from viberbot.api.messages import KeyboardMessage, ContactMessage
@@ -20,12 +18,12 @@ from messenger import forms, models
 from messenger.models import ViberMessage, ViberSubscriber
 
 
-class messengerListView(LoginAdminPermissionMixin, ListView):
+class MessengerListView(LoginAdminPermissionMixin, ListView):
     model = models.Messenger
     permission_required = 'messenger.view_messenger'
 
 
-class AddmessengerCreateView(LoginAdminMixin, FormView):
+class AddMessengerCreateView(LoginAdminMixin, FormView):
     template_name = 'messenger/add_messenger.html'
     form_class = forms.MessengerForm
 
@@ -40,7 +38,7 @@ class AddmessengerCreateView(LoginAdminMixin, FormView):
         return super().form_valid(form)
 
 
-class AddmessengerViberCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
+class AddMessengerViberCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
     model = models.ViberMessenger
     form_class = forms.MessengerViberForm
     permission_required = 'messenger.add_vibermessenger'
@@ -52,7 +50,7 @@ class AddmessengerViberCreateView(LoginAdminMixin, PermissionRequiredMixin, Crea
         return r
 
 
-class UpdateVibermessengerUpdateView(LoginAdminPermissionMixin, UpdateView):
+class UpdateViberMessengerUpdateView(LoginAdminPermissionMixin, UpdateView):
     model = models.ViberMessenger
     form_class = forms.MessengerViberForm
     permission_required = 'messenger.change_vibermessenger'
@@ -63,7 +61,7 @@ class UpdateVibermessengerUpdateView(LoginAdminPermissionMixin, UpdateView):
         return r
 
 
-class RemoveVibermessengerDeleteView(LoginAdminPermissionMixin, DeleteView):
+class RemoveViberMessengerDeleteView(LoginAdminPermissionMixin, DeleteView):
     model = models.ViberMessenger
     permission_required = 'messenger.delete_vibermessenger'
     success_url = reverse_lazy('messenger:messengers_list')
@@ -74,7 +72,6 @@ class RemoveVibermessengerDeleteView(LoginAdminPermissionMixin, DeleteView):
         return r
 
 
-@method_decorator(csrf_exempt, name='post')
 class ListenViberView(SingleObjectMixin, View):
     http_method_names = 'post',
     model = models.ViberMessenger
@@ -87,7 +84,6 @@ class ListenViberView(SingleObjectMixin, View):
         viber = obj.get_viber()
         if not viber.verify_signature(request.body, request.META.get('HTTP_X_VIBER_CONTENT_SIGNATURE')):
             return HttpResponseForbidden()
-        # this library supplies a simple way to receive a request object
         vr = viber.parse_request(request.body)
         if isinstance(vr, ViberMessageRequest):
             in_msg = vr.message
@@ -131,22 +127,30 @@ class ListenViberView(SingleObjectMixin, View):
                 },)
             }, min_api_version=3)
             viber = self.object.get_viber()
-            viber.send_messages(viber_user_profile.id, msg)
+            viber.send_message_to_id(viber_user_profile.id, msg)
         return subscriber, created
 
     def inbox_contact(self, msg, sender: ViberUserProfile):
         tel = msg.contact.phone_number
         accs = UserProfile.objects.filter(telephone__icontains=tel)
-        viber = self.object.get_viber()
+        viber = self.object
         if accs.exists():
+            first_acc = accs.first()
             subs = ViberSubscriber.objects.filter(uid=sender.id)
-            if subs.exists():
-                subs.update(account=accs.first())
-                viber.send_messages(sender.id, gettext(
+            subs_len = subs.count()
+            if subs_len > 0:
+                first_sub = subs.first()
+                if subs_len > 1:
+                    ViberSubscriber.objects.exclude(pk=first_sub.pk).delete()
+                first_sub.account = first_acc
+                first_sub.save(update_fields=('account',))
+                viber.send_message_to_acc(first_acc, gettext(
                     'Your account is attached. Now you will be receive notifications from billing'
                 ))
         else:
-            viber.send_messages(sender.id, gettext('Telephone not found, please specify telephone number in account in billing'))
+            viber.send_message_to_id(sender.id, gettext(
+                'Telephone not found, please specify telephone number in account in billing'
+            ))
 
 
 class SetWebhook(LoginAdminMixin, SingleObjectMixin, View):
@@ -159,3 +163,14 @@ class SetWebhook(LoginAdminMixin, SingleObjectMixin, View):
             return HttpResponseNotFound
         obj.send_webhook()
         return HttpResponse(b'ok', status=200)
+
+
+class SubscribersListView(LoginAdminMixin, ListView):
+    model = models.ViberSubscriber
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'messanger_slug': self.kwargs.get('slug')
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)

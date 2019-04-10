@@ -56,7 +56,7 @@ class ViberMessenger(Messenger):
             ))
         return self._viber_cache
 
-    def send_message(self, to: UserProfile, msg):
+    def send_message_to_acc(self, to: UserProfile, msg):
         try:
             viber = self.get_viber()
             vs = to.vibersubscriber
@@ -67,7 +67,7 @@ class ViberMessenger(Messenger):
         except ViberSubscriber.DoesNotExist:
             pass
 
-    def send_messages(self, receivers, msg_text: str):
+    def send_message_to_accs(self, receivers, msg_text: str):
         """
         :param receivers: QuerySet of accounts_app.UserProfile
         :param msg_text: text message
@@ -77,6 +77,13 @@ class ViberMessenger(Messenger):
         msg = TextMessage(text=msg_text)
         for vs in ViberSubscriber.objects.filter(account__in=receivers).iterator():
             viber.send_messages(str(vs.uid), msg)
+
+    def send_message_to_id(self, subscriber_id: str, msg):
+        viber = self.get_viber()
+        if issubclass(msg.__class__, Message):
+            viber.send_messages(subscriber_id, msg)
+        else:
+            viber.send_messages(subscriber_id, TextMessage(text=msg))
 
     def send_webhook(self):
         pub_url = getattr(settings, 'VIBER_BOT_PUBLIC_URL')

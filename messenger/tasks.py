@@ -21,10 +21,10 @@ def send_viber_message(messenger_id: Optional[int], account_id: int, message_tex
         sp = UserProfile.objects.get(pk=account_id)
         if messenger_id is None:
             for vm in ViberMessenger.objects.all().iterator():
-                vm.send_message(sp, message_text)
+                vm.send_message_to_acc(sp, message_text)
         else:
             vm = ViberMessenger.objects.get(pk=messenger_id)
-            vm.send_message(sp, message_text)
+            vm.send_message_to_acc(sp, message_text)
     except ViberMessenger.DoesNotExist:
         return 'ERROR: Viber messanger with id=%d not found' % messenger_id
     except UserProfile.DoesNotExist:
@@ -48,9 +48,9 @@ def multicast_viber_notify(messenger_id: Optional[int], account_id_list: Iterabl
         return 'No recipients found from ids: %s' % ','.join(str(i) for i in account_id_list)
     if messenger_id is None:
         for vm in ViberMessenger.objects.all().iterator():
-            vm.send_messages(recipients, message_text)
+            vm.send_message_to_accs(recipients, message_text)
     else:
         vm = ViberMessenger.objects.filter(pk=messenger_id).first()
         if vm is None:
             return 'ERROR ViberMessenger with pk=%d does not exist' % messenger_id
-        vm.send_messages(recipients, message_text)
+        vm.send_message_to_accs(recipients, message_text)

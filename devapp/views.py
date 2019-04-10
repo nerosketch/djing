@@ -18,7 +18,7 @@ from djing.lib import safe_int, ProcessLocked, DuplicateEntry
 from djing.lib.decorators import json_view
 from djing.lib.decorators import only_admins, hash_auth_view
 from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
-from djing.tasks import multicast_email_notify
+# from djing.tasks import multicast_email_notify
 from easysnmp import EasySNMPTimeoutError, EasySNMPError
 from group_app.models import Group
 from abonapp.models import Abon
@@ -772,7 +772,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
                     device_down.comment
                 )
             }
-            multicast_email_notify.delay(msg_text=text, account_ids=user_ids)
+            #multicast_email_notify.delay(msg_text=text, account_ids=user_ids)
             multicast_viber_notify.delay(None, account_id_list=user_ids, message_text=text)
             return {
                 'text': 'notification successfully sent'

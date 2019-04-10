@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
-from djing.tasks import send_email_notify, multicast_email_notify
+from djing.tasks import send_email_notify # , multicast_email_notify
 from messenger.tasks import multicast_viber_notify, send_viber_message
 
 
@@ -36,5 +36,5 @@ def handle(task, author, recipients):
         send_email_notify.delay(fulltext, author.pk)
         send_viber_message.delay(None, author.pk, fulltext)
     else:
-        multicast_email_notify.delay(fulltext, profile_ids)
+        #multicast_email_notify.delay(fulltext, profile_ids)
         multicast_viber_notify.delay(None, profile_ids, fulltext)
