@@ -767,7 +767,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             user_ids = tuple(recipient.pk for recipient in recipients.only('pk').iterator())
             text = gettext(notify_text) % {
                 'device_name': "%s(%s) %s" % (
-                    device_down.ip_address,
+                    device_down.ip_address or '',
                     device_down.mac_addr,
                     device_down.comment
                 )

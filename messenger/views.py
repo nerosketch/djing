@@ -8,8 +8,10 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, F
 from django.views.generic.detail import SingleObjectMixin
 from viberbot.api.messages import KeyboardMessage, ContactMessage
 from viberbot.api.user_profile import UserProfile as ViberUserProfile
-from viberbot.api.viber_requests import ViberMessageRequest, ViberSubscribedRequest, ViberFailedRequest, \
-    ViberUnsubscribedRequest
+from viberbot.api.viber_requests import (
+    ViberMessageRequest, ViberSubscribedRequest,
+    ViberFailedRequest, ViberUnsubscribedRequest
+)
 
 from accounts_app.models import UserProfile
 from djing.lib.mixins import LoginAdminPermissionMixin, LoginAdminMixin
@@ -126,7 +128,7 @@ class ListenViberView(SingleObjectMixin, View):
                     "TextSize": "medium"
                 },)
             }, min_api_version=3)
-            viber = self.object.get_viber()
+            viber = self.object
             viber.send_message_to_id(viber_user_profile.id, msg)
         return subscriber, created
 
@@ -143,7 +145,8 @@ class ListenViberView(SingleObjectMixin, View):
                 if subs_len > 1:
                     ViberSubscriber.objects.exclude(pk=first_sub.pk).delete()
                 first_sub.account = first_acc
-                first_sub.save(update_fields=('account',))
+                first_sub.name = first_acc.get_full_name()
+                first_sub.save(update_fields=('account', 'name'))
                 viber.send_message_to_acc(first_acc, gettext(
                     'Your account is attached. Now you will be receive notifications from billing'
                 ))
