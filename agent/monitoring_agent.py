@@ -11,7 +11,12 @@ API_AUTH_SECRET = 'your api key'
 
 SERVER_DOMAIN = 'http://127.0.0.1:8000'
 
-MAC_ADDR_REGEX = r'^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$'
+IP_ADDR_REGEX = (
+    '^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.'
+    '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+)
 
 
 def calc_hash(data):
@@ -40,11 +45,11 @@ def validate_status(text: str):
     return text
 
 
-def send_request(mac, stat, sign_hash):
+def send_request(ip_addr, stat, sign_hash):
     r = requests.get(
         os.path.join(SERVER_DOMAIN, 'dev', 'on_device_event'),
         params={
-            'mac': mac,
+            'ip_addr': ip_addr,
             'status': stat,
             'sign': sign_hash
         })
@@ -63,12 +68,12 @@ if __name__ == '__main__':
     if API_AUTH_SECRET == 'your api key':
         raise NotImplementedError('You must specified secret api key')
 
-    dev_mac = validate(MAC_ADDR_REGEX, sys.argv[1])
+    dev_ip = validate(IP_ADDR_REGEX, sys.argv[1])
     status = validate_status(sys.argv[2])
 
-    vars_to_hash = [dev_mac, status]
+    vars_to_hash = [dev_ip, status]
     vars_to_hash.sort()
     vars_to_hash.append(API_AUTH_SECRET)
     sign = calc_hash('_'.join(vars_to_hash))
 
-    send_request(dev_mac, status, sign)
+    send_request(dev_ip, status, sign)

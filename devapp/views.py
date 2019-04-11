@@ -13,7 +13,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _, gettext
 from django.views.generic import DetailView, DeleteView, UpdateView, CreateView
-from djing import global_base_views, MAC_ADDR_REGEX, ping, get_object_or_None
+from djing import global_base_views, IP_ADDR_REGEX, ping, get_object_or_None
 from djing.lib import safe_int, ProcessLocked, DuplicateEntry
 from djing.lib.decorators import json_view
 from djing.lib.decorators import only_admins, hash_auth_view
@@ -726,19 +726,20 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
     @method_decorator(json_view)
     def get(self, request):
         try:
-            dev_mac = request.GET.get('mac')
+            dev_ip = request.GET.get('dev_ip')
             dev_status = request.GET.get('status')
 
-            if dev_mac is None or dev_mac == '':
-                return {'text': 'mac does not passed'}
+            if dev_ip is None or dev_ip == '':
+                return {'text': 'ip does not passed'}
 
-            if not re.match(MAC_ADDR_REGEX, dev_mac):
-                return {'text': 'mac address %s is not valid' % dev_mac}
+            if not re.match(IP_ADDR_REGEX, dev_ip):
+                return {'text': 'ip address %s is not valid' % dev_ip}
 
-            device_down = Device.objects.filter(mac_addr=dev_mac).defer(
-                'extra_data').first()
+            device_down = Device.objects.filter(ip_address=dev_ip).defer(
+                'extra_data'
+            ).first()
             if device_down is None:
-                return {'text': 'Devices with mac %s does not exist' % dev_mac}
+                return {'text': 'Devices with ip %s does not exist' % dev_ip}
 
             if dev_status == 'UP':
                 device_down.status = 'up'
@@ -762,7 +763,8 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
                 }
 
             recipients = UserProfile.objects.get_profiles_by_group(
-                device_down.group.pk).filter(flags=UserProfile.flags.notify_mon)
+                device_down.group.pk
+            ).filter(flags=UserProfile.flags.notify_mon)
 
             user_ids = tuple(recipient.pk for recipient in recipients.only('pk').iterator())
             text = gettext(notify_text) % {
