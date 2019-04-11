@@ -49,7 +49,7 @@ def send_request(ip_addr, stat, sign_hash):
     r = requests.get(
         os.path.join(SERVER_DOMAIN, 'dev', 'on_device_event'),
         params={
-            'ip_addr': ip_addr,
+            'dev_ip': ip_addr,
             'status': stat,
             'sign': sign_hash
         })
