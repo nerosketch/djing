@@ -8,7 +8,7 @@ from transliterate import translit
 from django.utils.translation import gettext_lazy as _, gettext
 from django.conf import settings
 
-from djing.lib import RuTimedelta, safe_int
+from djing.lib import RuTimedelta, safe_int, safe_float
 from devapp.expect_scripts import register_f601_onu, register_f660_onu, ExpectValidationError, OnuZteRegisterError
 from .base_intr import (
     DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError,
@@ -181,14 +181,14 @@ class OLTDevice(DevBase, SNMPBaseWorker):
             for nm in nms:
                 n = int(nm)
                 status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % n)
-                signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % n)
+                signal = safe_float(self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % n))
                 onu = ONUdev(
                     num=n,
                     name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
                     status=True if status == '3' else False,
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
-                    signal=int(signal or 0),
+                    signal=signal / 10 if signal else '—',
                     snmp_worker=self)
                 res.append(onu)
         except EasySNMPTimeoutError as e:
@@ -262,17 +262,16 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             return
         try:
             status = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.26.%d' % num)
-            signal = self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num)
+            signal = safe_float(self.get_item('.1.3.6.1.4.1.3320.101.10.5.1.5.%d' % num))
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)
             if mac is not None:
                 mac = ':'.join('%x' % ord(i) for i in mac)
             # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
-            signal = safe_int(signal)
             if status is not None and status.isdigit():
                 return {
                     'status': status,
-                    'signal': signal / 10 if signal != 0 else 0,
+                    'signal': signal / 10 if signal else '—',
                     'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                     'mac': mac,
                     'distance': int(distance) / 10 if distance.isdigit() else 0
@@ -369,7 +368,7 @@ class EltexSwitch(DLinkDevice):
         return DevBase.reboot(self, save_before_reboot)
 
 
-def conv_signal(lvl: int) -> float:
+def conv_zte_signal(lvl: int) -> float:
     if lvl == 65535: return 0.0
     r = 0
     if 0 < lvl < 30000:
@@ -394,7 +393,7 @@ class Olt_ZTE_C320(OLTDevice):
 
         onu_types = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
         onu_ports = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.2.%d' % fiber_num)
-        onu_signals = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num)
+        onu_signals = safe_int(self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num))
 
         # Real sn in last 3 octets
         onu_sns = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%d' % fiber_num)
@@ -402,7 +401,7 @@ class Olt_ZTE_C320(OLTDevice):
         onu_list = ({
             'onu_type': onu_type_num[0],
             'onu_port': onu_port,
-            'onu_signal': conv_signal(safe_int(onu_signal)),
+            'onu_signal': conv_zte_signal(onu_signal),
             'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets,
             'snmp_extra': "%d.%d" % (fiber_num, safe_int(onu_type_num[1])),
         } for onu_type_num, onu_port, onu_signal, onu_sn, onu_prefix in zip(
@@ -494,7 +493,7 @@ class ZteOnuDevice(OnuDevice):
             fiber_num, onu_num = int(fiber_num), int(onu_num)
             fiber_addr = '%d.%d' % (fiber_num, onu_num)
             status = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.1.%s.1' % fiber_addr)
-            signal = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%s.1' % fiber_addr)
+            signal = safe_int(self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%s.1' % fiber_addr))
             distance = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.18.%s.1' % fiber_addr)
             ip_addr = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.16.1.1.10.%s' % fiber_addr)
             vlans = self.get_item('.1.3.6.1.4.1.3902.1012.3.50.15.100.1.1.7.%s.1.1' % fiber_addr)
@@ -507,8 +506,8 @@ class ZteOnuDevice(OnuDevice):
 
             return {
                 'status': status,
-                'signal': conv_signal(safe_int(signal)),
-                'distance': safe_int(distance) / 10,
+                'signal': conv_zte_signal(signal),
+                'distance': safe_float(distance) / 10,
                 'ip_addr': ip_addr,
                 'vlans': vlans,
                 'serial': sn,
