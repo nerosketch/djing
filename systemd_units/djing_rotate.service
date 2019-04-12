@@ -4,7 +4,7 @@ Description=A job for rotate djing netflow data
 [Service]
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/bin"
 Type=oneshot
-ExecStart=/bin/bash -c "kill -HUP `/bin/cat /run/flow.pid.6343`"
+ExecStart=/var/www/djing/agent/netflow/netflow_handler.sh
 User=root
 Group=root
 

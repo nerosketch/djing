@@ -103,13 +103,13 @@ class StatElem(models.Model):
         abstract = True
 
 
-def getModel(want_date=now()):
-    class DynamicStatElem(StatElem):
-        class Meta:
-            db_table = 'flowstat_%s' % want_date.strftime("%d%m%Y")
-            abstract = False
-
-    return DynamicStatElem
+def getModel(want_date=None):
+    if want_date is None:
+        want_date = now()
+    se = StatElem
+    se.Meta.db_table = 'flowstat_%s' % want_date.strftime("%d%m%Y")
+    se.Meta.abstract = False
+    return se
 
 
 class StatCache(models.Model):
