@@ -37,8 +37,8 @@ done
 # Сигналим коллекторам чтоб они сбросили дамп в папку /tmp/djing_flow/dump
 for fl in /run/flow.pid.*; do
     kill -HUP `cat ${fl}`
+    sleep 1
 done
-sleep 0.5
 
 
 # Экспортируем всё в mysql
