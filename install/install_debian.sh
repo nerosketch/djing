@@ -41,6 +41,11 @@ ln -s /etc/uwsgi/apps-available/djing.ini /etc/uwsgi/apps-enabled/djing.ini
 cp install/nginx_server.conf /etc/nginx/sites-available/djing.conf
 ln -s /etc/nginx/sites-available/djing.conf /etc/nginx/sites-enabled/djing.conf
 
+# Extract executable for netflow dumping
+cd agent/netflow
+tar -xvzf djing_flow.tar.gz
+cd ../../
+
 chown -R www-data:www-data /var/www/djing
 
 # dirs
