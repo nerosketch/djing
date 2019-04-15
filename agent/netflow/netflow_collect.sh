@@ -44,7 +44,7 @@ sleep 0.5
 # Экспортируем всё в mysql
 export LD_LIBRARY_PATH=.
 
-flow-cat /tmp/djing_flow/dump/*.dmp | ./djing_flow ${tmp_ipuser_file}| mysql -u ${mysql_user} -h ${mysql_host} -p -D ${mysql_database} -P ${mysql_port} --password=${mysql_passw}
+flow-cat /tmp/djing_flow/dump/*.dmp | ./djing_flow -i ${tmp_ipuser_file} -cl | mysql -u ${mysql_user} -h ${mysql_host} -p -D ${mysql_database} -P ${mysql_port} --password=${mysql_passw}
 
 
 rm -f tmp_ipuser_file
