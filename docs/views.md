@@ -8,7 +8,9 @@
 
 
 ### Пагинатор
-Есть реализованный шаблон для пагинации. При использовании [Class Based View](https://docs.djangoproject.com/en/1.11/topics/class-based-views/),
+Django предоставляет работу с пагинациями в представлении. Моя реализация только в шаблоне для bootstrap.
+Этот шаблон для пагинации лежит в *templates/pagination.html*.
+При использовании [Class Based View](https://docs.djangoproject.com/en/1.11/topics/class-based-views/),
 в шаблоне вы можете включить страницу *templates/pagination.html*.
 
 Например вы создали клас представления:
@@ -23,17 +25,20 @@ class PaysListView(ListView):
 ```
 
 Тогда в шаблоне с bootstrap вы можете подключить шаблон пагинации *templates/pagination.html* и
-увидеть примерно такую пагинацию которую вы конечно же можете изменить на свою.
+увидеть примерно это.
 ![paginator](./img/pagination.png).
 
 
 ### Сортировка по полям объектов из списка
-Для того чтоб иметь возможность сортировать по полю объекта из списка, в шаблоне нужно передать
-имя поля по которому нужна сортировка и направление сортировки.
+Для того чтоб иметь возможность сортировать по полю модели из списка, в шаблоне нужно передать
+имя поля по которому нужна сортировка, и направление сортировки.
 
 На примере *devapp/devices.html* можно рассмотреть такую сортировку.
 Там указан url с параметрами
-> \{\% url 'devapp:devs' group.pk \%\}?order_by=ip_address&dir=\{\{ dir|default:'down' \}\}
+> \{\% url 'devapp:devs' group.pk \%\}?{% url_order_by request order_by='ip_address' %}
+
+*url_order_by* подключается из шаблонного тега dpagination, например, так:
+> {% load dpagination %}
 
 Тут обратная сортировка по полю *ip_address*, со знаком -. То есть эквивалент будет выглядеть примерно так:
 > Device.objects.all().order_by('-ip_address')
