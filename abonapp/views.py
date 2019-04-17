@@ -9,8 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError, ProgrammingError, transaction
-from django.db.models import Count, Q
+from django.db import IntegrityError, transaction
+from django.db.models import Count
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
     HttpResponseRedirect
@@ -255,7 +255,8 @@ class DebtsListView(LoginAdminPermissionMixin, OrderedFilteredList):
     def get_queryset(self):
         if not hasattr(self, 'abon'):
             abon = get_object_or_404(models.Abon, username=self.kwargs.get('uname'))
-            self.abon = abonself.abon = abon
+            if not hasattr(self, 'abon'):
+                self.abon = abon
         return models.InvoiceForPayment.objects.filter(abon=self.abon)
 
     def get_context_data(self, **kwargs):
@@ -694,7 +695,7 @@ def clear_dev(request, gid: int, uname):
 @json_view
 def abon_ping(request, gid: int, uname):
     ip = request.GET.get('cmd_param')
-    status = False
+    status = 1
     text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _('no ping')
     abon = get_object_or_404(models.Abon, username=uname)
     try:
@@ -711,7 +712,7 @@ def abon_ping(request, gid: int, uname):
         ping_result = mngr.ping(ip)
         if ping_result is None:
             return {
-                'status': False,
+                'status': 1,
                 'dat': text
             }
         if isinstance(ping_result, tuple):
@@ -723,7 +724,7 @@ def abon_ping(request, gid: int, uname):
                     received, sent = ping_result
                 else:
                     return {
-                        'status': False,
+                        'status': 1,
                         'dat': text
                     }
             loses_percent = (
@@ -738,7 +739,7 @@ def abon_ping(request, gid: int, uname):
                 text = '<span class="glyphicon glyphicon-ok"></span> %s' % _(
                     'ok ping, %(return)d/%(all)d loses'
                 ) % ping_result
-                status = True
+                status = 0
             else:
                 text = '<span class="glyphicon glyphicon-exclamation-sign"></span> %s' % _(
                     'no ping, %(return)d/%(all)d loses'
@@ -750,7 +751,7 @@ def abon_ping(request, gid: int, uname):
         text = str(e)
 
     return {
-        'status': 0 if status else 1,
+        'status': status,
         'dat': text
     }
 

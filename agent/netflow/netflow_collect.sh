@@ -17,7 +17,6 @@ ldb = db.get('default')
 print('%s %s %s %s %d' % (ldb['NAME'], ldb['USER'],
 ldb['PASSWORD'], ldb['HOST'], ldb['PORT']))"`
 
-
 if ! ping -c 1 ${mysql_host} &> /dev/null; then
     echo "Host ${mysql_host} is not accessible"
 fi
@@ -33,19 +32,16 @@ do
     echo "${uip}-${uid}" >> ${tmp_ipuser_file}
 done
 
-
 # Сигналим коллекторам чтоб они сбросили дамп в папку /tmp/djing_flow/dump
 for fl in /run/flow.pid.*; do
     kill -HUP `cat ${fl}`
-    sleep 1
 done
-
+sleep 1
 
 # Экспортируем всё в mysql
 export LD_LIBRARY_PATH=.
 
-flow-cat /tmp/djing_flow/dump/*.dmp | ./djing_flow -i ${tmp_ipuser_file} -cl | mysql -u ${mysql_user} -h ${mysql_host} -p -D ${mysql_database} -P ${mysql_port} --password=${mysql_passw}
-
+flow-cat /tmp/djing_flow/dump/*/*.dmp | ./djing_flow -i ${tmp_ipuser_file} -cl | mysql -u ${mysql_user} -h ${mysql_host} -p -D ${mysql_database} -P ${mysql_port} --password=${mysql_passw}
 
 rm -f tmp_ipuser_file
-rm -f /tmp/djing_flow/dump/*.dmp
+rm -f /tmp/djing_flow/dump/*/*.dmp

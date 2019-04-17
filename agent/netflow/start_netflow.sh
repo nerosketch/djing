@@ -9,6 +9,6 @@ fi
 
 port=$1
 DIRECTORY=`dirname $(readlink -e "$0")`
-mkdir -p /tmp/djing_flow
+mkdir -p /tmp/djing_flow/${port}
 
-flow-capture -R ${DIRECTORY}/netflow_handler.sh -p /run/flow.pid -w /tmp/djing_flow -n1 -N0 0/0/${port}
+flow-capture -R "${DIRECTORY}/netflow_handler.sh ${port}" -p /run/flow.pid -w /tmp/djing_flow/${port} -n1 -N0 0/0/${port}
