@@ -14,11 +14,12 @@ fi
 
 cd "$tmpdir"
 fname=$1
-port=`echo $(find -name "$fname") | tr / "\n" | head -2 | tail -n1`
+abspath=$(find -name "$fname")
+port=`echo "${abspath}" | tr / "\n" | head -2 | tail -n1`
 
 if [[ -z "$port" ]]; then
     echo "$fname not found in any directory"
 else
-    mkdir -p dump/${port}
-    mv ${port}/${fname} dump/${port}/${fname}.dmp
+    mkdir -p ./dump/${port}
+    mv ${abspath} ./dump/${port}/${fname}.dmp
 fi

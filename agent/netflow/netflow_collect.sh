@@ -35,6 +35,7 @@ done
 # Сигналим коллекторам чтоб они сбросили дамп в папку /tmp/djing_flow/dump
 for fl in /run/flow.pid.*; do
     kill -HUP `cat ${fl}`
+    sleep 0.1
 done
 sleep 1
 
@@ -45,3 +46,4 @@ flow-cat /tmp/djing_flow/dump/*/*.dmp | ./djing_flow -i ${tmp_ipuser_file} -cl |
 
 rm -f ${tmp_ipuser_file}
 rm -f /tmp/djing_flow/dump/*/*.dmp
+rm -f /tmp/djing_flow/*/ft*
