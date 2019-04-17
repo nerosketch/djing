@@ -43,5 +43,5 @@ export LD_LIBRARY_PATH=.
 
 flow-cat /tmp/djing_flow/dump/*/*.dmp | ./djing_flow -i ${tmp_ipuser_file} -cl | mysql -u ${mysql_user} -h ${mysql_host} -p -D ${mysql_database} -P ${mysql_port} --password=${mysql_passw}
 
-rm -f tmp_ipuser_file
+rm -f ${tmp_ipuser_file}
 rm -f /tmp/djing_flow/dump/*/*.dmp

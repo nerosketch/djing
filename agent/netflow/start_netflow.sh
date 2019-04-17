@@ -10,7 +10,7 @@ fi
 port=$1
 DIRECTORY=`dirname $(readlink -e "$0")`
 
-tdir="mkdir -p /tmp/djing_flow/${port}"
+tdir="/tmp/djing_flow/${port}"
 if [ -d "${tdir}" ]; then
     echo "Warning: directory '${tdir}' exists"
 else

@@ -212,7 +212,7 @@
                             {% if abon.statcache.is_today %}
                                 {{ abon.statcache.last_time|date:"H:i" }}
                             {% else %}
-                                {{ abon.statcache.last_time|date:"D H:i" }}
+                                {{ abon.statcache.last_time|date:"d b Y H:i D" }}
                             {% endif %}
                         </dd>
                         <dt>{% trans 'Octets:' %}</dt>
