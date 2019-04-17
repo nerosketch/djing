@@ -9,6 +9,13 @@ fi
 
 port=$1
 DIRECTORY=`dirname $(readlink -e "$0")`
-mkdir -p /tmp/djing_flow/${port}
 
-flow-capture -R "${DIRECTORY}/netflow_handler.sh ${port}" -p /run/flow.pid -w /tmp/djing_flow/${port} -n1 -N0 0/0/${port}
+tdir="mkdir -p /tmp/djing_flow/${port}"
+if [ -d "${tdir}" ]; then
+    echo "Warning: directory '${tdir}' exists"
+else
+    mkdir -p "${tdir}"
+fi
+
+
+flow-capture -R ${DIRECTORY}/netflow_handler.sh -p /run/flow.pid -w ${tdir} -n1 -N0 0/0/${port}

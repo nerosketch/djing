@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 
 if [ -z "$1" ]; then
-    echo "missing port"
-    exit
-fi
-
-if [ -z "$2" ]; then
     echo "missing filename"
     exit
 fi
 
-fname=$2
-port=$1
 PATH=/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+tmpdir='/tmp/djing_flow'
 
-cd /tmp/djing_flow
-mkdir -p dump/${port}
-echo "mv ${port}/${fname} dump/${port}/${fname}.dmp" >> /tmp/mv.log
-mv ${port}/${fname} dump/${port}/${fname}.dmp
+if [ ! -d "$tmpdir" ]; then
+    mkdir -p "$tmpdir"
+fi
+
+cd "$tmpdir"
+fname=$1
+port=`echo $(find -name "$fname") | tr / "\n" | head -2 | tail -n1`
+
+if [[ -z "$port" ]]; then
+    echo "$fname not found in any directory"
+else
+    mkdir -p dump/${port}
+    mv ${port}/${fname} dump/${port}/${fname}.dmp
+fi
