@@ -170,57 +170,6 @@ $(document).ajaxError(function (ev, jqXHR, ajaxSettings, thrownError) {
 })(jQuery);
 
 
-(function($){
-    $.fn.notifys = function(opt){
-        var settings = $.extend({
-			news_url: null,
-			check_interval: 60
-		}, opt);
-
-        var notifShow = function(title, content){
-            if(!settings.news_url) return;
-            var perm = Notification.permission.toLowerCase();
-            if(perm === "granted"){
-                curnotify = new Notification(title, {
-                    tag: 'djing-notify',
-                    body: content,
-                    icon: '/static/img/noticon.png'}
-                );
-            }else if(perm === "default"){
-                Notification.requestPermission(on_ask_perm);
-            }
-        };
-
-        var on_ask_perm = function(r){
-            console.log("Thanks for letting notify you");
-        };
-
-        var check_news = function(){
-            var perm = Notification.permission.toLowerCase();
-            if("granted" === perm && settings.news_url){
-                $.getJSON(settings.news_url, function(r){
-                    if(r.auth){
-                        if(r.exist){
-                            notifShow(r.title, r.content);
-                        }
-                    }else{
-                        window.location.href = '/';
-                    }
-                });
-            }
-        };
-
-        if(settings.news_url){
-            // once per minute check news
-            var tiid = setInterval(check_news, settings.check_interval*1000);
-
-            //Notification.requestPermission(on_ask_perm);
-        }
-    }
-})(jQuery);
-
-
-
 $(document).ready(function () {
 
 	// Live html5 image preview
