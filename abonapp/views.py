@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Dict, Optional
+from kombu.exceptions import OperationalError
 
 from abonapp.tasks import customer_nas_command, customer_nas_remove
 from agent.commands.dhcp import dhcp_commit, dhcp_expiry, dhcp_release
@@ -194,7 +195,7 @@ class DelAbonDeleteView(LoginAdminMixin, PermissionRequiredMixin, DeleteView):
                 }).strip())
             messages.success(request, _('delete abon success msg'))
             return redirect('abonapp:people_list', gid=gid)
-        except NasNetworkError as e:
+        except (NasNetworkError, OperationalError) as e:
             messages.error(self.request, e)
         except NasFailedResult as e:
             messages.error(self.request, _("NAS says: '%s'") % e)
@@ -332,8 +333,12 @@ class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         r = super(AbonHomeUpdateView, self).form_valid(form)
         abon = self.object
-        customer_nas_command.delay(abon.pk, 'sync')
-        messages.success(self.request, _('edit abon success msg'))
+        try:
+            customer_nas_command.delay(abon.pk, 'sync')
+        except OperationalError as e:
+            messages.error(self.request, str(e))
+        else:
+            messages.success(self.request, _('edit abon success msg'))
         return r
 
     def form_invalid(self, form):
@@ -442,9 +447,7 @@ def pick_tariff(request, gid: int, uname):
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid,
                             uname=abon.username)
-    except (lib.LogicError, NasFailedResult) as e:
-        messages.error(request, e)
-    except NasNetworkError as e:
+    except (lib.LogicError, NasFailedResult, NasNetworkError, OperationalError) as e:
         messages.error(request, e)
         return redirect('abonapp:abon_services', gid=gid, uname=abon.username)
     except Tariff.DoesNotExist:
@@ -485,7 +488,7 @@ def unsubscribe_service(request, gid: int, uname, abon_tariff_id: int):
         messages.success(request, _('User has been detached from service'))
     except NasFailedResult as e:
         messages.error(request, e)
-    except NasNetworkError as e:
+    except (NasNetworkError, OperationalError) as e:
         messages.warning(request, e)
     except lib.MultipleException as errs:
         for err in errs.err_list:
@@ -608,8 +611,12 @@ class IpUpdateView(LoginAdminPermissionMixin, UpdateView):
     def form_valid(self, form):
         r = super(IpUpdateView, self).form_valid(form)
         abon = self.object
-        customer_nas_command.delay(abon.pk, 'sync')
-        messages.success(self.request, _('Ip successfully updated'))
+        try:
+            customer_nas_command.delay(abon.pk, 'sync')
+        except OperationalError as e:
+            messages.error(self.request, str(e))
+        else:
+            messages.success(self.request, _('Ip successfully updated'))
         return r
 
     def get_context_data(self, **kwargs):
@@ -1193,12 +1200,15 @@ class UserSessionFree(LoginRequiredMixin, OnlyAdminsMixin, PermissionRequiredMix
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         abon = self.object
-        if abon.ip_address:
-            abon.free_ip_addr()
-            customer_nas_command.delay(abon.pk, 'remove')
-            messages.success(request, _('Ip lease has been freed'))
-        else:
-            messages.error(request, _('User not have ip'))
+        try:
+            if abon.ip_address:
+                abon.free_ip_addr()
+                customer_nas_command.delay(abon.pk, 'remove')
+                messages.success(request, _('Ip lease has been freed'))
+            else:
+                messages.error(request, _('User not have ip'))
+        except OperationalError as e:
+            messages.error(request, e)
         return redirect(
             'abonapp:abon_home',
             gid=self.kwargs.get('gid'),

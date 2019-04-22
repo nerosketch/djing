@@ -1,3 +1,4 @@
+from kombu.exceptions import OperationalError
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -74,6 +75,8 @@ def buy_service(request, srv_id):
         messages.error(request, e)
     except NasFailedResult as e:
         messages.error(request, e)
+    except OperationalError:
+        pass
     return redirect('client_side:services')
 
 

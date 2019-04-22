@@ -1,6 +1,8 @@
 import re
 from ipaddress import ip_address
 
+from kombu.exceptions import OperationalError
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -93,7 +95,7 @@ class DeviceDeleteView(LoginAdminPermissionMixin, DeleteView):
             onu_register.delay(
                 tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
             )
-        except (DeviceDBException, PermissionError) as e:
+        except (DeviceDBException, PermissionError, OperationalError) as e:
             messages.error(request, e)
         messages.success(request, _('Device successfully deleted'))
         return res
@@ -152,7 +154,7 @@ class DeviceUpdate(LoginAdminPermissionMixin, UpdateView):
                 tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
             )
             messages.success(self.request, _('Device info has been saved'))
-        except PermissionError as e:
+        except (PermissionError, OperationalError) as e:
             messages.error(self.request, e)
         return r
 
@@ -226,7 +228,7 @@ class DeviceCreateView(LoginAdminMixin, PermissionRequiredMixin, CreateView):
                 tuple(dev.pk for dev in Device.objects.exclude(group=None).only('pk').iterator())
             )
             messages.success(self.request, _('Device info has been saved'))
-        except PermissionError as e:
+        except (PermissionError, OperationalError) as e:
             messages.error(self.request, e)
         return r
 
@@ -779,7 +781,7 @@ class OnDeviceMonitoringEvent(global_base_views.SecureApiView):
             return {
                 'text': 'notification successfully sent'
             }
-        except ValueError as e:
+        except (ValueError, OperationalError) as e:
             return {
                 'text': str(e)
             }
