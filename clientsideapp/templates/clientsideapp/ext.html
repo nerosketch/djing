@@ -1,15 +1,15 @@
-<!DOCTYPE HTML>{% load globaltags i18n %}
+<!DOCTYPE HTML>{% load globaltags i18n static %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% global_var 'COMPANY_NAME' %} - {% trans 'Personal account' %}</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
-    <script src="/static/js/all.min.js"></script>
-    <script src="/static/clientside/my_clientside.js"></script>
-    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
+    <script src="{% static 'js/all.min.js' %}"></script>
+    <script src="{% static 'clientside/my_clientside.js' %}"></script>
+    <link rel="shortcut icon" href="{% static 'img/favicon_m.ico' %}">
 </head>
 <body>
 <!-- Modal -->
@@ -30,7 +30,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <img src="/static/clientside/bc.png" class="navbar-brand">
+            <img src="{% static 'clientside/bc.png' %}" class="navbar-brand">
             <a class="navbar-brand hidden-xs" href="{{ client_side_home }}">{% global_var 'COMPANY_NAME' %}</a>
         </div>
         <div class="collapse navbar-collapse">

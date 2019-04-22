@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block additional_link %}
-    <link href="/static/css/chartist.min.css" rel="stylesheet" type="text/css"/>
-    <script src="/static/js/chartist.min.js"></script>
+    <link href="{% static 'css/chartist.min.css' %}?cs=0d6caf50a899aab4422a3afcfa80f4d7" rel="stylesheet" type="text/css"/>
+    <script src="{% static 'js/chartist.min.js' %}?cs=cf9d912db488847b9ee2c7993eaf5e27"></script>
 {% endblock %}
 
 {% block page-header %}{% trans 'Traffic' %}{% endblock %}

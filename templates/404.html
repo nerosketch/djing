@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static %}
 {% if request.is_ajax %}
     {% if exception %}
         {{ exception }}
@@ -14,9 +14,9 @@
     <title>{% trans 'Page does not exist' %}</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
+    <link rel="shortcut icon" href="{% static 'img/favicon_m.ico' %}">
     <!-- Core CSS - Include with every page -->
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
     <style>
         .no-border-on-me>thead>tr>th,

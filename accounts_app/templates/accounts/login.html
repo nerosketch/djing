@@ -1,11 +1,11 @@
-<!DOCTYPE html>{% load i18n acc_tags bootstrap3 %}
+<!DOCTYPE html>{% load i18n acc_tags bootstrap3 static %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <title>{% trans 'Auth' %}</title>
     <meta name="robots" content="noindex">
-    <link rel="shortcut icon" href="/static/img/favicon_m.ico">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{% static 'img/favicon_m.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <style>
         body{
             background-color: #ececec;
