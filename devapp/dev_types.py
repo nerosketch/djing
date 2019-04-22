@@ -10,6 +10,7 @@ from django.conf import settings
 
 from djing.lib import RuTimedelta, safe_int, safe_float
 from devapp.expect_scripts import register_f601_onu, register_f660_onu, ExpectValidationError, OnuZteRegisterError
+from devapp.expect_scripts.base import sn_to_mac
 from .base_intr import (
     DevBase, SNMPBaseWorker, BasePort, DeviceImplementationError,
     ListOrError, DeviceConfigurationError
@@ -512,7 +513,8 @@ class ZteOnuDevice(OnuDevice):
                 'vlans': vlans,
                 'serial': sn,
                 'int_name': int_name,
-                'onu_type': onu_type
+                'onu_type': onu_type,
+                'mac': sn_to_mac(sn)
             }
         except IndexError:
             pass
