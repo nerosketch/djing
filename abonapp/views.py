@@ -633,9 +633,16 @@ def chgroup_tariff(request, gid):
     if not request.user.has_perm('group_app.change_group', grp):
         raise PermissionDenied
     if request.method == 'POST':
-        tr = request.POST.getlist('tr')
-        grp.tariff_set.clear()
-        grp.tariff_set.add(*tr)
+        ma = frozenset(t.id for t in grp.tariff_set.all())
+        mb = frozenset(map(int, request.POST.getlist('tr')))
+        sub = ma - mb
+        add = mb - ma
+        grp.tariff_set.remove(*sub)
+        grp.tariff_set.add(*add)
+        models.Abon.objects.filter(
+            group=grp,
+            last_connected_tariff__in=sub
+        ).update(last_connected_tariff=None)
         messages.success(request, _('Successfully saved'))
         return redirect('abonapp:ch_group_tariff', gid)
     tariffs = Tariff.objects.all()
