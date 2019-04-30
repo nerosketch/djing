@@ -8,7 +8,7 @@ from . import base
 def get_onu_template(vlan_id: int, mac_addr: str):
     template = (
         'switchport mode hybrid vport 1',
-        'service-port 1 vport 1 user-vlan 100 vlan %d' % vlan_id,
+        'service-port 1 vport 1 user-vlan %d vlan %d' % (vlan_id, vlan_id),
         'port-location format flexible-syntax vport 1',
         'port-location sub-option remote-id enable vport 1',
         'port-location sub-option remote-id name %s vport 1' % mac_addr,
