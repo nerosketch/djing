@@ -77,6 +77,7 @@ def get_free_registered_onu_number(lines):
 
 
 def sn_to_mac(sn: str):
+    if not sn: return
     t = sn[4:].lower()
     r = tuple(t[i:i + 2] for i in range(0, len(t), 2))
     return '45:47:%s' % ':'.join(r)
