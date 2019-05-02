@@ -471,7 +471,7 @@ class AdditionalTelephone(models.Model):
         verbose_name=_('Telephone'),
         # unique=True,
         validators=(RegexValidator(
-            getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7,8,9,3]\d{10,11})?$')
+            getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7893]\d{10,11})?$')
         ),)
     )
     owner_name = models.CharField(max_length=127)

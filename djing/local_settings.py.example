@@ -39,7 +39,7 @@ DEFAULT_SNMP_PASSWORD = 'public'
 TELEGRAM_BOT_TOKEN = 'bot token'
 
 # Telephone or empty
-TELEPHONE_REGEXP = r'^(\+[7,8,9,3]\d{10,11})?$'
+TELEPHONE_REGEXP = r'^(\+[7893]\d{10,11})?$'
 
 ASTERISK_MANAGER_AUTH = {
     'username': 'admin',
