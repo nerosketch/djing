@@ -17,13 +17,46 @@
                     {% for fiber in dev_manager.get_fibers %}
                         <div class="port{% if fiber.fb_onu_num > 0 %} mega{% endif %} text-center">
                             <b>{{ fiber.fb_name }}</b>
-                            <a href="{% url 'devapp:zte_port_view_uncfg' grp dev.id fiber.fb_id %}" class="port-img">
-                                <b>{{ fiber.fb_onu_num }}</b>
-                            </a>
+                            <span class="port-img"><b>{{ fiber.fb_onu_num }}</b></span>
                         </div>
                     {% empty %}
                         <h3>{% trans 'We have not received info, please check options :(' %}</h3>
                     {% endfor %}
+                    <hr>
+
+                    <h4>{% trans 'Unregistered units' %}</h4>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th class="col-xs-1">#</th>
+                            <th class="col-xs-2">{% trans 'Mac' %}</th>
+                            <th class="col-xs-3">{% trans 'Firmware version' %}</th>
+                            <th class="col-xs-3">{% trans 'LOID password' %}</th>
+                            <th class="col-xs-2">{% trans 'LOID' %}</th>
+                            <th class="col-xs-1">#</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for onu in unregistered %}
+                            <tr>
+                                <td>-</td>
+                                <td>{{ onu.mac }}</td>
+                                <td>{{ onu.firmware_ver }}</td>
+                                <td>{{ onu.loid_passw }}</td>
+                                <td>{{ onu.loid }}</td>
+                                <td>
+                                    <a href="{% url 'devapp:add' grp %}?t=Zo&pdev={{ dev.pk }}&c={{ onu.loid }}&mac={{ onu.mac }}" title="{% trans 'Create device' %}">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7">{% trans 'ONU not found' %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
                 </div>
                 <div class="panel-footer">

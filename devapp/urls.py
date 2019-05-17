@@ -25,9 +25,6 @@ urlpatterns = [
     path('fix_device_group/<int:device_id>/', views.fix_device_group, name='fix_device_group'),
     path('search_dev/', views.search_dev),
 
-    # ZTE ports under fibers
-    path('<int:group_id>/<int:device_id>/<int:fiber_id>/', views.zte_port_view_uncfg, name='zte_port_view_uncfg'),
-
     # Monitoring api
     path('on_device_event/', views.OnDeviceMonitoringEvent.as_view()),
 

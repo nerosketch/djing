@@ -501,11 +501,18 @@ def devview(request, group_id: int, device_id: int):
         else:
             messages.warning(request, _('Not Set snmp device password'))
 
+        # unregistered units
+        unregistered = []
+        for fiber in manager.get_fibers():
+            for onu in manager.get_units_unregistered(int(fiber.get('fb_id'))):
+                if onu:
+                    unregistered.append(onu)
         return render(request, 'devapp/custom_dev_page/' + template_name, {
             'dev': device,
             'ports': ports,
             'dev_accs': Abon.objects.filter(device=device),
             'dev_manager': manager,
+            'unregistered': unregistered,
             'ports_db': Port.objects.filter(device=device).annotate(
                 num_abons=Count('abon')
             ),
@@ -518,21 +525,6 @@ def devview(request, group_id: int, device_id: int):
     return render(request, 'devapp/custom_dev_page/' + template_name, {
         'dev': device
     })
-
-
-@login_required
-@only_admins
-def zte_port_view_uncfg(request, group_id: str, device_id: str, fiber_id: str):
-    fiber_id = safe_int(fiber_id)
-    zte_olt_device = get_object_or_404(Device, id=device_id)
-    manager = zte_olt_device.get_manager_object()
-    onu_list = manager.get_units_unregistered(fiber_id)
-    return render(request,
-                  'devapp/custom_dev_page/olt_ztec320_units_uncfg.html', {
-                      'onu_list': onu_list,
-                      'dev': zte_olt_device,
-                      'grp': group_id
-                  })
 
 
 class RebootDevice(LoginAdminPermissionMixin, UpdateView):
