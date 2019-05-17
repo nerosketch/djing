@@ -493,8 +493,10 @@ def devview(request, group_id: int, device_id: int):
         if device.man_passw:
             manager = device.get_manager_object()
             ports = tuple(manager.get_ports())
-            if ports is not None and len(ports) > 0 and isinstance(ports[0],
-                                                                   Exception):
+            if ports is not None and len(ports) > 0 and isinstance(
+                    ports[0],
+                    Exception
+            ):
                 messages.error(request, ports[0])
                 ports = ports[1]
             template_name = manager.get_template_name()
@@ -503,10 +505,11 @@ def devview(request, group_id: int, device_id: int):
 
         # unregistered units
         unregistered = []
-        for fiber in manager.get_fibers():
-            for onu in manager.get_units_unregistered(int(fiber.get('fb_id'))):
-                if onu:
-                    unregistered.append(onu)
+        if hasattr(manager, 'get_fibers'):
+            for fiber in manager.get_fibers():
+                for onu in manager.get_units_unregistered(int(fiber.get('fb_id'))):
+                    if onu:
+                        unregistered.append(onu)
         return render(request, 'devapp/custom_dev_page/' + template_name, {
             'dev': device,
             'ports': ports,
