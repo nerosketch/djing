@@ -83,7 +83,7 @@ class AbonStreet(models.Model):
 
 class AbonManager(MyUserManager):
     def get_queryset(self):
-        return super(MyUserManager, self).get_queryset().filter(is_admin=False)
+        return super(AbonManager, self).get_queryset().filter(is_admin=False)
 
     def filter_ip_address(self, group_ids: tuple, nas_id: int):
         nas_id = int(nas_id)
@@ -187,9 +187,6 @@ class Abon(BaseAccount):
         :return: ['m-icon-donkey', 'm-icon-tv', ...]
         """
         return tuple("m-%s" % name for name, state in self.markers if state)
-
-    def is_markers_empty(self):
-        return int(self.markers) == 0
 
     def active_tariff(self):
         return self.current_tariff
@@ -437,9 +434,6 @@ class InvoiceForPayment(models.Model):
     def set_ok(self):
         self.status = True
         self.date_pay = timezone.now()
-
-    def get_prev_invoice(self):
-        return self.objects.order
 
     class Meta:
         ordering = ('date_create',)

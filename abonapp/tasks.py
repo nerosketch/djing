@@ -12,7 +12,6 @@ def customer_nas_command(customer_uid: int, command: str):
         return 'Command required'
     try:
         cust = Abon.objects.get(pk=customer_uid)
-        print(cust, command)
         if command == 'sync':
             r = cust.nas_sync_self()
             if isinstance(r, Exception):
