@@ -21,7 +21,7 @@ from django.urls import reverse_lazy
 
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, UpdateView, CreateView, DeleteView
+from django.views.generic import ListView, UpdateView, CreateView, DeleteView, DetailView
 from djing import lib
 from djing.global_base_views import OrderedFilteredList, SecureApiView
 from djing.lib.decorators import json_view, only_admins
@@ -267,35 +267,39 @@ class DebtsListView(LoginAdminPermissionMixin, OrderedFilteredList):
         return context
 
 
-@login_required
-@only_admins
-def abon_services(request, gid: int, uname):
-    grp = get_object_or_404(Group, pk=gid)
-    if not request.user.has_perm('group_app.view_group', grp):
-        raise PermissionDenied
-    abon = get_object_or_404(models.Abon, username=uname)
+class AbonServices(LoginAdminMixin, DetailView):
+    model = models.Abon
+    slug_url_kwarg = 'uname'
+    slug_field = 'username'
+    template_name = 'abonapp/service.html'
+    context_object_name = 'abon'
 
-    if abon.group != grp:
-        messages.warning(
-            request,
-            _("User group id is not matches with group in url")
-        )
-        return redirect('abonapp:abon_services', abon.group.id, abon.username)
+    def get_object(self, queryset=None):
+        gid = self.kwargs.get('gid')
+        abon = super().get_object(queryset)
+        if abon.group.pk != gid:
+            messages.warning(
+                self.request,
+                _("User group id is not matches with group in url")
+            )
+            return redirect('abonapp:abon_services', abon.group.pk, abon.username)
+        if not self.request.user.has_perm('group_app.view_group', abon.group):
+            raise PermissionDenied
+        return abon
 
-    try:
+    def get_context_data(self, **kwargs):
+        abon = self.object
         periodic_pay = models.PeriodicPayForId.objects.filter(
             account=abon
         ).first()
-    except models.PeriodicPayForId.DoesNotExist:
-        periodic_pay = None
-
-    return render(request, 'abonapp/service.html', {
-        'abon': abon,
-        'abon_tariff': abon.current_tariff,
-        'group': abon.group,
-        'services': Tariff.objects.get_tariffs_by_group(abon.group.pk),
-        'periodic_pay': periodic_pay
-    })
+        context = {
+            'abon_tariff': abon.current_tariff,
+            'group': abon.group,
+            'services': Tariff.objects.get_tariffs_by_group(abon.group.pk),
+            'periodic_pay': periodic_pay
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)
 
 
 class AbonHomeUpdateView(LoginAdminMixin, PermissionRequiredMixin, UpdateView):

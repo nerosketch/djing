@@ -6,7 +6,7 @@ app_name = 'abonapp'
 
 subscriber_patterns = [
     path('', views.AbonHomeUpdateView.as_view(), name='abon_home'),
-    path('services/', views.abon_services, name='abon_services'),
+    path('services/', views.AbonServices.as_view(), name='abon_services'),
     path('amount/', views.abonamount, name='abon_amount'),
     path('debts/', views.DebtsListView.as_view(), name='abon_debts'),
     path('pay/', views.PayHistoryListView.as_view(), name='abon_phistory'),
