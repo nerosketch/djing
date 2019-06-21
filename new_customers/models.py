@@ -13,6 +13,7 @@ class PotentialSubscriber(models.Model):
         max_length=16,
         verbose_name=_('Telephone'),
         blank=True,
+        null=True,
         validators=(RegexValidator(
             getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7893]\d{10,11})?$')
         ),)

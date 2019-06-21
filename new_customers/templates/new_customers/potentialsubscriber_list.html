@@ -23,16 +23,34 @@
         </div>
         <div class="list-group">
             {% for new_user in object_list %}
+
                 {% with user_group=new_user.group %}
                 <a href="{{ new_user.get_absolute_url }}" class="list-group-item">
-                    {% if user_group.deadline %}
-                        <div class="pull-right">
-                            <small>{{ user_group.deadline|date:'d M, H:i:s' }}</small>
-                        </div>
+
+                    <div class="pull-right">
+                        <small>{{ new_user.make_data|date:'d M, H:i:s' }}</small>
+                        {% if user_group.deadline %}
+                            <small>{{ new_user.deadline|date:'d M, H:i:s' }}</small>
+                        {% endif %}
+                    </div>
+
+                    <h4>{{ new_user.fio }} <small>{{ new_user.telephone }}</small></h4>
+
+                    {% if user_group %}
+                        {{ user_group.title }}
+                    {% else %}
+                        {{ town|default_if_none:'' }}
                     {% endif %}
-                    <h4>{{ new_user.fio }}</h4>
+
+                    {{ new_user.street }}, {{ new_user.house }}
+
+                    {% if new_user.description %}
+                        <p>{{ new_user.description }}</p>
+                    {% endif %}
+
                 </a>
                 {% endwith %}
+
             {% empty %}
                 <a href="#" class="list-group-item">
                     <p class="list-group-item-text">{% trans 'Not have new subscribers' %}</p>

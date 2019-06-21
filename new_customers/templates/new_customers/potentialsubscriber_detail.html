@@ -1,0 +1,54 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n bootstrap3 %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li><a href="{% url 'new_customers:customers_list' %}">{% trans 'Potential subscribers' %}</a></li>
+        <li class="active">{{ object.fio }}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {{ object.fio|default:_('Not assigned') }}
+{% endblock %}
+
+{% block main %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">{% trans 'Potential subscriber' %}</h3>
+    </div>
+    <div class="panel-body">
+
+        <dl class="dl-horizontal">
+
+            {% for model_field in model_fields %}
+                <dt>{{ model_field.verbose_name }}</dt>
+                <dd>{{ model_field.value }}</dd>
+            {% endfor %}
+
+        </dl>
+
+        <form role="form" action="{% url 'new_customers:new_user' %}" method="post">{% csrf_token %}
+            {% bootstrap_form form %}
+
+            <div class="btn-group btn-group-sm">
+                <a href="#" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
+                </a>
+
+                <a href="#" class="btn btn-success">
+                    <span class="glyphicon glyphicon-fire"></span> {% trans 'Make client' %}
+                </a>
+
+                <a href="#" class="btn btn-default">
+                    <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Cancel' %}
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -6,3 +6,6 @@ class CustomerModelForm(forms.ModelForm):
     class Meta:
         model = PotentialSubscriber
         exclude = ('make_data',)
+        widgets = {
+            'deadline': forms.DateInput(attrs={'type': 'date'})
+        }
