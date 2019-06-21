@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n bootstrap3 %}
 <form role="form" action="{% url 'abonapp:telephone_new' gid uname %}" method="post"> {% csrf_token %}
     <div class="modal-header primary">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -6,21 +6,12 @@
     </div>
 
     <div class="modal-body">
-        <div class="form-group">
-            <label for="id_telephone">{% trans 'Telephone' %}</label>
-            <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-earphone"></span></span>
-                {{ form.telephone }}{{ form.telephone.errors }}
-            </div>
-        </div>
 
-        <div class="form-group">
-            <label for="id_owner_name">{% trans 'Telephone owner' %}</label>
-            <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                {{ form.owner_name }}{{ form.owner_name.errors }}
-            </div>
-        </div>
+        {% bootstrap_icon 'earphone' as ic %}
+        {% bootstrap_field form.telephone addon_before=ic %}
+
+        {% bootstrap_icon 'user' as ic %}
+        {% bootstrap_field form.owner_name addon_before=ic %}
 
         <div class="btn-group">
             <button type="submit" class="btn btn-success">

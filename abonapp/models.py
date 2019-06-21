@@ -68,8 +68,8 @@ class AbonTariff(models.Model):
 
 
 class AbonStreet(models.Model):
-    name = models.CharField(max_length=64)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    name = models.CharField(_('Street title'), max_length=64)
+    group = models.ForeignKey(Group, verbose_name=_('User group'), on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -468,7 +468,7 @@ class AdditionalTelephone(models.Model):
             getattr(settings, 'TELEPHONE_REGEXP', r'^(\+[7893]\d{10,11})?$')
         ),)
     )
-    owner_name = models.CharField(max_length=127)
+    owner_name = models.CharField(_('Telephone owner'), max_length=127)
 
     def __str__(self):
         return "%s - (%s)" % (self.owner_name, self.telephone)

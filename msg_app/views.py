@@ -60,14 +60,17 @@ def to_conversation(request, conv_id):
             frm = MessageForm(request.POST, request.FILES)
             if frm.is_valid():
                 frm.create(conv, request.user)
+                return redirect(conv.get_absolute_url())
             else:
                 messages.error(request, _('fix form errors'))
         else:
             conv.make_messages_status_old(request.user)
+            frm = MessageForm()
         msg_list = conv.get_messages()
         return render(request, 'msg_app/chat.html', {
             'conv': conv,
-            'msg_list': msg_list
+            'msg_list': msg_list,
+            'msg_form': frm
         })
     except MessageError as e:
         messages.error(request, e)

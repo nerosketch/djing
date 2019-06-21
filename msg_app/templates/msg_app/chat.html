@@ -1,5 +1,5 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
-{% load i18n %}
+{% load i18n bootstrap3 %}
 
 
 {% block breadcrumb %}
@@ -51,7 +51,7 @@
 
                             <pre>{{ msg.text }}</pre>
                             {% if msg.attachment %}
-                                <a href="{{ msg.attachment }}" class="btn btn-default btn-sm">
+                                <a href="{{ msg.attachment.url }}" class="btn btn-default btn-sm" target="_blank">
                                     <span class="glyphicon glyphicon-gift"></span> {{ msg.attachment }}
                                 </a>
                             {% endif %}
@@ -67,24 +67,12 @@
             {% endfor %}
         {% endwith %}
         </div>
-        <form action="{% url 'msg_app:to_conversation' conv.pk %}" method="post"
-              enctype="multipart/form-data">{% csrf_token %}
+        <form action="{% url 'msg_app:to_conversation' conv.pk %}" method="post" enctype="multipart/form-data">{% csrf_token %}
             <div class="panel-footer">
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-comment"></span></span>
-                        <textarea name="text" required class="form-control"></textarea>
-                    </div>
-                </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-default" type="submit">
-                        <span class="glyphicon glyphicon-send"></span> {% trans 'Send' %}
-                    </button>
-                    <!--<button class="btn btn-default" type="button">
-                        <span class="glyphicon glyphicon-tag"></span> { % trans 'Attach' % }
-                    </button>-->
-                </div>
+                {% bootstrap_form msg_form %}
+
+                {% bootstrap_button _('Send') button_type='submit' button_class='btn-default' icon='send' %}
 
                 <small>Если кто-то будет пользоваться то усовершенствую личные сообщения</small>
             </div>

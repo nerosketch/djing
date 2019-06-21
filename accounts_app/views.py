@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404, resolve_url
 from django.contrib import messages
 from django.urls import NoReverseMatch
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _, gettext
+from django.utils.translation import ugettext as _
 from django.views.generic import ListView, UpdateView, DetailView
 from django.conf import settings
 

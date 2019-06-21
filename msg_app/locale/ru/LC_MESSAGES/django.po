@@ -45,7 +45,7 @@ msgstr "Статусы сообщений"
 
 #: msg_app/models.py:35
 msgid "Body"
-msgstr "Тело"
+msgstr "Текст сообщения"
 
 #: msg_app/models.py:36
 msgid "sent at"
@@ -156,3 +156,9 @@ msgstr "Беседа создана"
 #: msg_app/views.py:38 msg_app/views.py:57
 msgid "fix form errors"
 msgstr "заполните все поля в соответствии с их форматом"
+
+msgid "Participants"
+msgstr "Участники"
+
+msgid "Title"
+msgstr "Название"

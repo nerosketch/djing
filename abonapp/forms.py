@@ -125,7 +125,7 @@ class PassportForm(forms.ModelForm):
             ),
             'distributor': forms.TextInput(attrs={'required': ''}),
             'date_of_acceptance': forms.DateInput(attrs={
-                'class': 'form-control', 'required': ''
+                'required': ''
             }, format='%Y-%m-%d')
         }
 
@@ -136,10 +136,8 @@ class AbonStreetForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'form-control',
                 'required': '', 'autofocus': ''
-            }),
-            'group': forms.Select(attrs={'class': 'form-control'})
+            })
         }
 
 
@@ -154,11 +152,10 @@ class AdditionalTelephoneForm(forms.ModelForm):
                     settings, 'TELEPHONE_REGEXP',
                     r'^(\+[7,8,9,3]\d{10,11})?$'
                 ),
-                'required': '',
-                'class': 'form-control'
+                'required': ''
             }),
             'owner_name': forms.TextInput(attrs={
-                'class': 'form-control', 'required': ''
+                'required': ''
             })
         }
 
@@ -168,7 +165,7 @@ class PeriodicPayForIdForm(forms.ModelForm):
         model = models.PeriodicPayForId
         exclude = ('account',)
         widgets = {
-            'next_pay': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+            'next_pay': forms.DateInput(attrs={'type': 'date'})
         }
 
 

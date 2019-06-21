@@ -11,10 +11,13 @@ class ConversationForm(forms.ModelForm):
         if user_profile_queryset is not None:
             self.fields['participants'].choices = [(up.pk, up.get_full_name()) for up in user_profile_queryset]
 
-    title = forms.CharField(max_length=32, required=False,
-                            widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '32'}))
-    participants = forms.MultipleChoiceField(required=False,
-                                             widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+    title = forms.CharField(
+        max_length=32, required=False,
+        widget=forms.TextInput(attrs={'maxlength': '32'})
+    )
+    participants = forms.MultipleChoiceField(
+        required=False,
+    )
 
     class Meta:
         model = Conversation
@@ -41,8 +44,7 @@ class MessageForm(forms.ModelForm):
         model = Message
         exclude = ('sent_at', 'author', 'conversation', 'account_status')
         widgets = {
-            'text': forms.Textarea(attrs={'class': 'form-control'}),
-            'attachment': forms.FileInput(attrs={'class': 'form-control'})
+            'text': forms.Textarea(attrs={'required': ''})
         }
 
     def create(self, conversation, author):

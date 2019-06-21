@@ -1,3 +1,4 @@
+from django.shortcuts import resolve_url
 from kombu.exceptions import OperationalError
 
 from django.db import models
@@ -175,11 +176,13 @@ class ConversationManager(models.Manager):
 
 
 class Conversation(models.Model):
-    title = models.CharField(max_length=32)
+    title = models.CharField(_('Title'), max_length=32)
     participants = models.ManyToManyField(
         UserProfile, related_name='conversations',
+        verbose_name=_('Participants'),
         through='ConversationMembership',
-        through_fields=('conversation', 'account')
+        through_fields=('conversation', 'account'),
+        help_text=_('for select multiple press ctrl and click on field')
     )
     author = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_create = models.DateTimeField(auto_now_add=True)
@@ -293,6 +296,9 @@ class Conversation(models.Model):
 
     def make_messages_status_old(self, account):
         return self._make_messages_status(account, 'old')
+
+    def get_absolute_url(self):
+        return resolve_url('msg_app:to_conversation', conv_id=self.pk)
 
     class Meta:
         db_table = 'conversations'

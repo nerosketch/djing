@@ -62,34 +62,24 @@
                             <ul class="dropdown-menu selectajax-ul"></ul>{{ form.abon.errors }}
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="id_out_date">{% trans 'Reality' %}</label>
 
-                        <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                            {{ form.out_date }}{{ form.out_date.errors }}
-                        </div>
-                    </div>
+                    {% bootstrap_icon 'calendar' as ic %}
+                    {% bootstrap_field form.out_date addon_before=ic %}
 
                     {% bootstrap_icon 'picture' as ic %}
                     {% bootstrap_field form.attachment addon_before=ic %}
 
                     <div class="btn-group btn-group-sm">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="glyphicon glyphicon-save"></span> {% trans 'Save' %}
-                        </button>
-                        <button type="reset" class="btn btn-default">
-                            <span class="glyphicon glyphicon-remove-circle"></span> {% trans 'Reset' %}
-                        </button>
+                        {% bootstrap_button _('Save') button_type='submit' button_class='btn-primary' icon='save' %}
+
+                        {% bootstrap_button _('Reset') button_type='reset' icon='remove-circle' %}
+
                         {% if task.id %}
-                            <a href="{% url 'taskapp:delete' task.id %}" class="btn btn-danger">
-                                <span class="glyphicon glyphicon-remove"></span> {% trans 'Delete' %}
-                            </a>
-                        {% endif %}
-                        {% if task.id %}
-                            <a href="{% url 'taskapp:finish' task.id %}" class="btn btn-success">
-                                <span class="glyphicon glyphicon-ok"></span> {% trans 'Complete' %}
-                            </a>
+                            {% url 'taskapp:delete' task.id as delurl%}
+                            {% bootstrap_button _('Delete') button_class='btn-danger' href=delurl icon='remove' %}
+
+                            {% url 'taskapp:finish' task.id as cmpurl %}
+                            {% bootstrap_button _('Complete') button_class='btn-success' href=cmpurl icon='ok' %}
                         {% endif %}
                     </div>
                     </form>
