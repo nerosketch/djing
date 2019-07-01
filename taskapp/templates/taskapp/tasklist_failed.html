@@ -1,6 +1,8 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
 {% load i18n %}
 
+{% block title %}{% trans 'Failed tasks' %}{% endblock %}
+
 {% block page-header %}
     {% trans 'Tasks in which was trouble while at runtime' %}
 {% endblock %}

@@ -1,6 +1,8 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
 {% load i18n %}
 
+{% block title %}{% trans 'Tasks in which no recipients' %}{% endblock %}
+
 {% block page-header %}
     {% trans 'Tasks in which no recipients' %}
 {% endblock %}

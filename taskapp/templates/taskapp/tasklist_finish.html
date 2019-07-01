@@ -1,7 +1,9 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,taskapp/ext.htm' %}
 {% load i18n %}
-{% block content %}
 
+{% block title %}{% trans 'Completed tasks' %}{% endblock %}
+
+{% block content %}
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>

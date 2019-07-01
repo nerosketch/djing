@@ -1,6 +1,13 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n bootstrap3 globaltags %}
 
+{% block title %}
+    {% if task.id %}
+        {% trans 'Edit' %}
+    {% else %}
+        {% trans 'Create' %}
+    {% endif %}
+{% endblock %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">
