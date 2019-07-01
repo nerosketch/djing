@@ -129,7 +129,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
 
     def uptime(self) -> timedelta:
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.8.0'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100))
         return tm
 
     def get_template_name(self):
@@ -203,7 +203,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
 
     def uptime(self):
         up_timestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.9.1.4.1'))
-        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100))
         return tm
 
     def get_template_name(self):
@@ -358,7 +358,7 @@ class EltexSwitch(DLinkDevice):
 
     def uptime(self):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=uptimestamp / 100))
         return tm
 
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:
@@ -429,7 +429,7 @@ class Olt_ZTE_C320(OLTDevice):
 
     def uptime(self):
         up_timestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
-        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(timedelta(seconds=up_timestamp / 100))
         return tm
 
     def get_long_description(self):
