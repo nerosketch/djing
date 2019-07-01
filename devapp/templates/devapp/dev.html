@@ -1,5 +1,8 @@
 {% extends request.is_ajax|yesno:'nullcont.htm,devapp/ext.htm' %}
 {% load i18n bootstrap3 %}
+
+{% block title %}{{ form.comment.value }}{% endblock %}
+
 {% block content %}
 
 <div class="panel panel-default">
