@@ -1,6 +1,14 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n bootstrap3 %}
 
+{% block title %}
+    {% if object %}
+        {% trans 'Change payment gateway' %}
+    {% else %}
+        {% trans 'Add payment gateway' %}
+    {% endif %}
+{% endblock %}
+
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
@@ -17,7 +25,11 @@
 
 
 {% block page-header %}
-    {% trans 'Make new payment gateway' %}
+    {% if object %}
+        {% trans 'Change payment gateway' %}
+    {% else %}
+        {% trans 'Add payment gateway' %}
+    {% endif %}
 {% endblock %}
 
 
