@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'messenger',
     'msg_app',
     'group_app',
+    'new_customers',
     'guardian',
     'pinax_theme_bootstrap',
     'bootstrapform',

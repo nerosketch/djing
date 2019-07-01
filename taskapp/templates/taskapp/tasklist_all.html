@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n tasktags %}
 
+{% block title %}{% trans 'All tasks' %}{% endblock %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">

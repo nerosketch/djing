@@ -122,6 +122,13 @@
                 </li>
             {% endif %}
 
+            {% url 'new_customers:customers_list' as newclist %}
+            <li{% if newclist in request.path %} class="active"{% endif %}>
+                <a href="{{ newclist }}">
+                    <span class="glyphicon glyphicon-question-sign"></span> {% trans 'Potential subscribers' %}
+                </a>
+            </li>
+
         </ul>
 
     </div>

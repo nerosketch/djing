@@ -599,9 +599,8 @@ class GroupsListView(LoginAdminMixin, global_base_views.OrderedFilteredList):
     model = Group
 
     def get_queryset(self):
-        groups = super(GroupsListView, self).get_queryset()
         groups = get_objects_for_user(self.request.user,
-                                      'group_app.view_group', klass=groups,
+                                      'group_app.view_group', klass=Group,
                                       accept_global_perms=False)
         return groups
 

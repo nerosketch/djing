@@ -1,0 +1,70 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Potential subscribers' %}{% endblock %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Potential subscribers' %}</li>
+    </ol>
+{% endblock %}
+
+
+{% block page_header %}
+    <h3>{% trans 'Potential subscribers' %}</h3>
+{% endblock %}
+
+{% block main %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% trans 'New subscribers' %}</h3>
+	        <span>{% trans 'People that may be clients' %}</span>
+        </div>
+        <div class="list-group">
+            {% for new_user in object_list %}
+
+                {% with user_group=new_user.group %}
+                <a href="{{ new_user.get_absolute_url }}" class="list-group-item">
+
+                    <div class="pull-right">
+                        <small>{{ new_user.make_data|date:'d M, H:i:s' }}</small>
+                        {% if user_group.deadline %}
+                            <small>{{ new_user.deadline|date:'d M, H:i:s' }}</small>
+                        {% endif %}
+                    </div>
+
+                    <h4>{{ new_user.fio }} <small>{{ new_user.telephone }}</small></h4>
+
+                    {% if user_group %}
+                        {{ user_group.title }}
+                    {% else %}
+                        {{ town|default_if_none:'' }}
+                    {% endif %}
+
+                    {{ new_user.street }}, {{ new_user.house }}
+
+                    {% if new_user.description %}
+                        <p>{{ new_user.description }}</p>
+                    {% endif %}
+
+                </a>
+                {% endwith %}
+
+            {% empty %}
+                <a href="#" class="list-group-item">
+                    <p class="list-group-item-text">{% trans 'Not have new subscribers' %}</p>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                <a href="{% url 'new_customers:new_user' %}" class="btn btn-default btn-modal">
+                    <span class="glyphicon glyphicon-plus"></span> {% trans 'Add' %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

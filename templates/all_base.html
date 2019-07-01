@@ -1,7 +1,7 @@
 <!DOCTYPE html>{% load i18n globaltags static %}
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
-    <title>{% global_var 'COMPANY_NAME' %} - {% trans 'Admin side' %}</title>
+    <title>{% block title %}{% global_var 'COMPANY_NAME' %} - {% trans 'Admin side' %}{% endblock %}</title>
     <meta charset="UTF-8">
     <!--[if lt IE 9]><meta http-equiv="refresh" content="0;URL={% static 'bad_ie.html' %}" /><![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
