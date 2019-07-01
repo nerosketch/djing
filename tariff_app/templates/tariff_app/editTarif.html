@@ -1,6 +1,14 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n bootstrap3 %}
 
+{% block title %}
+    {% if tarif_id == 0 %}
+        {% trans 'Add' %}
+    {% else %}
+        {{ form.title.value }}
+    {% endif %}
+{% endblock %}
+
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>

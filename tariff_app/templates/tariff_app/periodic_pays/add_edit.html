@@ -1,6 +1,14 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n bootstrap3 %}
 
+{% block title %}
+    {% if pay_instance %}
+        {% trans 'Change periodic pay' %}
+    {% else %}
+        {% trans 'Add new periodic pay' %}
+    {% endif %}
+{% endblock %}
+
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>

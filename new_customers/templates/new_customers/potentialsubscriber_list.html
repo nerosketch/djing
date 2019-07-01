@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n %}
 
+{% block title %}{% trans 'Potential subscribers' %}{% endblock %}
 
 {% block breadcrumb %}
     <ol class="breadcrumb">

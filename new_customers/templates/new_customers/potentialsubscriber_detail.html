@@ -1,6 +1,10 @@
 {% extends request.is_ajax|yesno:'bajax.html,base.html' %}
 {% load i18n bootstrap3 %}
 
+{% block title %}
+    {{ object.fio|default:_('Not assigned') }}
+{% endblock %}
+
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li><span class="glyphicon glyphicon-home"></span></li>
