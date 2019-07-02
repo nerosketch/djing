@@ -13,7 +13,7 @@ from django.views.generic.edit import FormMixin, DeleteView, UpdateView
 from guardian.shortcuts import assign_perm
 from abonapp.models import Abon
 from djing import httpresponse_to_referrer
-from djing.lib import safe_int, MultipleException, RuTimedelta
+from djing.lib import safe_int, MultipleException
 from djing.lib.decorators import only_admins
 from djing.lib.mixins import LoginAdminMixin, LoginAdminPermissionMixin
 from .handle import TaskException
@@ -222,10 +222,10 @@ class TaskUpdateView(LoginAdminMixin, UpdateView):
         task = self.object
         if task:
             if task.out_date > now_date:
-                time_diff = "%s: %s" % (_('time left'), RuTimedelta(task.out_date - now_date))
+                time_diff = "%s: %s" % (_('time left'), (task.out_date - now_date))
             else:
                 time_diff = _("Expired timeout -%(time_left)s") % {
-                    'time_left': RuTimedelta(now_date - task.out_date)
+                    'time_left': (now_date - task.out_date)
                 }
         else:
             time_diff = None
