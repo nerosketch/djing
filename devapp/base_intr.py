@@ -5,6 +5,8 @@ from easysnmp import Session
 
 from django.utils.translation import gettext, gettext_lazy as _
 
+from djing.lib import RuTimedelta
+
 ListOrError = Union[
     Iterable,
     Union[Exception, Iterable]
@@ -93,16 +95,22 @@ class DevBase(object, metaclass=ABCMeta):
 
 
 class BasePort(object, metaclass=ABCMeta):
-    __slots__ = 'num', 'snmp_num', 'nm', 'st', '_mac', 'sp', 'writable'
+    __slots__ = 'num', 'snmp_num', 'nm', 'st', '_mac', 'sp', 'uptime', 'writable'
 
-    def __init__(self, num, name, status, mac, speed, snmp_num=None, writable=False):
+    def __init__(self, num, name, status, mac, speed, uptime: int=None, snmp_num=None, writable=False):
         self.num = int(num)
         self.snmp_num = int(num) if snmp_num is None else int(snmp_num)
         self.nm = name
         self.st = status
         self._mac = mac
         self.sp = speed
+        self.uptime = int(uptime) if uptime else None
         self.writable = writable
+
+    def uptime_str(self):
+        if self.uptime:
+            return str(RuTimedelta(seconds=self.uptime / 100))
+        return ''
 
     @abstractmethod
     def disable(self):

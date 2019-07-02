@@ -69,7 +69,7 @@ class EltexSwitch(DLinkDevice):
 
     def uptime(self):
         uptimestamp = safe_int(self.get_item('.1.3.6.1.2.1.1.3.0'))
-        tm = RuTimedelta(timedelta(seconds=uptimestamp/100)) or RuTimedelta(timedelta())
+        tm = RuTimedelta(seconds=uptimestamp/100)
         return tm
     
     def monitoring_template(self, *args, **kwargs) -> Optional[str]:

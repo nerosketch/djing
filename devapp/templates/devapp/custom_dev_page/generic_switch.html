@@ -21,15 +21,19 @@
                             {% if port.sp == 10000000 %}
                                 <div class="port kilo text-center">
                                     <b>10 mbps</b>
+                                    <span>{{ port.uptime_str }}</span>
                             {% elif port.sp == 100000000 %}
                                 <div class="port mega text-center">
                                     <b>100 mbps</b>
+                                    <span>{{ port.uptime_str }}</span>
                             {% elif port.sp == 1000000000 %}
                                 <div class="port giga text-center">
                                     <b>1 gbps</b>
+                                    <span>{{ port.uptime_str }}</span>
                             {% elif port.sp == 10000000000 %}
                                 <div class="port ten text-center">
                                     <b>10 gbps</b>
+                                    <span>{{ port.uptime_str }}</span>
                             {% else %}
                                 <div class="port text-center">
                             {% endif %}
