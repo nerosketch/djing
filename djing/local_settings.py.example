@@ -31,21 +31,11 @@ DATABASES = {
     }
 }
 
-# path to asterisk dial records
-DIALING_MEDIA = 'path/to/asterisk_records'
 
 DEFAULT_SNMP_PASSWORD = 'public'
 
-TELEGRAM_BOT_TOKEN = 'bot token'
-
 # Telephone or empty
 TELEPHONE_REGEXP = r'^(\+[7893]\d{10,11})?$'
-
-ASTERISK_MANAGER_AUTH = {
-    'username': 'admin',
-    'password': 'password',
-    'host': '127.0.0.1'
-}
 
 # Secret word for auth to api views by hash
 API_AUTH_SECRET = 'your api secret'

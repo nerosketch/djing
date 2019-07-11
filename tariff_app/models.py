@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
+from django.shortcuts import resolve_url
 from .base_intr import TariffBase, PeriodicPayCalcBase
 from .custom_tariffs import TARIFF_CHOICES, PERIODIC_PAY_CHOICES
 from group_app.models import Group
@@ -48,6 +49,9 @@ class Tariff(models.Model):
 
     def __str__(self):
         return "%s (%.2f)" % (self.title, self.amount)
+
+    def get_absolute_url(self):
+        return resolve_url('tarifs:edit', self.pk)
 
     class Meta:
         db_table = 'tariffs'
