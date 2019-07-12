@@ -1,6 +1,5 @@
 # coding=utf-8
 from datetime import timedelta
-import os
 from django.db import models
 from django.conf import settings
 from django.shortcuts import resolve_url
@@ -136,9 +135,6 @@ class Task(models.Model):
            self, self.author,
            self.recipients.filter(is_active=True)
         )
-
-    def get_attachment_fname(self):
-        return os.path.basename(self.attachment.name)
 
     def is_relevant(self):
         return self.out_date < timezone.now().date() or self.state == 'F'
