@@ -146,7 +146,10 @@ class NetworkModel(models.Model):
                 continue
             elif ip > work_range_end_ip:
                 break  # Not found
-            used_ip = next(employed_ips)
+            try:
+                used_ip = next(employed_ips)
+            except StopIteration:
+                return ip
             if used_ip is None:
                 return ip
             used_ip = ip_address(used_ip)
