@@ -32,11 +32,11 @@ class Messenger(models.Model):
         if self.bot_type == 1:
             return resolve_url('messenger:update_viber_messenger', self.slug)
 
-    def get_next_url(self):
-        if self.bot_type == 1:  # Viber
-            return resolve_url('messenger:update_viber_messenger', self.slug)
-        else:
-            return resolve_url('messenger:messengers_list')
+    # def get_next_url(self):
+    #     if self.bot_type == 1:  # Viber
+    #         return resolve_url('messenger:update_viber_messenger', self.slug)
+    #     else:
+    #         return resolve_url('messenger:messengers_list')
 
 
 class ViberMessenger(Messenger):
@@ -106,7 +106,7 @@ class ViberMessage(models.Model):
     msg = models.TextField(_('Message'))
     date = models.DateTimeField(_('Date'), auto_now_add=True)
     sender = models.CharField(_('Sender'), max_length=32)
-    messenger = models.ForeignKey(ViberMessenger, verbose_name=_('messenger'), on_delete=models.CASCADE)
+    messenger = models.ForeignKey(ViberMessenger, verbose_name=_('Messenger'), on_delete=models.CASCADE)
     subscriber = models.ForeignKey('ViberSubscriber', on_delete=models.SET_NULL, verbose_name=_('Subscriber'), null=True)
 
     def __str__(self):
