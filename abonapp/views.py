@@ -443,10 +443,7 @@ def pick_tariff(request, gid: int, uname):
                     }
             if deadline:
                 deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M')
-                abon.pick_tariff(trf, request.user, deadline=deadline,
-                                 comment=log_comment)
-            else:
-                abon.pick_tariff(trf, request.user, comment=log_comment)
+            abon.pick_tariff(trf, request.user, deadline=deadline, comment=log_comment)
             customer_nas_command.delay(abon.pk, 'sync')
             messages.success(request, _('Tariff has been picked'))
             return redirect('abonapp:abon_services', gid=gid,
