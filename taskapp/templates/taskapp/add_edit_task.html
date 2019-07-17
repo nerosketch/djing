@@ -79,8 +79,6 @@
                     <div class="btn-group btn-group-sm">
                         {% bootstrap_button _('Save') button_type='submit' button_class='btn-primary' icon='save' %}
 
-                        {% bootstrap_button _('Reset') button_type='reset' icon='remove-circle' %}
-
                         {% if task.id %}
                             {% url 'taskapp:delete' task.id as delurl%}
                             {% bootstrap_button _('Delete') button_class='btn-danger' href=delurl icon='remove' %}
