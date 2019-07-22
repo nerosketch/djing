@@ -1,14 +1,11 @@
 from ipaddress import ip_network, ip_address
 from typing import Optional, Generator
 
-from django.db.utils import IntegrityError
 from django.shortcuts import resolve_url
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from djing.fields import MACAddressField
-from djing.lib import DuplicateEntry
 from ip_pool.fields import GenericIpAddressWithPrefix
 from group_app.models import Group
 
