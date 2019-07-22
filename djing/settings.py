@@ -189,15 +189,9 @@ LOGOUT_URL = reverse_lazy('acc_app:logout')
 
 PAGINATION_ITEMS_PER_PAGE = local_settings.PAGINATION_ITEMS_PER_PAGE
 
-DIALING_MEDIA = local_settings.DIALING_MEDIA
-
 DEFAULT_SNMP_PASSWORD = local_settings.DEFAULT_SNMP_PASSWORD
 
-TELEGRAM_BOT_TOKEN = local_settings.TELEGRAM_BOT_TOKEN
-
 TELEPHONE_REGEXP = local_settings.TELEPHONE_REGEXP
-
-ASTERISK_MANAGER_AUTH = local_settings.ASTERISK_MANAGER_AUTH
 
 # Secret word for auth to api views by hash
 API_AUTH_SECRET = local_settings.API_AUTH_SECRET
@@ -207,7 +201,6 @@ API_AUTH_SUBNET = local_settings.API_AUTH_SUBNET
 
 # Company name
 COMPANY_NAME = local_settings.COMPANY_NAME
-
 
 # bootstrap3 settings
 BOOTSTRAP3 = {
