@@ -732,7 +732,6 @@ def abon_ping(request, gid: int, uname):
             }
         if isinstance(ping_result, tuple):
             received, sent = ping_result
-            print(ping_result)
             if received == 0:
                 ping_result = mngr.ping(ip, arp=True)
                 if ping_result is not None and isinstance(ping_result, tuple):
