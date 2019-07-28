@@ -11,10 +11,10 @@ from djing.fields import MACAddressField
 
 
 class BatchSaveStreamList(list):
-    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args,
+    def __init__(self, model_queryset, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
-        self._model_class = model_class
+        self._qs = model_queryset
         self._model_name = model_name
         self._except_fields = (except_fields or []) + ['id']
         self._choice_list_map = choice_list_map or {}
@@ -32,7 +32,7 @@ class BatchSaveStreamList(list):
                 ob.name not in self._except_fields and ob.concrete}
 
     def __iter__(self):
-        for d in self._model_class.objects.all().iterator():
+        for d in self._qs.iterator():
             yield {
                 "model": self._model_name,
                 "pk": d.pk,
@@ -76,7 +76,9 @@ class BatchSaveStreamList(list):
             v = getattr(obj, field.name)
             if isinstance(v, bool):
                 return v
-            return v or None
+            if field.null:
+                return v or None
+            return v
 
     def __len__(self):
         return 1
@@ -94,20 +96,22 @@ def batch_save(fname, *args, **kwargs):
 
 def dump_groups():
     from group_app.models import Group
-    batch_save("groups.json", Group, 'groupapp.group')
+    batch_save("groups.json", Group.objects.all(), 'groupapp.group')
 
 
 def dump_accounts():
     from accounts_app.models import UserProfile, BaseAccount, UserProfileLog
-    batch_save('accounts_baseaccount.json', BaseAccount, 'profiles.baseaccount')
-    batch_save('accounts_userprofile.json', UserProfile, 'profiles.userprofile')
+    batch_save('accounts_baseaccount.json', BaseAccount.objects.exclude(username='AnonymousUser'), 'profiles.baseaccount',
+               except_fields=['groups', 'user_permissions'])
+    batch_save('accounts_userprofile.json', UserProfile.objects.exclude(username='AnonymousUser'), 'profiles.userprofile',
+               except_fields=['groups', 'user_permissions'])
     do_type_map = {
         'cusr': 1, 'dusr': 2,
         'cdev': 3, 'ddev': 4,
         'cnas': 5, 'dnas': 6,
         'csrv': 7, 'dsrv': 8
     }
-    batch_save('accounts_userprofilelog.json', UserProfileLog, 'profiles.userprofilelog',
+    batch_save('accounts_userprofilelog.json', UserProfileLog.objects.all(), 'profiles.userprofilelog',
                except_fields=['meta_info'],
                choice_list_map={
                    'do_type': do_type_map
@@ -116,15 +120,15 @@ def dump_accounts():
 
 def dump_messenger():
     from messenger.models import Messenger, ViberMessenger, ViberMessage, ViberSubscriber
-    batch_save("messenger.json", Messenger, 'messenger.messenger')
-    batch_save("ViberMessenger.json", ViberMessenger, 'messenger.vibermessenger')
-    batch_save("ViberMessage.json", ViberMessage, 'messenger.vibermessage')
-    batch_save("ViberSubscriber.json", ViberSubscriber, 'messenger.vibersubscriber')
+    batch_save("messenger.json", Messenger.objects.all(), 'messenger.messenger')
+    batch_save("vibermessenger.json", ViberMessenger.objects.all(), 'messenger.vibermessenger')
+    batch_save("vibermessage.json", ViberMessage.objects.all(), 'messenger.vibermessage')
+    batch_save("vibersubscriber.json", ViberSubscriber.objects.all(), 'messenger.vibersubscriber')
 
 
 def dump_services():
     from tariff_app.models import Tariff, PeriodicPay
-    batch_save("services.json", Tariff, 'services.service', field_name_map={
+    batch_save("services.json", Tariff.objects.all(), 'services.service', field_name_map={
         'speedIn': 'speed_in',
         'speedOut': 'speed_out',
         'amount': 'cost'
@@ -136,7 +140,7 @@ def dump_services():
             'Dl': 3
         }
     })
-    batch_save("services_periodicpay.json", PeriodicPay, 'services.periodicpay', choice_list_map={
+    batch_save("services_periodicpay.json", PeriodicPay.objects.all(), 'services.periodicpay', choice_list_map={
         'calc_type': {
             'df': 0,
             'cs': 1
@@ -146,7 +150,7 @@ def dump_services():
 
 def dump_gateways():
     from gw_app.models import NASModel
-    batch_save("gateways.json", NASModel, 'gateways.gateway', field_name_map={
+    batch_save("gateways.json", NASModel.objects.all(), 'gateways.gateway', field_name_map={
         'nas_type': 'gw_type',
         'default': 'is_default'
     }, choice_list_map={
@@ -158,7 +162,7 @@ def dump_gateways():
 
 def dump_devices():
     from devapp.models import Device, Port
-    batch_save("devices.json", Device, 'devices.device', field_name_map={
+    batch_save("devices.json", Device.objects.all(), 'devices.device', field_name_map={
         'devtype': 'dev_type'
     }, choice_list_map={
         'devtype': {
@@ -174,7 +178,7 @@ def dump_devices():
             'dwn': 3
         }
     })
-    batch_save('devices_port.json', Port, 'devices.port')
+    batch_save('devices_port.json', Port.objects.all(), 'devices.port')
 
 
 def dump_customers():
@@ -183,41 +187,41 @@ def dump_customers():
         PassportInfo, InvoiceForPayment, AbonRawPassword,
         AdditionalTelephone, PeriodicPayForId
     )
-    batch_save('customers.json', Abon, 'customers.customer', field_name_map={
+    batch_save('customer.json', Abon.objects.exclude(username='AnonymousUser'), 'customers.customer', field_name_map={
         'current_tariff': 'current_service',
         'ballance': 'balance',
         'nas': 'gateway',
         'autoconnect_service': 'auto_renewal_service',
         'last_connected_tariff': 'last_connected_service'
-    })
-    batch_save('customers_log.json', AbonLog, 'customers.customerlog', field_name_map={
+    }, except_fields=['groups', 'user_permissions'])
+    batch_save('customers_log.json', AbonLog.objects.all(), 'customers.customerlog', field_name_map={
         'abon': 'customer',
         'amount': 'cost'
     })
-    batch_save('customers_service.json', AbonTariff, 'customers.customerservice', field_name_map={
+    batch_save('customers_service.json', AbonTariff.objects.all(), 'customers.customerservice', field_name_map={
         'tariff': 'service',
         'time_start': 'start_time'
     })
-    batch_save('customers_street.json', AbonStreet, 'customers.customerstreet')
-    batch_save('customers_passport.json', PassportInfo, 'customers.passportinfo', field_name_map={
+    batch_save('customers_street.json', AbonStreet.objects.all(), 'customers.customerstreet')
+    batch_save('customers_passport.json', PassportInfo.objects.all(), 'customers.passportinfo', field_name_map={
         'abon': 'customer'
     })
-    batch_save('customers_inv.json', InvoiceForPayment, 'customers.invoiceforpayment', field_name_map={
+    batch_save('customers_inv.json', InvoiceForPayment.objects.all(), 'customers.invoiceforpayment', field_name_map={
         'abon': 'customer',
         'amount': 'cost'
     })
-    batch_save('customers_passw.json', AbonRawPassword, 'customers.customerrawpassword', field_name_map={
+    batch_save('customers_passw.json', AbonRawPassword.objects.all(), 'customers.customerrawpassword', field_name_map={
         'account': 'customer'
     })
-    batch_save('customers_tels.json', AdditionalTelephone, 'customers.additionaltelephone', field_name_map={
+    batch_save('customers_tels.json', AdditionalTelephone.objects.all(), 'customers.additionaltelephone', field_name_map={
         'abon': 'customer'
     })
-    batch_save('customers_tels.json', PeriodicPayForId, 'customers.periodicpayforid')
+    batch_save('customers_tels.json', PeriodicPayForId.objects.all(), 'customers.periodicpayforid')
 
 
 def dump_networks():
     from ip_pool.models import NetworkModel
-    batch_save('nets.json', NetworkModel, 'networks.networkmodel', choice_list_map={
+    batch_save('nets.json', NetworkModel.objects.all(), 'networks.networkmodel', choice_list_map={
         'kind': {
             'inet': 1,
             'guest': 2,
@@ -230,7 +234,7 @@ def dump_networks():
 
 def dump_tasks():
     from taskapp.models import Task, ExtraComment, ChangeLog
-    batch_save('task.json', Task, 'tasks.task', field_name_map={
+    batch_save('task.json', Task.objects.all(), 'tasks.task', field_name_map={
         'abon': 'customer'
     }, except_fields=['attachment'], choice_list_map={
         'priority': {
@@ -253,8 +257,8 @@ def dump_tasks():
             'ot': 12
         }
     })
-    batch_save('task_comments.json', ExtraComment, 'tasks.extracomment')
-    batch_save('task_log.json', ChangeLog, 'tasks.changelog', choice_list_map={
+    batch_save('task_comments.json', ExtraComment.objects.all(), 'tasks.extracomment')
+    batch_save('task_log.json', ChangeLog.objects.all(), 'tasks.changelog', choice_list_map={
         'act_type': {
             'e': 1, 'c': 2,
             'd': 3, 'f': 4, 'b': 5
