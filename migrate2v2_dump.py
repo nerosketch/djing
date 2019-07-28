@@ -18,6 +18,7 @@ class BatchSaveStreamList(list):
         self._except_fields = (except_fields or []) + ['id']
         self._choice_list_map = choice_list_map or {}
         self._field_name_map = field_name_map or {}
+        print(model_name, end='\t'*3)
 
     def _map_field_name(self, name):
         if name in self._field_name_map:
@@ -77,6 +78,7 @@ class BatchSaveStreamList(list):
 
 def batch_save(fname, *args, **kwargs):
     sa = BatchSaveStreamList(*args, **kwargs)
+    print(fname)
     with open(fname, 'w') as f:
         dump(sa, f, ensure_ascii=False, indent=2, cls=DjangoJSONEncoder)
 
@@ -173,7 +175,46 @@ def dump_devices():
     batch_save('devices_port.json', Port, 'devices.port')
 
 
+def dump_customers():
+    from abonapp.models import (
+        Abon, AbonLog, AbonTariff, AbonStreet,
+        PassportInfo, InvoiceForPayment, AbonRawPassword,
+        AdditionalTelephone, PeriodicPayForId
+    )
+    batch_save('customers.json', Abon, 'customers.customer', field_name_map={
+        'current_tariff': 'current_service',
+        'ballance': 'balance',
+        'nas': 'gateway',
+        'autoconnect_service': 'auto_renewal_service',
+        'last_connected_tariff': 'last_connected_service'
+    })
+    batch_save('customers_log.json', AbonLog, 'customers.customerlog', field_name_map={
+        'abon': 'customer',
+        'amount': 'cost'
+    })
+    batch_save('customers_service.json', AbonTariff, 'customers.customerservice', field_name_map={
+        'tariff': 'service',
+        'time_start': 'start_time'
+    })
+    batch_save('customers_street.json', AbonStreet, 'customers.customerstreet')
+    batch_save('customers_passport.json', PassportInfo, 'customers.passportinfo', field_name_map={
+        'abon': 'customer'
+    })
+    batch_save('customers_inv.json', InvoiceForPayment, 'customers.invoiceforpayment', field_name_map={
+        'abon': 'customer',
+        'amount': 'cost'
+    })
+    batch_save('customers_passw.json', AbonRawPassword, 'customers.customerrawpassword', field_name_map={
+        'account': 'customer'
+    })
+    batch_save('customers_tels.json', AdditionalTelephone, 'customers.additionaltelephone', field_name_map={
+        'abon': 'customer'
+    })
+    batch_save('customers_tels.json', PeriodicPayForId, 'customers.periodicpayforid')
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_devices()
+    dump_accounts()
+    dump_customers()
