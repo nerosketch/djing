@@ -9,15 +9,15 @@ from django.db.models import ImageField
 
 
 class BatchSaveStreamList(list):
-    def __init__(self, model_class, model_name, except_fields=None, list_map=None, *args, **kwargs):
+    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._model_class = model_class
         self._model_name = model_name
         self._except_fields = (except_fields or []) + ['id']
-        self._list_map = list_map or {}
+        self._choice_list_map = choice_list_map or {}
 
     def _fields(self, obj):
-        return {ob.name: self._list_map_fn(obj, ob) for ob in obj._meta.concrete_fields if
+        return {ob.name: self._field_val(obj, ob) for ob in obj._meta.concrete_fields if
                 ob.name not in self._except_fields}
 
     def __iter__(self):
@@ -28,22 +28,30 @@ class BatchSaveStreamList(list):
                 "fields": self._fields(d)
             }
 
-    def _list_map_fn(self, obj, field):
+    def _field_val(self, obj, field):
+        # related fields
         if field.is_relation:
-            # fl = getattr(obj, field.name)
             val = getattr(obj, field.attname)
             return val
-        elif field.name in self._list_map.keys():
+
+        # choice fields
+        elif field.name in self._choice_list_map.keys():
             val = getattr(obj, field.name)
-            return self._list_map.get(val)
+            return self._choice_list_map.get(val)
+
+        # bit fields
         elif isinstance(field, BitField):
             val = getattr(obj, field.name)
             # val is instance of BitHandler
             return int(val)
+
+        # image fields
         elif isinstance(field, ImageField):
             val = getattr(obj, field.name)
             if val._file:
                 return val.url
+
+        # all other simple fields
         else:
             return getattr(obj, field.name) or None
 
@@ -92,6 +100,11 @@ def dump_messenger():
     batch_save("ViberMessenger.json", ViberMessenger, 'messenger.vibermessenger')
     batch_save("ViberMessage.json", ViberMessage, 'messenger.vibermessage')
     batch_save("ViberSubscriber.json", ViberSubscriber, 'messenger.vibersubscriber')
+
+
+def dump_services():
+    from tariff_app.models import Tariff
+    batch_save("services.json", Tariff, 'services.service')
 
 
 if __name__ == '__main__':
