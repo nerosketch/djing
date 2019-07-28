@@ -5,7 +5,7 @@ from json import dump
 from bitfield import BitField
 from django import setup
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import ImageField
+from django.db.models import ImageField, ManyToManyField
 
 from djing.fields import MACAddressField
 
@@ -26,7 +26,8 @@ class BatchSaveStreamList(list):
         return name
 
     def _fields(self, obj):
-        return {self._map_field_name(ob.name): self._field_val(obj, ob) for ob in obj._meta.concrete_fields if
+        fls = obj._meta.get_fields()
+        return {self._map_field_name(ob.name): self._field_val(obj, ob) for ob in fls if
                 ob.name not in self._except_fields}
 
     def __iter__(self):
@@ -38,13 +39,8 @@ class BatchSaveStreamList(list):
             }
 
     def _field_val(self, obj, field):
-        # related fields
-        if field.is_relation:
-            val = getattr(obj, field.attname)
-            return val
-
         # choice fields
-        elif field.name in self._choice_list_map.keys():
+        if field.name in self._choice_list_map.keys():
             val = getattr(obj, field.name)
             return self._choice_list_map[field.name].get(val)
 
@@ -64,6 +60,14 @@ class BatchSaveStreamList(list):
         elif isinstance(field, MACAddressField):
             val = getattr(obj, field.name)
             return str(val)
+
+        # related fields
+        if field.is_relation:
+            val = getattr(obj, field.attname)
+            if isinstance(field, ManyToManyField):
+                s = val.only('pk').values_list('pk', flat=True)
+                return tuple(s)
+            return val
 
         # all other simple fields
         else:
@@ -213,8 +217,20 @@ def dump_customers():
     batch_save('customers_tels.json', PeriodicPayForId, 'customers.periodicpayforid')
 
 
+def dump_networks():
+    from ip_pool.models import NetworkModel
+    batch_save('nets.json', NetworkModel, 'networks.networkmodel', choice_list_map={
+        'kind': {
+            'inet': 1,
+            'guest': 2,
+            'trust': 3,
+            'device': 4,
+            'admin': 5
+        }
+    })
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_accounts()
-    dump_customers()
+    dump_networks()
