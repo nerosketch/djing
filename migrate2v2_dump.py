@@ -5,20 +5,21 @@ from json import dump
 from bitfield import BitField
 from django import setup
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import ImageField, ManyToManyField
+from django.db.models import ImageField, ManyToManyField, ManyToOneRel
 
 from djing.fields import MACAddressField
 
 
 class BatchSaveStreamList(list):
-    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args, **kwargs):
+    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         self._model_class = model_class
         self._model_name = model_name
         self._except_fields = (except_fields or []) + ['id']
         self._choice_list_map = choice_list_map or {}
         self._field_name_map = field_name_map or {}
-        print(model_name, end='\t'*3)
+        print(model_name, end='\t' * 3)
 
     def _map_field_name(self, name):
         if name in self._field_name_map:
@@ -63,6 +64,8 @@ class BatchSaveStreamList(list):
 
         # related fields
         if field.is_relation:
+            if isinstance(field, ManyToOneRel):
+                return getattr(obj, field.field_name)
             val = getattr(obj, field.attname)
             if isinstance(field, ManyToManyField):
                 s = val.only('pk').values_list('pk', flat=True)
@@ -246,13 +249,13 @@ def dump_tasks():
             'F': 2
         },
         'mode': {
-            'na', 0, 'ic', 1,
-            'yt', 2, 'rc', 3,
-            'ls', 4, 'cf', 5,
-            'cn', 6, 'pf', 7,
-            'cr', 8, 'co', 9,
-            'fc', 10, 'ni', 11,
-            'ot', 12
+            'na': 0, 'ic': 1,
+            'yt': 2, 'rc': 3,
+            'ls': 4, 'cf': 5,
+            'cn': 6, 'pf': 7,
+            'cr': 8, 'co': 9,
+            'fc': 10, 'ni': 11,
+            'ot': 12
         }
     })
     batch_save('task_comments.json', ExtraComment, 'tasks.extracomment')
