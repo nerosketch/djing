@@ -29,7 +29,7 @@ class BatchSaveStreamList(list):
     def _fields(self, obj):
         fls = obj._meta.get_fields()
         return {self._map_field_name(ob.name): self._field_val(obj, ob) for ob in fls if
-                ob.name not in self._except_fields}
+                ob.name not in self._except_fields and ob.concrete}
 
     def __iter__(self):
         for d in self._model_class.objects.all().iterator():
@@ -54,8 +54,7 @@ class BatchSaveStreamList(list):
         # image fields
         elif isinstance(field, ImageField):
             val = getattr(obj, field.name)
-            if val._file:
-                return val.url
+            return getattr(val, 'url') if val else None
 
         # mac address validated by netaddr.EUI
         elif isinstance(field, MACAddressField):
@@ -103,14 +102,10 @@ def dump_accounts():
     batch_save('accounts_baseaccount.json', BaseAccount, 'profiles.baseaccount')
     batch_save('accounts_userprofile.json', UserProfile, 'profiles.userprofile')
     do_type_map = {
-        'cusr': 1,
-        'dusr': 2,
-        'cdev': 3,
-        'ddev': 4,
-        'cnas': 5,
-        'dnas': 6,
-        'csrv': 7,
-        'dsrv': 8
+        'cusr': 1, 'dusr': 2,
+        'cdev': 3, 'ddev': 4,
+        'cnas': 5, 'dnas': 6,
+        'csrv': 7, 'dsrv': 8
     }
     batch_save('accounts_userprofilelog.json', UserProfileLog, 'profiles.userprofilelog',
                except_fields=['meta_info'],
@@ -267,7 +262,15 @@ def dump_tasks():
     })
 
 
+all_migrs = (
+    dump_groups, dump_accounts, dump_messenger,
+    dump_services, dump_gateways, dump_devices,
+    dump_customers, dump_networks, dump_tasks
+)
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_tasks()
+    # dump_accounts()
+    for migr in all_migrs:
+        migr()
