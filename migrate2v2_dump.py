@@ -133,7 +133,19 @@ def dump_services():
     })
 
 
+def dump_gateways():
+    from gw_app.models import NASModel
+    batch_save("gateways.json", NASModel, 'gateways.gateway', field_name_map={
+        'nas_type': 'gw_type',
+        'default': 'is_default'
+    }, choice_list_map={
+        'nas_type': {
+            'mktk': 0
+        }
+    })
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_services()
+    dump_gateways()
