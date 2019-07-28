@@ -88,14 +88,14 @@ class PeriodicPay(models.Model):
         #
         calc_obj = self._get_calc_object()
         res = calc_obj.get_next_time_to_pay(self, last_time_payment)
-        if type(res) is not datetime:
+        if not isinstance(res, datetime):
             raise TypeError
         return res
 
     def calc_amount(self):
         calc_obj = self._get_calc_object()
         res = calc_obj.calc_amount(self)
-        if type(res) is not float:
+        if not isinstance(res, float):
             raise TypeError
         return res
 
