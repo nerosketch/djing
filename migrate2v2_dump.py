@@ -230,7 +230,41 @@ def dump_networks():
     })
 
 
+def dump_tasks():
+    from taskapp.models import Task, ExtraComment, ChangeLog
+    batch_save('task.json', Task, 'tasks.task', field_name_map={
+        'abon': 'customer'
+    }, except_fields=['attachment'], choice_list_map={
+        'priority': {
+            'E': 0,
+            'C': 1,
+            'A': 2
+        },
+        'state': {
+            'S': 0,
+            'C': 1,
+            'F': 2
+        },
+        'mode': {
+            'na', 0, 'ic', 1,
+            'yt', 2, 'rc', 3,
+            'ls', 4, 'cf', 5,
+            'cn', 6, 'pf', 7,
+            'cr', 8, 'co', 9,
+            'fc', 10, 'ni', 11,
+            'ot', 12
+        }
+    })
+    batch_save('task_comments.json', ExtraComment, 'tasks.extracomment')
+    batch_save('task_log.json', ChangeLog, 'tasks.changelog', choice_list_map={
+        'act_type': {
+            'e': 1, 'c': 2,
+            'd': 3, 'f': 4, 'b': 5
+        }
+    })
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_networks()
+    dump_tasks()
