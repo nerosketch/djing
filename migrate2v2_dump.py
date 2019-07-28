@@ -9,15 +9,21 @@ from django.db.models import ImageField
 
 
 class BatchSaveStreamList(list):
-    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, *args, **kwargs):
+    def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._model_class = model_class
         self._model_name = model_name
         self._except_fields = (except_fields or []) + ['id']
         self._choice_list_map = choice_list_map or {}
+        self._field_name_map = field_name_map or {}
+
+    def _map_field_name(self, name):
+        if name in self._field_name_map:
+            return self._field_name_map.get(name)
+        return name
 
     def _fields(self, obj):
-        return {ob.name: self._field_val(obj, ob) for ob in obj._meta.concrete_fields if
+        return {self._map_field_name(ob.name): self._field_val(obj, ob) for ob in obj._meta.concrete_fields if
                 ob.name not in self._except_fields}
 
     def __iter__(self):
@@ -37,7 +43,7 @@ class BatchSaveStreamList(list):
         # choice fields
         elif field.name in self._choice_list_map.keys():
             val = getattr(obj, field.name)
-            return self._choice_list_map.get(val)
+            return self._choice_list_map[field.name].get(val)
 
         # bit fields
         elif isinstance(field, BitField):
@@ -53,7 +59,10 @@ class BatchSaveStreamList(list):
 
         # all other simple fields
         else:
-            return getattr(obj, field.name) or None
+            v = getattr(obj, field.name)
+            if isinstance(v, bool):
+                return v
+            return v or None
 
     def __len__(self):
         return 1
@@ -89,7 +98,7 @@ def dump_accounts():
     }
     batch_save('accounts_userprofilelog.json', UserProfileLog, 'profiles.userprofilelog',
                except_fields=['meta_info'],
-               list_map={
+               choice_list_map={
                    'do_type': do_type_map
                })
 
@@ -103,11 +112,28 @@ def dump_messenger():
 
 
 def dump_services():
-    from tariff_app.models import Tariff
-    batch_save("services.json", Tariff, 'services.service')
+    from tariff_app.models import Tariff, PeriodicPay
+    batch_save("services.json", Tariff, 'services.service', field_name_map={
+        'speedIn': 'speed_in',
+        'speedOut': 'speed_out',
+        'amount': 'cost'
+    }, choice_list_map={
+        'calc_type': {
+            'Df': 0,
+            'Dp': 1,
+            'Cp': 2,
+            'Dl': 3
+        }
+    })
+    batch_save("services_periodicpay.json", PeriodicPay, 'services.periodicpay', choice_list_map={
+        'calc_type': {
+            'df': 0,
+            'cs': 1
+        }
+    })
 
 
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_messenger()
+    dump_services()
