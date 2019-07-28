@@ -7,6 +7,8 @@ from django import setup
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import ImageField
 
+from djing.fields import MACAddressField
+
 
 class BatchSaveStreamList(list):
     def __init__(self, model_class, model_name, except_fields=None, choice_list_map=None, field_name_map=None, *args, **kwargs):
@@ -56,6 +58,11 @@ class BatchSaveStreamList(list):
             val = getattr(obj, field.name)
             if val._file:
                 return val.url
+
+        # mac address validated by netaddr.EUI
+        elif isinstance(field, MACAddressField):
+            val = getattr(obj, field.name)
+            return str(val)
 
         # all other simple fields
         else:
@@ -145,7 +152,28 @@ def dump_gateways():
     })
 
 
+def dump_devices():
+    from devapp.models import Device, Port
+    batch_save("devices.json", Device, 'devices.device', field_name_map={
+        'devtype': 'dev_type'
+    }, choice_list_map={
+        'devtype': {
+            'Dl': 1, 'Pn': 2,
+            'On': 3, 'Ex': 4,
+            'Zt': 5, 'Zo': 6,
+            'Z6': 7, 'Hw': 8
+        },
+        'status': {
+            'und': 0,
+            'up': 1,
+            'unr': 2,
+            'dwn': 3
+        }
+    })
+    batch_save('devices_port.json', Port, 'devices.port')
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_gateways()
+    dump_devices()
