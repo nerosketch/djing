@@ -2,7 +2,7 @@
 import os
 from json import dump
 
-from bitfield import BitHandler, BitField
+from bitfield import BitField
 from django import setup
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import ImageField
@@ -86,7 +86,15 @@ def dump_accounts():
                })
 
 
+def dump_messenger():
+    from messenger.models import Messenger, ViberMessenger, ViberMessage, ViberSubscriber
+    batch_save("messenger.json", Messenger, 'messenger.messenger')
+    batch_save("ViberMessenger.json", ViberMessenger, 'messenger.vibermessenger')
+    batch_save("ViberMessage.json", ViberMessage, 'messenger.vibermessage')
+    batch_save("ViberSubscriber.json", ViberSubscriber, 'messenger.vibersubscriber')
+
+
 if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djing.settings')
     setup()
-    dump_accounts()
+    dump_messenger()
