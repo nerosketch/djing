@@ -118,7 +118,7 @@
                         </td>
                         <td class="col-xs-2">
                             {% if perms.abonapp.can_ping %}
-                                <a href="{% url 'abonapp:ping' group.pk human.username %}" class="btn btn-default btn-sm btn-cmd" title="Ping" data-param="{{ human.ip_address }}" data-toggle="tooltip">
+                                <a href="{% url 'abonapp:ping' group.pk human.username %}" class="btn btn-default btn-sm btn-cmd" data-param="{{ human.ip_address }}">
                                     <span class="glyphicon glyphicon-flash"></span>
                                 </a>
                             {% endif %}
