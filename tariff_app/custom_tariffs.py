@@ -16,8 +16,11 @@ class TariffDefault(TariffBase):
         # assert isinstance(abon_tariff, AbonTariff)
         self.abon_tariff = abon_tariff
 
-    # Базовый функционал считает стоимость пропорционально использованному времени
     def calc_amount(self) -> float:
+        """
+        Базовый функционал считает стоимость пропорционально использованному времени
+        :return: Пропорциональная от времени сумма за использование услуги
+        """
         # сейчас
         nw = timezone.now()
 
@@ -32,7 +35,7 @@ class TariffDefault(TariffBase):
         # Сколько это в процентах от всего месяца (k - коеффициент)
         k = time_diff.total_seconds() / curr_month_time.total_seconds()
 
-        # результат - это полная стоимость тарифа умноженная на k
+        # результат - это полная стоимость тарифа умноженная на k, k < 0
         res = k * self.abon_tariff.tariff.amount
 
         return float(res)
