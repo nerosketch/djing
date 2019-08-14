@@ -271,7 +271,7 @@ class Abon(BaseAccount):
             # make log about it
             AbonLog.objects.create(
                 abon=self, amount=-tariff.amount,
-                author=author,
+                author=author if isinstance(author, UserProfile) else None,
                 comment=comment or _('Buy service default log')
             )
 

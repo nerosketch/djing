@@ -36,7 +36,7 @@ class CustomAuthBackend(ModelBackend):
 
 
 class LocationAuthBackend(ModelBackend):
-    def authenticate(self, request, byip, **kwargs):
+    def authenticate(self, request, **kwargs):
         try:
             remote_ip = ip_address(request.META.get('REMOTE_ADDR'))
             user = Abon.objects.filter(

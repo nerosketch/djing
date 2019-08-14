@@ -38,7 +38,7 @@ def services(request):
         abon = request.user
         all_tarifs = Tariff.objects.get_tariffs_by_group(
             abon.group.pk
-        ).filter(is_admin=False)
+        )# .filter(is_admin=False)
         current_service = abon.active_tariff()
     except Abon.DoesNotExist:
         all_tarifs = None
@@ -57,8 +57,8 @@ def buy_service(request, srv_id):
         current_service = abon.active_tariff()
         if request.method == 'POST':
             abon.pick_tariff(
-                service, None,
-                _("Buy the service via user side, service '%s'") % service
+                tariff=service, author=abon,
+                comment=_("Buy the service via user side, service '%s'") % service
             )
             customer_nas_command.delay(abon.pk, 'sync')
             messages.success(
