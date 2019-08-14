@@ -2,7 +2,7 @@
 
 PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/bin
 
-if ! [ -n "$1" ]; then
+if ! [[ -n "$1" ]]; then
     echo 'Missing port parameter'
     exit
 fi
@@ -11,7 +11,7 @@ port=$1
 DIRECTORY=`dirname $(readlink -e "$0")`
 
 tdir="/tmp/djing_flow/${port}"
-if [ -d "${tdir}" ]; then
+if [[ -d "${tdir}" ]]; then
     echo "Warning: directory '${tdir}' exists, clean all"
     rm -f ${tdir}/ft*
 else
