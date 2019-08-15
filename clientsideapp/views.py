@@ -54,7 +54,6 @@ def buy_service(request, srv_id):
     abon = request.user
     service = get_object_or_404(Tariff, pk=srv_id)
     try:
-        current_service = abon.active_tariff()
         if request.method == 'POST':
             abon.pick_tariff(
                 tariff=service, author=abon,
@@ -66,6 +65,7 @@ def buy_service(request, srv_id):
                 _("The service '%s' wan successfully activated") % service.title
             )
         else:
+            current_service = abon.active_tariff()
             return render(request, 'clientsideapp/modal_service_buy.html', {
                 'service': service,
                 'current_service': current_service.tariff
