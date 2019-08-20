@@ -62,7 +62,7 @@ def buy_service(request, srv_id):
             customer_nas_command.delay(abon.pk, 'sync')
             messages.success(
                 request,
-                _("The service '%s' wan successfully activated") % service.title
+                _("The service '%s' was successfully activated") % service.title
             )
         else:
             current_service = abon.active_tariff()

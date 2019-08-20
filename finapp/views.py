@@ -3,7 +3,7 @@ from hashlib import md5
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db import DatabaseError
+from django.db import DatabaseError, transaction
 from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, resolve_url
@@ -15,7 +15,6 @@ from django.utils.translation import ugettext_lazy as _
 from xmlview.decorators import xml_view
 from djing import lib
 from djing.global_base_views import OrderedFilteredList
-from djing.lib import safe_int
 from djing.lib.mixins import LoginAdminMixin, LoginAdminPermissionMixin
 from finapp.forms import PayAllTimeGatewayForm
 from finapp.models import AllTimePayLog, PayAllTimeGateway
@@ -40,14 +39,14 @@ class AllTimePay(DetailView):
         return r
 
     def check_sign(self, data: dict, sign: str) -> bool:
-        act = safe_int(data.get('ACT'))
+        act = lib.safe_int(data.get('ACT'))
         pay_account = data.get('PAY_ACCOUNT')
         serv_id = data.get('SERVICE_ID')
         pay_id = data.get('PAY_ID')
         md = md5()
         s = '_'.join(
             (str(act), pay_account or '', serv_id or '',
-             pay_id, self.object.secret)
+             pay_id or '', self.object.secret)
         )
         md.update(bytes(s, 'utf-8'))
         our_sign = md.hexdigest()
@@ -112,20 +111,21 @@ class AllTimePay(DetailView):
         if pays.exists():
             return self._bad_ret(-100, 'Pay already exists')
 
-        abon.add_ballance(
-            None, pay_amount,
-            comment='%s %.2f' % (self.object.title, pay_amount)
-        )
-        abon.save(update_fields=('ballance',))
+        with transaction.atomic():
+            abon.add_ballance(
+                None, pay_amount,
+                comment='%s %.2f' % (self.object.title, pay_amount)
+            )
+            abon.save(update_fields=('ballance',))
 
-        AllTimePayLog.objects.create(
-            pay_id=pay_id,
-            summ=pay_amount,
-            abon=abon,
-            trade_point=trade_point,
-            receipt_num=receipt_num,
-            pay_gw=self.object
-        )
+            AllTimePayLog.objects.create(
+                pay_id=pay_id,
+                summ=pay_amount,
+                abon=abon,
+                trade_point=trade_point,
+                receipt_num=receipt_num,
+                pay_gw=self.object
+            )
         return {
             'pay_id': pay_id,
             'service_id': data.get('SERVICE_ID'),

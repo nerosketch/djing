@@ -37,6 +37,7 @@ class MyBaseTestCase(metaclass=ABCMeta):
 
     def setUp(self):
         grp = Group.objects.create(title='Grp1')
+        grp.refresh_from_db()
         a1 = Abon.objects.create_user(
             telephone='+79781234567',
             username='abon',
@@ -44,7 +45,9 @@ class MyBaseTestCase(metaclass=ABCMeta):
         )
         a1.group = grp
         a1.save(update_fields=('group',))
+        a1.refresh_from_db()
         my_admin = UserProfile.objects.create_superuser('+79781234567', 'local_superuser', 'ps')
+        my_admin.refresh_from_db()
         self.adminuser = my_admin
         self.abon = a1
         self.group = grp
@@ -68,6 +71,7 @@ class AllPayTestCase(MyBaseTestCase, TestCase):
             service_id='service_id',
             slug='pay_gw_slug'
         )
+        pay_system.refresh_from_db()
         self.pay_system = pay_system
 
     def user_pay_view(self):
