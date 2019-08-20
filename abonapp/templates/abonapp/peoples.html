@@ -117,8 +117,12 @@
                             {% endfor %}
                         </td>
                         <td class="col-xs-2">
-                            {% if perms.abonapp.can_ping %}
+                            {% if perms.abonapp.can_ping and human.ip_address %}
                                 <a href="{% url 'abonapp:ping' group.pk human.username %}" class="btn btn-default btn-sm btn-cmd" data-param="{{ human.ip_address }}">
+                                    <span class="glyphicon glyphicon-flash"></span>
+                                </a>
+                            {% else %}
+                                <a href="#" class="btn btn-default btn-sm" disabled >
                                     <span class="glyphicon glyphicon-flash"></span>
                                 </a>
                             {% endif %}

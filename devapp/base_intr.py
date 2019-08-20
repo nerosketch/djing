@@ -23,7 +23,6 @@ class DeviceConfigurationError(DeviceImplementationError):
 
 class DevBase(object, metaclass=ABCMeta):
     def __init__(self, dev_instance=None):
-        super().__init__()
         self.db_instance = dev_instance
 
     @property
