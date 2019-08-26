@@ -93,7 +93,7 @@ msgstr "подключение"
 
 #: models.py:32
 msgid "periodic disappearance"
-msgstr "переодическое пропадание"
+msgstr "периодическое пропадание"
 
 #: models.py:33
 msgid "router setup"
