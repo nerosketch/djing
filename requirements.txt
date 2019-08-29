@@ -1,3 +1,4 @@
+wheel
 urllib3
 Django>=2
 Pillow
