@@ -4,8 +4,8 @@ import re
 import os
 from hashlib import sha256
 from typing import Iterable, Union, AnyStr
-
-import requests
+from requests import get
+from requests.compat import urljoin
 
 API_AUTH_SECRET = 'your api key'
 
@@ -46,8 +46,8 @@ def validate_status(text: str):
 
 
 def send_request(ip_addr, stat, sign_hash):
-    r = requests.get(
-        os.path.join(SERVER_DOMAIN, 'dev', 'on_device_event'),
+    r = get(
+        urljoin(SERVER_DOMAIN, 'dev/on_device_event/'),
         params={
             'dev_ip': ip_addr,
             'status': stat,
