@@ -15,7 +15,7 @@ spec.loader.exec_module(ls)
 db = ls.DATABASES
 ldb = db.get('default')
 print('%s %s %s %s %d' % (ldb['NAME'], ldb['USER'],
-ldb['PASSWORD'], ldb['HOST'], ldb['PORT']))"`
+ldb['PASSWORD'], ldb['HOST'], ldb.get('PORT', 3306)))"`
 
 if ! ping -c 1 ${mysql_host} &> /dev/null; then
     echo "Host ${mysql_host} is not accessible"
