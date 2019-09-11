@@ -2,6 +2,37 @@
 
 PATH=/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
 
+if [ ! -f /etc/debian_version ]; then
+  echo "Script required Debian"
+  exit 0
+fi
+
+while [ -n "$1" ]
+  do
+    case "$1" in
+      -p) echo "Password for db ***"
+          dbpassw="$2"
+          shift ;;
+      --) shift
+      break ;;
+    *) echo "$1 is not an option" ;;
+    esac
+  shift
+done
+
+
+
+if [ -z "$dbpassw" ]; then
+  read -s -p "Enter new password for database: " dbpassw
+  if [ -z "$dbpassw" ]; then
+    echo "Please type new password for database with parameter -p <password> and try again"
+    exit 0;
+  fi
+else
+  echo "Pass new password for db from parameter, use it!"
+fi
+
+
 apt -y update
 apt -y upgrade
 
@@ -17,7 +48,7 @@ mkdir -p /var/www
 cd /var/www
 
 mysql -u root -e "create database djing_db charset utf8 collate utf8_general_ci;"
-mysql -u root -e "create user 'djinguser'@'localhost' identified by 'password';"
+mysql -u root -e "create user 'djinguser'@'localhost' identified by '${dbpassw}';"
 mysql -u root -e "grant all privileges on djing_db.* to 'djinguser'@'localhost';"
 mysql -u root -e "flush privileges;"
 
@@ -29,10 +60,13 @@ pip3 install --upgrade pip
 export PYCURL_SSL_LIBRARY=openssl
 pip3 install -r requirements.txt
 cp djing/local_settings.py.example djing/local_settings.py
+sed -i "s/'PASSWORD': 'password',/'PASSWORD': '${dbpassw}',/" djing/local_settings.py
 chmod +x ./manage.py
 ./manage.py migrate
 ./manage.py compilemessages -l ru
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('+79781234567', 'admin', 'admin')" | ./manage.py shell
+secret_key=`./manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key().replace(\"&\", \"@\"))"`
+sed -i -r "s/^SECRET_KEY = '.+'$/SECRET_KEY = '${secret_key}'/" djing/local_settings.py
+./manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('+79781234567', 'admin', 'admin')"
 deactivate
 
 cp install/robots.txt robots.txt
@@ -46,7 +80,7 @@ cd agent/netflow
 tar -xvzf djing_flow.tar.gz
 cd ../../
 
-chown -R www-data:www-data /var/www/djing
+chown -R www-data. /var/www/djing
 
 # dirs
 find . -type d \( -path ./venv -o -path ./src -o -path ./.git \) -prune -o -type d -exec chmod 750 {} \;
@@ -59,7 +93,9 @@ chmod 400 djing/settings.py
 
 rm /etc/nginx/sites-enabled/default
 systemctl restart uwsgi
+systemctl enable uwsgi
 systemctl restart nginx
+systemctl enable nginx
 
 
 cp ./systemd_units/djing_celery.service /etc/systemd/system/
@@ -70,3 +106,4 @@ systemctl start djing_celery.service
 
 echo -e "\n\nOpen your Djing on http://`hostname -i`/
 Initial login and password admin admin\n"
+
