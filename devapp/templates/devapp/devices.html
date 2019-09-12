@@ -82,7 +82,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="6">{% trans 'Devices does not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
+                    <td colspan="6">{% trans 'Devices not found' %}. <a href="{% url 'devapp:add' group.pk %}">{% trans 'Create' %}</a></td>
                 </tr>
             {% endfor %}
             {% endwith %}

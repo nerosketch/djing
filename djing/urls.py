@@ -20,7 +20,8 @@ urlpatterns = [
     path('messenger/', include('messenger.urls', namespace='messenger')),
     path('gw/', include('gw_app.urls', namespace='gw_app')),
     path('new_customers/', include('new_customers.urls', namespace='new_customers')),
-    path('fin/', include('finapp.urls', namespace='finapp'))
+    path('fin/', include('finapp.urls', namespace='finapp')),
+    path('docs/', include('docsapp.urls', namespace='docsapp'))
 
     # Switch language
     #path(r'i18n/', include('django.conf.urls.i18n')),

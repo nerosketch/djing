@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Dmitry Novikov nerosketch@gmail.com, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-12 13:57+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Dmitry Novikov nerosketch@gmail.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: models.py:8 templates/docsapp/documenttemplatemodel_list.html:25
+msgid "Title"
+msgstr "Название"
+
+#: models.py:10
+msgid "File docx template"
+msgstr "Файл шаблон docx"
+
+#: templates/docsapp/documenttemplatemodel_confirm_delete.html:9
+msgid "Remove document"
+msgstr "Удалить документ"
+
+#: templates/docsapp/documenttemplatemodel_confirm_delete.html:13
+msgid "Are you sure you want to delete this document?"
+msgstr "Вы уверены что хотите удалить документ?"
+
+#: templates/docsapp/documenttemplatemodel_form.html:19
+msgid "Change document"
+msgstr "Изменить документ"
+
+#: templates/docsapp/documenttemplatemodel_form.html:21
+#: templates/docsapp/documenttemplatemodel_list.html:58
+#: templates/docsapp/documenttemplatemodel_list.html:69
+msgid "Add document"
+msgstr "Добавить документ"
+
+#: templates/docsapp/documenttemplatemodel_form.html:30
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/docsapp/documenttemplatemodel_form.html:34
+msgid "Back"
+msgstr "Назад"
+
+#: templates/docsapp/documenttemplatemodel_list.html:5
+#: templates/docsapp/documenttemplatemodel_list.html:11
+#: templates/docsapp/documenttemplatemodel_list.html:16
+msgid "Documents"
+msgstr "Документы"
+
+#: templates/docsapp/documenttemplatemodel_list.html:26
+msgid "File"
+msgstr "Файл"
+
+#: templates/docsapp/documenttemplatemodel_list.html:27
+msgid "Document type"
+msgstr "Тип документа"
+
+#: templates/docsapp/documenttemplatemodel_list.html:57
+msgid "Documents not found"
+msgstr "Документы не найдены"

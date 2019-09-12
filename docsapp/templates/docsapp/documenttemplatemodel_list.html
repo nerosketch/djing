@@ -1,0 +1,77 @@
+{% extends request.is_ajax|yesno:'bajax.html,base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans 'Documents' %}
+{% endblock %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li><span class="glyphicon glyphicon-home"></span></li>
+        <li class="active">{% trans 'Documents' %}</li>
+    </ol>
+{% endblock %}
+
+{% block page-header %}
+    {% trans 'Documents' %}
+{% endblock %}
+
+{% block main %}
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>.</th>
+                <th class="col-md-2">{% trans 'Title' %}</th>
+                <th class="col-md-4">{% trans 'File' %}</th>
+                <th class="col-md-3">{% trans 'Document type' %}</th>
+                <th>#</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% with can_del_doc=perms.docsapp.delete_documenttemplatemodel can_ch_doc=perms.docsapp.change_documenttemplatemodel %}
+            {% for doc in object_list %}
+                <tr>
+                    <td>{{ doc.id }}</td>
+                    <td>{{ doc.title }}</td>
+                    <td>{{ doc.doc_template }}</td>
+                    <td>DocX</td>
+
+                    <td class="btn-group btn-group-xs btn-group-justified">
+                        {% if can_del_doc %}
+                            <a href="{% url 'docsapp:doc_del' doc.pk %}" class="btn btn-danger btn-modal">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        {% endif %}
+                        {% if can_ch_doc %}
+                            <a href="{% url 'docsapp:doc_edit' doc.id %}" class="btn btn-default btn-modal">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">
+                        {% trans 'Documents not found' %}.
+                        <a href="{% url 'docsapp:doc_add' %}" class="btn-modal">{% trans 'Add document' %}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% endwith %}
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td colspan="6">
+                    <a href="{% url 'docsapp:doc_add' %}" class="btn btn-success btn-sm btn-modal">
+                        <span class="glyphicon glyphicon-plus"></span> {% trans 'Add document' %}
+                    </a>
+                </td>
+            </tr>
+            </tfoot>
+
+        </table>
+    </div>
+{% endblock %}

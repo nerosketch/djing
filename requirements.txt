@@ -45,3 +45,5 @@ django-encrypted-model-fields
 Celery
 redis
 celery[redis]
+
+docxtpl

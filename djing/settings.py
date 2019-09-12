@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'encrypted_model_fields',
     'django_cleanup.apps.CleanupConfig',
+    'guardian',
+    'pinax_theme_bootstrap',
+    'bootstrapform',
+    'bootstrap3',
     'ip_pool',
     'accounts_app',
     'gw_app',
@@ -59,10 +63,7 @@ INSTALLED_APPS = [
     'msg_app',
     'group_app',
     'new_customers',
-    'guardian',
-    'pinax_theme_bootstrap',
-    'bootstrapform',
-    'bootstrap3'
+    'docsapp'
 ]
 
 if DEBUG:
