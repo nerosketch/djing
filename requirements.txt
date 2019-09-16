@@ -13,7 +13,7 @@ dicttoxml
 # db client for Mariadb
 mysqlclient
 
-easysnmp
+-e git://github.com/nerosketch/easysnmp.git#egg=easysnmp
 pid
 django-guardian
 pinax-theme-bootstrap
