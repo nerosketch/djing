@@ -391,27 +391,6 @@ class Olt_ZTE_C320(OLTDevice):
         } for fiber_name, fiber_id in self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.1.1.1'))
         return fibers
 
-    def get_ports_on_fiber(self, fiber_num: int) -> Iterable:
-
-        onu_types = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
-        onu_ports = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.2.%d' % fiber_num)
-        onu_signals = safe_int(self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num))
-
-        # Real sn in last 3 octets
-        onu_sns = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%d' % fiber_num)
-        onu_prefixs = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d' % fiber_num)
-        onu_list = ({
-            'onu_type': onu_type_num[0],
-            'onu_port': onu_port,
-            'onu_signal': conv_zte_signal(onu_signal),
-            'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets,
-            'snmp_extra': "%d.%d" % (fiber_num, safe_int(onu_type_num[1])),
-        } for onu_type_num, onu_port, onu_signal, onu_sn, onu_prefix in zip(
-            onu_types, onu_ports, onu_signals, onu_sns, onu_prefixs
-        ))
-
-        return onu_list
-
     def get_units_unregistered(self, fiber_num: int) -> Iterable:
         sn_num_list = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.3.1.2.%d' % fiber_num)
         firmware_ver = self.get_list('.1.3.6.1.4.1.3902.1012.3.13.3.1.11.%d' % fiber_num)
