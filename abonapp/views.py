@@ -775,7 +775,7 @@ def abon_ping(request, gid: int, uname):
 @json_view
 def set_auto_continue_service(request, gid: int, uname):
     checked = request.GET.get('checked')
-    checked = True if checked == 'true' else False
+    checked = checked == 'true'
     abon = get_object_or_404(models.Abon, username=uname)
     abon.autoconnect_service = checked
     abon.save(update_fields=('autoconnect_service',))
@@ -844,7 +844,7 @@ def save_user_dev_port(request, gid: int, uname):
         return redirect('abonapp:abon_home', gid, uname)
     user_port = lib.safe_int(request.POST.get('user_port'))
     is_dynamic_ip = request.POST.get('is_dynamic_ip')
-    is_dynamic_ip = True if is_dynamic_ip == 'on' else False
+    is_dynamic_ip = is_dynamic_ip == 'on'
     try:
         abon = models.Abon.objects.get(username=uname)
         if user_port == 0:

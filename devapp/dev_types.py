@@ -113,7 +113,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         uptimes = self.get_list('.1.3.6.1.2.1.2.2.1.9')
         try:
             for num in ints:
-                status = True if int(next(stats)) == 1 else False
+                status = int(next(stats)) == 1
                 yield DLinkPort(
                     num=num,
                     name=next(nams),
@@ -187,7 +187,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                 onu = ONUdev(
                     num=n,
                     name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
-                    status=True if status == '3' else False,
+                    status=status == '3',
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
                     signal=signal / 10 if signal else '—',

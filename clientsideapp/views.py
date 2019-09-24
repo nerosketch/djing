@@ -140,7 +140,7 @@ def task_history(request):
 @json_view
 def set_auto_continue_service(request):
     checked = request.GET.get('checked')
-    checked = True if checked == 'true' else False
+    checked = checked == 'true'
     abon = request.user
     abon.autoconnect_service = checked
     abon.save(update_fields=('autoconnect_service',))
