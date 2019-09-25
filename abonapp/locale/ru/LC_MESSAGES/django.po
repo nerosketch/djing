@@ -1133,3 +1133,7 @@ msgstr "Выберите шлюз для абонента"
 
 msgid "Are you sure you want to free ip user session?"
 msgstr "Вы уверены что хотите удалить ip абонента?"
+
+msgid "Document list"
+msgstr "Документы"
+
