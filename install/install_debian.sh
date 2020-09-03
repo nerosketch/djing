@@ -58,7 +58,7 @@ python3 -m venv venv
 source ./venv/bin/activate
 pip3 install --upgrade pip
 export PYCURL_SSL_LIBRARY=openssl
-pip3 install -r requirements.txt
+#pip3 install -r requirements.txt
 cp djing/local_settings.py.example djing/local_settings.py
 sed -i "s/'PASSWORD': 'password',/'PASSWORD': '${dbpassw}',/" djing/local_settings.py
 chmod +x ./manage.py

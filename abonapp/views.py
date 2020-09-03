@@ -33,7 +33,7 @@ from djing.lib.mixins import (
 from group_app.models import Group
 from guardian.decorators import \
     permission_required_or_403 as permission_required
-from guardian.shortcuts import get_objects_for_user, assign_perm
+#from guardian.shortcuts import get_objects_for_user, assign_perm
 from gw_app.models import NASModel
 from gw_app.nas_managers import NasFailedResult, NasNetworkError
 from ip_pool.models import NetworkModel
@@ -89,12 +89,13 @@ class GroupListView(LoginRequiredMixin, OnlyAdminsMixin, OrderedFilteredList):
     template_name = 'abonapp/group_list.html'
 
     def get_queryset(self):
-        queryset = get_objects_for_user(
-            self.request.user,
-            'group_app.view_group', klass=Group,
-            use_groups=False,
-            accept_global_perms=False
-        )
+        #queryset = get_objects_for_user(
+        #    self.request.user,
+        #    'group_app.view_group', klass=Group,
+        #    use_groups=False,
+        #    accept_global_perms=False
+        #)
+        queryset = Group.objects.all()
         return queryset.annotate(usercount=Count('abon'))
 
 
@@ -131,10 +132,10 @@ class AbonCreateView(LoginRequiredMixin, OnlyAdminsMixin,
         try:
             abon = form.save()
             me = self.request.user
-            assign_perm("abonapp.change_abon", me, abon)
-            assign_perm("abonapp.delete_abon", me, abon)
-            assign_perm("abonapp.can_buy_tariff", me, abon)
-            assign_perm('abonapp.can_add_ballance', me, abon)
+            #assign_perm("abonapp.change_abon", me, abon)
+            #assign_perm("abonapp.delete_abon", me, abon)
+            #assign_perm("abonapp.can_buy_tariff", me, abon)
+            #assign_perm('abonapp.can_add_ballance', me, abon)
             me.log(self.request.META, 'cusr', '%s, "%s", %s' % (
                 abon.username, abon.fio,
                 abon.group.title if abon.group else ''

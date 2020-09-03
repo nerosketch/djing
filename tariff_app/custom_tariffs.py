@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
+from typing import AnyStr
+from calendar import monthrange
 
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from .base_intr import TariffBase, PeriodicPayCalcBase
-from calendar import monthrange
 
 from random import uniform
 
@@ -65,7 +66,7 @@ class TariffCp(TariffDp):
     def calc_deadline(self) -> datetime:
         # делаем время окончания услуги на 10 лет вперёд
         nw = timezone.now()
-        long_long_time = datetime(year=nw.year + 10, month=nw.month, day=1,
+        long_long_time = datetime(year=nw.year + 10, month=nw.month, day=nw.day,
                                   hour=23, minute=59, second=59)
         return long_long_time
 
@@ -97,8 +98,10 @@ class PeriodicPayCalcDefault(PeriodicPayCalcBase):
         return model_object.amount
 
     def get_next_time_to_pay(self, model_object, last_time_payment) -> datetime:
-        # TODO: решить какой будет расёт периодических платежей
-        return datetime.now() + timedelta(days=30)
+        today = date.today()
+        nw = datetime(today.year, today.month, today.day)
+        days = monthrange(nw.year, nw.month)[1]
+        return nw + timedelta(days - nw.day+1)
 
 
 class PeriodicPayCalcCustom(PeriodicPayCalcDefault):

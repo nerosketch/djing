@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.conf import settings
 from djing.lib.decorators import only_admins
 from guardian.decorators import permission_required_or_403 as permission_required
-from guardian.shortcuts import get_objects_for_user
+#from guardian.shortcuts import get_objects_for_user
 
 from djing.global_base_views import OrderedFilteredList
 from . import models
@@ -28,11 +28,11 @@ class GroupListView(OrderedFilteredList):
     model = models.Group
     context_object_name = 'groups'
 
-    def get_queryset(self):
-        queryset = get_objects_for_user(self.request.user,
-                                        'group_app.view_group', klass=self.model,
-                                        accept_global_perms=False)
-        return queryset
+    #def get_queryset(self):
+    #    queryset = get_objects_for_user(self.request.user,
+    #                                    'group_app.view_group', klass=self.model,
+    #                                    accept_global_perms=False)
+    #    return queryset
 
 
 @method_decorator(login_decs, name='dispatch')

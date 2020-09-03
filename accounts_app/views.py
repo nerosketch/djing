@@ -191,7 +191,7 @@ class AccountsListView(LoginRequiredMixin, OnlyAdminsMixin, ListView):
 
     def get_queryset(self):
         users = UserProfile.objects.filter(is_admin=True).exclude(pk=self.request.user.pk)
-        users = get_objects_for_user(self.request.user, 'accounts_app.view_userprofile', users)
+        #users = get_objects_for_user(self.request.user, 'accounts_app.view_userprofile', users)
         return users
 
 

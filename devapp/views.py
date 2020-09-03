@@ -27,7 +27,7 @@ from abonapp.models import Abon
 from accounts_app.models import UserProfile
 from messenger.tasks import multicast_viber_notify
 from guardian.decorators import permission_required_or_403 as permission_required
-from guardian.shortcuts import get_objects_for_user
+#from guardian.shortcuts import get_objects_for_user
 from devapp.forms import DeviceForm, PortForm, DeviceExtraDataForm, DeviceRebootForm
 from devapp.models import Device, Port, DeviceDBException, DeviceMonitoringException
 from devapp.tasks import onu_register
@@ -598,11 +598,11 @@ class GroupsListView(LoginAdminMixin, global_base_views.OrderedFilteredList):
     template_name = 'devapp/group_list.html'
     model = Group
 
-    def get_queryset(self):
-        groups = get_objects_for_user(self.request.user,
-                                      'group_app.view_group', klass=Group,
-                                      accept_global_perms=False)
-        return groups
+    #def get_queryset(self):
+    #    groups = get_objects_for_user(self.request.user,
+    #                                  'group_app.view_group', klass=Group,
+    #                                  accept_global_perms=False)
+    #    return groups
 
 
 @login_required

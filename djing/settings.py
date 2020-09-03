@@ -213,13 +213,13 @@ BOOTSTRAP3 = {
 
 
 # Email config
-EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
-EMAIL_HOST = local_settings.EMAIL_HOST
-EMAIL_PORT = local_settings.EMAIL_PORT
-EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
-EMAIL_USE_TLS = getattr(local_settings, 'EMAIL_USE_TLS', True)
+#EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
+#EMAIL_HOST = local_settings.EMAIL_HOST
+#EMAIL_PORT = local_settings.EMAIL_PORT
+#EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
+#EMAIL_USE_TLS = getattr(local_settings, 'EMAIL_USE_TLS', True)
 
-SERVER_EMAIL = getattr(local_settings, 'SERVER_EMAIL', EMAIL_HOST_USER)
+#SERVER_EMAIL = getattr(local_settings, 'SERVER_EMAIL', EMAIL_HOST_USER)
 
 # REDIS related settings
 REDIS_HOST = 'localhost'
@@ -230,7 +230,7 @@ CELERY_RESULT_BACKEND = 'redis://%s:%d/0' % (REDIS_HOST, REDIS_PORT)
 
 
 # public url for Viber Bot
-VIBER_BOT_PUBLIC_URL = local_settings.VIBER_BOT_PUBLIC_URL
+#VIBER_BOT_PUBLIC_URL = local_settings.VIBER_BOT_PUBLIC_URL
 
 
 # Encrypted fields
