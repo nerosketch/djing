@@ -1,5 +1,4 @@
 from datetime import timedelta, datetime, date
-from typing import AnyStr
 
 from calendar import monthrange
 from random import uniform
