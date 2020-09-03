@@ -1,31 +1,30 @@
-wheel
-urllib3
-Django>=2
-Pillow
+urllib3==1.25.10
+Django==2.2
+Pillow==7.2.0
 
 # for mac address field
-netaddr
+netaddr==0.8.0
 
 # for testing required xmltodict
 #xmltodict
-dicttoxml
+dicttoxml==1.7.4
 
 # db client for Mariadb
 mysqlclient
 
-easysnmp
-pid
-django-guardian
-pinax-theme-bootstrap
-django-bootstrap3
+git+git://github.com/nerosketch/easysnmp.git#egg=easysnmp
+pid==3.0.4
+django-guardian==2.3.0
+pinax-theme-bootstrap==8.0.1
+django-bootstrap3==14.1.0
 
 # django-jsonfield
 -e git://github.com/dmkoch/django-jsonfield.git#egg=django-jsonfield
 
-requests
-webdavclient
-transliterate
-django-encrypted-model-fields
+requests==2.24.0
+webdavclient==1.0.8
+transliterate==1.10.2
+django-encrypted-model-fields==0.5.8
 
 # django-xmlview for pay system allpay
 -e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview
@@ -43,5 +42,5 @@ django-encrypted-model-fields
 -e git://github.com/pexpect/pexpect.git#egg=pexpect
 
 Celery
-redis
+redis==3.5.3
 celery[redis]
