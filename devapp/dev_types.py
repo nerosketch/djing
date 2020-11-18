@@ -268,7 +268,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)
             if mac is not None:
-                mac = ':'.join('%x' % ord(i) for i in mac)
+                mac = ':'.join('%x' % i for i in mac)
             # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
             if status is not None and status.isdigit():
                 return {
@@ -276,7 +276,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
                     'signal': signal / 10 if signal else '—',
                     'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                     'mac': mac,
-                    'distance': int(distance) / 10 if distance.isdigit() else 0
+                    'distance': distance / 10 if distance else 0
                 }
         except EasySNMPTimeoutError as e:
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
