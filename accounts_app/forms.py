@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from guardian.forms import UserObjectPermissionsForm
 from guardian.shortcuts import assign_perm, remove_perm
 from django import forms

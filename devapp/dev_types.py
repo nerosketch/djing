@@ -113,7 +113,7 @@ class DLinkDevice(DevBase, SNMPBaseWorker):
         uptimes = self.get_list('.1.3.6.1.2.1.2.2.1.9')
         try:
             for num in ints:
-                status = True if int(next(stats)) == 1 else False
+                status = int(next(stats)) == 1
                 yield DLinkPort(
                     num=num,
                     name=next(nams),
@@ -187,7 +187,7 @@ class OLTDevice(DevBase, SNMPBaseWorker):
                 onu = ONUdev(
                     num=n,
                     name=self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % n),
-                    status=True if status == '3' else False,
+                    status=status == '3',
                     mac=self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % n),
                     speed=0,
                     signal=signal / 10 if signal else '—',
@@ -268,7 +268,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
             distance = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.27.%d' % num)
             mac = self.get_item('.1.3.6.1.4.1.3320.101.10.1.1.3.%d' % num)
             if mac is not None:
-                mac = ':'.join('%x' % ord(i) for i in mac)
+                mac = ':'.join('%x' % i for i in mac)
             # uptime = self.get_item('.1.3.6.1.2.1.2.2.1.9.%d' % num)
             if status is not None and status.isdigit():
                 return {
@@ -276,7 +276,7 @@ class OnuDevice(DevBase, SNMPBaseWorker):
                     'signal': signal / 10 if signal else '—',
                     'name': self.get_item('.1.3.6.1.2.1.2.2.1.2.%d' % num),
                     'mac': mac,
-                    'distance': int(distance) / 10 if distance.isdigit() else 0
+                    'distance': distance / 10 if distance else 0
                 }
         except EasySNMPTimeoutError as e:
             return {'err': "%s: %s" % (_('ONU not connected'), e)}
@@ -390,27 +390,6 @@ class Olt_ZTE_C320(OLTDevice):
             'fb_onu_num': safe_int(self.get_item('.1.3.6.1.4.1.3902.1012.3.13.1.1.13.%d' % int(fiber_id)))
         } for fiber_name, fiber_id in self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.1.1.1'))
         return fibers
-
-    def get_ports_on_fiber(self, fiber_num: int) -> Iterable:
-
-        onu_types = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.28.1.1.1.%d' % fiber_num)
-        onu_ports = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.2.%d' % fiber_num)
-        onu_signals = safe_int(self.get_list('.1.3.6.1.4.1.3902.1012.3.50.12.1.1.10.%d' % fiber_num))
-
-        # Real sn in last 3 octets
-        onu_sns = self.get_list('.1.3.6.1.4.1.3902.1012.3.28.1.1.5.%d' % fiber_num)
-        onu_prefixs = self.get_list('.1.3.6.1.4.1.3902.1012.3.50.11.2.1.1.%d' % fiber_num)
-        onu_list = ({
-            'onu_type': onu_type_num[0],
-            'onu_port': onu_port,
-            'onu_signal': conv_zte_signal(onu_signal),
-            'onu_sn': onu_prefix + ''.join('%.2X' % ord(i) for i in onu_sn[-4:]),  # Real sn in last 4 octets,
-            'snmp_extra': "%d.%d" % (fiber_num, safe_int(onu_type_num[1])),
-        } for onu_type_num, onu_port, onu_signal, onu_sn, onu_prefix in zip(
-            onu_types, onu_ports, onu_signals, onu_sns, onu_prefixs
-        ))
-
-        return onu_list
 
     def get_units_unregistered(self, fiber_num: int) -> Iterable:
         sn_num_list = self.get_list_keyval('.1.3.6.1.4.1.3902.1012.3.13.3.1.2.%d' % fiber_num)
@@ -596,9 +575,9 @@ class HuaweiSwitch(EltexSwitch):
             n = int(n)
             speed = self.get_item('.1.3.6.1.2.1.2.2.1.5.%d' % n)
             oper_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.7.%d' % n))
-            oper_status = True if oper_status == 1 else False
+            oper_status = oper_status == 1
             link_status = safe_int(self.get_item('.1.3.6.1.2.1.2.2.1.8.%d' % n))
-            link_status = True if link_status == 1 else False
+            link_status = link_status == 1
             ep = EltexPort(
                 self,
                 num=i+1,

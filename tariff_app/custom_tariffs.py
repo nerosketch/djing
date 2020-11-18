@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 from datetime import timedelta, datetime, date
-from typing import AnyStr
+
 from calendar import monthrange
+from random import uniform
 
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from .base_intr import TariffBase, PeriodicPayCalcBase
-
-from random import uniform
 
 
 class TariffDefault(TariffBase):
@@ -101,7 +99,7 @@ class PeriodicPayCalcDefault(PeriodicPayCalcBase):
         today = date.today()
         nw = datetime(today.year, today.month, today.day)
         days = monthrange(nw.year, nw.month)[1]
-        return nw + timedelta(days - nw.day+1)
+        return nw + timedelta(days - nw.day + 1)
 
 
 class PeriodicPayCalcCustom(PeriodicPayCalcDefault):

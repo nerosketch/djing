@@ -129,6 +129,12 @@
                 </a>
             </li>
 
+            {% url 'docsapp:docs_list' as docslist %}
+            <li{% if docslist in request.path %} class="active"{% endif %}>
+                <a href="{{ docslist }}">
+                    <span class="glyphicon glyphicon-book"></span> {% trans 'Documents' %}
+                </a>
+            </li>
         </ul>
 
     </div>

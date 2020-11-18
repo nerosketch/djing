@@ -3,7 +3,6 @@ Description=Run every night a job for djing
 
 [Timer]
 OnCalendar=*-*-* 01:59:00
-Persistent=true
 Unit=djing.service
 
 [Install]

@@ -57,7 +57,7 @@ default_app_config = 'abonapp.apps.AbonappConfig'
 def ping(ip_addr: str, count=1):
     if re.match(IP_ADDR_REGEX, ip_addr):
         response = os.system("`which ping` -4Anq -c%d -W1 %s > /dev/null" % (count, ip_addr))
-        return True if response == 0 else False
+        return response == 0
     else:
         return False
 

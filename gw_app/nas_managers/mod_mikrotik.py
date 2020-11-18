@@ -235,7 +235,7 @@ class MikrotikTransmitter(core.BaseTransmitter, ApiRos,
             name = info.get('=name')
             disabled = info.get('=disabled', False)
             if disabled is not None:
-                disabled = True if disabled == 'true' else False
+                disabled = disabled == 'true'
             if target and name:
                 # target may be '192.168.0.3/32,192.168.0.2/32'
                 net = target.split(',')[0]

@@ -3,7 +3,6 @@ Description=Run backup periodically
 
 [Timer]
 OnCalendar=*-*-* 8,12,14,16,19,23:15:0
-Persistent=true
 Unit=djing_backup.service
 
 [Install]

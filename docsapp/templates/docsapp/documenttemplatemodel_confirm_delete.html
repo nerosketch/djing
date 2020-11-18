@@ -1,0 +1,14 @@
+{% extends 'base_delete_modal.html' %}
+{% load i18n %}
+
+{% block modal_form_url %}
+    {% url 'docsapp:doc_del' object.pk %}
+{% endblock %}
+
+{% block modal_form_title %}
+    {% trans 'Remove document' %}
+{% endblock %}
+
+{% block modal_form_text %}
+    <h4>{% trans 'Are you sure you want to delete this document?' %}</h4>
+{% endblock %}

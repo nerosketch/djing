@@ -99,6 +99,10 @@
                                         <span>{% trans 'Remove subscriber' %}</span>
                                     </a>
                                 {% endif %}
+
+                                <a href="{% url 'docsapp:simple_list' abon.username %}" class="btn btn-default btn-modal">
+                                    <span class="glyphicon glyphicon-print"></span> {% trans 'Document list' %}
+                                </a>
                             </div>
                         </div>
 

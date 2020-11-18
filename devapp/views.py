@@ -681,7 +681,7 @@ def fix_onu(request):
                    })
             for srcmac, snmpnum in ports:
                 # convert bytes mac address to str presentation mac address
-                real_mac = ':'.join('%x' % ord(i) for i in srcmac)
+                real_mac = ':'.join('%x' % i for i in srcmac)
                 if mac == real_mac:
                     onu.snmp_extra = str(snmpnum)
                     onu.save(update_fields=('snmp_extra',))

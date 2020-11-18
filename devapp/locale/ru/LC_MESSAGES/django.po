@@ -484,7 +484,7 @@ msgid "Are you sure you want to delete device?"
 msgstr "Вы уверены что хотите удалить устройство?"
 
 #: templates/devapp/devices.html:83 templates/devapp/devices_null_group.html:65
-msgid "Devices does not found"
+msgid "Devices not found"
 msgstr "Нет созданных устройств"
 
 #: templates/devapp/devices.html:83 templates/devapp/devices.html:93

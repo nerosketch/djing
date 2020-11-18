@@ -60,9 +60,9 @@
                         {% else %}
                             <div class="media">
                                 <div class="media-left font-extra-large">
-                                    {% if onu_details.status == '1' %}
+                                    {% if onu_details.status == 1 %}
                                         <span class="media-object glyphicon glyphicon-ok-sign text-success"></span>
-                                    {% elif onu_details.status == '2' %}
+                                    {% elif onu_details.status == 2 %}
                                         <span class="media-object glyphicon glyphicon-remove-sign text-danger"></span>
                                     {% else %}
                                         <span class="media-object glyphicon glyphicon-question-sign"></span>

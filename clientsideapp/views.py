@@ -17,7 +17,7 @@ from gw_app.nas_managers import NasFailedResult, NasNetworkError
 @login_required
 def home(request):
     num_active_tasks = Task.objects.filter(
-        abon=request.user, state='S'
+        abon=request.user, state=0
     ).count()
     return render(request, 'clientsideapp/index.html', {
         'num_active_tasks': num_active_tasks
@@ -38,7 +38,7 @@ def services(request):
         abon = request.user
         all_tarifs = Tariff.objects.get_tariffs_by_group(
             abon.group.pk
-        )# .filter(is_admin=False)
+        ).filter(is_admin=False)
         current_service = abon.active_tariff()
     except Abon.DoesNotExist:
         all_tarifs = None
@@ -140,7 +140,7 @@ def task_history(request):
 @json_view
 def set_auto_continue_service(request):
     checked = request.GET.get('checked')
-    checked = True if checked == 'true' else False
+    checked = checked == 'true'
     abon = request.user
     abon.autoconnect_service = checked
     abon.save(update_fields=('autoconnect_service',))
