@@ -90,7 +90,7 @@ class AllTimePay(DetailView):
         fio = abon.fio
         ballance = float(abon.ballance)
         return {
-            'balance': ballance,
+            'balance': round(ballance, 2),
             'name': fio,
             'account': pay_account,
             'service_id': self.object.service_id,
@@ -129,7 +129,7 @@ class AllTimePay(DetailView):
         return {
             'pay_id': pay_id,
             'service_id': data.get('SERVICE_ID'),
-            'amount': pay_amount,
+            'amount': round(pay_amount, 2),
             'status_code': 22,
             'time_stamp': self.current_date
         }
@@ -143,7 +143,7 @@ class AllTimePay(DetailView):
             'transaction': {
                 'pay_id': pay_id,
                 'service_id': data.get('SERVICE_ID'),
-                'amount': pay.summ,
+                'amount': round(pay.summ, 2),
                 'status': 111,
                 'time_stamp': pay.date_add.strftime("%d.%m.%Y %H:%M")
             }
