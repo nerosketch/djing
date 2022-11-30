@@ -21,9 +21,9 @@ DATABASES = {
         },
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djing_db',
-        'USER': 'djinguser',  # You can change the user name
+        'USER': 'root',          # You can change the user name
         'PASSWORD': 'password',  # You can change the password
-        'HOST': 'localhost',
+        'HOST': 'db',
         'TEST': {
             'CHARSET': 'utf8',
             'COLLATION': 'utf8_general_ci'

@@ -170,9 +170,9 @@ SESSION_COOKIE_AGE = 60 * 60 * 24
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 STATIC_URL = '/static/'
-if DEBUG:
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 # Example output: 16 september 2018
 DATE_FORMAT = 'd E Y'

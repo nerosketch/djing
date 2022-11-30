@@ -1,0 +1,12 @@
+*.pyc
+*.db
+media/*
+media/min/*
+.idea/
+.git/
+gmap/fixtures
+*.sqlite3
+*.json
+*.bak
+*.mo
+venv/

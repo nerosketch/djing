@@ -1,0 +1,30 @@
+version: '3.5'
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=password
+      - MARIADB_DATABASE=djing_db
+      - MARIADB_INITDB_SKIP_TZINFO=y
+    volumes:
+      - db-data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+  app:
+    image: nerosketch/djing:latest
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - media-data:/var/www/djing/media
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8000:8000
+
+volumes:
+  db-data:
+  media-data:
+  nginx_logs:

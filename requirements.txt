@@ -12,14 +12,13 @@ dicttoxml==1.7.4
 # db client for Mariadb
 mysqlclient
 
-git+git://github.com/nerosketch/easysnmp.git#egg=easysnmp
+https://github.com/nerosketch/easysnmp/archive/refs/tags/0.2.5.zip#egg=easysnmp
 pid==3.0.4
 django-guardian==2.3.0
 pinax-theme-bootstrap==8.0.1
 django-bootstrap3==14.1.0
 
-# django-jsonfield
--e git://github.com/dmkoch/django-jsonfield.git#egg=django-jsonfield
+jsonfield
 
 requests==2.24.0
 webdavclient==1.0.8
@@ -27,22 +26,23 @@ transliterate==1.10.2
 django-encrypted-model-fields==0.5.8
 
 # django-xmlview for pay system allpay
--e git://github.com/nerosketch/django-xmlview.git#egg=django-xmlview
+https://github.com/nerosketch/django-xmlview/archive/refs/tags/v0.0.2.zip#egg=django-xmlview
 
 # django-bitfield
--e git://github.com/disqus/django-bitfield.git#egg=django-bitfield
+https://github.com/disqus/django-bitfield/archive/refs/tags/2.2.0.zip#egg=django-bitfield
 
 # django_cleanup for clean unused media
--e git://github.com/un1t/django-cleanup.git#egg=django_cleanup
+https://github.com/un1t/django-cleanup/archive/refs/tags/6.0.0.zip#egg=django_cleanup
 
 # viberbot
--e git://github.com/Viber/viber-bot-python.git#egg=viberbot
+https://github.com/Viber/viber-bot-python/archive/refs/tags/1.0.11.zip#egg=viberbot
 
 # pexpect
--e git://github.com/pexpect/pexpect.git#egg=pexpect
+https://github.com/pexpect/pexpect/archive/refs/tags/4.8.0.zip#egg=pexpect
 
 Celery
 redis==3.5.3
 celery[redis]
 
 docxtpl
+gunicorn
